@@ -17,26 +17,19 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "LVR.h"
+/* Some not module-specific or widely used constants / defines / macros goes here */
 
-LVR::LVR(DataPipe* pipe)
-{
-	pipeptr = pipe;
-	render = NULL;
-	rendsize = 0;
-}
+#ifndef MISCONSTS_H_
+#define MISCONSTS_H_
 
-LVR::~LVR()
-{
-	//TODO
-}
+#define MAXPATHLEN 1024
 
-bool LVR::Resize(int w, int h)
-{
-	if (w < 1) w = 0;
-	if (h < 1) h = 0;
-	rendsize = w * h;
+/*
+ * I don't want to use <inttypes.h> because it causes all kinds of problems
+ * on different platforms. Or even with different versions of glibc inclusion files.
+ */
+typedef unsigned long long int ulli; //for short
+typedef unsigned long int uli;
 
-	render = (SGUIPixel*)realloc(render,rendsize);
-	return (render != NULL);
-}
+
+#endif /* MISCONSTS_H_ */

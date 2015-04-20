@@ -23,9 +23,15 @@
 #include "plastic.h"
 #include "visual.h"
 #include "support.h"
+#include "datapipe.h"
+#include "LVR.h"
 
-static SGameSettings g_set = DEFAULT_SETTINGS;
-static CurseGUI* g_gui = NULL;
+
+static SGameSettings	g_set = DEFAULT_SETTINGS;
+static CurseGUI*		g_gui = NULL;
+static DataPipe*		g_data = NULL;
+static LVR*				g_lvr = NULL;
+
 
 /* *********************************************************** */
 
@@ -36,13 +42,39 @@ static void plastic_shell()
 
 static void plastic_start()
 {
+	float alloc_gb;
+
+	g_data = new DataPipe(g_set.root);
+	if (g_data->GetStatus() == DPIPE_ERROR) {
+		errout("Unable to initialize data pipe. Possibly invalid root directory.\n");
+		abort();
+	}
+	alloc_gb = (float)(g_data->GetAllocatedRAM()) / 1024.f / 1024.f / 1024.f;
+	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
+	printf("Allocated chunks memory: %llu bytes (%.3f GiB)\n",g_data->GetAllocatedRAM(),alloc_gb);
+
 	g_gui = new CurseGUI();
 	if (g_gui->GetLastResult()) {
 		errout("Unable to create CurseGUI!\n");
 		abort();
 	}
+
+	g_lvr = new LVR(g_data);
+	if (!g_lvr->Resize(g_gui->GetWidth(),g_gui->GetHeight())) {
+		errout("Unable to resize LVR render window!\n");
+		abort();
+	}
+
+	g_gui->SetBackgroundData(g_lvr->GetRender(),g_lvr->GetRenderLen());
+
 	//TODO
+}
+
+static void plastic_cleanup()
+{
 	delete g_gui;
+	delete g_lvr;
+	delete g_data;
 }
 
 /* *********************************************************** */
@@ -57,6 +89,8 @@ int main(int argc, char* argv[])
 	if (g_set.use_shell) plastic_shell();
 
 	plastic_start();
+	//TODO: main loop
+	plastic_cleanup();
 
 	printf("\n\n\nGood exit.\n");
 	return 0;

@@ -17,26 +17,21 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "LVR.h"
+#ifndef VOXEL_H_
+#define VOXEL_H_
 
-LVR::LVR(DataPipe* pipe)
-{
-	pipeptr = pipe;
-	render = NULL;
-	rendsize = 0;
-}
+///Number of voxels at a side of chunk.
+#define CHUNKBOX 256
 
-LVR::~LVR()
-{
-	//TODO
-}
+///Number of chunks in current active buffers.
+#define HOLDCHUNKS 27
 
-bool LVR::Resize(int w, int h)
-{
-	if (w < 1) w = 0;
-	if (h < 1) h = 0;
-	rendsize = w * h;
+///Main voxel data type. Used as index.
+typedef unsigned short int voxel; //must be a 16-bit wide
 
-	render = (SGUIPixel*)realloc(render,rendsize);
-	return (render != NULL);
-}
+///Chunk data type
+typedef voxel VChunk[CHUNKBOX][CHUNKBOX][CHUNKBOX];
+typedef VChunk * PChunk;
+
+
+#endif /* VOXEL_H_ */

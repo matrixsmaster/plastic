@@ -73,8 +73,8 @@ void CurseGUIBase::UpdateBack()
 	wcolor_set(wnd,1,NULL);
 	lc = -1;
 	for (i = 0; i < g_h; i++) {
-		for (j = 0; j < g_w; j++) {
-			lin = i * g_w + j;
+		lin = i * g_w;
+		for (j = 0; j < g_w; j++,lin++) {
 			if (lc != backgr[lin].col) {
 				if (l > 0) {
 					wcolor_set(wnd,lc,NULL);

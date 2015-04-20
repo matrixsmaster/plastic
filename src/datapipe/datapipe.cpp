@@ -17,4 +17,54 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <stdlib.h>
+#include <string.h>
 #include "datapipe.h"
+
+DataPipe::DataPipe(char* root)
+{
+	int i;
+	unsigned l;
+
+	status = DPIPE_ERROR;
+	memset(chunks,0,sizeof(chunks));
+	allocated = 0;
+
+	if (!ScanFiles()) return;
+
+	//allocate chunks buffers memory
+	l = CHUNKBOX * CHUNKBOX * CHUNKBOX * sizeof(voxel);
+	for (i = 0; i < HOLDCHUNKS; i++) {
+		chunks[i] = (PChunk)malloc(l);
+		if (!chunks[i]) {
+			PurgeChunks();
+			return;
+		}
+		allocated += l;
+	}
+
+	//All clear.
+	status = DPIPE_NOTREADY;
+}
+
+DataPipe::~DataPipe()
+{
+	PurgeChunks();
+}
+
+bool DataPipe::ScanFiles()
+{
+	//TODO: scan world files to map known chunks
+	return true;
+}
+
+void DataPipe::PurgeChunks()
+{
+	int i;
+	for (i = 0; i < HOLDCHUNKS; i++)
+		if (chunks[i]) {
+			free(chunks[i]);
+			chunks[i] = NULL;
+		}
+	allocated = 0;
+}

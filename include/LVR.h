@@ -20,8 +20,25 @@
 #ifndef LVR_H_
 #define LVR_H_
 
-class LVRPipe {
-	//TODO
+#include "voxel.h"
+#include "datapipe.h"
+#include "misconsts.h"
+#include "CurseGUI.h"
+
+
+class LVR {
+private:
+	DataPipe* pipeptr;
+	SGUIPixel* render;
+	uli rendsize;
+
+public:
+	LVR(DataPipe* pipe);
+	virtual ~LVR();
+
+	SGUIPixel* GetRender()		{ return render; }
+	uli GetRenderLen()			{ return rendsize; }
+	bool Resize(int w, int h);
 };
 
 #endif /* LVR_H_ */

@@ -20,6 +20,31 @@
 #ifndef DATAPIPE_H_
 #define DATAPIPE_H_
 
+#include "voxel.h"
+#include "misconsts.h"
 
+enum EDPipeStatus {
+	DPIPE_NOTREADY,
+	DPIPE_ERROR,
+	DPIPE_IDLE,
+	DPIPE_BUSY
+};
+
+class DataPipe {
+private:
+	PChunk chunks[HOLDCHUNKS];
+	EDPipeStatus status;
+	ulli allocated;
+
+	bool ScanFiles();
+
+public:
+	DataPipe(char*);
+	virtual ~DataPipe();
+
+	EDPipeStatus GetStatus()	{ return status; }
+	ulli GetAllocatedRAM()		{ return allocated; }
+	void PurgeChunks();
+};
 
 #endif /* DATAPIPE_H_ */
