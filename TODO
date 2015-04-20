@@ -32,3 +32,4 @@ to prims:  void GenCubeQ(T3dPoint cnt, double sz, T3dPoint* buf);
 
 -> Implement interactive startup shell
 
+-> Implement debug window (CurseGUIDbgWnd)

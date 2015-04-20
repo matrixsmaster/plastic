@@ -23,7 +23,7 @@ CurseGUIBase::CurseGUIBase()
 
 CurseGUIBase::~CurseGUIBase()
 {
-	//
+	//FIXME: delete this if not needed.
 }
 
 bool CurseGUIBase::UpdateSize()
@@ -99,7 +99,6 @@ CurseGUI::CurseGUI()
 	noecho();
 	cbreak();
 	keypad(wnd,TRUE);
-//	leaveok(wnd,TRUE);
 	start_color();
 
 	refresh();
@@ -187,7 +186,6 @@ CurseGUIWnd* CurseGUI::GetWindowN(int no)
 CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 {
 	wnd = subwin(scrn->GetWindow(),h,w,y,x);
-//	wnd = newwin(h,w,y,x);
 	if (wnd) {
 		g_w = w;
 		g_h = h;
@@ -210,7 +208,6 @@ void CurseGUIWnd::Move(int x, int y)
 {
 	if ((x < 0) || (y < 0)) return;
 	mvderwin(wnd,y,x);
-//	touchwin(wnd);
 }
 
 void CurseGUIWnd::Resize(int w, int h)
