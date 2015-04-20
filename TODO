@@ -1,6 +1,30 @@
 This file used to track current jobs and their completion.
 
 -> Combine vector math from GWIC' CPoint2D and a3dtest' T3dPoint. Merge'em into vecmath.h/.cpp. Translate them all to classes.
+implementation:
+OK  T3dPoint PntPlusPnt(T3dPoint a, T3dPoint b);
+OK  T3dPoint PntMinusPnt(T3dPoint a, T3dPoint b);
+OK  T3dPoint PntMinusPntAbs(T3dPoint a, T3dPoint b);
+OK  T3dPoint PntMulPnt(T3dPoint a, T3dPoint b);
+OK  double PntDotPnt(T3dPoint a, T3dPoint b);
+OK  T3dPoint PntMulScal(T3dPoint a, double s);
+OK  double Pnt2PntLen(T3dPoint a, T3dPoint b);
+OK  T3dPoint PntHalf(T3dPoint a, T3dPoint b);
+to vecmisc:  T3dPoint CenterPoint(T3dPoint* pts, int n);
+to vecmisc:  bool AxSect(const double a, const double b, const double x);
+to vecmisc:  T3dPoint InterpolatePntByX(T3dPoint a, T3dPoint b, double x);
+to vecmisc:  T3dPoint InterpolatePntByY(T3dPoint a, T3dPoint b, double y);
+to vecmisc:  T3dPoint InterpolatePntByZ(T3dPoint a, T3dPoint b, double z);
+to vecmisc:  double InterpolateZQ(T3dPoint* pts, double x, double y);
+to vecmisc:  double InterpolateZQ2(T3dPoint* pts, double x, double y);
+to vecmisc:  void SortVectors(T3dPoint* arr, const int n, const int axis);
+OK  bool isPntEqual(T3dPoint a, T3dPoint b);
+OK  bool isPntIntEqual(T3dPointInt a, T3dPointInt b);
+to vecmisc:  int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy);
+to vecmisc:  bool isPntRectIsect(T3dPoint aim, T3dPoint ul, T3dPoint br);
+to vecmisc:  bool isPntPoly4Isect(T3dPoint aim, T3dPoint a, T3dPoint b, T3dPoint c, T3dPoint d);
+to prims:  void GenPlaneQ(int plane, T3dPoint cnt, double sz, T3dPoint* buf);
+to prims:  void GenCubeQ(T3dPoint cnt, double sz, T3dPoint* buf);
 
 -> Fill in some short info into README.md
 

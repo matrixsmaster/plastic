@@ -10,7 +10,7 @@
 #include "CPoint2D.h"
 #include <math.h>
 
-double CPoint2D::Module()
-{
-	return sqrt(X*X + Y*Y);
-}
+//double CPoint2D::Module()
+//{
+//
+//}
