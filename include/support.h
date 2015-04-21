@@ -23,6 +23,8 @@
 #include <stdarg.h>
 #include "plastic.h"
 
+#define BOOLSTR(X) ((X)? "ON":"OFF")
+
 /// Prints out SGameSettings data.
 void printsettings(SGameSettings* s);
 

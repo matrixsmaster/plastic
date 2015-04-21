@@ -26,7 +26,9 @@
 
 void printsettings(SGameSettings* s)
 {
-	//TODO
+	printf("\n%s settings:\n",PRODNAME);
+	printf("Root dir:\t\t%s\n",s->root);
+	printf("Use startup shell:\t%s\n",BOOLSTR(s->use_shell));
 }
 
 void errout(char const* fmt, ...)

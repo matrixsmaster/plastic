@@ -53,10 +53,12 @@ static void* plastic_eventhread(void* ptr)
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 		if (g_gui->UpdateSize()) {
+			/* Size of terminal has changed */
 			//TODO: do something :)
 		}
 
 		if (!g_gui->PumpEvents(&my_e)) {
+			/* No one consumed event, need to be processed */
 			switch (my_e) {
 			case 'n':
 				dbgwnd = new CurseGUIDebugWnd(g_gui,1,1,20,10);
@@ -68,6 +70,7 @@ static void* plastic_eventhread(void* ptr)
 		//temporarily there
 		g_gui->Update(true);
 
+		/* To keep CPU load low */
 		usleep(EVENTUSLEEP);
 	}
 	return NULL;
@@ -77,6 +80,7 @@ static void plastic_start()
 {
 	float alloc_gb;
 
+	/* Create and set up DataPipe */
 	g_data = new DataPipe(g_set.root);
 	if (g_data->GetStatus() == DPIPE_ERROR) {
 		errout("Unable to initialize data pipe. Possibly invalid root directory.\n");
@@ -86,30 +90,37 @@ static void plastic_start()
 	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
 	printf("Allocated chunks memory: %llu bytes (%.3f GiB)\n",g_data->GetAllocatedRAM(),alloc_gb);
 
+	/* Make a CurseGUI */
 	g_gui = new CurseGUI();
 	if (g_gui->GetLastResult()) {
 		errout("Unable to create CurseGUI!\n");
 		abort();
 	}
 
+	/* Init LVR */
 	g_lvr = new LVR(g_data);
 	if (!g_lvr->Resize(g_gui->GetWidth(),g_gui->GetHeight())) {
 		errout("Unable to resize LVR render window!\n");
 		abort();
 	}
 
+	/* Connect lvr output to CurseGUI main background */
 //	g_gui->SetBackgroundData(g_lvr->GetRender(),g_lvr->GetRenderLen());
 
+	/* Start events processing thread */
 	pthread_create(&t_event,NULL,plastic_eventhread,NULL);
 }
 
 static void plastic_cleanup()
 {
+	/* Join all active threads */
 	if (t_event) {
 		errout("Closing events thread... ");
 		pthread_join(t_event,NULL);
 		errout("OK\n");
 	}
+
+	/* Destroy all main classes instances */
 	if (g_gui) delete g_gui;
 	if (g_lvr) delete g_lvr;
 	if (g_data) delete g_data;
