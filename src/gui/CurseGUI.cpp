@@ -162,6 +162,11 @@ CurseGUIWnd* CurseGUI::MkWindow(int x, int y, int w, int h)
 	return nwd;
 }
 
+void CurseGUI::AddWindow(CurseGUIWnd* n_wnd)
+{
+	if (n_wnd) windows.push_back(n_wnd);
+}
+
 bool CurseGUI::RmWindow(CurseGUIWnd* ptr)
 {
 	std::vector<CurseGUIWnd*>::iterator it;
@@ -197,21 +202,20 @@ CurseGUIWnd* CurseGUI::GetWindowN(int no)
 	return (windows[no]);
 }
 
-void CurseGUI::PumpEvents()
+bool CurseGUI::PumpEvents(CGUIEvent* e)
 {
 	int i;
-	CGUIEvent e;
 	bool consumed = false;
+	result = 1;
 
-	if (will_close) return;
+	if (will_close) return true; //to not process event furthermore
 
 	//FIXME: use something more robust than that
-	e = getch();
-	result = 1;
-	if ((!e) || (e == ERR)) return;
+	*e = getch();
+	if ((!(*e)) || ((*e) == ERR)) return true; //Event consumed 'cause there's no event!
 
 	for (i = windows.size() - 1; i >= 0; i--) {
-		if (windows[i]->PutEvent(e)) {
+		if (windows[i]->PutEvent(*e)) {
 			consumed = true;
 			if (windows[i]->WillClose()) RmWindow(i);
 			break;
@@ -219,13 +223,14 @@ void CurseGUI::PumpEvents()
 	}
 
 	if (!consumed) {
-		switch (e) {
+		switch (*e) {
 		case 'q': will_close = true; break;
 		default: break; //to make compiler happy
 		}
 	}
 
 	result = 0;
+	return consumed;
 }
 
 CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)

@@ -27,7 +27,9 @@
 #include "support.h"
 #include "datapipe.h"
 #include "LVR.h"
-#include "CGUIEvents.h"
+#include "CurseGUI.h"
+#include "CGUISpecWnd.h"
+
 
 
 static SGameSettings	g_set = DEFAULT_SETTINGS;
@@ -46,12 +48,25 @@ static void plastic_shell()
 
 static void* plastic_eventhread(void* ptr)
 {
+	CGUIEvent my_e;
+	CurseGUIDebugWnd* dbgwnd;
+
 	while ((g_gui) && (!g_gui->WillClose())) {
 		if (g_gui->UpdateSize()) {
 			//TODO: do something :)
 		}
 
-		g_gui->PumpEvents();
+		if (!g_gui->PumpEvents(&my_e)) {
+			switch (my_e) {
+			case 'n':
+				dbgwnd = new CurseGUIDebugWnd(g_gui,1,1,20,10);
+				g_gui->AddWindow(dbgwnd);
+				break;
+			}
+		}
+
+		//temporarily there
+		g_gui->Update(true);
 
 		usleep(EVENTUSLEEP);
 	}
@@ -83,7 +98,7 @@ static void plastic_start()
 		abort();
 	}
 
-	g_gui->SetBackgroundData(g_lvr->GetRender(),g_lvr->GetRenderLen());
+//	g_gui->SetBackgroundData(g_lvr->GetRender(),g_lvr->GetRenderLen());
 
 	pthread_create(&t_event,NULL,plastic_eventhread,NULL);
 }

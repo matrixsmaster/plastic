@@ -106,6 +106,9 @@ public:
 	///Create new CurseGUI window.
 	CurseGUIWnd* MkWindow(int x, int y, int w, int h);
 
+	///Register CurseGUI window created outside.
+	void AddWindow(CurseGUIWnd* n_wnd);
+
 	///Remove CurseGUI window by its' pointer.
 	bool RmWindow(CurseGUIWnd* ptr);
 
@@ -122,7 +125,8 @@ public:
 	CurseGUIWnd* GetWindowN(int no);
 
 	///Push events through all windows and controls.
-	void PumpEvents();
+	///Returns whatever event was consumed or not.
+	bool PumpEvents(CGUIEvent* e);
 };
 
 class CurseGUIWnd : public CurseGUIBase {
