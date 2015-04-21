@@ -17,26 +17,12 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef VOXEL_H_
-#define VOXEL_H_
+#ifndef PRIMS_H_
+#define PRIMS_H_
 
-///Number of voxels at a side of chunk.
-#define CHUNKBOX 256
+#include "vecmath.h"
 
-///Number of chunks in current active buffers.
-#define HOLDCHUNKS 1
+void GenPlaneQ(int plane, vector3d cnt, double sz, vector3d* buf);
+void GenCubeQ(vector3d cnt, double sz, vector3d* buf);
 
-///Main voxel data type. Used as index.
-typedef unsigned short int voxel; //must be a 16-bit wide
-
-///Voxel index info structure.
-struct SVoxelInf {
-	short col;
-};
-
-///Chunk data type
-typedef voxel VChunk[CHUNKBOX][CHUNKBOX][CHUNKBOX];
-typedef VChunk * PChunk;
-
-
-#endif /* VOXEL_H_ */
+#endif /* PRIMS_H_ */

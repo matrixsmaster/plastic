@@ -20,6 +20,43 @@
 #ifndef VECMISC_H_
 #define VECMISC_H_
 
+#include "vecmath.h"
 
+#define SORTVEC_2DDIST	4
+#define SORTVEC_3DDIST	0
+#define SORTVEC_BYX		1
+#define SORTVEC_BYY		2
+#define SORTVEC_BYZ		3
+
+#define SWAPVEC(A,B,Sw) { Sw = A; A = B; B = Sw; }
+
+/*
+ * PNPOLY - Point Inclusion in Polygon Test
+ * (C) W. Randolph Franklin (WRF)
+ */
+int pnpoly(int nvert, float *vertx, float *verty, float testx, float testy);
+
+//FIXME: use vector2d instead of 3d
+
+///Test inclusion of 2D point in rectangle described by given UpperLeft and BottomRight.
+bool isPntRectIsect2D(vector3d aim, vector3d ul, vector3d br);
+
+///Test inclusion of 2D point in polygon with four vertices.
+bool isPntPoly4Isect2D(vector3d aim, vector3d a, vector3d b, vector3d c, vector3d d);
+
+///Returns medium point of N-Gon.
+vector3d CenterPoint(vector3d* pts, int n);
+
+///Returns true if a value X lies in gap [a;b].
+bool AxSect(const double a, const double b, const double x);
+
+///Set of interpolation functions for Z-buffer operations.
+vector3d InterpolatePntByX(vector3d a, vector3d b, double x);
+vector3d InterpolatePntByY(vector3d a, vector3d b, double y);
+vector3d InterpolatePntByZ(vector3d a, vector3d b, double z);
+double InterpolateZQ(vector3d* pts, double x, double y);
+
+///Vectors sorting.
+void SortVectors(vector3d* arr, const int n, const int axis);
 
 #endif /* VECMISC_H_ */

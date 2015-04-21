@@ -24,13 +24,18 @@
 #include "datapipe.h"
 #include "misconsts.h"
 #include "CurseGUI.h"
+#include "vecmath.h"
+#include "mtx3d.h"
 
 
 class LVR {
 private:
 	DataPipe* pipeptr;
 	SGUIPixel* render;
+	float* zbuf;
 	uli rendsize;
+	SMatrix3d rot[3];
+	vector3d offset;
 
 public:
 	LVR(DataPipe* pipe);
@@ -39,6 +44,9 @@ public:
 	SGUIPixel* GetRender()		{ return render; }
 	uli GetRenderLen()			{ return rendsize; }
 	bool Resize(int w, int h);
+	void SetEulerRotation(vector3d r);
+	void SetPosition(vector3d pos);
+	void Frame();
 };
 
 #endif /* LVR_H_ */

@@ -18,3 +18,22 @@
  */
 
 #include "vecmath.h"
+
+CPoint3D CPoint3D::HalfWay(const CPoint3D s)
+{
+	CPoint3D r;
+	r.X = (fabs(X-s.X)/2) + fmin(X,s.X);
+	r.Y = (fabs(Y-s.Y)/2) + fmin(Y,s.Y);
+	r.Z = (fabs(Z-s.Z)/2) + fmin(Z,s.Z);
+	return r;
+}
+
+double CPoint3D::DistanceTo(const CPoint3D s)
+{
+	//TODO
+}
+
+int CPoint3D::fcompare(const double a, const double b)
+{
+	//TODO
+}

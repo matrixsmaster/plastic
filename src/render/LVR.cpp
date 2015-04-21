@@ -17,18 +17,22 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <stdlib.h>
 #include "LVR.h"
 
 LVR::LVR(DataPipe* pipe)
 {
 	pipeptr = pipe;
 	render = NULL;
+	zbuf = NULL;
 	rendsize = 0;
+	memset(rot,0,sizeof(rot));
 }
 
 LVR::~LVR()
 {
-	//TODO
+	if (render) free(render);
+	if (zbuf) free(zbuf);
 }
 
 bool LVR::Resize(int w, int h)
@@ -38,5 +42,24 @@ bool LVR::Resize(int w, int h)
 	rendsize = w * h;
 
 	render = (SGUIPixel*)realloc(render,rendsize);
-	return (render != NULL);
+	zbuf = (float*)realloc(zbuf,rendsize);
+
+	return ((render != NULL) && (zbuf != NULL));
+}
+
+void LVR::SetEulerRotation(vector3d r)
+{
+	rot[0] = GenMtxRotX(r.X * M_PI / 180.f);
+	rot[1] = GenMtxRotY(r.Y * M_PI / 180.f);
+	rot[2] = GenMtxRotZ(r.Z * M_PI / 180.f);
+}
+
+void LVR::SetPosition(vector3d pos)
+{
+	offset = pos;
+}
+
+void LVR::Frame()
+{
+	//
 }
