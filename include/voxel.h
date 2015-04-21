@@ -26,6 +26,9 @@
 ///Number of chunks in current active buffers.
 #define HOLDCHUNKS 1
 
+///Number of intial voxel types.
+#define DEFVOXTYPES 5
+
 ///Main voxel data type. Used as index.
 typedef unsigned short int voxel; //must be a 16-bit wide
 
@@ -35,7 +38,7 @@ struct SVoxelInf {
 	char sides[6];
 };
 
-///Chunk data type
+///Chunk data type {[z][y][x]}
 typedef voxel VChunk[CHUNKBOX][CHUNKBOX][CHUNKBOX];
 typedef VChunk * PChunk;
 

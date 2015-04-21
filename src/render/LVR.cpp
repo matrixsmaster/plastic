@@ -28,7 +28,7 @@ LVR::LVR(DataPipe* pipe)
 	render = NULL;
 	zbuf = NULL;
 	rendsize = 0;
-	table = NULL;
+	table = pipe->GetVoxTable();
 	for (i = 0; i < 3; i++) rot[i] = GenOMatrix();
 }
 
@@ -44,8 +44,8 @@ bool LVR::Resize(int w, int h)
 	if (h < 1) h = 0;
 	rendsize = w * h;
 
-	render = (SGUIPixel*)realloc(render,rendsize);
-	zbuf = (float*)realloc(zbuf,rendsize);
+	render = (SGUIPixel*)realloc(render,rendsize*sizeof(SGUIPixel));
+	zbuf = (float*)realloc(zbuf,rendsize*sizeof(float));
 
 	return ((render != NULL) && (zbuf != NULL));
 }
@@ -64,5 +64,8 @@ void LVR::SetPosition(vector3d pos)
 
 void LVR::Frame()
 {
+	memset(render,0,rendsize*sizeof(SGUIPixel));
+	memset(zbuf,0,rendsize*sizeof(float));
+
 	if (!table) return;
 }

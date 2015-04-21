@@ -24,6 +24,7 @@
 
 #define COLPAIRS 7
 
+//FIXME: this tab should be linked with voxel types. Or shouldn't it?
 static const struct SGUIWCol gui_coltable[COLPAIRS] = {
 		{COLOR_WHITE,COLOR_BLACK}, //the first one is default
 		{COLOR_WHITE,COLOR_BLUE},

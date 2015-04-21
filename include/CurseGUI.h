@@ -129,14 +129,18 @@ public:
 	bool PumpEvents(CGUIEvent* e);
 };
 
+/* CurseGUI Window Base Class */
 class CurseGUIWnd : public CurseGUIBase {
+private:
+	bool focused;
+
 public:
 	CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h);
 	virtual ~CurseGUIWnd();
-	void Update(bool refr);
-	void Move(int x, int y);
-	void Resize(int w, int h);
-	bool PutEvent(CGUIEvent e);
+	virtual void Update(bool refr);
+	virtual void Move(int x, int y);
+	virtual void Resize(int w, int h);
+	virtual bool PutEvent(CGUIEvent e);
 };
 
 #endif /* CURSEGUI_H_ */

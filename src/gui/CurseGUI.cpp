@@ -240,6 +240,7 @@ CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 		g_w = w;
 		g_h = h;
 	}
+	focused = true;
 }
 
 CurseGUIWnd::~CurseGUIWnd()
@@ -268,7 +269,7 @@ void CurseGUIWnd::Resize(int w, int h)
 
 bool CurseGUIWnd::PutEvent(CGUIEvent e)
 {
-	if (will_close) return false;
+	if (will_close || (!focused)) return false;
 
 	switch (e) {
 	case 'q': will_close = true; return true;

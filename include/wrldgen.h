@@ -17,36 +17,27 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef PLASTIC_H_
-#define PLASTIC_H_
+#ifndef WRLDGEN_H_
+#define WRLDGEN_H_
 
-#include "misconsts.h"
+#include "voxel.h"
 
-
-#ifndef BUILDNO
-#define BUILDNO 1
-#endif
-
-#define VERMAJOR 0
-#define VERMINOR 0
-
-#define PRODNAME "Plastic Inquisitor"
-
-#define HELLOSTR  "%s ver.%d.%d build %d\n\
-Copyright (C) 2015, The Plastic Team\n\
-%s comes with ABSOLUTELY NO WARRANTY.\n\
-This is free software, and you are welcome to redistribute it\n\
-under conditions of GNU GPL v2\n\n"
-
-
-struct SGameSettings {
-	char root[MAXPATHLEN];
-	bool use_shell;
+struct SWorldGenState {
+	int medium;
+	int water;
+	float slope;
+	//TODO
 };
 
-#define DEFAULT_SETTINGS { \
-	{'.',0},		\
-	true 			\
-}
+class WorldGen {
+private:
+	SWorldGenState state;
 
-#endif /* PLASTIC_H_ */
+public:
+	WorldGen();
+	virtual ~WorldGen();
+
+	void GenerateChunk(PChunk buf);
+};
+
+#endif /* WRLDGEN_H_ */

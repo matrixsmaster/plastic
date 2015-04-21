@@ -22,33 +22,35 @@
 
 #include <math.h>
 
-class CPoint2D {
+template <class T> class CPoint2D {
 public:
 	CPoint2D() : 								X(0), Y(0) {}
-	CPoint2D(int x, int y) : 					X(x), Y(y) {}
-	CPoint2D(int both) : 						X(both), Y(both) {}
+	CPoint2D(T x, T y) : 						X(x), Y(y) {}
+	CPoint2D(T both) : 							X(both), Y(both) {}
 	CPoint2D(const CPoint2D & nw) : 			X(nw.X), Y(nw.Y) {}
 	virtual ~CPoint2D()							{}
 	CPoint2D & operator = (const CPoint2D & other) 		{ X=other.X; Y=other.Y; return *this; }
 	CPoint2D operator + (const CPoint2D & add) const 	{return CPoint2D((X+add.X),(Y+add.Y));}
 	CPoint2D operator - (const CPoint2D & sub) const 	{return CPoint2D((X-sub.X),(Y-sub.Y));}
-	CPoint2D & operator += (const int add) 				{ X+=add; Y+=add; return *this; }
-	CPoint2D & operator -= (const int sub) 				{ X-=sub; Y-=sub; return *this; }
+	CPoint2D & operator += (const T add) 				{ X+=add; Y+=add; return *this; }
+	CPoint2D & operator -= (const T sub) 				{ X-=sub; Y-=sub; return *this; }
 	CPoint2D & operator += (const CPoint2D add)	 		{ X+=add.X; Y+=add.X; return *this; }
 	CPoint2D & operator -= (const CPoint2D sub) 		{ X-=sub.Y; Y-=sub.Y; return *this; }
-	CPoint2D & operator *= (const int imul) 			{ X*=imul; Y*=imul; return *this; }
-	CPoint2D & operator /= (const int idiv) 			{ X/=idiv; Y/=idiv; return *this; }
-	CPoint2D operator * (const int imul) const 			{ return CPoint2D((X*imul),(Y*imul)); }
-	CPoint2D operator / (const int idiv) const 			{ return CPoint2D((X/idiv),(Y/idiv)); }
+	CPoint2D & operator *= (const T imul) 				{ X*=imul; Y*=imul; return *this; }
+	CPoint2D & operator /= (const T idiv) 				{ X/=idiv; Y/=idiv; return *this; }
+	CPoint2D operator * (const T imul) const 			{ return CPoint2D((X*imul),(Y*imul)); }
+	CPoint2D operator / (const T idiv) const 			{ return CPoint2D((X/idiv),(Y/idiv)); }
 	bool operator == (const CPoint2D & comp) const 		{return ((X==comp.X) && (Y==comp.Y));}
 	bool operator != (const CPoint2D & comp) const 		{return ((X!=comp.X) || (Y!=comp.Y));}
 	double Module() const 								{ return sqrt(X*X + Y*Y); }
-	int X;
-	int Y;
+	T X;
+	T Y;
 };
 
-typedef CPoint2D vector2di;
+typedef CPoint2D<int> vector2di;
 
+
+/* CPoint3D is basically for a real values, so we don't make a template of it */
 class CPoint3D {
 public:
 	CPoint3D() : 								X(0), Y(0), Z(0), epsilon(0) {}
@@ -86,6 +88,35 @@ public:
 };
 
 typedef CPoint3D vector3d;
+
+
+/* CPoint3D strict version for integer values, made as a template */
+template <class T> class CPoint3Di {
+public:
+	CPoint3Di() : 								X(0), Y(0), Z(0) {}
+	CPoint3Di(T x, T y, T z) :					X(x), Y(y), Z(z) {}
+	CPoint3Di(T all) :							X(all), Y(all), Z(all) {}
+	CPoint3Di(const CPoint3Di & nw) :			X(nw.X), Y(nw.Y), Z(nw.Z) {}
+	virtual ~CPoint3Di()						{}
+	CPoint3Di & operator = (const CPoint3Di & old) 		{ X=old.X; Y=old.Y; Z=old.Z; return *this; }
+	CPoint3Di operator + (const CPoint3Di & add) const	{return CPoint3Di((X+add.X),(Y+add.Y),(Z+add.Z));}
+	CPoint3Di operator - (const CPoint3Di & sub) const	{return CPoint3Di((X-sub.X),(Y-sub.Y),(Z-sub.Z));}
+	CPoint3Di & operator += (const T add)				{ X+=add; Y+=add; Z+=add; return *this; }
+	CPoint3Di & operator -= (const T sub)				{ X-=sub; Y-=sub; Z-=sub; return *this; }
+	CPoint3Di & operator += (const CPoint3Di add)		{ X+=add.X; Y+=add.X; Z+=add.Z; return *this; }
+	CPoint3Di & operator -= (const CPoint3Di sub)		{ X-=sub.Y; Y-=sub.Y; Z-=sub.Z; return *this; }
+	CPoint3Di & operator *= (const T fmul)				{ X*=fmul; Y*=fmul; Z*=fmul; return *this; }
+	CPoint3Di & operator /= (const T fdiv)				{ X/=fdiv; Y/=fdiv; Z/=fdiv; return *this; }
+	CPoint3Di operator * (const T fmul) const			{ return CPoint3Di((X*fmul),(Y*fmul),(Z*fmul)); }
+	CPoint3Di operator / (const T fdiv) const			{ return CPoint3Di((X/fdiv),(Y/fdiv),(Z/fdiv)); }
+	CPoint3Di operator * (const CPoint3Di & mul) const	{ return CPoint3Di((X*mul.X),(Y*mul.Y),(Z*mul.Z)); }
+	CPoint3Di operator / (const CPoint3Di & div) const	{ return CPoint3Di((X/div.X),(Y/div.Y),(Z/div.Z)); }
+	T X, Y, Z;
+};
+
+typedef CPoint3Di<int> vector3di;
+typedef CPoint3Di<long long int> vector3dlli;
+typedef CPoint3Di<unsigned long long int> vector3dulli;
 
 
 #endif /* VECMATH_H_ */

@@ -52,15 +52,22 @@ static void* plastic_eventhread(void* ptr)
 	CurseGUIDebugWnd* dbgwnd;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
+		/* Terminal window size change event */
 		if (g_gui->UpdateSize()) {
 			/* Size of terminal has changed */
-			//TODO: do something :)
+			if (!g_lvr->Resize(g_gui->GetWidth(),g_gui->GetHeight())) {
+				errout("Can't resize LVR frame!");
+				abort();
+			}
+			g_gui->SetBackgroundData(g_lvr->GetRender(),g_lvr->GetRenderLen());
+			//FIXME: do something :)
 		}
 
+		/* Keyboard events */
 		if (!g_gui->PumpEvents(&my_e)) {
 			/* No one consumed event, need to be processed */
 			switch (my_e) {
-			case 'n':
+			case 'n': /*test*/
 				dbgwnd = new CurseGUIDebugWnd(g_gui,1,1,20,10);
 				g_gui->AddWindow(dbgwnd);
 				break;
@@ -68,6 +75,7 @@ static void* plastic_eventhread(void* ptr)
 		}
 
 		//temporarily there
+		g_lvr->Frame();
 		g_gui->Update(true);
 
 		/* To keep CPU load low */
@@ -88,7 +96,7 @@ static void plastic_start()
 	}
 	alloc_gb = (float)(g_data->GetAllocatedRAM()) / 1024.f / 1024.f / 1024.f;
 	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
-	printf("Allocated chunks memory: %llu bytes (%.3f GiB)\n",g_data->GetAllocatedRAM(),alloc_gb);
+	printf("Allocated data pipe memory: %llu bytes (%.3f GiB)\n",g_data->GetAllocatedRAM(),alloc_gb);
 
 	/* Make a CurseGUI */
 	g_gui = new CurseGUI();
@@ -105,7 +113,11 @@ static void plastic_start()
 	}
 
 	/* Connect lvr output to CurseGUI main background */
-//	g_gui->SetBackgroundData(g_lvr->GetRender(),g_lvr->GetRenderLen());
+	g_gui->SetBackgroundData(g_lvr->GetRender(),g_lvr->GetRenderLen());
+
+	//DEBUG:
+	g_data->SetGP(vector3dulli(0));
+	g_lvr->SetPosition(vector3d(128));
 
 	/* Start events processing thread */
 	pthread_create(&t_event,NULL,plastic_eventhread,NULL);

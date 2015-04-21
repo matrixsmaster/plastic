@@ -22,8 +22,12 @@
 #ifndef DATAPIPE_H_
 #define DATAPIPE_H_
 
+#include <vector>
 #include "voxel.h"
 #include "misconsts.h"
+#include "vecmath.h"
+#include "wrldgen.h"
+
 
 enum EDPipeStatus {
 	DPIPE_NOTREADY,
@@ -41,14 +45,25 @@ enum EMoveDir {
 	PMOVE_EAST
 };
 
+struct SDataPlacement {
+	unsigned filenum;
+	vector3dulli pos;
+	long offset;
+};
+
 class DataPipe {
 private:
-	PChunk chunks[HOLDCHUNKS];		//world chunk buffers
+	PChunk chunks[HOLDCHUNKS];				//world chunk buffers
 	EDPipeStatus status;
-	ulli allocated;					//amount of allocated RAM
-	ulli gp_X, gp_Y, gp_Z;			//global position of central chunk
+	ulli allocated;							//amount of allocated RAM
+	vector3dulli gp;						//global position of central chunk
+	char root[MAXPATHLEN];					//root path
+	std::vector<SDataPlacement> placetab;	//chunk displacement table
+	WorldGen* wgen;							//world generator instance
+	SVoxelInf* voxeltab;					//voxel types table
 
 	bool ScanFiles();
+	bool FindChunk(vector3dulli pos, SDataPlacement* res);
 
 public:
 	DataPipe(char*);
@@ -60,11 +75,14 @@ public:
 	///Returns amount of RAM allocated by buffers.
 	ulli GetAllocatedRAM()		{ return allocated; }
 
+	///Returns a pointer to voxel info table.
+	SVoxelInf* GetVoxTable()	{ return voxeltab; }
+
 	///Discards all chunks buffers and release memory.
 	void PurgeChunks();
 
 	///Set up the global position of central chunk.
-	void SetGP(ulli x, ulli y, ulli z);
+	void SetGP(vector3dulli pos);
 
 	///Move the world to next chunk.
 	///Update chunks buffers either by loading or by generating.

@@ -20,26 +20,51 @@
 #include <stdlib.h>
 #include <string.h>
 #include "datapipe.h"
+#include "support.h"
 
-DataPipe::DataPipe(char* root)
+
+DataPipe::DataPipe(char* root_dir)
 {
 	int i;
+	size_t sz;
 
+	//init variables
 	status = DPIPE_ERROR;
 	memset(chunks,0,sizeof(chunks));
 	allocated = 0;
-	gp_X = gp_Y = gp_Z = 0;
+	memset(root,0,MAXPATHLEN);
 
-	if (!ScanFiles()) return;
+	//create the world generator
+	wgen = new WorldGen();
+
+	//allocate voxel info table
+	sz = DEFVOXTYPES * sizeof(SVoxelInf);
+	voxeltab = (SVoxelInf*)malloc(sz);
+	if (!voxeltab) {
+		errout("Unable to allocate RAM for voxel table.\n");
+		return;
+	}
+	memset(voxeltab,0,sz);
+	allocated += sz;
+
+	//scan world data files
+	i = strlen(root_dir);
+	if (i > 0) {
+		memcpy(root,root_dir,i);
+		if (!ScanFiles()) return;
+	} else
+		return;
 
 	//allocate chunks buffers memory
+	sz = sizeof(VChunk);
 	for (i = 0; i < HOLDCHUNKS; i++) {
-		chunks[i] = (PChunk)malloc(sizeof(VChunk));
+		chunks[i] = (PChunk)malloc(sz);
 		if (!chunks[i]) {
+			errout("Unable to allocate RAM for voxel chunk %d.\n",i);
 			PurgeChunks();
 			return;
 		}
-		allocated += sizeof(VChunk);
+		allocated += sz;
 	}
 
 	//All clear.
@@ -49,12 +74,26 @@ DataPipe::DataPipe(char* root)
 DataPipe::~DataPipe()
 {
 	PurgeChunks();
+	delete wgen;
 }
 
 bool DataPipe::ScanFiles()
 {
 	//TODO: scan world files to map known chunks
 	return true;
+}
+
+bool DataPipe::FindChunk(vector3dulli pos, SDataPlacement* res)
+{
+	std::vector<SDataPlacement>::iterator it;
+	if (!res) return false;
+
+	//TODO
+	for (it = placetab.begin(); it != placetab.end(); it++) {
+//		if ((*it)->)
+	}
+
+	return false; //FIXME
 }
 
 void DataPipe::PurgeChunks()
@@ -68,10 +107,15 @@ void DataPipe::PurgeChunks()
 	allocated = 0;
 }
 
-void DataPipe::SetGP(ulli x, ulli y, ulli z)
+void DataPipe::SetGP(vector3dulli pos)
 {
-	gp_X = x; gp_Y = y; gp_Z = z;
-	//TODO: load buffers to new position
+	SDataPlacement plc;
+	gp = pos;
+
+	//FIXME: search in all directions
+	if (!FindChunk(pos,&plc))
+		wgen->GenerateChunk(chunks[0]);
+
 	status = DPIPE_IDLE;
 }
 
