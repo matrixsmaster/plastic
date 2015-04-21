@@ -32,6 +32,8 @@
 #include <string.h>
 #include <ncurses.h>
 #include <vector>
+#include "CGUIEvents.h"
+
 
 struct SGUIWCol {
 //	char sym;
@@ -50,6 +52,7 @@ protected:
 	int g_w, g_h;
 	SGUIPixel* backgr;
 	int backgr_size;
+	bool will_close;
 
 	///Internal background updater.
 	void UpdateBack();
@@ -75,6 +78,9 @@ public:
 
 	///Specify background data buffer.
 	void SetBackgroundData(SGUIPixel* ptr, int size);
+
+	///Returns if the window or frame is going to close.
+	bool WillClose()		{ return will_close; }
 
 	virtual void Update(bool) = 0;
 };
@@ -114,6 +120,9 @@ public:
 
 	///Returns CurseGUI window pointer by window number.
 	CurseGUIWnd* GetWindowN(int no);
+
+	///Push events through all windows and controls.
+	void PumpEvents();
 };
 
 class CurseGUIWnd : public CurseGUIBase {
@@ -123,6 +132,7 @@ public:
 	void Update(bool refr);
 	void Move(int x, int y);
 	void Resize(int w, int h);
+	bool PutEvent(CGUIEvent e);
 };
 
 #endif /* CURSEGUI_H_ */

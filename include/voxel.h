@@ -31,7 +31,8 @@ typedef unsigned short int voxel; //must be a 16-bit wide
 
 ///Voxel index info structure.
 struct SVoxelInf {
-	short col;
+	short color;
+	char sides[6];
 };
 
 ///Chunk data type

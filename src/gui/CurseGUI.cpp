@@ -32,6 +32,7 @@ CurseGUIBase::CurseGUIBase()
 	backgr_size = 0;
 	result = 0;
 	g_w = g_h = 0;
+	will_close = false;
 }
 
 CurseGUIBase::~CurseGUIBase()
@@ -196,6 +197,37 @@ CurseGUIWnd* CurseGUI::GetWindowN(int no)
 	return (windows[no]);
 }
 
+void CurseGUI::PumpEvents()
+{
+	int i;
+	CGUIEvent e;
+	bool consumed = false;
+
+	if (will_close) return;
+
+	//FIXME: use something more robust than that
+	e = getch();
+	result = 1;
+	if ((!e) || (e == ERR)) return;
+
+	for (i = windows.size() - 1; i >= 0; i--) {
+		if (windows[i]->PutEvent(e)) {
+			consumed = true;
+			if (windows[i]->WillClose()) RmWindow(i);
+			break;
+		}
+	}
+
+	if (!consumed) {
+		switch (e) {
+		case 'q': will_close = true; break;
+		default: break; //to make compiler happy
+		}
+	}
+
+	result = 0;
+}
+
 CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 {
 	wnd = subwin(scrn->GetWindow(),h,w,y,x);
@@ -227,4 +259,14 @@ void CurseGUIWnd::Resize(int w, int h)
 {
 	if ((w < 1) && (h < 1)) return;
 	wresize(wnd,h,w);
+}
+
+bool CurseGUIWnd::PutEvent(CGUIEvent e)
+{
+	if (will_close) return false;
+
+	switch (e) {
+	case 'q': will_close = true; return true;
+	default: return false; //to make compiler happy
+	}
 }

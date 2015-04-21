@@ -20,17 +20,21 @@
 /* Defines the entry point of the application */
 
 #include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
 #include "plastic.h"
 #include "visual.h"
 #include "support.h"
 #include "datapipe.h"
 #include "LVR.h"
+#include "CGUIEvents.h"
 
 
 static SGameSettings	g_set = DEFAULT_SETTINGS;
 static CurseGUI*		g_gui = NULL;
 static DataPipe*		g_data = NULL;
 static LVR*				g_lvr = NULL;
+static pthread_t		t_event = 0;
 
 
 /* *********************************************************** */
@@ -38,6 +42,20 @@ static LVR*				g_lvr = NULL;
 static void plastic_shell()
 {
 	//TODO
+}
+
+static void* plastic_eventhread(void* ptr)
+{
+	while ((g_gui) && (!g_gui->WillClose())) {
+		if (g_gui->UpdateSize()) {
+			//TODO: do something :)
+		}
+
+		g_gui->PumpEvents();
+
+		usleep(EVENTUSLEEP);
+	}
+	return NULL;
 }
 
 static void plastic_start()
@@ -67,14 +85,19 @@ static void plastic_start()
 
 	g_gui->SetBackgroundData(g_lvr->GetRender(),g_lvr->GetRenderLen());
 
-	//TODO
+	pthread_create(&t_event,NULL,plastic_eventhread,NULL);
 }
 
 static void plastic_cleanup()
 {
-	delete g_gui;
-	delete g_lvr;
-	delete g_data;
+	if (t_event) {
+		errout("Closing events thread... ");
+		pthread_join(t_event,NULL);
+		errout("OK\n");
+	}
+	if (g_gui) delete g_gui;
+	if (g_lvr) delete g_lvr;
+	if (g_data) delete g_data;
 }
 
 /* *********************************************************** */
@@ -89,7 +112,9 @@ int main(int argc, char* argv[])
 	if (g_set.use_shell) plastic_shell();
 
 	plastic_start();
-	//TODO: main loop
+
+	while (!g_gui->WillClose()) usleep(1000); //FIXME: stub
+
 	plastic_cleanup();
 
 	printf("\n\n\nGood exit.\n");

@@ -18,15 +18,18 @@
  */
 
 #include <stdlib.h>
+#include <math.h>
 #include "LVR.h"
 
 LVR::LVR(DataPipe* pipe)
 {
+	int i;
 	pipeptr = pipe;
 	render = NULL;
 	zbuf = NULL;
 	rendsize = 0;
-	memset(rot,0,sizeof(rot));
+	table = NULL;
+	for (i = 0; i < 3; i++) rot[i] = GenOMatrix();
 }
 
 LVR::~LVR()
@@ -61,5 +64,5 @@ void LVR::SetPosition(vector3d pos)
 
 void LVR::Frame()
 {
-	//
+	if (!table) return;
 }

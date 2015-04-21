@@ -24,23 +24,22 @@
 DataPipe::DataPipe(char* root)
 {
 	int i;
-	unsigned l;
 
 	status = DPIPE_ERROR;
 	memset(chunks,0,sizeof(chunks));
 	allocated = 0;
+	gp_X = gp_Y = gp_Z = 0;
 
 	if (!ScanFiles()) return;
 
 	//allocate chunks buffers memory
-	l = CHUNKBOX * CHUNKBOX * CHUNKBOX * sizeof(voxel);
 	for (i = 0; i < HOLDCHUNKS; i++) {
-		chunks[i] = (PChunk)malloc(l);
+		chunks[i] = (PChunk)malloc(sizeof(VChunk));
 		if (!chunks[i]) {
 			PurgeChunks();
 			return;
 		}
-		allocated += l;
+		allocated += sizeof(VChunk);
 	}
 
 	//All clear.
@@ -67,4 +66,17 @@ void DataPipe::PurgeChunks()
 			chunks[i] = NULL;
 		}
 	allocated = 0;
+}
+
+void DataPipe::SetGP(ulli x, ulli y, ulli z)
+{
+	gp_X = x; gp_Y = y; gp_Z = z;
+	//TODO: load buffers to new position
+	status = DPIPE_IDLE;
+}
+
+bool DataPipe::Move(EMoveDir dir)
+{
+	//TODO
+	return false;
 }

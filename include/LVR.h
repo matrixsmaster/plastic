@@ -36,6 +36,7 @@ private:
 	uli rendsize;
 	SMatrix3d rot[3];
 	vector3d offset;
+	SVoxelInf* table;
 
 public:
 	LVR(DataPipe* pipe);

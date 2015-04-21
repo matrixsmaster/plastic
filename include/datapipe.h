@@ -30,11 +30,21 @@ enum EDPipeStatus {
 	DPIPE_BUSY
 };
 
+enum EMoveDir {
+	PMOVE_UP,
+	PMOVE_DOWN,
+	PMOVE_NORTH,
+	PMOVE_SOUTH,
+	PMOVE_WEST,
+	PMOVE_EAST
+};
+
 class DataPipe {
 private:
-	PChunk chunks[HOLDCHUNKS];
+	PChunk chunks[HOLDCHUNKS];		//world chunk buffers
 	EDPipeStatus status;
-	ulli allocated;
+	ulli allocated;					//amount of allocated RAM
+	ulli gp_X, gp_Y, gp_Z;			//global position of central chunk
 
 	bool ScanFiles();
 
@@ -42,9 +52,22 @@ public:
 	DataPipe(char*);
 	virtual ~DataPipe();
 
+	///Returns a status of the pipe.
 	EDPipeStatus GetStatus()	{ return status; }
+
+	///Returns amount of RAM allocated by buffers.
 	ulli GetAllocatedRAM()		{ return allocated; }
+
+	///Discards all chunks buffers and release memory.
 	void PurgeChunks();
+
+	///Set up the global position of central chunk.
+	void SetGP(ulli x, ulli y, ulli z);
+
+	///Move the world to next chunk.
+	///Update chunks buffers either by loading or by generating.
+	///Returns false if move is invalid.
+	bool Move(EMoveDir dir);
 };
 
 #endif /* DATAPIPE_H_ */
