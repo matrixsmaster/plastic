@@ -36,11 +36,12 @@ void dbg_finalize()
 
 void dbg_logstr(char* str)
 {
-	debug_ui->PutString(str);
+	if (debug_ui) debug_ui->PutString(str);
 }
 
 void dbg_print(const char* fmt, ...)
 {
+	if (!debug_ui) return;
 	char str[DBGUIMAXLEN];
 	va_list vl;
 	va_start(vl,fmt);
