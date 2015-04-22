@@ -250,6 +250,7 @@ CurseGUIWnd::~CurseGUIWnd()
 
 void CurseGUIWnd::Update(bool refr)
 {
+	werase(wnd);
 	UpdateBack();
 	if (boxed) box(wnd,0,0);
 	if (refr) wrefresh(wnd);
