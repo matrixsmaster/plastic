@@ -35,8 +35,15 @@ CurseGUIDebugWnd::~CurseGUIDebugWnd()
 void CurseGUIDebugWnd::Update(bool refr)
 {
 	vector<string>::iterator it;
+	int n = g_h - ((boxed)? 2:1);
 
-	//TODO
+	//TODO check vector size
+	if (log.size() > 0) {
+		for (it = log.end()-1; it != log.begin(); it--, n--) { //FIXME
+			mvwaddnstr(wnd, n, 1, it->c_str(), -1);
+		}
+	}
+//	if(!log.empty()) mvwaddnstr(wnd, 1, 1, log.at(0).c_str(), -1);
 
 	if (boxed) box(wnd,0,0);
 	if (refr) wrefresh(wnd);
@@ -51,9 +58,12 @@ bool CurseGUIDebugWnd::PutEvent(CGUIEvent e)
 void CurseGUIDebugWnd::PutString(char* str)
 {
 	//TODO
+	string log_str(str);
+	log.push_back(log_str);
 }
 
-void PutString(std::string str)
+void CurseGUIDebugWnd::PutString(std::string str)
 {
 	//TODO
+	log.push_back(str);
 }
