@@ -34,6 +34,6 @@ SMatrix3d GenMtxRotY(const double fi);
 SMatrix3d GenMtxRotZ(const double fi);
 
 SMatrix3d Mtx3Mul(SMatrix3d A, SMatrix3d B);
-vector3d MtxPntMul(SMatrix3d M, vector3d P);
+vector3d MtxPntMul(const SMatrix3d* M, const vector3d* P);
 
 #endif /* MTX3D_H_ */

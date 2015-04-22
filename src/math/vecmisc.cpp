@@ -177,6 +177,20 @@ void SortVectors(vector3d* arr, const int n, const int axis)
 	}
 }
 
+void PerspectiveD(vector3d* pnt, const vector2di* fov, const vector2di* mid)
+{
+	if (!pnt) return;
+	pnt->X = ( pnt->X * (double)(fov->X) / pnt->Z ) + (double)(mid->X);
+	pnt->Y = (-pnt->Y * (double)(fov->Y) / pnt->Z ) + (double)(mid->Y);
+}
+
+void PerspectiveDInv(vector3d* pnt, const vector2di* fov, const vector2di* mid)
+{
+	if (!pnt) return;
+	pnt->X = (pnt->Z * (-(double)(mid->X) + pnt->X)) / (double)(fov->X);
+	pnt->Y = (pnt->Z * ( (double)(mid->Y) - pnt->Y)) / (double)(fov->Y);
+}
+
 /*
  * PNPOLY - Point Inclusion in Polygon Test
  * (C) W. Randolph Franklin (WRF)

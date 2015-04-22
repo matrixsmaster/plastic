@@ -28,17 +28,18 @@ DataPipe::DataPipe(char* root_dir)
 	int i;
 	size_t sz;
 
-	//init variables
+	/* Init variables */
 	status = DPIPE_ERROR;
 	memset(chunks,0,sizeof(chunks));
 	allocated = 0;
 	memset(root,0,MAXPATHLEN);
 
-	//create the world generator
+	/* Create the world generator */
 	wgen = new WorldGen();
 
-	//allocate voxel info table
+	/* Allocate voxel info table */
 	sz = DEFVOXTYPES * sizeof(SVoxelInf);
+	voxtablen = DEFVOXTYPES;
 	voxeltab = (SVoxelInf*)malloc(sz);
 	if (!voxeltab) {
 		errout("Unable to allocate RAM for voxel table.\n");
@@ -46,8 +47,9 @@ DataPipe::DataPipe(char* root_dir)
 	}
 	memset(voxeltab,0,sz);
 	allocated += sz;
+	LoadVoxTab(); //and load'em up!
 
-	//scan world data files
+	/* Scan world data files */
 	i = strlen(root_dir);
 	if (i > 0) {
 		memcpy(root,root_dir,i);
@@ -55,7 +57,7 @@ DataPipe::DataPipe(char* root_dir)
 	} else
 		return;
 
-	//allocate chunks buffers memory
+	/* Allocate chunks buffers memory */
 	sz = sizeof(VChunk);
 	for (i = 0; i < HOLDCHUNKS; i++) {
 		chunks[i] = (PChunk)malloc(sz);
@@ -67,7 +69,7 @@ DataPipe::DataPipe(char* root_dir)
 		allocated += sz;
 	}
 
-	//All clear.
+	/* All clear. */
 	status = DPIPE_NOTREADY;
 }
 
@@ -94,6 +96,11 @@ bool DataPipe::FindChunk(vector3dulli pos, SDataPlacement* res)
 	}
 
 	return false; //FIXME
+}
+
+void DataPipe::LoadVoxTab()
+{
+	//
 }
 
 void DataPipe::PurgeChunks()
@@ -123,4 +130,21 @@ bool DataPipe::Move(EMoveDir dir)
 {
 	//TODO
 	return false;
+}
+
+voxel DataPipe::GetVoxel(const vector3di* p)
+{
+	PChunk ch;
+	//FIXME: use other chunks
+	if ((p->X < 0) || (p->Y < 0) || (p->Z < 0)) return 0;
+	if ((p->X >= CHUNKBOX) || (p->Y >= CHUNKBOX) || (p->Z >= CHUNKBOX)) return 0;
+	ch = chunks[0];
+	return ((*ch)[p->Z][p->Y][p->X]);
+}
+
+SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
+{
+	voxel v = GetVoxel(p);
+	if (v < voxtablen) return &voxeltab[v];
+	else return NULL;
 }

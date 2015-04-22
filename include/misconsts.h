@@ -24,6 +24,8 @@
 
 #define MAXPATHLEN 1024
 
+#define DEFFARPLANE 64
+
 /*
  * I don't want to use <inttypes.h> because it causes all kinds of problems
  * on different platforms. Or even with different versions of glibc inclusion files.
