@@ -1,0 +1,8 @@
+;test comment
+
+;V type color sides (6 characters)
+V0 1 000000
+V1 2 123456
+V1 3 abcdef
+V1 4 \|/-\|
+V1 5 QWERTY

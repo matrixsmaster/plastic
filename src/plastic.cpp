@@ -48,6 +48,8 @@ static void plastic_shell()
 static void* plastic_eventhread(void* ptr)
 {
 	CGUIEvent my_e;
+	//DEBUG:
+	vector3d r;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 		/* Terminal window size change event */
@@ -68,14 +70,20 @@ static void* plastic_eventhread(void* ptr)
 			case 't': /* test */
 				dbg_logstr("Testing OK");
 				break;
+			/* DEBUG */
+			case KEY_UP: r.X += 1; break;
+			case KEY_DOWN: r.X -= 1; break;
+			case KEY_LEFT: r.Y += 1; break;
+			case KEY_RIGHT: r.Y -= 1; break;
 			}
+			g_lvr->SetEulerRotation(r);
 		}
 
 		//temporarily there
 		g_lvr->Frame();
 		g_gui->Update(true);
 
-		/* To keep CPU load low */
+		/* To keep CPU load low(er) */
 		usleep(EVENTUSLEEP);
 	}
 	return NULL;
@@ -101,6 +109,7 @@ static void plastic_start()
 		errout("Unable to create CurseGUI!\n");
 		abort();
 	}
+	g_gui->SetColortable(gui_coltable,COLPAIRS);
 
 	/* Init LVR */
 	g_lvr = new LVR(g_data);
@@ -152,7 +161,7 @@ int main(int argc, char* argv[])
 
 	plastic_start();
 
-	while (!g_gui->WillClose()) usleep(1000); //FIXME: stub
+	while (!g_gui->WillClose()) usleep(100000); //FIXME: stub
 
 	plastic_cleanup();
 

@@ -20,7 +20,7 @@
 #ifndef CGUIEVENTS_H_
 #define CGUIEVENTS_H_
 
-#define EVENTUSLEEP 100
+#define EVENTUSLEEP 3000
 
 //temporarily it's just a return type of getch()
 typedef int CGUIEvent;

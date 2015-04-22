@@ -45,7 +45,7 @@ struct SGameSettings {
 };
 
 #define DEFAULT_SETTINGS { \
-	{'.',0},		\
+	".",			\
 	true 			\
 }
 

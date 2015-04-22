@@ -22,7 +22,7 @@
 #ifndef MISCONSTS_H_
 #define MISCONSTS_H_
 
-#define MAXPATHLEN 1024
+#define MAXPATHLEN 512
 
 #define DEFFARPLANE 64
 

@@ -77,7 +77,7 @@ void LVR::Frame()
 	vector3di iv;
 	SVoxelInf* vox;
 
-	memset(render,0,rendsize*sizeof(SGUIPixel));
+//	memset(render,0,rendsize*sizeof(SGUIPixel));
 	memset(zbuf,0,rendsize*sizeof(float));
 
 	if (!table) return;
@@ -85,6 +85,8 @@ void LVR::Frame()
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
 		for (x = 0; x < g_w; x++,l++) {
+			render[l].col = 1;
+			render[l].sym = ' ';
 			for (z = 1; z <= far; z++) {
 				v.X = (double)x;
 				v.Y = (double)y;

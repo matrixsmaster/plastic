@@ -29,6 +29,8 @@
 #include "wrldgen.h"
 
 
+#define VOXTABFILENAME "voxtab.dat"
+
 enum EDPipeStatus {
 	DPIPE_NOTREADY,
 	DPIPE_ERROR,
@@ -65,7 +67,7 @@ private:
 
 	bool ScanFiles();
 	bool FindChunk(vector3dulli pos, SDataPlacement* res);
-	void LoadVoxTab();
+	bool LoadVoxTab();
 
 public:
 	DataPipe(char*);

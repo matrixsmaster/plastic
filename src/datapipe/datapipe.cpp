@@ -17,6 +17,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "datapipe.h"
@@ -34,6 +35,11 @@ DataPipe::DataPipe(char* root_dir)
 	allocated = 0;
 	memset(root,0,MAXPATHLEN);
 
+	/* Copy root path */
+	i = strlen(root_dir);
+	if (i > 0) memcpy(root,root_dir,i);
+	else return;
+
 	/* Create the world generator */
 	wgen = new WorldGen();
 
@@ -47,15 +53,11 @@ DataPipe::DataPipe(char* root_dir)
 	}
 	memset(voxeltab,0,sz);
 	allocated += sz;
-	LoadVoxTab(); //and load'em up!
+	if (!LoadVoxTab()) //and load'em up!
+		return;
 
 	/* Scan world data files */
-	i = strlen(root_dir);
-	if (i > 0) {
-		memcpy(root,root_dir,i);
-		if (!ScanFiles()) return;
-	} else
-		return;
+	if (!ScanFiles()) return;
 
 	/* Allocate chunks buffers memory */
 	sz = sizeof(VChunk);
@@ -75,6 +77,7 @@ DataPipe::DataPipe(char* root_dir)
 
 DataPipe::~DataPipe()
 {
+	if (voxeltab) free(voxeltab);
 	PurgeChunks();
 	delete wgen;
 }
@@ -91,16 +94,34 @@ bool DataPipe::FindChunk(vector3dulli pos, SDataPlacement* res)
 	if (!res) return false;
 
 	//TODO
-	for (it = placetab.begin(); it != placetab.end(); it++) {
+	for (it = placetab.begin(); it != placetab.end(); ++it) {
 //		if ((*it)->)
 	}
 
 	return false; //FIXME
 }
 
-void DataPipe::LoadVoxTab()
+bool DataPipe::LoadVoxTab()
 {
-	//
+	FILE* vtf;
+	char pth[MAXPATHLEN];
+	char fx;
+	SVoxelInf cvf;
+	int r,n = 0;
+
+	snprintf(pth,MAXPATHLEN,"%s/%s",root,VOXTABFILENAME);
+	vtf = fopen(pth,"r");
+	if (!vtf) return false;
+
+	while (!feof(vtf)) {
+		r = fscanf(vtf,"%c%d %hd %6c\n",&fx,(int*)&(cvf.type),&(cvf.color),cvf.sides);
+		if (r < 4) continue;
+		if (fx == 'V') voxeltab[n++] = cvf;
+		if (n >= voxtablen) break;
+	}
+
+	fclose(vtf);
+	return true;
 }
 
 void DataPipe::PurgeChunks()
@@ -135,15 +156,17 @@ bool DataPipe::Move(EMoveDir dir)
 voxel DataPipe::GetVoxel(const vector3di* p)
 {
 	PChunk ch;
+	if (status != DPIPE_IDLE) return 0;
 	//FIXME: use other chunks
 	if ((p->X < 0) || (p->Y < 0) || (p->Z < 0)) return 0;
 	if ((p->X >= CHUNKBOX) || (p->Y >= CHUNKBOX) || (p->Z >= CHUNKBOX)) return 0;
 	ch = chunks[0];
-	return ((*ch)[p->Z][p->Y][p->X]);
+	return ((*ch)[p->Y][p->Z][p->X]); //swap Y-Z axes
 }
 
 SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
 {
+	if (status != DPIPE_IDLE) return NULL;
 	voxel v = GetVoxel(p);
 	if (v < voxtablen) return &voxeltab[v];
 	else return NULL;
