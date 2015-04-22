@@ -19,8 +19,41 @@
 
 #include "CGUISpecWnd.h"
 
-/*CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUIWnd *wnd) {}
+using namespace std;
 
-CurseGUIDebugWnd::~CurseGUIDebugWnd() {}
-*/
+CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn, int x, int y, int w, int h) :
+	CurseGUIWnd(scrn,x,y,w,h)
+{
+	//TODO: do something
+}
 
+CurseGUIDebugWnd::~CurseGUIDebugWnd()
+{
+	//TODO
+}
+
+void CurseGUIDebugWnd::Update(bool refr)
+{
+	vector<string>::iterator it;
+
+	//TODO
+
+	if (boxed) box(wnd,0,0);
+	if (refr) wrefresh(wnd);
+}
+
+bool CurseGUIDebugWnd::PutEvent(CGUIEvent e)
+{
+	//TODO: DebugUI events processing
+	return false;
+}
+
+void CurseGUIDebugWnd::PutString(char* str)
+{
+	//TODO
+}
+
+void PutString(std::string str)
+{
+	//TODO
+}

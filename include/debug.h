@@ -17,28 +17,19 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Special kinds of CurseGUI windows are defined here */
+#ifndef DEBUG_H_
+#define DEBUG_H_
 
-#ifndef INCLUDE_CGUISPECWND_H_
-#define INCLUDE_CGUISPECWND_H_
+#include <stdarg.h>
+#include "CGUISpecWnd.h"
 
-#include <string>
-#include <vector>
-#include "CurseGUI.h"
+#define DBGUIMAXLEN 768
 
+extern CurseGUIDebugWnd* debug_ui;
 
-class CurseGUIDebugWnd : public CurseGUIWnd {
-private:
-	std::vector<std::string> log;
+void dbg_init(CurseGUI* gui);
+void dbg_finalize();
+void dbg_logstr(char* str);
+void dbg_print(const char* fmt, ...);
 
-public:
-	CurseGUIDebugWnd(CurseGUI* scrn, int x, int y, int w, int h);
-	virtual ~CurseGUIDebugWnd();
-
-	void Update(bool refr);
-	bool PutEvent(CGUIEvent e);
-	void PutString(char* str);
-	void PutString(std::string str);
-};
-
-#endif /* INCLUDE_CGUISPECWND_H_ */
+#endif /* DEBUG_H_ */

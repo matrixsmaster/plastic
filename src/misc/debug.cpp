@@ -17,28 +17,34 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Special kinds of CurseGUI windows are defined here */
+#include "debug.h"
 
-#ifndef INCLUDE_CGUISPECWND_H_
-#define INCLUDE_CGUISPECWND_H_
-
-#include <string>
-#include <vector>
-#include "CurseGUI.h"
+CurseGUIDebugWnd* debug_ui = NULL;
 
 
-class CurseGUIDebugWnd : public CurseGUIWnd {
-private:
-	std::vector<std::string> log;
+void dbg_init(CurseGUI* gui)
+{
+	debug_ui = new CurseGUIDebugWnd(gui,0,0,gui->GetWidth(),gui->GetHeight()/4);
+	gui->AddWindow(debug_ui);
+//	debug_ui->SetBoxed(false);
+}
 
-public:
-	CurseGUIDebugWnd(CurseGUI* scrn, int x, int y, int w, int h);
-	virtual ~CurseGUIDebugWnd();
+void dbg_finalize()
+{
+	//TODO
+}
 
-	void Update(bool refr);
-	bool PutEvent(CGUIEvent e);
-	void PutString(char* str);
-	void PutString(std::string str);
-};
+void dbg_logstr(char* str)
+{
+	debug_ui->PutString(str);
+}
 
-#endif /* INCLUDE_CGUISPECWND_H_ */
+void dbg_print(const char* fmt, ...)
+{
+	char str[DBGUIMAXLEN];
+	va_list vl;
+	va_start(vl,fmt);
+	vsnprintf(str,DBGUIMAXLEN,fmt,vl);
+	va_end(vl);
+	debug_ui->PutString(str);
+}

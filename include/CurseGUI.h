@@ -128,7 +128,8 @@ public:
 
 /* CurseGUI Window Base Class */
 class CurseGUIWnd : public CurseGUIBase {
-private:
+protected:
+	CurseGUI* parent;
 	bool focused;
 	bool boxed;
 

@@ -110,6 +110,7 @@ CurseGUI::CurseGUI()
 	noecho();
 	cbreak();
 	keypad(wnd,TRUE);
+	nodelay(wnd,TRUE);
 	start_color();
 
 	refresh();
@@ -232,6 +233,7 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 
 CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 {
+	parent = scrn;
 	wnd = subwin(scrn->GetWindow(),h,w,y,x);
 	if (wnd) {
 		g_w = w;

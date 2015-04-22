@@ -28,8 +28,7 @@
 #include "datapipe.h"
 #include "LVR.h"
 #include "CurseGUI.h"
-#include "CGUISpecWnd.h"
-
+#include "debug.h"
 
 
 static SGameSettings	g_set = DEFAULT_SETTINGS;
@@ -49,7 +48,6 @@ static void plastic_shell()
 static void* plastic_eventhread(void* ptr)
 {
 	CGUIEvent my_e;
-	CurseGUIDebugWnd* dbgwnd;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 		/* Terminal window size change event */
@@ -67,9 +65,8 @@ static void* plastic_eventhread(void* ptr)
 		if (!g_gui->PumpEvents(&my_e)) {
 			/* No one consumed event, need to be processed */
 			switch (my_e) {
-			case 'n': /*test*/
-				dbgwnd = new CurseGUIDebugWnd(g_gui,1,1,20,10);
-				g_gui->AddWindow(dbgwnd);
+			case 't': /* test */
+				dbg_logstr("Testing OK");
 				break;
 			}
 		}
@@ -116,6 +113,7 @@ static void plastic_start()
 	g_gui->SetBackgroundData(g_lvr->GetRender(),g_lvr->GetRenderLen());
 
 	//DEBUG:
+	dbg_init(g_gui);
 	g_data->SetGP(vector3dulli(0));
 	g_lvr->SetPosition(vector3d(128));
 
@@ -131,6 +129,9 @@ static void plastic_cleanup()
 		pthread_join(t_event,NULL);
 		errout("OK\n");
 	}
+
+	/* Destroy debugging UI */
+	dbg_finalize();
 
 	/* Destroy all main classes instances */
 	if (g_gui) delete g_gui;
