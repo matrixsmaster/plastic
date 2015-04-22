@@ -27,11 +27,17 @@
 #include "misconsts.h"
 #include "CurseGUI.h"
 #include "vecmath.h"
+#include "vecmisc.h"
 #include "mtx3d.h"
 
+#define DEFFOVX 14
+#define DEFFOVY 7
 
 class LVR {
 private:
+	int g_w,g_h;
+	int far;
+	vector2di fov,mid;
 	DataPipe* pipeptr;
 	SGUIPixel* render;
 	float* zbuf;

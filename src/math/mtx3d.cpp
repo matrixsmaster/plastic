@@ -35,12 +35,12 @@ SMatrix3d Mtx3Mul(SMatrix3d A, SMatrix3d B)
 	return res;
 }
 
-vector3d MtxPntMul(SMatrix3d M, vector3d P)
+vector3d MtxPntMul(const SMatrix3d* M, const vector3d* P)
 {
 	vector3d res;
 	double rk;
 	for (int i=0; i<4; i++) {
-		rk = P.X*M.m[0][i] + P.Y*M.m[1][i] + P.Z*M.m[2][i] + M.m[3][i];
+		rk = P->X*M->m[0][i] + P->Y*M->m[1][i] + P->Z*M->m[2][i] + M->m[3][i];
 		switch (i) {
 		case 0: res.X = rk; break;
 		case 1: res.Y = rk; break;

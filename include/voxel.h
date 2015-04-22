@@ -32,8 +32,16 @@
 ///Main voxel data type. Used as index.
 typedef unsigned short int voxel; //must be a 16-bit wide
 
+///Voxel physical type.
+enum EVoxelType {
+	VOXT_EMPTY = 0,
+	VOXT_SOLID,
+	VOXT_WATER
+};
+
 ///Voxel index info structure.
 struct SVoxelInf {
+	EVoxelType type;
 	short color;
 	char sides[6];
 };

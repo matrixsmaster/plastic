@@ -61,9 +61,11 @@ private:
 	std::vector<SDataPlacement> placetab;	//chunk displacement table
 	WorldGen* wgen;							//world generator instance
 	SVoxelInf* voxeltab;					//voxel types table
+	int voxtablen;
 
 	bool ScanFiles();
 	bool FindChunk(vector3dulli pos, SDataPlacement* res);
+	void LoadVoxTab();
 
 public:
 	DataPipe(char*);
@@ -78,6 +80,9 @@ public:
 	///Returns a pointer to voxel info table.
 	SVoxelInf* GetVoxTable()	{ return voxeltab; }
 
+	///Returns voxel info table length.
+	int GetVoxTableLen()		{ return voxtablen; }
+
 	///Discards all chunks buffers and release memory.
 	void PurgeChunks();
 
@@ -88,6 +93,10 @@ public:
 	///Update chunks buffers either by loading or by generating.
 	///Returns false if move is invalid.
 	bool Move(EMoveDir dir);
+
+	///Returns a specific voxel (or its data) in loaded space.
+	voxel GetVoxel(const vector3di* p);
+	SVoxelInf* GetVoxelI(const vector3di* p);
 };
 
 #endif /* DATAPIPE_H_ */
