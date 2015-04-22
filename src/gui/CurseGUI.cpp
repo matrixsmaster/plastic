@@ -17,10 +17,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/*
- * ported from TDWS (dynworld) project
- * and adapted for stl
- */
+/* CurseGUI is a set of wrapper classes to make easier to use ncurses in object-oriented environment */
 
 #include "CurseGUI.h"
 
@@ -241,6 +238,7 @@ CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 		g_h = h;
 	}
 	focused = true;
+	boxed = true;
 }
 
 CurseGUIWnd::~CurseGUIWnd()
@@ -251,7 +249,7 @@ CurseGUIWnd::~CurseGUIWnd()
 void CurseGUIWnd::Update(bool refr)
 {
 	UpdateBack();
-	box(wnd,0,0);
+	if (boxed) box(wnd,0,0);
 	if (refr) wrefresh(wnd);
 }
 
