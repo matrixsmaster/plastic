@@ -39,6 +39,8 @@ This is free software, and you are welcome to redistribute it\n\
 under conditions of GNU GPL v2\n\n"
 
 
+#define GAMEARGTYPES 2
+
 struct SGameSettings {
 	char root[MAXPATHLEN];
 	bool use_shell;
@@ -46,7 +48,24 @@ struct SGameSettings {
 
 #define DEFAULT_SETTINGS { \
 	".",			\
-	true 			\
+	false 			\
 }
+
+enum EGameArgType {
+	GAT_NOTHING,
+	GAT_ROOTDIR,
+	GAT_USESHELL
+};
+
+struct SGameArg {
+	char sw;		//switch character
+	int anum;		//number of sub-arguments
+	EGameArgType typ;
+};
+
+static const SGameArg argp_table[GAMEARGTYPES] = {
+		{ 'r', 1, GAT_ROOTDIR },
+		{ 's', 1, GAT_USESHELL }
+};
 
 #endif /* PLASTIC_H_ */

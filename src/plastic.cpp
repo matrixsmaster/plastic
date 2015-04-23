@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
 {
 	printf(HELLOSTR,PRODNAME,VERMAJOR,VERMINOR,BUILDNO,PRODNAME);
 
-	if (!argparser(argc,argv)) return 1;
+	if (!argparser(argc,argv,&g_set)) return 1;
 
 	printsettings(&g_set);
 	if (g_set.use_shell) plastic_shell();

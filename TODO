@@ -3,8 +3,6 @@ This file used to track current jobs and their completion.
 
 -> Fill in some short info into README.md
 
--> Implement arg parser
-
 -> Implement interactive startup shell
 
 -> Implement debug window (CurseGUIDbgWnd)

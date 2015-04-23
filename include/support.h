@@ -32,7 +32,7 @@ void printsettings(SGameSettings* s);
 void errout(char const* fmt, ...);
 
 /// Argument parser. Supposed to be used for analyze startup environment.
-bool argparser(int argc, char* argv[]);
+bool argparser(int argc, char* argv[], SGameSettings* sets);
 
 
 #endif /* SUPPORT_H_ */
