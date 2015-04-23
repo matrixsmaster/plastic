@@ -124,6 +124,8 @@ public:
 	///Push events through all windows and controls.
 	///Returns whatever event was consumed or not.
 	bool PumpEvents(CGUIEvent* e);
+
+	//Add Event buffer
 };
 
 /* CurseGUI Window Base Class */

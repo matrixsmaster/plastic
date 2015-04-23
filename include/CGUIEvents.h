@@ -20,17 +20,35 @@
 #ifndef CGUIEVENTS_H_
 #define CGUIEVENTS_H_
 
+#include <string>
+
 #define EVENTUSLEEP 3000
+
+
 
 enum CGUIEventType {
 	GUIEV_KEYPRESS,
-	GUIEV_RESIZE
+	GUIEV_RESIZE,
+	GUIEV_COMMAND
+};
+
+enum CGUICommandType {
+	GUICT_NONE,
+	GUICT_LSTWINDOWS
+};
+
+struct CGUICommand {
+	CGUICommandType t;
+	std::string arg_str;
+	int arg_int;
 };
 
 struct CGUIEvent {
 	CGUIEventType t;	//event type
 	int k;				//pressed key code
+	CGUICommand* c;		//pointer to command structure
 };
+
 
 #define GUI_DEFCLOSE 'q'
 

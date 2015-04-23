@@ -51,20 +51,20 @@ void CurseGUIDebugWnd::Update(bool refr)
 
 	werase(wnd);
 
-	h = g_h - ((boxed)? 2:1);
-	numstr = h;
+	h = g_h - ((boxed)? 3:2);
+	numstr = h+1;
 
 	//TODO add edit line
 	if (edit) {
 		edit_line += key;
 		edit = false;
 	}
-	mvwaddnstr(wnd, h, 1, edit_line.c_str(), -1);
+	mvwaddnstr(wnd, h+1, 1, edit_line.c_str(), -1);
 
 	size = log.size();
 	if (size > 0) {
 		if((h - size >= 0))
-			numstr = size;
+			numstr = size + 1;
 
 		for (it = log.end()-1; it != log.end() - numstr; it--) {
 			w = g_w - ((boxed)? 2:1);
@@ -95,11 +95,19 @@ bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 			hidden ^= true;
 			edit_line = ">";
 			break;
-		case 't':
+//		case 't':
 			// to do nothing
+//			break;
+		case KEY_ENTER:
+		case 10: /* in case enter isn't enter */
+			if(!hidden) {
+				//TODO parse command
+				if(edit_line.size() > 1) {
+					PutString(edit_line.c_str()+1);
+					edit_line = ">";
+				}
+			}
 			break;
-
-		// KEY_ENTER
 		default:
 			if(!hidden) {
 				key = e->k;
