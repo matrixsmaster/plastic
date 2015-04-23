@@ -30,8 +30,8 @@
 #include "vecmisc.h"
 #include "mtx3d.h"
 
-#define DEFFOVX 1
-#define DEFFOVY 1
+#define DEFFOVX 80
+#define DEFFOVY 40
 
 class LVR {
 private:
@@ -43,8 +43,7 @@ private:
 	float* zbuf;
 	uli rendsize;
 	SMatrix3d rot[3];
-	vector3d offset;
-	SVoxelInf* table;
+	vector3d offset,scale;
 
 public:
 	LVR(DataPipe* pipe);
@@ -53,8 +52,10 @@ public:
 	SGUIPixel* GetRender()		{ return render; }
 	uli GetRenderLen()			{ return rendsize; }
 	bool Resize(int w, int h);
-	void SetEulerRotation(vector3d r);
-	void SetPosition(vector3d pos);
+	void SetEulerRotation(const vector3d r);
+	void SetPosition(const vector3d pos);
+	void SetScale(const double s);
+	void SetFOV(const vector2di f);
 	void Frame();
 };
 

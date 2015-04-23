@@ -50,6 +50,12 @@ static void* plastic_eventhread(void* ptr)
 	CGUIEvent my_e;
 	//DEBUG:
 	vector3d r, p(128);
+	float scl = 1.0;
+	time_t beg;
+	ulli cnt = 0;
+	vector2di fov(DEFFOVX,DEFFOVY);
+
+	beg = clock();
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 
@@ -71,9 +77,19 @@ static void* plastic_eventhread(void* ptr)
 				case 's': p.Y -= 1; break;
 				case 'a': p.X -= 1; break;
 				case 'd': p.X += 1; break;
+				case '-': p.Z -= 1; break;
+				case '=': p.Z += 1; break;
+				case '[': scl -= 0.01; break;
+				case ']': scl += 0.01; break;
+				case ',': fov.X--; break;
+				case '.': fov.X++; break;
+				case 'n': fov.Y--; break;
+				case 'm': fov.Y++; break;
 				}
 				g_lvr->SetEulerRotation(r);
 				g_lvr->SetPosition(p);
+				g_lvr->SetScale(scl);
+				g_lvr->SetFOV(fov);
 				break;
 
 			case GUIEV_RESIZE:
@@ -92,7 +108,12 @@ static void* plastic_eventhread(void* ptr)
 		}
 
 		//temporarily there
-		g_lvr->Frame();
+		g_lvr->Frame(); cnt++;
+		if ((clock() - beg) >= CLOCKS_PER_SEC) {
+			dbg_print("fps = %llu",cnt);
+			cnt = 0;
+			beg = clock();
+		}
 		g_gui->Update(true);
 
 		/* To keep CPU load low(er) */

@@ -33,7 +33,7 @@ LVR::LVR(DataPipe* pipe)
 	far = DEFFARPLANE;
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
-	table = pipe->GetVoxTable();
+	scale = vector3d(1);
 	for (i = 0; i < 3; i++) rot[i] = GenOMatrix();
 }
 
@@ -64,20 +64,32 @@ bool LVR::Resize(int w, int h)
 	return ((render != NULL) && (zbuf != NULL));
 }
 
-void LVR::SetEulerRotation(vector3d r)
+void LVR::SetEulerRotation(const vector3d r)
 {
 	rot[0] = GenMtxRotX(r.X * M_PI / 180.f);
 	rot[1] = GenMtxRotY(r.Z * M_PI / 180.f); //swap Y-Z axes
 	rot[2] = GenMtxRotZ(r.Y * M_PI / 180.f);
 }
 
-void LVR::SetPosition(vector3d pos)
+void LVR::SetPosition(const vector3d pos)
 {
 //	offset = pos;
 	offset.X = pos.X;
 	offset.Y = pos.Z; //swap Y-Z axes
 	offset.Z = pos.Y;
-	dbg_print("offset = %.1f %.1f %.1f",pos.X,pos.Z,pos.Y);
+	dbg_print("offset = [%.1f %.1f %.1f]",pos.X,pos.Z,pos.Y);
+}
+
+void LVR::SetScale(const double s)
+{
+	scale = vector3d(s);
+	dbg_print("scale = %.4f",s);
+}
+
+void LVR::SetFOV(const vector2di f)
+{
+	fov = f;
+	dbg_print("FOV = [%d %d]",f.X,f.Y);
 }
 
 void LVR::Frame()
@@ -88,29 +100,28 @@ void LVR::Frame()
 	SVoxelInf* vox;
 
 //	memset(render,0,rendsize*sizeof(SGUIPixel));
-	memset(zbuf,0,rendsize*sizeof(float));
-
-	if (!table) return;
+//	memset(zbuf,0,rendsize*sizeof(float));
 
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
 		for (x = 0; x < g_w; x++,l++) {
 			render[l].col = 1;
 			render[l].sym = ' ';
-			//reverse painter's algorithm + z-buffer
+			//reverse painter's algorithm (+ z-buffer)?
 			for (z = 1; z <= far; z++) {
 				//make current point vector
-				v.X = (double)x;
-				v.Y = (double)y;
+				v.X = (double)x;// / (double)fov.X;
+				v.Y = (double)y;// / (double)fov.Y;
 				v.Z = (double)z;
 				//calculate reverse projection into screen space
 				PerspectiveDInv(&v,&fov,&mid);
 
 				//apply transformations
+//				v *= vector3d((1.f/fov.X),(1.f/fov.Y),1);
+				v *= scale;
 				for (i = 0; i < 3; i++)
 					v = MtxPntMul(&rot[i],&v);
 				v += offset;
-//				v *= vector3d(0.01);
 
 				//round vector to use as a voxel space co-ord
 				iv.X = (int)(round(v.X));

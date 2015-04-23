@@ -126,9 +126,9 @@ void CurseGUIDebugWnd::PutString(char* str)
 {
 	//TODO delete ss
 	string log_str(str);
-	ostringstream ss;
+	/*ostringstream ss;
 	ss << cnt++;
-	log_str += ss.str();
+	log_str += ss.str();*/ //Sorry, Begemot, I really want pure output :)
 	log.push_back(log_str);
 }
 
