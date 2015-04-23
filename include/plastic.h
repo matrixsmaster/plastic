@@ -58,14 +58,13 @@ enum EGameArgType {
 };
 
 struct SGameArg {
-	char sw;		//switch character
-	int anum;		//number of sub-arguments
 	EGameArgType typ;
+	char sw;		//switch character
 };
 
 static const SGameArg argp_table[GAMEARGTYPES] = {
-		{ 'r', 1, GAT_ROOTDIR },
-		{ 's', 1, GAT_USESHELL }
+		{ GAT_ROOTDIR,		'r' },
+		{ GAT_USESHELL,		's' }
 };
 
 #endif /* PLASTIC_H_ */

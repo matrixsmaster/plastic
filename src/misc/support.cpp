@@ -43,7 +43,7 @@ void errout(char const* fmt, ...)
 
 bool argparser(int argc, char* argv[], SGameSettings* sets)
 {
-	int i,j,an, fsm = 0;
+	int i,j, fsm = 0;
 	EGameArgType curt;
 
 	for (i = 1; i < argc; i++) {
@@ -51,7 +51,6 @@ bool argparser(int argc, char* argv[], SGameSettings* sets)
 		case 0: /* default */
 			//detect switch
 			curt = GAT_NOTHING;
-			an = 0;
 			if ((argv[i][0] != '-') || (strlen(argv[i]) != 2)) {
 				errout("Malformed parameter switch at position %d.\n",i);
 				return false;
@@ -60,7 +59,6 @@ bool argparser(int argc, char* argv[], SGameSettings* sets)
 			for (j = 0; j < GAMEARGTYPES; j++)
 				if (argv[i][1] == argp_table[j].sw) {
 					curt = argp_table[j].typ;
-					an = argp_table[j].anum;
 					break;
 				}
 			if (curt == GAT_NOTHING) {
