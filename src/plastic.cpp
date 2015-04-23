@@ -49,7 +49,7 @@ static void* plastic_eventhread(void* ptr)
 {
 	CGUIEvent my_e;
 	//DEBUG:
-	vector3d r;
+	vector3d r, p(128);
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 
@@ -67,8 +67,13 @@ static void* plastic_eventhread(void* ptr)
 				case KEY_DOWN: r.X -= 1; break;
 				case KEY_LEFT: r.Y += 1; break;
 				case KEY_RIGHT: r.Y -= 1; break;
+				case 'w': p.Z += 1; break;
+				case 's': p.Z -= 1; break;
+				case 'a': p.X -= 1; break;
+				case 'd': p.X += 1; break;
 				}
 				g_lvr->SetEulerRotation(r);
+				g_lvr->SetPosition(p);
 				break;
 
 			case GUIEV_RESIZE:
