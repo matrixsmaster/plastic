@@ -52,31 +52,38 @@ static void* plastic_eventhread(void* ptr)
 	vector3d r;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
-		/* Terminal window size change event */
-		if (g_gui->UpdateSize()) {
-			/* Size of terminal has changed */
-			if (!g_lvr->Resize(g_gui->GetWidth(),g_gui->GetHeight())) {
-				errout("Can't resize LVR frame!");
-				abort();
-			}
-			g_gui->SetBackgroundData(g_lvr->GetRender(),g_lvr->GetRenderLen());
-			//FIXME: do something :)
-		}
 
-		/* Keyboard events */
+		/* Events */
 		if (!g_gui->PumpEvents(&my_e)) {
 			/* No one consumed event, need to be processed */
-			switch (my_e) {
-			case 't': /* test */
-				dbg_logstr("Testing OK");
+			switch (my_e.t) {
+			case GUIEV_KEYPRESS:
+				switch (my_e.k) {
+				case 't': /* test */
+					dbg_logstr("Testing OK Alice in Wonderland bla bla bla. Test if string is too long for add to one string");
+					break;
+					/* DEBUG */
+				case KEY_UP: r.X += 1; break;
+				case KEY_DOWN: r.X -= 1; break;
+				case KEY_LEFT: r.Y += 1; break;
+				case KEY_RIGHT: r.Y -= 1; break;
+				}
+				g_lvr->SetEulerRotation(r);
 				break;
-			/* DEBUG */
-			case KEY_UP: r.X += 1; break;
-			case KEY_DOWN: r.X -= 1; break;
-			case KEY_LEFT: r.Y += 1; break;
-			case KEY_RIGHT: r.Y -= 1; break;
+
+			case GUIEV_RESIZE:
+				//TODO: should we do anything here? Yes, we should!
+				/* Size of terminal has changed */
+				if (!g_lvr->Resize(g_gui->GetWidth(),g_gui->GetHeight())) {
+					errout("Can't resize LVR frame!");
+					abort();
+				}
+				g_gui->SetBackgroundData(g_lvr->GetRender(),g_lvr->GetRenderLen());
+				break;
+
+			default:
+				errout("Events: WTF?!"); //TODO: write something more intelligent
 			}
-			g_lvr->SetEulerRotation(r);
 		}
 
 		//temporarily there

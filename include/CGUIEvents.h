@@ -22,7 +22,16 @@
 
 #define EVENTUSLEEP 3000
 
-//temporarily it's just a return type of getch()
-typedef int CGUIEvent;
+enum CGUIEventType {
+	GUIEV_KEYPRESS,
+	GUIEV_RESIZE
+};
+
+struct CGUIEvent {
+	CGUIEventType t;	//event type
+	int k;				//pressed key code
+};
+
+#define GUI_DEFCLOSE 'q'
 
 #endif /* CGUIEVENTS_H_ */

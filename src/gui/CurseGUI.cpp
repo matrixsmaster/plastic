@@ -208,12 +208,18 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 
 	if (will_close) return true; //to not process event furthermore
 
-	//FIXME: use something more robust than that
-	*e = getch();
-	if ((!(*e)) || ((*e) == ERR)) return true; //Event consumed 'cause there's no event!
+	/* Get the resize event */
+	if (UpdateSize()) {
+		e->t = GUIEV_RESIZE;
+	} else {
+		/* Or, get the keypress event */
+		e->t = GUIEV_KEYPRESS;
+		e->k = getch(); //FIXME: use something more robust than that
+		if ((!e->k) || (e->k == ERR)) return true; //Event consumed 'cause there's no event!
+	}
 
 	for (i = windows.size() - 1; i >= 0; i--) {
-		if (windows[i]->PutEvent(*e)) {
+		if (windows[i]->PutEvent(e)) {
 			consumed = true;
 			if (windows[i]->WillClose()) RmWindow(i);
 			break;
@@ -221,9 +227,21 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 	}
 
 	if (!consumed) {
-		switch (*e) {
-		case 'q': will_close = true; break;
-		default: break; //to make compiler happy
+		switch (e->t) {
+		case GUIEV_KEYPRESS:
+			switch (e->k) {
+			case GUI_DEFCLOSE:
+				will_close = true;
+				consumed = true;
+				break;
+			}
+			break;
+
+		case GUIEV_RESIZE:
+			//do nothing (at least for now)
+			break;
+
+		default: break;
 		}
 	}
 
@@ -266,14 +284,25 @@ void CurseGUIWnd::Resize(int w, int h)
 {
 	if ((w < 1) && (h < 1)) return;
 	wresize(wnd,h,w);
+	UpdateSize();
 }
 
-bool CurseGUIWnd::PutEvent(CGUIEvent e)
+bool CurseGUIWnd::PutEvent(CGUIEvent* e)
 {
 	if (will_close || (!focused)) return false;
 
-	switch (e) {
-	case 'q': will_close = true; return true;
-	default: return false; //to make compiler happy
+	switch (e->t) {
+	case GUIEV_KEYPRESS:
+		switch (e->k) {
+		case GUI_DEFCLOSE: will_close = true; return true;
+		}
+		return false;
+
+	case GUIEV_RESIZE:
+		UpdateSize();
+		return false; //don't consume resize event!
+
+	default: break;
 	}
+	return false;
 }

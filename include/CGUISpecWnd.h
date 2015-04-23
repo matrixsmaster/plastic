@@ -30,13 +30,14 @@
 class CurseGUIDebugWnd : public CurseGUIWnd {
 private:
 	std::vector<std::string> log;
+	int cnt; //tmp
 
 public:
-	CurseGUIDebugWnd(CurseGUI* scrn, int x, int y, int w, int h);
+	CurseGUIDebugWnd(CurseGUI* scrn, int x, int y);
 	virtual ~CurseGUIDebugWnd();
 
 	void Update(bool refr);
-	bool PutEvent(CGUIEvent e);
+	bool PutEvent(CGUIEvent* e);
 	void PutString(char* str);
 	void PutString(std::string str);
 };

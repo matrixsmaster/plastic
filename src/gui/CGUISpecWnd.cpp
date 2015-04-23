@@ -18,13 +18,18 @@
  */
 
 #include "CGUISpecWnd.h"
+#include <sstream>
 
 using namespace std;
 
-CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn, int x, int y, int w, int h) :
-	CurseGUIWnd(scrn,x,y,w,h)
+CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn, int x, int y) :
+	CurseGUIWnd(scrn,x,y,2,2),
+	cnt(0)
 {
 	//TODO: do something
+	CGUIEvent e;
+	e.t = GUIEV_RESIZE;
+	PutEvent(&e);
 }
 
 CurseGUIDebugWnd::~CurseGUIDebugWnd()
@@ -35,30 +40,58 @@ CurseGUIDebugWnd::~CurseGUIDebugWnd()
 void CurseGUIDebugWnd::Update(bool refr)
 {
 	vector<string>::iterator it;
+	int size, w, nl;
 	int n = g_h - ((boxed)? 2:1);
+	int numstr = n+1;
 
-	//TODO check vector size
-	if (log.size() > 0) {
-		for (it = log.end()-1; it != log.begin(); it--, n--) { //FIXME
-			mvwaddnstr(wnd, n, 1, it->c_str(), -1);
+	werase(wnd);
+	//TODO
+	size = log.size();
+	if (size > 0) {
+		if((n - size >= 0))
+			numstr = size + 1;
+
+		for (it = log.end()-1; it != log.end() - numstr; it--) {
+			w = g_h - ((boxed)? 2:1);
+
+			if(it->size() % (w) != 0) {
+				// partitioning into multiple lines
+				nl = (it->size() / (w));
+				for(int i = nl; i >= 0 ; i--) {
+					mvwaddnstr(wnd, n--, 1, it->c_str()+(w*i), w);
+				}
+			} else mvwaddnstr(wnd, n--, 1, it->c_str(), -1);
 		}
 	}
-//	if(!log.empty()) mvwaddnstr(wnd, 1, 1, log.at(0).c_str(), -1);
 
 	if (boxed) box(wnd,0,0);
 	if (refr) wrefresh(wnd);
 }
 
-bool CurseGUIDebugWnd::PutEvent(CGUIEvent e)
+bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 {
 	//TODO: DebugUI events processing
+	int w, h;
+	switch (e->t) {
+	case GUIEV_RESIZE:
+		h = parent->GetHeight() / 4;
+		w = parent->GetWidth() / 2;
+		Resize(w, h);
+		break;
+	case GUIEV_KEYPRESS: break;
+	default: break;
+	}
 	return false;
 }
 
 void CurseGUIDebugWnd::PutString(char* str)
 {
 	//TODO
+	//temporarily
 	string log_str(str);
+	ostringstream ss;
+	ss << cnt++;
+	log_str += ss.str();
 	log.push_back(log_str);
 }
 
@@ -67,3 +100,4 @@ void CurseGUIDebugWnd::PutString(std::string str)
 	//TODO
 	log.push_back(str);
 }
+

@@ -140,7 +140,7 @@ public:
 	virtual void Update(bool refr);
 	virtual void Move(int x, int y);
 	virtual void Resize(int w, int h);
-	virtual bool PutEvent(CGUIEvent e);
+	virtual bool PutEvent(CGUIEvent* e);
 };
 
 #endif /* CURSEGUI_H_ */

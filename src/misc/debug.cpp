@@ -24,7 +24,7 @@ CurseGUIDebugWnd* debug_ui = NULL;
 
 void dbg_init(CurseGUI* gui)
 {
-	debug_ui = new CurseGUIDebugWnd(gui,0,0,gui->GetWidth(),gui->GetHeight()/4);
+	debug_ui = new CurseGUIDebugWnd(gui,0,0);
 	gui->AddWindow(debug_ui);
 //	debug_ui->SetBoxed(false);
 }
