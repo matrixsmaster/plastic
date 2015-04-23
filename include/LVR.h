@@ -30,7 +30,7 @@
 #include "vecmisc.h"
 #include "mtx3d.h"
 
-#define DEFFOVX 2
+#define DEFFOVX 1
 #define DEFFOVY 1
 
 class LVR {

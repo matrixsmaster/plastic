@@ -32,12 +32,12 @@ public:
 	CPoint2D & operator = (const CPoint2D & other) 		{ X=other.X; Y=other.Y; return *this; }
 	CPoint2D operator + (const CPoint2D & add) const 	{return CPoint2D((X+add.X),(Y+add.Y));}
 	CPoint2D operator - (const CPoint2D & sub) const 	{return CPoint2D((X-sub.X),(Y-sub.Y));}
-	CPoint2D & operator += (const T add) 				{ X+=add; Y+=add; return *this; }
-	CPoint2D & operator -= (const T sub) 				{ X-=sub; Y-=sub; return *this; }
-	CPoint2D & operator += (const CPoint2D add)	 		{ X+=add.X; Y+=add.X; return *this; }
-	CPoint2D & operator -= (const CPoint2D sub) 		{ X-=sub.Y; Y-=sub.Y; return *this; }
-	CPoint2D & operator *= (const T imul) 				{ X*=imul; Y*=imul; return *this; }
-	CPoint2D & operator /= (const T idiv) 				{ X/=idiv; Y/=idiv; return *this; }
+	CPoint2D & operator += (const T add) 				{ X+=add; 	Y+=add; return *this; }
+	CPoint2D & operator -= (const T sub) 				{ X-=sub; 	Y-=sub; return *this; }
+	CPoint2D & operator += (const CPoint2D add)	 		{ X+=add.X; Y+=add.Y; return *this; }
+	CPoint2D & operator -= (const CPoint2D sub) 		{ X-=sub.X; Y-=sub.Y; return *this; }
+	CPoint2D & operator *= (const T imul) 				{ X*=imul; 	Y*=imul; return *this; }
+	CPoint2D & operator /= (const T idiv) 				{ X/=idiv; 	Y/=idiv; return *this; }
 	CPoint2D operator * (const T imul) const 			{ return CPoint2D((X*imul),(Y*imul)); }
 	CPoint2D operator / (const T idiv) const 			{ return CPoint2D((X/idiv),(Y/idiv)); }
 	bool operator == (const CPoint2D & comp) const 		{return ((X==comp.X) && (Y==comp.Y));}
@@ -61,12 +61,14 @@ public:
 	CPoint3D & operator = (const CPoint3D & old) 		{ X=old.X; Y=old.Y; Z=old.Z; return *this; }
 	CPoint3D operator + (const CPoint3D & add) const	{return CPoint3D((X+add.X),(Y+add.Y),(Z+add.Z));}
 	CPoint3D operator - (const CPoint3D & sub) const	{return CPoint3D((X-sub.X),(Y-sub.Y),(Z-sub.Z));}
-	CPoint3D & operator += (const double add)			{ X+=add; Y+=add; Z+=add; return *this; }
-	CPoint3D & operator -= (const double sub)			{ X-=sub; Y-=sub; Z-=sub; return *this; }
-	CPoint3D & operator += (const CPoint3D add)			{ X+=add.X; Y+=add.X; Z+=add.Z; return *this; }
-	CPoint3D & operator -= (const CPoint3D sub)			{ X-=sub.Y; Y-=sub.Y; Z-=sub.Z; return *this; }
-	CPoint3D & operator *= (const double fmul)			{ X*=fmul; Y*=fmul; Z*=fmul; return *this; }
-	CPoint3D & operator /= (const double fdiv)			{ X/=fdiv; Y/=fdiv; Z/=fdiv; return *this; }
+	CPoint3D & operator += (const double add)			{ X+=add; 	Y+=add; 	Z+=add; return *this; }
+	CPoint3D & operator -= (const double sub)			{ X-=sub; 	Y-=sub; 	Z-=sub; return *this; }
+	CPoint3D & operator += (const CPoint3D add)			{ X+=add.X; Y+=add.Y; 	Z+=add.Z; return *this; }
+	CPoint3D & operator -= (const CPoint3D sub)			{ X-=sub.X; Y-=sub.Y; 	Z-=sub.Z; return *this; }
+	CPoint3D & operator *= (const double fmul)			{ X*=fmul; 	Y*=fmul; 	Z*=fmul; return *this; }
+	CPoint3D & operator /= (const double fdiv)			{ X/=fdiv; 	Y/=fdiv; 	Z/=fdiv; return *this; }
+	CPoint3D & operator *= (const CPoint3D mul)			{ X*=mul.X; Y*=mul.Y; 	Z*=mul.Z; return *this; }
+	CPoint3D & operator /= (const CPoint3D div)			{ X/=div.X; Y/=div.Y; 	Z/=div.Z; return *this; }
 	CPoint3D operator * (const double fmul) const		{ return CPoint3D((X*fmul),(Y*fmul),(Z*fmul)); }
 	CPoint3D operator / (const double fdiv) const		{ return CPoint3D((X/fdiv),(Y/fdiv),(Z/fdiv)); }
 	CPoint3D operator * (const CPoint3D & mul) const	{ return CPoint3D((X*mul.X),(Y*mul.Y),(Z*mul.Z)); }
@@ -101,12 +103,14 @@ public:
 	CPoint3Di & operator = (const CPoint3Di & old) 		{ X=old.X; Y=old.Y; Z=old.Z; return *this; }
 	CPoint3Di operator + (const CPoint3Di & add) const	{return CPoint3Di((X+add.X),(Y+add.Y),(Z+add.Z));}
 	CPoint3Di operator - (const CPoint3Di & sub) const	{return CPoint3Di((X-sub.X),(Y-sub.Y),(Z-sub.Z));}
-	CPoint3Di & operator += (const T add)				{ X+=add; Y+=add; Z+=add; return *this; }
-	CPoint3Di & operator -= (const T sub)				{ X-=sub; Y-=sub; Z-=sub; return *this; }
-	CPoint3Di & operator += (const CPoint3Di add)		{ X+=add.X; Y+=add.X; Z+=add.Z; return *this; }
-	CPoint3Di & operator -= (const CPoint3Di sub)		{ X-=sub.Y; Y-=sub.Y; Z-=sub.Z; return *this; }
-	CPoint3Di & operator *= (const T fmul)				{ X*=fmul; Y*=fmul; Z*=fmul; return *this; }
-	CPoint3Di & operator /= (const T fdiv)				{ X/=fdiv; Y/=fdiv; Z/=fdiv; return *this; }
+	CPoint3Di & operator += (const T add)				{ X+=add; 	Y+=add; 	Z+=add; return *this; }
+	CPoint3Di & operator -= (const T sub)				{ X-=sub; 	Y-=sub; 	Z-=sub; return *this; }
+	CPoint3Di & operator += (const CPoint3Di add)		{ X+=add.X; Y+=add.Y; 	Z+=add.Z; return *this; }
+	CPoint3Di & operator -= (const CPoint3Di sub)		{ X-=sub.X; Y-=sub.Y; 	Z-=sub.Z; return *this; }
+	CPoint3Di & operator *= (const T fmul)				{ X*=fmul; 	Y*=fmul; 	Z*=fmul; return *this; }
+	CPoint3Di & operator /= (const T fdiv)				{ X/=fdiv; 	Y/=fdiv; 	Z/=fdiv; return *this; }
+	CPoint3Di & operator *= (const CPoint3Di mul)		{ X*=mul.X; Y*=mul.Y; 	Z*=mul.Z; return *this; }
+	CPoint3Di & operator /= (const CPoint3Di div)		{ X/=div.X; Y/=div.Y; 	Z/=div.Z; return *this; }
 	CPoint3Di operator * (const T fmul) const			{ return CPoint3Di((X*fmul),(Y*fmul),(Z*fmul)); }
 	CPoint3Di operator / (const T fdiv) const			{ return CPoint3Di((X/fdiv),(Y/fdiv),(Z/fdiv)); }
 	CPoint3Di operator * (const CPoint3Di & mul) const	{ return CPoint3Di((X*mul.X),(Y*mul.Y),(Z*mul.Z)); }

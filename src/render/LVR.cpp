@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "LVR.h"
+#include "debug.h"
 
 LVR::LVR(DataPipe* pipe)
 {
@@ -66,13 +67,17 @@ bool LVR::Resize(int w, int h)
 void LVR::SetEulerRotation(vector3d r)
 {
 	rot[0] = GenMtxRotX(r.X * M_PI / 180.f);
-	rot[1] = GenMtxRotY(r.Y * M_PI / 180.f);
-	rot[2] = GenMtxRotZ(r.Z * M_PI / 180.f);
+	rot[1] = GenMtxRotY(r.Z * M_PI / 180.f); //swap Y-Z axes
+	rot[2] = GenMtxRotZ(r.Y * M_PI / 180.f);
 }
 
 void LVR::SetPosition(vector3d pos)
 {
-	offset = pos;
+//	offset = pos;
+	offset.X = pos.X;
+	offset.Y = pos.Z; //swap Y-Z axes
+	offset.Z = pos.Y;
+	dbg_print("offset = %.1f %.1f %.1f",pos.X,pos.Z,pos.Y);
 }
 
 void LVR::Frame()
@@ -105,11 +110,12 @@ void LVR::Frame()
 				for (i = 0; i < 3; i++)
 					v = MtxPntMul(&rot[i],&v);
 				v += offset;
+//				v *= vector3d(0.01);
 
-				//round vector to use a voxel co-ord
+				//round vector to use as a voxel space co-ord
 				iv.X = (int)(round(v.X));
-				iv.Y = (int)(round(v.Y));
-				iv.Z = (int)(round(v.Z));
+				iv.Y = (int)(round(v.Z)); //swap Y-Z axes
+				iv.Z = (int)(round(v.Y));
 				vox = pipeptr->GetVoxelI(&iv);
 
 				//if voxel place is occupied, break current z-axis loop

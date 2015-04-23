@@ -22,7 +22,7 @@
 
 #include <string>
 
-#define EVENTUSLEEP 3000
+#define EVENTUSLEEP 2000
 
 
 

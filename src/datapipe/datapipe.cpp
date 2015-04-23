@@ -162,7 +162,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	if ((p->X < 0) || (p->Y < 0) || (p->Z < 0)) return 0;
 	if ((p->X >= CHUNKBOX) || (p->Y >= CHUNKBOX) || (p->Z >= CHUNKBOX)) return 0;
 	ch = chunks[0];
-	return ((*ch)[p->Y][p->Z][p->X]); //swap Y-Z axes
+	return ((*ch)[p->Z][p->Y][p->X]);
 }
 
 SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
