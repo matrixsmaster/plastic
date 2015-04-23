@@ -23,9 +23,14 @@
 using namespace std;
 
 CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn, int x, int y) :
-	CurseGUIWnd(scrn,x,y,2,2),
-	cnt(0)
+	CurseGUIWnd(scrn,x,y,2,2)
 {
+	cnt = 0;
+	hidden = true;
+	edit_line = ">";
+	key = 0;
+	edit = false;
+
 	//TODO: do something
 	CGUIEvent e;
 	e.t = GUIEV_RESIZE;
@@ -40,27 +45,36 @@ CurseGUIDebugWnd::~CurseGUIDebugWnd()
 void CurseGUIDebugWnd::Update(bool refr)
 {
 	vector<string>::iterator it;
-	int size, w, nl;
-	int n = g_h - ((boxed)? 2:1);
-	int numstr = n+1;
+	int size, w, h, nl, numstr;
+
+	if (hidden) return;
 
 	werase(wnd);
-	//TODO
+
+	h = g_h - ((boxed)? 2:1);
+	numstr = h;
+
+	//TODO add edit line
+	if (edit) {
+		edit_line += key;
+		edit = false;
+	}
+	mvwaddnstr(wnd, h, 1, edit_line.c_str(), -1);
+
 	size = log.size();
 	if (size > 0) {
-		if((n - size >= 0))
-			numstr = size + 1;
+		if((h - size >= 0))
+			numstr = size;
 
 		for (it = log.end()-1; it != log.end() - numstr; it--) {
-			w = g_h - ((boxed)? 2:1);
-
+			w = g_w - ((boxed)? 2:1);
 			if(it->size() % (w) != 0) {
 				// partitioning into multiple lines
 				nl = (it->size() / (w));
 				for(int i = nl; i >= 0 ; i--) {
-					mvwaddnstr(wnd, n--, 1, it->c_str()+(w*i), w);
+					mvwaddnstr(wnd, h--, 1, it->c_str()+(w*i), w);
 				}
-			} else mvwaddnstr(wnd, n--, 1, it->c_str(), -1);
+			} else mvwaddnstr(wnd, h--, 1, it->c_str(), -1);
 		}
 	}
 
@@ -71,14 +85,30 @@ void CurseGUIDebugWnd::Update(bool refr)
 bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 {
 	//TODO: DebugUI events processing
-	int w, h;
 	switch (e->t) {
 	case GUIEV_RESIZE:
-		h = parent->GetHeight() / 4;
-		w = parent->GetWidth() / 2;
-		Resize(w, h);
+		ResizeWnd();
 		break;
-	case GUIEV_KEYPRESS: break;
+	case GUIEV_KEYPRESS:
+		switch (e->k) {
+		case '`':
+			hidden ^= true;
+			edit_line = ">";
+			break;
+		case 't':
+			// to do nothing
+			break;
+
+		// KEY_ENTER
+		default:
+			if(!hidden) {
+				key = e->k;
+				edit = true;
+				return true;
+			}
+			break;
+		}
+		break;
 	default: break;
 	}
 	return false;
@@ -86,8 +116,7 @@ bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 
 void CurseGUIDebugWnd::PutString(char* str)
 {
-	//TODO
-	//temporarily
+	//TODO delete ss
 	string log_str(str);
 	ostringstream ss;
 	ss << cnt++;
@@ -97,7 +126,13 @@ void CurseGUIDebugWnd::PutString(char* str)
 
 void CurseGUIDebugWnd::PutString(std::string str)
 {
-	//TODO
 	log.push_back(str);
 }
 
+void CurseGUIDebugWnd::ResizeWnd()
+{
+	int w, h;
+	h = parent->GetHeight() / 4;
+	w = parent->GetWidth();
+	Resize(w, h);
+}
