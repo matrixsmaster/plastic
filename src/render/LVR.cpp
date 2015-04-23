@@ -46,12 +46,17 @@ bool LVR::Resize(int w, int h)
 {
 	if (w < 1) w = 0;
 	if (h < 1) h = 0;
+
+	//apply setting
 	g_w = w;
 	g_h = h;
 	rendsize = w * h;
+
+	//get a screen middle point
 	mid.X = w / 2;
 	mid.Y = h / 2;
 
+	//reallocate buffers memory
 	render = (SGUIPixel*)realloc(render,rendsize*sizeof(SGUIPixel));
 	zbuf = (float*)realloc(zbuf,rendsize*sizeof(float));
 
@@ -87,27 +92,33 @@ void LVR::Frame()
 		for (x = 0; x < g_w; x++,l++) {
 			render[l].col = 1;
 			render[l].sym = ' ';
+			//reverse painter's algorithm + z-buffer
 			for (z = 1; z <= far; z++) {
+				//make current point vector
 				v.X = (double)x;
 				v.Y = (double)y;
 				v.Z = (double)z;
+				//calculate reverse projection into screen space
 				PerspectiveDInv(&v,&fov,&mid);
 
+				//apply transformations
 				for (i = 0; i < 3; i++)
 					v = MtxPntMul(&rot[i],&v);
 				v += offset;
 
+				//round vector to use a voxel co-ord
 				iv.X = (int)(round(v.X));
 				iv.Y = (int)(round(v.Y));
 				iv.Z = (int)(round(v.Z));
 				vox = pipeptr->GetVoxelI(&iv);
 
+				//if voxel place is occupied, break current z-axis loop
 				if (vox->type != VOXT_EMPTY) {
 					render[l].col = vox->color;
 					render[l].sym = vox->sides[0]; //FIXME
 					break;
 				}
-			}
-		}
-	}
+			} //by Z
+		} //by X
+	} //by Y
 }

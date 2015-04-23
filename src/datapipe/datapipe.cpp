@@ -53,11 +53,10 @@ DataPipe::DataPipe(char* root_dir)
 	}
 	memset(voxeltab,0,sz);
 	allocated += sz;
-	if (!LoadVoxTab()) //and load'em up!
-		return;
 
-	/* Scan world data files */
-	if (!ScanFiles()) return;
+	/* Load external files */
+	if (!LoadVoxTab()) return;	//Voxel table
+	ScanFiles();				//map known chunks
 
 	/* Allocate chunks buffers memory */
 	sz = sizeof(VChunk);
@@ -109,10 +108,12 @@ bool DataPipe::LoadVoxTab()
 	SVoxelInf cvf;
 	int r,n = 0;
 
+	//combine a file path
 	snprintf(pth,MAXPATHLEN,"%s/%s",root,VOXTABFILENAME);
 	vtf = fopen(pth,"r");
 	if (!vtf) return false;
 
+	//read table
 	while (!feof(vtf)) {
 		r = fscanf(vtf,"%c%d %hd %6c\n",&fx,(int*)&(cvf.type),&(cvf.color),cvf.sides);
 		if (r < 4) continue;
