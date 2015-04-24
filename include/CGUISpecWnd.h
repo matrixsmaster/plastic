@@ -30,7 +30,6 @@
 class CurseGUIDebugWnd : public CurseGUIWnd {
 private:
 	std::vector<std::string> log;
-	int cnt; //tmp
 	bool hidden;
 	int key;
 	bool edit;
