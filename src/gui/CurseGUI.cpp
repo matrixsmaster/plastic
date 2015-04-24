@@ -99,11 +99,20 @@ CurseGUI::CurseGUI()
 	wnd = initscr();
 	if (!wnd) {
 		result = 1;
+		endwin();
 		return;
 	}
 
 	if (has_colors() == FALSE) {
 		result = 2;
+		endwin();
+		return;
+	}
+	start_color();
+
+	if (can_change_color() == FALSE) {
+		result = 3;
+		endwin();
 		return;
 	}
 
@@ -111,7 +120,6 @@ CurseGUI::CurseGUI()
 	cbreak();
 	keypad(wnd,TRUE);
 	nodelay(wnd,TRUE);
-	start_color();
 
 	refresh();
 	UpdateSize();

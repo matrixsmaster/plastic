@@ -17,51 +17,35 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Lightweight Voxel Renderer */
+#ifndef SKY_H_
+#define SKY_H_
 
-#ifndef LVR_H_
-#define LVR_H_
-
-#include "voxel.h"
-#include "datapipe.h"
-#include "misconsts.h"
 #include "CurseGUI.h"
 #include "vecmath.h"
-#include "vecmisc.h"
-#include "mtx3d.h"
-#include "sky.h"
+#include "misconsts.h"
 
 
-#define DEFFOVX 80
-#define DEFFOVY 40
-#define DEFSKYLEN 1024
-
-
-class LVR {
-private:
-	int g_w,g_h;
-	int far;
-	vector2di fov,mid;
-	DataPipe* pipeptr;
-	SGUIPixel* render;
-	float* zbuf;
-	uli rendsize;
-	SMatrix3d rot[3];
-	vector3d offset,scale;
-	AtmoSky* skies;
-
-public:
-	LVR(DataPipe* pipe);
-	virtual ~LVR();
-
-	SGUIPixel* GetRender()		{ return render; }
-	uli GetRenderLen()			{ return rendsize; }
-	bool Resize(int w, int h);
-	void SetEulerRotation(const vector3d r);
-	void SetPosition(const vector3d pos);
-	void SetScale(const double s);
-	void SetFOV(const vector2di f);
-	void Frame();
+struct AtmoTime {
+	//TODO
 };
 
-#endif /* LVR_H_ */
+class AtmoSky {
+private:
+	uli square;			//linear size of skies buffer
+	SGUIPixel* sky;		//skies buf
+	AtmoTime time;		//atmospheric time
+	vector3d scrot;		//scene rotation
+	float windsp;		//wind speed
+	vector3d wind;		//wind direction
+
+public:
+	AtmoSky(uli sidelen)	{}
+	virtual ~AtmoSky()		{}
+
+	void SetTime(const AtmoTime nwtime);
+	void SetEulerAngles(const vector3d nwang);
+
+	void RenderTo(SGUIPixel* buf, const uli len);
+};
+
+#endif /* SKY_H_ */

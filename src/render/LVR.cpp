@@ -34,11 +34,13 @@ LVR::LVR(DataPipe* pipe)
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
 	scale = vector3d(1);
+	skies = new AtmoSky(DEFSKYLEN);
 	for (i = 0; i < 3; i++) rot[i] = GenOMatrix();
 }
 
 LVR::~LVR()
 {
+	delete skies;
 	if (render) free(render);
 	if (zbuf) free(zbuf);
 }
