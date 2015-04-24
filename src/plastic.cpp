@@ -171,8 +171,6 @@ static void plastic_start()
 
 	//DEBUG:
 	dbg_init(g_gui);
-	//OVERLAY
-
 
 	g_data->SetGP(vector3dulli(0));
 	g_lvr->SetPosition(vector3d(128));
