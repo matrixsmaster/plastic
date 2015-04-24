@@ -81,7 +81,7 @@ short CGUIColorManager::CheckPair(const SGUIPixel* px)
 	for (i = 0; i < (short)pairs.size(); i++) {
 		if (	isEqual(&(px->bg),&(pairs.at(i).tb),COLTOLERANCE) &&
 				isEqual(&(px->fg),&(pairs.at(i).tf),COLTOLERANCE) )
-			return i;
+			return ++i;
 	}
 
 	//add new pair
@@ -92,7 +92,7 @@ short CGUIColorManager::CheckPair(const SGUIPixel* px)
 		npr.cf = CheckColor(&(px->fg));
 		npr.cb = CheckColor(&(px->bg));
 		pairs.push_back(npr);
-		return ((short)(pairs.size()-1));
+		return ((short)(pairs.size()));
 	}
 
 	return 0; //default
@@ -110,7 +110,7 @@ void CGUIColorManager::Apply()
 		init_color(i,ic->r,ic->g,ic->b);
 	}
 
-	for (i = 0, ip = pairs.begin(); ip != pairs.end(); ++ip,++i) {
+	for (i = 1, ip = pairs.begin(); ip != pairs.end(); ++ip,++i) {
 		init_pair(i,ip->cf,ip->cb);
 	}
 

@@ -279,6 +279,7 @@ void CurseGUIWnd::Update(bool refr)
 {
 	werase(wnd);
 	UpdateBack();
+	wcolor_set(wnd,0,NULL);
 	if (boxed) box(wnd,0,0);
 	if (refr) wrefresh(wnd);
 }
