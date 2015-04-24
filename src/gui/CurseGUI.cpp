@@ -30,11 +30,7 @@ CurseGUIBase::CurseGUIBase()
 	result = 0;
 	g_w = g_h = 0;
 	will_close = false;
-}
-
-CurseGUIBase::~CurseGUIBase()
-{
-	//FIXME: delete this if not needed.
+	cmanager = NULL;
 }
 
 bool CurseGUIBase::UpdateSize()
@@ -58,11 +54,11 @@ void CurseGUIBase::SetBackgroundData(SGUIPixel* ptr, int size)
 void CurseGUIBase::UpdateBack()
 {
 	int i,j,l,lin;
-	short lc;
+	short lc,clc;
 	char* lbuf;
 
 	werase(wnd);
-	if ((!backgr) || (backgr_size < g_w*g_h)) return;
+	if ((!cmanager) || (!backgr) || (backgr_size < g_w*g_h)) return;
 
 	lbuf = (char*)malloc(g_w);
 	if (!lbuf) return;
@@ -73,7 +69,8 @@ void CurseGUIBase::UpdateBack()
 	for (i = 0; i < g_h; i++) {
 		lin = i * g_w;
 		for (j = 0; j < g_w; j++,lin++) {
-			if (lc != backgr[lin].col) {
+			clc = cmanager->CheckPair(&backgr[lin]);
+			if (lc != clc) {
 				if (l > 0) {
 					wcolor_set(wnd,lc,NULL);
 					mvwaddnstr(wnd,i,j-l,lbuf,l);
@@ -81,7 +78,7 @@ void CurseGUIBase::UpdateBack()
 				}
 			}
 			lbuf[l++] = backgr[lin].sym;
-			lc = backgr[lin].col;
+			lc = clc;
 		}
 		if (l > 0) {
 			wcolor_set(wnd,lc,NULL);
@@ -94,7 +91,7 @@ void CurseGUIBase::UpdateBack()
 	free(lbuf);
 }
 
-CurseGUI::CurseGUI()
+CurseGUI::CurseGUI() : CurseGUIBase()
 {
 	wnd = initscr();
 	if (!wnd) {
@@ -116,6 +113,8 @@ CurseGUI::CurseGUI()
 		return;
 	}
 
+	cmanager = new CGUIColorManager();
+
 	noecho();
 	cbreak();
 	keypad(wnd,TRUE);
@@ -130,24 +129,26 @@ CurseGUI::~CurseGUI()
 {
 	RmAllWindows();
 	if (wnd) delwin(wnd);
+	if (cmanager) delete cmanager;
 	endwin();
 	refresh();
 }
 
-void CurseGUI::SetColortable(const SGUIWCol* table, int count)
-{
-	int i;
-	for (i = 0; i < count; i++)
-		init_pair(i+1,table[i].f,table[i].b);
-}
+//void CurseGUI::SetColortable(const SGUIWCol* table, int count)
+//{
+//	int i;
+//	for (i = 0; i < count; i++)
+//		init_pair(i+1,table[i].f,table[i].b);
+//}
 
 void CurseGUI::Update(bool refr)
 {
 	std::vector<CurseGUIWnd*>::iterator it;
 	UpdateBack();
-//	touchwin(wnd); //ncurses' man page suggests this, but this causes too much flicker
+	/*touchwin(wnd); //ncurses' man page suggests this, but this causes too much flicker*/
 	for (it = windows.begin(); it != windows.end(); it++)
 		(*it)->Update(false);
+	cmanager->Apply();
 	if (refr) wrefresh(wnd);
 }
 

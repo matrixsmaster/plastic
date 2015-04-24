@@ -20,19 +20,16 @@
 #ifndef VISUAL_H_
 #define VISUAL_H_
 
-#include "CurseGUI.h"
 
-#define COLPAIRS 7
+///Color triplet for ncurses.
+struct SCTriple {
+	short r,g,b;
+};
 
-//FIXME: this tab should be linked with voxel types. Or shouldn't it?
-static const struct SGUIWCol gui_coltable[COLPAIRS] = {
-		{COLOR_WHITE,COLOR_BLACK}, //the first one is default
-		{COLOR_WHITE,COLOR_BLUE},
-		{COLOR_YELLOW,COLOR_GREEN},
-		{COLOR_WHITE,COLOR_YELLOW},
-		{COLOR_BLACK,COLOR_WHITE},
-		{COLOR_WHITE,COLOR_RED},
-		{COLOR_WHITE,COLOR_MAGENTA}
+///ncurses GUI <pixel> type
+struct SGUIPixel {
+	char sym;
+	SCTriple fg,bg;
 };
 
 #endif /* VISUAL_H_ */

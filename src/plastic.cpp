@@ -144,9 +144,7 @@ static void plastic_start()
 		errout("Unable to create CurseGUI (error %d)\n",r);
 		abort();
 	}
-	g_gui->SetColortable(gui_coltable,COLPAIRS);
-	//DEBUG:
-	printf("COLORS = %d\nCOLOR_PAIRS = %d\n",COLORS,COLOR_PAIRS);
+	errout("COLORS = %d\nCOLOR_PAIRS = %d\n",COLORS,COLOR_PAIRS); //DEBUG
 
 	/* Init LVR */
 	g_lvr = new LVR(g_data);

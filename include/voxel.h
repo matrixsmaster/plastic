@@ -20,6 +20,8 @@
 #ifndef VOXEL_H_
 #define VOXEL_H_
 
+#include "visual.h"
+
 ///Number of voxels at a side of chunk.
 #define CHUNKBOX 256
 
@@ -42,7 +44,7 @@ enum EVoxelType {
 ///Voxel index info structure.
 struct SVoxelInf {
 	EVoxelType type;
-	short color;
+	SGUIPixel pix;
 	char sides[6];
 };
 

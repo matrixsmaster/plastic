@@ -17,43 +17,38 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "sky.h"
+#ifndef CGUICOLORMANAGER_H_
+#define CGUICOLORMANAGER_H_
+
+#include <vector>
+#include "visual.h"
 
 
-AtmoSky::AtmoSky(uli sidelen)
-{
-	//TODO
-}
+#define COLTOLERANCE 10
 
-AtmoSky::~AtmoSky()
-{
-	//TODO
-}
+struct SGUIExtPairs {
+	SCTriple tf,tb;
+	short cf,cb;
+};
 
-void AtmoSky::SetTime(const AtmoTime nwtime)
-{
-	//TODO
-}
+class CGUIColorManager {
+protected:
+	bool changed;
 
-void AtmoSky::SetEulerAngles(const vector3d nwang)
-{
-	//TODO
-}
+	std::vector<SCTriple> colors;
+	std::vector<SGUIExtPairs> pairs;
 
-void AtmoSky::RenderTo(SGUIPixel* buf, const uli len)
-{
-	uli i;
-	if ((!buf) || (len < 1)) return;
+	bool isEqual(const SCTriple* a, const SCTriple* b, const short tol);
+	short FindNearest(const SCTriple* cl);
 
-	//FIXME
-	for (i = 0; i < len; i++) {
-		buf[i].bg.r = 0;
-		buf[i].bg.g = 500;
-		buf[i].bg.b = 00;
-		buf[i].fg.r = 500;
-		buf[i].fg.g = 100;
-		buf[i].fg.b = 100;
+public:
+	CGUIColorManager();
+	virtual ~CGUIColorManager();
 
-		buf[i].sym = '9';
-	}
-}
+	void Flush();
+	short CheckColor(const SCTriple* cl);
+	short CheckPair(const SGUIPixel* px);
+	void Apply();
+};
+
+#endif /* CGUICOLORMANAGER_H_ */

@@ -39,8 +39,8 @@ private:
 	vector3d wind;		//wind direction
 
 public:
-	AtmoSky(uli sidelen)	{}
-	virtual ~AtmoSky()		{}
+	AtmoSky(uli sidelen);
+	virtual ~AtmoSky();
 
 	void SetTime(const AtmoTime nwtime);
 	void SetEulerAngles(const vector3d nwang);
