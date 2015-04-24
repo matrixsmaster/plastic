@@ -29,6 +29,7 @@
 #include "LVR.h"
 #include "CurseGUI.h"
 #include "debug.h"
+#include "CGUIOverlay.h"
 
 
 static SGameSettings	g_set = DEFAULT_SETTINGS;
@@ -54,6 +55,9 @@ static void* plastic_eventhread(void* ptr)
 	time_t beg;
 	ulli cnt = 0;
 	vector2di fov(DEFFOVX,DEFFOVY);
+	int x = 0, y = 0;
+	CurseGUIOverlay *ovrl = new CurseGUIOverlay(g_gui, 0, 0);
+	g_gui->AddWindow(ovrl);
 
 	beg = clock();
 
@@ -69,6 +73,15 @@ static void* plastic_eventhread(void* ptr)
 					dbg_logstr("Testing OK Alice in Wonderland bla bla bla. Test if string is too long for add to one string");
 					break;
 					/* DEBUG */
+				case 'f': /* test overlay */
+					ovrl->PutString("Testing overlay OK");
+					break;
+				case 'g': /* test overlay */
+					ovrl->Move(++x, y);
+					break;
+				case 'b': /* test overlay */
+					ovrl->Move(--x, y);
+					break;
 				case KEY_UP: r.X += 1; break;
 				case KEY_DOWN: r.X -= 1; break;
 				case KEY_LEFT: r.Z += 1; break;
@@ -156,6 +169,9 @@ static void plastic_start()
 
 	//DEBUG:
 	dbg_init(g_gui);
+	//OVERLAY
+
+
 	g_data->SetGP(vector3dulli(0));
 	g_lvr->SetPosition(vector3d(128));
 

@@ -18,7 +18,6 @@
  */
 
 #include "CGUISpecWnd.h"
-#include <sstream>
 
 using namespace std;
 
@@ -113,7 +112,10 @@ bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 			break;
 		default:
 			if(!hidden) {
-				if((e->k >= 'A' && e->k <= 'Z') || (e->k >= 'a' && e->k <= 'z') || (e->k == '-') || (e->k == ' ')) {
+				if((e->k >= 'A' && e->k <= 'Z') ||
+						(e->k >= 'a' && e->k <= 'z') ||
+						(e->k == '-') ||
+						(e->k == ' ')) {
 					key = e->k;
 					edit = true;
 					return true;
@@ -129,7 +131,6 @@ bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 
 void CurseGUIDebugWnd::PutString(char* str)
 {
-	//TODO delete ss
 	string log_str(str);
 	log.push_back(log_str);
 }
