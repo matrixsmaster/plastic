@@ -17,51 +17,43 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Lightweight Voxel Renderer */
-
-#ifndef LVR_H_
-#define LVR_H_
-
-#include "voxel.h"
-#include "datapipe.h"
-#include "misconsts.h"
-#include "CurseGUI.h"
-#include "vecmath.h"
-#include "vecmisc.h"
-#include "mtx3d.h"
 #include "sky.h"
 
 
-#define DEFFOVX 80
-#define DEFFOVY 40
-#define DEFSKYLEN 1024
+AtmoSky::AtmoSky(uli sidelen)
+{
+	//TODO
+}
 
+AtmoSky::~AtmoSky()
+{
+	//TODO
+}
 
-class LVR {
-private:
-	int g_w,g_h;
-	int far;
-	vector2di fov,mid;
-	DataPipe* pipeptr;
-	SGUIPixel* render;
-	float* zbuf;
-	uli rendsize;
-	SMatrix3d rot[3];
-	vector3d offset,scale;
-	AtmoSky* skies;
+void AtmoSky::SetTime(const AtmoTime nwtime)
+{
+	//TODO
+}
 
-public:
-	LVR(DataPipe* pipe);
-	virtual ~LVR();
+void AtmoSky::SetEulerAngles(const vector3d nwang)
+{
+	//TODO
+}
 
-	SGUIPixel* GetRender()		{ return render; }
-	uli GetRenderLen()			{ return rendsize; }
-	bool Resize(int w, int h);
-	void SetEulerRotation(const vector3d r);
-	void SetPosition(const vector3d pos);
-	void SetScale(const double s);
-	void SetFOV(const vector2di f);
-	void Frame();
-};
+void AtmoSky::RenderTo(SGUIPixel* buf, const uli len)
+{
+	uli i;
+	if ((!buf) || (len < 1)) return;
 
-#endif /* LVR_H_ */
+	//FIXME
+	for (i = 0; i < len; i++) {
+		buf[i].bg.r = 0;
+		buf[i].bg.g = 500;
+		buf[i].bg.b = 00;
+		buf[i].fg.r = 500;
+		buf[i].fg.g = 100;
+		buf[i].fg.b = 100;
+
+		buf[i].sym = '9';
+	}
+}

@@ -115,8 +115,13 @@ bool DataPipe::LoadVoxTab()
 
 	//read table
 	while (!feof(vtf)) {
-		r = fscanf(vtf,"%c%d %hd %6c\n",&fx,(int*)&(cvf.type),&(cvf.color),cvf.sides);
-		if (r < 4) continue;
+		r = fscanf(vtf,"%c%d %hd %hd %hd %hd %hd %hd %6c\n",&fx,
+				(int*)&(cvf.type),
+				&(cvf.pix.fg.r),&(cvf.pix.fg.g),&(cvf.pix.fg.b),
+				&(cvf.pix.bg.r),&(cvf.pix.bg.g),&(cvf.pix.bg.b),
+				cvf.sides);
+
+		if (r < 9) continue;
 		if (fx == 'V') voxeltab[n++] = cvf;
 		if (n >= voxtablen) break;
 	}

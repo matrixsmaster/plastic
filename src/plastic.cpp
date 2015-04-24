@@ -137,6 +137,7 @@ static void* plastic_eventhread(void* ptr)
 
 static void plastic_start()
 {
+	int r;
 	float alloc_gb;
 
 	/* Create and set up DataPipe */
@@ -151,11 +152,12 @@ static void plastic_start()
 
 	/* Make a CurseGUI */
 	g_gui = new CurseGUI();
-	if (g_gui->GetLastResult()) {
-		errout("Unable to create CurseGUI!\n");
+	r = g_gui->GetLastResult();
+	if (r) {
+		errout("Unable to create CurseGUI (error %d)\n",r);
 		abort();
 	}
-	g_gui->SetColortable(gui_coltable,COLPAIRS);
+	errout("COLORS = %d\nCOLOR_PAIRS = %d\n",COLORS,COLOR_PAIRS); //DEBUG
 
 	/* Init LVR */
 	g_lvr = new LVR(g_data);

@@ -1,8 +1,6 @@
-;test comment
-
-;V type color sides (6 characters)
-V0 1 000000
-V1 2 123456
-V1 3 abcdef
-V1 4 \|/-\|
-V1 5 QWERTY
+;V type foreground_color background_color 6 sides chars
+V0 000 000 000 000 000 000 000000
+V1 900 900 900 100 100 100 123456
+V1 900 900 900 900 000 000 abcdef
+V1 900 900 900 000 900 000 \|/-\|
+V1 900 900 900 000 000 900 QWERTY

@@ -34,11 +34,13 @@ LVR::LVR(DataPipe* pipe)
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
 	scale = vector3d(1);
+	skies = new AtmoSky(DEFSKYLEN);
 	for (i = 0; i < 3; i++) rot[i] = GenOMatrix();
 }
 
 LVR::~LVR()
 {
+	delete skies;
 	if (render) free(render);
 	if (zbuf) free(zbuf);
 }
@@ -69,6 +71,7 @@ void LVR::SetEulerRotation(const vector3d r)
 	rot[0] = GenMtxRotX(r.X * M_PI / 180.f);
 	rot[1] = GenMtxRotY(r.Z * M_PI / 180.f); //swap Y-Z axes
 	rot[2] = GenMtxRotZ(r.Y * M_PI / 180.f);
+	skies->SetEulerAngles(r);
 }
 
 void LVR::SetPosition(const vector3d pos)
@@ -102,11 +105,11 @@ void LVR::Frame()
 //	memset(render,0,rendsize*sizeof(SGUIPixel));
 //	memset(zbuf,0,rendsize*sizeof(float));
 
+	skies->RenderTo(render,rendsize);
+
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
 		for (x = 0; x < g_w; x++,l++) {
-			render[l].col = 1;
-			render[l].sym = ' ';
 			//reverse painter's algorithm (+ z-buffer)?
 			for (z = 1; z <= far; z++) {
 				//make current point vector
@@ -131,7 +134,8 @@ void LVR::Frame()
 
 				//if voxel place is occupied, break current z-axis loop
 				if (vox->type != VOXT_EMPTY) {
-					render[l].col = vox->color;
+					render[l].bg = vox->pix.bg;
+					render[l].fg = vox->pix.fg;
 					render[l].sym = vox->sides[0]; //FIXME
 					break;
 				}

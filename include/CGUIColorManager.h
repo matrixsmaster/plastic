@@ -17,19 +17,38 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef VISUAL_H_
-#define VISUAL_H_
+#ifndef CGUICOLORMANAGER_H_
+#define CGUICOLORMANAGER_H_
+
+#include <vector>
+#include "visual.h"
 
 
-///Color triplet for ncurses.
-struct SCTriple {
-	short r,g,b;
+#define COLTOLERANCE 10
+
+struct SGUIExtPairs {
+	SCTriple tf,tb;
+	short cf,cb;
 };
 
-///ncurses GUI <pixel> type
-struct SGUIPixel {
-	char sym;
-	SCTriple fg,bg;
+class CGUIColorManager {
+protected:
+	bool changed;
+
+	std::vector<SCTriple> colors;
+	std::vector<SGUIExtPairs> pairs;
+
+	bool isEqual(const SCTriple* a, const SCTriple* b, const short tol);
+	short FindNearest(const SCTriple* cl);
+
+public:
+	CGUIColorManager();
+	virtual ~CGUIColorManager();
+
+	void Flush();
+	short CheckColor(const SCTriple* cl);
+	short CheckPair(const SGUIPixel* px);
+	void Apply();
 };
 
-#endif /* VISUAL_H_ */
+#endif /* CGUICOLORMANAGER_H_ */

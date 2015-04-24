@@ -30,17 +30,8 @@
 #include <ncurses.h>
 #include <vector>
 #include "CGUIEvents.h"
+#include "CGUIColorManager.h"
 
-
-struct SGUIWCol {
-//	char sym;
-	short f,b;
-};
-
-struct SGUIPixel {
-	char sym;
-	short col;
-};
 
 class CurseGUIBase {
 protected:
@@ -50,13 +41,14 @@ protected:
 	SGUIPixel* backgr;
 	int backgr_size;
 	bool will_close;
+	CGUIColorManager* cmanager;
 
 	///Internal background updater.
 	void UpdateBack();
 
 public:
 	CurseGUIBase();
-	virtual ~CurseGUIBase();
+	virtual ~CurseGUIBase()	{}
 
 	///Returns result of last operation (0 if everything is OK).
 	int GetLastResult()		{ return result; }
@@ -92,7 +84,7 @@ public:
 	virtual ~CurseGUI();
 
 	///Specify the color pairs to use.
-	void SetColortable(const SGUIWCol* table, int count);
+//	void SetColortable(const SGUIWCol* table, int count);
 
 	///Update all GUI (calling refresh automatically if refr == true).
 	void Update(bool refr);
@@ -124,8 +116,6 @@ public:
 	///Push events through all windows and controls.
 	///Returns whatever event was consumed or not.
 	bool PumpEvents(CGUIEvent* e);
-
-	//Add Event buffer
 };
 
 /* CurseGUI Window Base Class */
