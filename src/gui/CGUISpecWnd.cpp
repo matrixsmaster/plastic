@@ -25,7 +25,6 @@ using namespace std;
 CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn, int x, int y) :
 	CurseGUIWnd(scrn,x,y,2,2)
 {
-	cnt = 0;
 	hidden = true;
 	edit_line = ">";
 	key = 0;
@@ -51,10 +50,11 @@ void CurseGUIDebugWnd::Update(bool refr)
 
 	werase(wnd);
 
+	if(g_h < ((boxed)? 3:2)) return;
 	h = g_h - ((boxed)? 3:2);
 	numstr = h+1;
 
-	//TODO add edit line
+	/* Add edit line */
 	if (edit) {
 		edit_line += key;
 		edit = false;
@@ -84,7 +84,7 @@ void CurseGUIDebugWnd::Update(bool refr)
 
 bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 {
-	//TODO: DebugUI events processing
+	//DebugUI events processing
 	switch (e->t) {
 	case GUIEV_RESIZE:
 		ResizeWnd();
@@ -95,9 +95,6 @@ bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 			hidden ^= true;
 			edit_line = ">";
 			break;
-//		case 't':
-			// to do nothing
-//			break;
 		case KEY_ENTER:
 		case 10: /* in case enter isn't enter */
 			if(!hidden) {
@@ -108,11 +105,19 @@ bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 				}
 			}
 			break;
+		case KEY_BACKSPACE:
+		case 127: /* in case backspace isn't delete */
+			if(!hidden)
+				if(edit_line.size() > 1)
+					edit_line.erase(edit_line.end() - 1);
+			break;
 		default:
 			if(!hidden) {
-				key = e->k;
-				edit = true;
-				return true;
+				if((e->k >= 'A' && e->k <= 'Z') || (e->k >= 'a' && e->k <= 'z') || (e->k == '-') || (e->k == ' ')) {
+					key = e->k;
+					edit = true;
+					return true;
+				}
 			}
 			break;
 		}
@@ -126,9 +131,6 @@ void CurseGUIDebugWnd::PutString(char* str)
 {
 	//TODO delete ss
 	string log_str(str);
-	/*ostringstream ss;
-	ss << cnt++;
-	log_str += ss.str();*/ //Sorry, Begemot, I really want pure output :)
 	log.push_back(log_str);
 }
 
