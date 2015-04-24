@@ -17,19 +17,55 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+/* PlasticWorld is the core game class, which implements most of world/user interactions,
+ * as well as holding crucial game facilities, like renderer, datapipe etc.
+ */
+
 #ifndef WORLD_H_
 #define WORLD_H_
 
 #include "vecmath.h"
 #include "CurseGUI.h"
+#include "plastic.h"
+#include "datapipe.h"
 #include "LVR.h"
 #include "actor.h"
 
 
 class PlasticWorld {
+private:
+	int result;
+	SGameSettings* sets;
+	DataPipe* data;
+	LVR* lvr;
+	CurseGUI* gui;
+	Player* PC;
+
+	//FIXME: delete them
+	float scale;
+	vector2di fov;
+
 public:
-	PlasticWorld();
+	PlasticWorld(SGameSettings* settings);
 	virtual ~PlasticWorld();
+
+	///Main method for incremental updating world state.
+	void Quantum();
+
+	///Returns result of latest operation (mainly for outsiders).
+	int GetLastResult()						{ return result; }
+
+	///Connects CurseGUI to World.
+	void ConnectGUI(CurseGUI* guiptr);
+
+	///Restore or update CurseGUI connection.
+	void ConnectGUI();
+
+	///Returns a pointer to renderer (for outside use).
+	LVR* GetRenderer()						{ return lvr; }
+
+	///Main events processing facility.
+	void ProcessEvents(const CGUIEvent* e);
 };
 
 

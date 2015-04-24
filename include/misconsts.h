@@ -26,6 +26,10 @@
 
 #define DEFFARPLANE 64
 
+#define EVENTUSLEEP 2000
+#define WORLDUSLEEP 30000
+
+
 /*
  * I don't want to use <inttypes.h> because it causes all kinds of problems
  * on different platforms. Or even with different versions of glibc inclusion files.

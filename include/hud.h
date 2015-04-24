@@ -17,32 +17,9 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef ACTOR_H_
-#define ACTOR_H_
+#ifndef HUD_H_
+#define HUD_H_
 
-#include <string>
-#include "vecmath.h"
+#include "CGUIOverlay.h"
 
-
-class PlasticActor {
-protected:
-	vector3di pos,rot;
-	std::string name;
-
-public:
-	PlasticActor() {}
-	virtual ~PlasticActor() {}
-
-	void SetPos(const vector3di p)		{ pos = p; }
-	void SetRot(const vector3di r)		{ rot = r; }
-	vector3di GetPos()					{ return pos; }
-	vector3di GetRot()					{ return rot; }
-};
-
-class Player : public PlasticActor {
-public:
-	Player() : PlasticActor() {}
-	virtual ~Player() {}
-};
-
-#endif /* ACTOR_H_ */
+#endif /* HUD_H_ */

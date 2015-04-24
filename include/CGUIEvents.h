@@ -22,9 +22,6 @@
 
 #include <string>
 
-#define EVENTUSLEEP 2000
-
-
 
 enum CGUIEventType {
 	GUIEV_KEYPRESS,

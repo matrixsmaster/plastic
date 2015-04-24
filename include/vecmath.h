@@ -115,6 +115,7 @@ public:
 	CPoint3Di operator / (const T idiv) const			{ return CPoint3Di((X/idiv),(Y/idiv),(Z/idiv)); }
 	CPoint3Di operator * (const CPoint3Di & mul) const	{ return CPoint3Di((X*mul.X),(Y*mul.Y),(Z*mul.Z)); }
 	CPoint3Di operator / (const CPoint3Di & div) const	{ return CPoint3Di((X/div.X),(Y/div.Y),(Z/div.Z)); }
+	CPoint3D ToReal()									{ return CPoint3D((double)X,(double)Y,(double)Z); }
 	T X, Y, Z;
 };
 
