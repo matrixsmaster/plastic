@@ -20,6 +20,25 @@
 #ifndef HUD_H_
 #define HUD_H_
 
+#include <vector>
+#include "misconsts.h"
+#include "CurseGUI.h"
 #include "CGUIOverlay.h"
+
+class HUD {
+private:
+	CurseGUI* gui;
+	std::vector<CurseGUIOverlay*> overlays;
+
+	///Spawn an overlay window (for internal use only).
+	void Spawn(int x, int y, const char* txt);
+
+public:
+	HUD(CurseGUI* guiptr);
+	virtual ~HUD();
+
+	///Example of HUD info updater.
+	void UpdateFPS(uli fps);
+};
 
 #endif /* HUD_H_ */

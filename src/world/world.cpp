@@ -33,6 +33,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	lvr = NULL;
 	gui = NULL;
 	PC = new Player();
+	hud = NULL;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets->root);
@@ -58,6 +59,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 PlasticWorld::~PlasticWorld()
 {
+	if (hud) delete hud;
 	if (PC) delete PC;
 	if (lvr) delete lvr;
 	if (data) delete data;
@@ -91,6 +93,10 @@ void PlasticWorld::ConnectGUI()
 	//Connect lvr output to CurseGUI main background
 	gui->SetBackgroundData(lvr->GetRender(),lvr->GetRenderLen());
 
+	//Update HUD sizes, positions etc (reset)
+	if (hud) delete hud;
+	hud = new HUD(gui);
+
 	//OK
 	result = 0;
 }
@@ -104,6 +110,7 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 	result = 0;
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
+		/* User pressed a key */
 		switch (e->k) {
 		case KEY_UP: r.X += 1; break;
 		case KEY_DOWN: r.X -= 1; break;
@@ -130,13 +137,13 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 		PC->SetRot(r);
 		break;
 
-		case GUIEV_RESIZE:
-			/* Size of terminal has changed */
-			ConnectGUI();
-			break;
+	case GUIEV_RESIZE:
+		/* Size of terminal has changed */
+		ConnectGUI();
+		break;
 
-		default:
-			errout("Warning: unknown event type pumped. Possibly memory corruption.\n");
-			result = 1;
+	default:
+		errout("Warning: unknown event type pumped. Possibly memory corruption.\n");
+		result = 1;
 	}
 }

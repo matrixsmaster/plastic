@@ -30,6 +30,7 @@
 #include "datapipe.h"
 #include "LVR.h"
 #include "actor.h"
+#include "hud.h"
 
 
 class PlasticWorld {
@@ -40,6 +41,7 @@ private:
 	LVR* lvr;
 	CurseGUI* gui;
 	Player* PC;
+	HUD* hud;
 
 	//FIXME: delete them
 	float scale;

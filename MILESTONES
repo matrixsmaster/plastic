@@ -1,0 +1,7 @@
+v.0.1
+	Fully working LVR (without lighting, though)
+	Working atmosphere (clouds, wind and stars)
+	Some rigid actors
+	Startup shell (character generation and game options)
+	Working GUI (HUD, console, inventory, stats, map)
+	Some sort of landscape generation

@@ -1,5 +1,8 @@
 This file used to track current jobs and their completion.
+Most of the job need to be done is described inside source files.
+Just use 'Task control' feature of Eclipse, and you'll see :)
 
+More 'global' or just not-started-yet tasks are here (not sorted):
 
 -> Fill in some short info into README.md
 
@@ -8,3 +11,29 @@ This file used to track current jobs and their completion.
 -> Implement interactive startup shell
 
 -> Implement overlay
+
+-> Implement 'GUI controls' set of classes
+
+-> Add focus showing feature to GUI windows
+
+-> Implement DataPipe chunks crossing
+
+-> Implement DataPipe sphere mapping feature
+
+-> Implement DataPipe chunks dumping (saving)
+
+-> Implement DataPipe chunks swapping and loading
+
+-> Implement DataPipe chnuks mapping on load
+
+-> Add zlib compression to DataPipe
+
+-> Start working on physics system
+
+-> Implement actor animation system
+
+-> Add vehicle class (mountable actors??)
+
+-> Implement atmosphere (day/night cycle, stars, clouds etc)
+ 
+-> 
