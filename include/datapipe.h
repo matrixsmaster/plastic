@@ -23,12 +23,15 @@
 #define DATAPIPE_H_
 
 #include <vector>
+#include <map>
+#include <string>
 #include "voxel.h"
 #include "misconsts.h"
 #include "vecmath.h"
 #include "wrldgen.h"
 
 
+#define MAXINISTRLEN 256
 #define VOXTABFILENAME "voxtab.dat"
 
 enum EDPipeStatus {
@@ -53,6 +56,9 @@ struct SDataPlacement {
 	long offset;
 };
 
+typedef std::map<std::string,std::string> IniData;
+
+
 class DataPipe {
 private:
 	PChunk chunks[HOLDCHUNKS];				//world chunk buffers
@@ -63,11 +69,13 @@ private:
 	std::vector<SDataPlacement> placetab;	//chunk displacement table
 	WorldGen* wgen;							//world generator instance
 	SVoxelInf* voxeltab;					//voxel types table
-	int voxtablen;
+	int voxtablen;							//...its length
+	std::map<std::string,IniData> ini;		//map of known (and loaded) ini files
 
 	bool ScanFiles();
 	bool FindChunk(vector3dulli pos, SDataPlacement* res);
 	bool LoadVoxTab();
+	bool LoadIni(const std::string name);
 
 public:
 	DataPipe(char*);
@@ -97,8 +105,12 @@ public:
 	bool Move(EMoveDir dir);
 
 	///Returns a specific voxel (or its data) in loaded space.
-	voxel GetVoxel(const vector3di* p);
-	SVoxelInf* GetVoxelI(const vector3di* p);
+	voxel GetVoxel(const vector3di* p);			//return voxel code
+	SVoxelInf* GetVoxelI(const vector3di* p);	//return voxel info
+
+	///Supply INI-file based data by INI name and field name.
+	void GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen);
+	std::string GetIniDataS(const std::string ininame, const std::string inifield);
 };
 
 #endif /* DATAPIPE_H_ */
