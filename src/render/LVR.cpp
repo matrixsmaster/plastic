@@ -34,7 +34,7 @@ LVR::LVR(DataPipe* pipe)
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
 	scale = vector3d(1);
-	skies = new AtmoSky(DEFSKYLEN);
+	skies = new AtmoSky(DEFSKYLEN,pipe);
 	for (i = 0; i < 3; i++) rot[i] = GenOMatrix();
 }
 

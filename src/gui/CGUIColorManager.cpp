@@ -24,12 +24,13 @@ using namespace std;
 
 CGUIColorManager::CGUIColorManager()
 {
-	changed = true;
+	Flush();
 }
 
 CGUIColorManager::~CGUIColorManager()
 {
-	Flush();
+	colors.clear();
+	pairs.clear();
 }
 
 bool CGUIColorManager::isEqual(const SCTriple* a, const SCTriple* b, const short tol)
@@ -48,8 +49,17 @@ short CGUIColorManager::FindNearest(const SCTriple* cl)
 
 void CGUIColorManager::Flush()
 {
+	SCTriple tmp;
+
 	colors.clear();
 	pairs.clear();
+
+	//Add default black and white pair
+	tmp.r = 0; tmp.g = 0; tmp.b = 0;
+	colors.push_back(tmp);
+	tmp.r = 1000; tmp.g = 1000; tmp.b = 1000;
+	colors.push_back(tmp);
+
 	changed = true;
 }
 

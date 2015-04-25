@@ -47,6 +47,7 @@ void CurseGUIDebugWnd::Update(bool refr)
 
 	if (hidden) return;
 
+	wcolor_set(wnd,0,NULL);
 	werase(wnd);
 
 	if(g_h < ((boxed)? 3:2)) return;

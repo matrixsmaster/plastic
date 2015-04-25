@@ -33,6 +33,8 @@
 
 #define MAXINISTRLEN 256
 #define VOXTABFILENAME "voxtab.dat"
+#define ATMOININAME "atmosphere"
+
 
 enum EDPipeStatus {
 	DPIPE_NOTREADY,

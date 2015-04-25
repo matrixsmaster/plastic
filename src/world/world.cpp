@@ -55,14 +55,6 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	data->SetGP(vector3dulli(0));
 	lvr->SetPosition(vector3d(128));
 	PC->SetPos(vector3di(128));
-
-	//DEBUG:
-	int test = atoi(data->GetIniDataS("atmosphere","test").c_str());
-	errout("test = %d\n",test);
-	char test2[64];
-	data->GetIniDataC("atmosphere","test",test2,64);
-	errout("test = '%s'\n",test2);
-	data->GetIniDataS("invalid","file");
 }
 
 PlasticWorld::~PlasticWorld()
