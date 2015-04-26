@@ -17,35 +17,36 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include <stdlib.h>
-#include "wrldgen.h"
+#include "CGUIControls.h"
 
+using namespace std;
 
-WorldGen::WorldGen()
+CurseGUIControl::CurseGUIControl(CurseGUIWnd* p, int x, int y)
 {
-	//TODO: RLCG init
+	owner = p;
+	g_x = x;
+	g_y = y;
+	back.r = 0;
+	back.g = 0;
+	back.b = 0;
+	//TODO: init something here :)
 }
 
-WorldGen::~WorldGen()
+CurseGUICtrlHolder::~CurseGUICtrlHolder()
 {
+	vector<CurseGUIControl*>::iterator it;
+	if (controls.empty()) return;
+
+	for (it = controls.begin(); it != controls.end(); ++it)
+		delete (*it);
+	controls.clear();
 }
 
-void WorldGen::GenerateChunk(PChunk buf)
+void CurseGUICtrlHolder::Update()
 {
-	int x,y,z,t;
-	voxel v;
-	if (!buf) return;
-	//FIXME: for debug only
-	for (z = 0; z < CHUNKBOX; z++) {
-		for (y = 0; y < CHUNKBOX; y++) {
-			for (x = 0; x < CHUNKBOX; x++) {
-				if (z < 128) {
-//					t = (rand() & 3) + 1;
-					t = (((y % 2)? x:(x+1)) % 2) + 1 + (z % 2);
-					v = (voxel)t;
-				} else v = 0;
-				(*buf)[z][y][x] = v;
-			}
-		}
-	}
+	vector<CurseGUIControl*>::iterator it;
+	if (controls.empty()) return;
+
+	for (it = controls.begin(); it != controls.end(); ++it)
+		(*it)->Update();
 }

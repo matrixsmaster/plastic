@@ -35,13 +35,13 @@ LVR::LVR(DataPipe* pipe)
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
 	scale = vector3d(1);
-	skies = new AtmoSky(DEFSKYLEN,pipe);
+	skies = (pipe)? (new AtmoSky(DEFSKYLEN,pipe)):NULL;
 	for (i = 0; i < 3; i++) rot[i] = GenOMatrix();
 }
 
 LVR::~LVR()
 {
-	delete skies;
+	if (skies) delete skies;
 	if (render) free(render);
 	if (zbuf) free(zbuf);
 	if (pbuf) delete[] pbuf;
@@ -136,7 +136,7 @@ void LVR::Frame()
 				v.Y = (double)y;
 				v.Z = (double)z;
 				//calculate reverse projection into screen space
-				PerspectiveNInv(&v,&fov,&mid);
+				PerspectiveDInv(&v,&fov,&mid);
 
 				//apply transformations
 				v *= scale;
@@ -145,9 +145,9 @@ void LVR::Frame()
 				v += offset;
 
 				//round vector to use as a voxel space co-ord
-				iv.X = (int)(round(v.X));
-				iv.Y = (int)(round(v.Z)); //swap Y-Z axes
-				iv.Z = (int)(round(v.Y));
+				iv.X = (int)(floor(v.X)); //FIXME: used floor() instead of round() to make quantum error easily visible
+				iv.Y = (int)(floor(v.Z)); //swap Y-Z axes
+				iv.Z = (int)(floor(v.Y));
 				vox = pipeptr->GetVoxelI(&iv);
 
 				//if voxel place is occupied, break current z-axis loop

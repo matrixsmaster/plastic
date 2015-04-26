@@ -20,6 +20,7 @@
 /* CurseGUI is a set of wrapper classes to make easier to use ncurses in object-oriented environment */
 
 #include "CurseGUI.h"
+#include "CGUIControls.h"
 
 
 CurseGUIBase::CurseGUIBase()
@@ -113,6 +114,12 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 		return;
 	}
 
+	if (use_default_colors() == ERR) {
+		result = 4;
+		endwin();
+		return;
+	}
+
 	cmanager = new CGUIColorManager();
 
 	noecho();
@@ -153,11 +160,12 @@ void CurseGUI::SoftReset()
 	Update(true);
 }
 
-CurseGUIWnd* CurseGUI::MkWindow(int x, int y, int w, int h)
+CurseGUIWnd* CurseGUI::MkWindow(int x, int y, int w, int h, const char* name)
 {
 	CurseGUIWnd* nwd;
 	if ((x<0) || (y<0) || (w<1) || (h<1)) return NULL;
 	nwd = new CurseGUIWnd(this,x,y,w,h);
+	nwd->SetName(name);
 	windows.push_back(nwd);
 	return nwd;
 }
@@ -185,6 +193,21 @@ bool CurseGUI::RmWindow(int no)
 		/* we don't want more than two billion windows, though */
 		return false;
 	return (RmWindow(windows[no]));
+}
+
+bool CurseGUI::RmWindow(const char* name)
+{
+	std::vector<CurseGUIWnd*>::iterator it;
+	std::string nm(name);
+	if (nm.empty()) return false;
+
+	for (it = windows.begin(); it != windows.end(); it++)
+		if ((*it)->GetName() == nm) {
+			delete (*it);
+			windows.erase(it);
+			return true;
+		}
+	return false;
 }
 
 void CurseGUI::RmAllWindows()
@@ -259,6 +282,7 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 
 CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 {
+	type = GUIWT_BASIC;
 	parent = scrn;
 	cmanager = scrn->GetColorManager();
 	wnd = subwin(scrn->GetWindow(),h,w,y,x);
@@ -270,11 +294,18 @@ CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 	}
 	focused = true;
 	boxed = true;
+	ctrls = new CurseGUICtrlHolder(this);
 }
 
 CurseGUIWnd::~CurseGUIWnd()
 {
+	if (ctrls) delete ctrls;
 	if (wnd) delwin(wnd);
+}
+
+void CurseGUIWnd::SetName(const char* nm)
+{
+	if (nm) name = std::string(nm);
 }
 
 void CurseGUIWnd::Update(bool refr)

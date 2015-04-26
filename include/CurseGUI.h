@@ -29,9 +29,12 @@
 #include <string.h>
 #include <ncurses.h>
 #include <vector>
+#include <string>
 #include "CGUIEvents.h"
 #include "CGUIColorManager.h"
 
+
+/* ********************************** GUI BASE ********************************** */
 
 class CurseGUIBase {
 protected:
@@ -77,7 +80,11 @@ public:
 	virtual void Update(bool) = 0;
 };
 
+/* ********************************** GUI MAIN ********************************** */
+
 class CurseGUIWnd;
+
+/* Curse GUI Main class */
 class CurseGUI : public CurseGUIBase {
 private:
 	std::vector<CurseGUIWnd*> windows;
@@ -93,7 +100,7 @@ public:
 	void SoftReset();
 
 	///Create new CurseGUI window.
-	CurseGUIWnd* MkWindow(int x, int y, int w, int h);
+	CurseGUIWnd* MkWindow(int x, int y, int w, int h, const char* name);
 
 	///Register CurseGUI window created outside.
 	void AddWindow(CurseGUIWnd* n_wnd);
@@ -103,6 +110,9 @@ public:
 
 	///Remove CurseGUI window by number.
 	bool RmWindow(int no);
+
+	///Remove CurseGUI window by name.
+	bool RmWindow(const char* name);
 
 	///Destroy all active CurseGUI windows.
 	void RmAllWindows();
@@ -118,18 +128,41 @@ public:
 	bool PumpEvents(CGUIEvent* e);
 };
 
+/* ********************************** GUI WINDOWS ********************************** */
+
+/* Window types enumeration to make windows sortable by its purpose */
+enum ECGUIWindowType {
+	GUIWT_BASIC,
+	GUIWT_OVERLAY,
+	GUIWT_DEBUGUI
+};
+
+class CurseGUICtrlHolder;
+
 /* CurseGUI Window Base Class */
 class CurseGUIWnd : public CurseGUIBase {
 protected:
 	CurseGUI* parent;
+	ECGUIWindowType type;
+	std::string name;
 	bool focused;
 	bool boxed;
 	int g_x, g_y;
+	CurseGUICtrlHolder* ctrls;
 
 public:
 	CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h);
 	virtual ~CurseGUIWnd();
-	void SetBoxed(bool b)				{ boxed = b; }
+
+	virtual void SetBoxed(bool b)		{ boxed = b; }
+	virtual void GainFocus()			{ focused = true; }
+	virtual void LooseFocus()			{ focused = false; }
+	bool IsFocused()					{ return focused; }
+
+	virtual void SetName(const char* nm);
+	std::string GetName()				{ return name; }
+	ECGUIWindowType GetType()			{ return type; }
+
 	virtual void Update(bool refr);
 	virtual void Move(int x, int y);
 	virtual void Resize(int w, int h);

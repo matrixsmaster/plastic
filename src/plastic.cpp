@@ -54,12 +54,13 @@ static void* plastic_eventhread(void* ptr)
 	vector2di curso;
 	char s[128];
 	vector3di x;
+	bool d;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 
 		/* Events pump */
 		if (!g_gui->PumpEvents(&my_e)) {
-			/* No one consumed event, need to be processed inside core */
+			/* No one consumed event, need to be processed inside the core */
 			g_wrld->ProcessEvents(&my_e);
 		}
 
@@ -74,18 +75,22 @@ static void* plastic_eventhread(void* ptr)
 		g_gui->Update(true);
 
 		//debug:
+		d = false;
 		if (my_e.t == GUIEV_KEYPRESS) {
 			switch (my_e.k) {
-			case 'i': curso.Y--; break;
-			case 'k': curso.Y++; break;
-			case 'j': curso.X--; break;
-			case 'l': curso.X++; break;
+			case 'i': curso.Y--; d = true; break;
+			case 'k': curso.Y++; d = true; break;
+			case 'j': curso.X--; d = true; break;
+			case 'l': curso.X++; d = true; break;
 			}
 		}
 		move(curso.Y,curso.X);
-		x = g_wrld->GetRenderer()->GetProjection(curso);
-		snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
-		g_wrld->GetHUD()->Testing(s);
+		if (d) {
+			x = g_wrld->GetRenderer()->GetProjection(curso);
+			snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
+			//g_wrld->GetHUD()->Testing(s);
+			dbg_logstr(s);
+		}
 
 		/* To keep CPU load low(er) */
 		usleep(EVENTUSLEEP);
