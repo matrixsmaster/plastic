@@ -71,6 +71,9 @@ public:
 	///Returns if the window or frame is going to close.
 	bool WillClose()		{ return will_close; }
 
+	///Returns a pointer to current ColorManager.
+	CGUIColorManager* GetColorManager()	{ return cmanager; }
+
 	virtual void Update(bool) = 0;
 };
 
@@ -82,9 +85,6 @@ private:
 public:
 	CurseGUI();
 	virtual ~CurseGUI();
-
-	///Specify the color pairs to use.
-//	void SetColortable(const SGUIWCol* table, int count);
 
 	///Update all GUI (calling refresh automatically if refr == true).
 	void Update(bool refr);
@@ -124,6 +124,7 @@ protected:
 	CurseGUI* parent;
 	bool focused;
 	bool boxed;
+	int g_x, g_y;
 
 public:
 	CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h);

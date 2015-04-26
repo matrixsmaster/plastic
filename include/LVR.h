@@ -61,6 +61,7 @@ public:
 	void SetPosition(const vector3d pos);
 	void SetScale(const double s);
 	void SetFOV(const vector2di f);
+	void SetFarDist(const int d);
 	void Frame();
 };
 

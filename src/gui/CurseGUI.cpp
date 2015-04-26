@@ -134,13 +134,6 @@ CurseGUI::~CurseGUI()
 	refresh();
 }
 
-//void CurseGUI::SetColortable(const SGUIWCol* table, int count)
-//{
-//	int i;
-//	for (i = 0; i < count; i++)
-//		init_pair(i+1,table[i].f,table[i].b);
-//}
-
 void CurseGUI::Update(bool refr)
 {
 	std::vector<CurseGUIWnd*>::iterator it;
@@ -261,10 +254,13 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 {
 	parent = scrn;
+	cmanager = scrn->GetColorManager();
 	wnd = subwin(scrn->GetWindow(),h,w,y,x);
 	if (wnd) {
 		g_w = w;
 		g_h = h;
+		g_x = x;
+		g_y = y;
 	}
 	focused = true;
 	boxed = true;
@@ -288,6 +284,8 @@ void CurseGUIWnd::Move(int x, int y)
 {
 	if ((x < 0) || (y < 0)) return;
 	mvderwin(wnd,y,x);
+	g_x = x;
+	g_y = y;
 }
 
 void CurseGUIWnd::Resize(int w, int h)

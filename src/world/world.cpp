@@ -51,6 +51,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 	//FIXME:
 	scale = 1.0;
+	far = DEFFARPLANE;
 	fov = vector2di(DEFFOVX,DEFFOVY);
 	data->SetGP(vector3dulli(0));
 	lvr->SetPosition(vector3d(128));
@@ -128,11 +129,19 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 		case '.': fov.X++; break;
 		case 'n': fov.Y--; break;
 		case 'm': fov.Y++; break;
+		case ';': far--; break;
+		case '\'': far++; break;
+		case KEY_F(4):
+				gui->GetColorManager()->Flush();
+				printf("TESTING: YOU SHOULDN'T SEE THIS!!!");
+				redrawwin(gui->GetWindow());
+				break;
 		}
 		lvr->SetEulerRotation(r.ToReal());
 		lvr->SetPosition(p.ToReal());
 		lvr->SetScale(scale);
 		lvr->SetFOV(fov);
+		lvr->SetFarDist(far);
 		PC->SetPos(p);
 		PC->SetRot(r);
 		break;

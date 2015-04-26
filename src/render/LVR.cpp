@@ -76,7 +76,6 @@ void LVR::SetEulerRotation(const vector3d r)
 
 void LVR::SetPosition(const vector3d pos)
 {
-//	offset = pos;
 	offset.X = pos.X;
 	offset.Y = pos.Z; //swap Y-Z axes
 	offset.Z = pos.Y;
@@ -95,6 +94,12 @@ void LVR::SetFOV(const vector2di f)
 	dbg_print("FOV = [%d %d]",f.X,f.Y);
 }
 
+void LVR::SetFarDist(const int d)
+{
+	far = d;
+	dbg_print("Far = %d",d);
+}
+
 void LVR::Frame()
 {
 	int x,y,z,l,i;
@@ -102,7 +107,6 @@ void LVR::Frame()
 	vector3di iv;
 	SVoxelInf* vox;
 
-//	memset(render,0,rendsize*sizeof(SGUIPixel));
 //	memset(zbuf,0,rendsize*sizeof(float));
 
 	skies->RenderTo(render,rendsize);
@@ -113,14 +117,13 @@ void LVR::Frame()
 			//reverse painter's algorithm (+ z-buffer)?
 			for (z = 1; z <= far; z++) {
 				//make current point vector
-				v.X = (double)x;// / (double)fov.X;
-				v.Y = (double)y;// / (double)fov.Y;
+				v.X = (double)x;
+				v.Y = (double)y;
 				v.Z = (double)z;
 				//calculate reverse projection into screen space
 				PerspectiveDInv(&v,&fov,&mid);
 
 				//apply transformations
-//				v *= vector3d((1.f/fov.X),(1.f/fov.Y),1);
 				v *= scale;
 				for (i = 0; i < 3; i++)
 					v = MtxPntMul(&rot[i],&v);
@@ -133,6 +136,8 @@ void LVR::Frame()
 				vox = pipeptr->GetVoxelI(&iv);
 
 				//if voxel place is occupied, break current z-axis loop
+//				if ((vox->type != VOXT_EMPTY) && ((zbuf[l] > v.Z) || (zbuf[l] == 0))) {
+//					zbuf[l] = v.Z;
 				if (vox->type != VOXT_EMPTY) {
 					render[l].bg = vox->pix.bg;
 					render[l].fg = vox->pix.fg;
