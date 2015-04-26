@@ -177,18 +177,25 @@ void SortVectors(vector3d* arr, const int n, const int axis)
 	}
 }
 
-void PerspectiveD(vector3d* pnt, const vector2di* fov, const vector2di* mid)
+void PerspectiveD(vector3d* pnt, const vector3d* fov, const vector2di* mid)
 {
 	if (!pnt) return;
-	pnt->X = ( pnt->X * (double)(fov->X) / pnt->Z ) + (double)(mid->X);
-	pnt->Y = (-pnt->Y * (double)(fov->Y) / pnt->Z ) + (double)(mid->Y);
+	pnt->X = ( pnt->X * fov->X / pnt->Z ) + (double)(mid->X);
+	pnt->Y = (-pnt->Y * fov->Y / pnt->Z ) + (double)(mid->Y);
 }
 
-void PerspectiveDInv(vector3d* pnt, const vector2di* fov, const vector2di* mid)
+void PerspectiveDInv(vector3d* pnt, const vector3d* fov, const vector2di* mid)
 {
 	if (!pnt) return;
-	pnt->X = (pnt->Z * (-(double)(mid->X) + pnt->X)) / (double)(fov->X);
-	pnt->Y = (pnt->Z * ( (double)(mid->Y) - pnt->Y)) / (double)(fov->Y);
+	pnt->X = (pnt->Z * (-mid->X + pnt->X)) / (double)(fov->X);
+	pnt->Y = (pnt->Z * ( mid->Y - pnt->Y)) / (double)(fov->Y);
+}
+
+void PerspectiveNInv(vector3d* pnt, const vector3d* fov, const vector2di* mid)
+{
+	if (!pnt) return;
+	pnt->X = (2.f * (double)(mid->X) * (pnt->X - (double)(mid->X))) / (fov->X * pnt->Z);
+	pnt->Y =-(2.f * (double)(mid->Y) * (pnt->Y - (double)(mid->Y))) / (fov->Y * pnt->Z);
 }
 
 /*

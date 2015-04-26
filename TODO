@@ -30,10 +30,12 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 
 -> Start working on physics system
 
--> Implement actor animation system
+-> Implement static actors
+
+-> Add actor animation system
 
 -> Add vehicle class (mountable actors??)
 
 -> Implement atmosphere (day/night cycle, stars, clouds etc)
  
--> 
+-> Fix CurseGUI pair0 (default) color bug!

@@ -39,6 +39,8 @@ public:
 
 	///Example of HUD info updater.
 	void UpdateFPS(uli fps);
+
+	void Testing(const char* str);
 };
 
 #endif /* HUD_H_ */

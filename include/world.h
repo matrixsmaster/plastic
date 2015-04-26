@@ -45,7 +45,7 @@ private:
 
 	//FIXME: delete them
 	float scale;
-	vector2di fov;
+	vector3d fov;
 	int far;
 
 public:
@@ -66,6 +66,9 @@ public:
 
 	///Returns a pointer to renderer (for outside use).
 	LVR* GetRenderer()						{ return lvr; }
+
+	///Returns HUD pointer.
+	HUD* GetHUD()							{ return hud; }
 
 	///Main events processing facility.
 	void ProcessEvents(const CGUIEvent* e);

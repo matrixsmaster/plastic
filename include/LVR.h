@@ -32,8 +32,9 @@
 #include "sky.h"
 
 
-#define DEFFOVX 80
-#define DEFFOVY 40
+#define DEFFARPLANE 32
+#define DEFFOVX 3
+#define DEFFOVY 2
 #define DEFSKYLEN 1024
 
 
@@ -41,10 +42,12 @@ class LVR {
 private:
 	int g_w,g_h;
 	int far;
-	vector2di fov,mid;
+	vector2di mid;
+	vector3d fov;
 	DataPipe* pipeptr;
 	SGUIPixel* render;
 	float* zbuf;
+	vector3di* pbuf;
 	uli rendsize;
 	SMatrix3d rot[3];
 	vector3d offset,scale;
@@ -56,12 +59,17 @@ public:
 
 	SGUIPixel* GetRender()		{ return render; }
 	uli GetRenderLen()			{ return rendsize; }
+
 	bool Resize(int w, int h);
+
 	void SetEulerRotation(const vector3d r);
 	void SetPosition(const vector3d pos);
 	void SetScale(const double s);
-	void SetFOV(const vector2di f);
+	void SetFOV(const vector3d f);
 	void SetFarDist(const int d);
+
+	vector3di GetProjection(const vector2di pnt);
+
 	void Frame();
 };
 

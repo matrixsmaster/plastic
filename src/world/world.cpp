@@ -49,10 +49,10 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	/* Create LVR */
 	lvr = new LVR(data);
 
-	//FIXME:
+	//FIXME: debugging stuff
 	scale = 1.0;
 	far = DEFFARPLANE;
-	fov = vector2di(DEFFOVX,DEFFOVY);
+	fov = vector3d(DEFFOVX,DEFFOVY,1);
 	data->SetGP(vector3dulli(0));
 	lvr->SetPosition(vector3d(128));
 	PC->SetPos(vector3di(128));
@@ -125,10 +125,14 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 		case '=': p.Z += 1; break;
 		case '[': scale -= 0.01; break;
 		case ']': scale += 0.01; break;
-		case ',': fov.X--; break;
-		case '.': fov.X++; break;
-		case 'n': fov.Y--; break;
-		case 'm': fov.Y++; break;
+		case ',': fov.X -= 0.1; break;
+		case '.': fov.X += 0.1; break;
+		case 'n': fov.Y -= 0.1; break;
+		case 'm': fov.Y += 0.1; break;
+		case '<': fov.X -= 1; break;
+		case '>': fov.X += 1; break;
+		case 'N': fov.Y -= 1; break;
+		case 'M': fov.Y += 1; break;
 		case ';': far--; break;
 		case '\'': far++; break;
 		case KEY_F(4):

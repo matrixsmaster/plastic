@@ -23,7 +23,7 @@
 #include "visual.h"
 
 ///Number of voxels at a side of chunk.
-#define CHUNKBOX 256
+#define CHUNKBOX 768
 
 ///Number of chunks in current active buffers.
 #define HOLDCHUNKS 1

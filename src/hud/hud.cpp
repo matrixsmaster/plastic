@@ -59,3 +59,9 @@ void HUD::UpdateFPS(uli fps)
 	 * */
 	//overlays[0]->PutString( bla -bla-bla
 }
+
+void HUD::Testing(const char* str)
+{
+	//That's doesn't work, Begemot! I can't see fucking projection points! I can't see anything usable!!! That sucks!
+	overlays[0]->PutString(str);
+}

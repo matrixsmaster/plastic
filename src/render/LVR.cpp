@@ -28,6 +28,7 @@ LVR::LVR(DataPipe* pipe)
 	pipeptr = pipe;
 	render = NULL;
 	zbuf = NULL;
+	pbuf = NULL;
 	rendsize = 0;
 	g_w = g_h = 0;
 	far = DEFFARPLANE;
@@ -43,6 +44,7 @@ LVR::~LVR()
 	delete skies;
 	if (render) free(render);
 	if (zbuf) free(zbuf);
+	if (pbuf) delete[] pbuf;
 }
 
 bool LVR::Resize(int w, int h)
@@ -62,8 +64,10 @@ bool LVR::Resize(int w, int h)
 	//reallocate buffers memory
 	render = (SGUIPixel*)realloc(render,rendsize*sizeof(SGUIPixel));
 	zbuf = (float*)realloc(zbuf,rendsize*sizeof(float));
+	if (pbuf) delete[] pbuf;
+	pbuf = new vector3di[rendsize];
 
-	return ((render != NULL) && (zbuf != NULL));
+	return ((render != NULL) && (zbuf != NULL) && (pbuf != NULL));
 }
 
 void LVR::SetEulerRotation(const vector3d r)
@@ -88,10 +92,10 @@ void LVR::SetScale(const double s)
 	dbg_print("scale = %.4f",s);
 }
 
-void LVR::SetFOV(const vector2di f)
+void LVR::SetFOV(const vector3d f)
 {
 	fov = f;
-	dbg_print("FOV = [%d %d]",f.X,f.Y);
+	dbg_print("FOV = [%.2f %.2f]",f.X,f.Y);
 }
 
 void LVR::SetFarDist(const int d)
@@ -100,9 +104,19 @@ void LVR::SetFarDist(const int d)
 	dbg_print("Far = %d",d);
 }
 
+vector3di LVR::GetProjection(const vector2di pnt)
+{
+	vector3di r(-1);
+	if ((!pbuf) || (pnt.X < 0) || (pnt.Y < 0)) return r;
+	if ((pnt.X >= CHUNKBOX) || (pnt.Y >= CHUNKBOX)) return r;
+	r = pbuf[pnt.Y * g_w + pnt.X];
+	return r;
+}
+
 void LVR::Frame()
 {
 	int x,y,z,l,i;
+	float fz;
 	vector3d v;
 	vector3di iv;
 	SVoxelInf* vox;
@@ -116,12 +130,13 @@ void LVR::Frame()
 		for (x = 0; x < g_w; x++,l++) {
 			//reverse painter's algorithm (+ z-buffer)?
 			for (z = 1; z <= far; z++) {
+//			for (fz = 0; fz <= far; fz += 0.1) {
 				//make current point vector
 				v.X = (double)x;
 				v.Y = (double)y;
 				v.Z = (double)z;
 				//calculate reverse projection into screen space
-				PerspectiveDInv(&v,&fov,&mid);
+				PerspectiveNInv(&v,&fov,&mid);
 
 				//apply transformations
 				v *= scale;
@@ -139,6 +154,7 @@ void LVR::Frame()
 //				if ((vox->type != VOXT_EMPTY) && ((zbuf[l] > v.Z) || (zbuf[l] == 0))) {
 //					zbuf[l] = v.Z;
 				if (vox->type != VOXT_EMPTY) {
+					pbuf[l] = iv;
 					render[l].bg = vox->pix.bg;
 					render[l].fg = vox->pix.fg;
 					render[l].sym = vox->sides[0]; //FIXME

@@ -50,6 +50,10 @@ static void* plastic_eventhread(void* ptr)
 	time_t beg;
 	ulli cnt = 0;
 	beg = clock();
+	//projection testing:
+	vector2di curso;
+	char s[128];
+	vector3di x;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 
@@ -68,6 +72,20 @@ static void* plastic_eventhread(void* ptr)
 			beg = clock();
 		}
 		g_gui->Update(true);
+
+		//debug:
+		if (my_e.t == GUIEV_KEYPRESS) {
+			switch (my_e.k) {
+			case 'i': curso.Y--; break;
+			case 'k': curso.Y++; break;
+			case 'j': curso.X--; break;
+			case 'l': curso.X++; break;
+			}
+		}
+		move(curso.Y,curso.X);
+		x = g_wrld->GetRenderer()->GetProjection(curso);
+		snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
+		g_wrld->GetHUD()->Testing(s);
 
 		/* To keep CPU load low(er) */
 		usleep(EVENTUSLEEP);

@@ -208,7 +208,10 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 	bool consumed = false;
 	result = 1;
 
-	if (will_close) return true; //to not process event furthermore
+	if (will_close) {
+		e->t = GUIEV_NONE; //reset event type to prevent loops
+		return true; //to not process event furthermore
+	}
 
 	/* Get the resize event */
 	if (UpdateSize()) {
@@ -217,7 +220,10 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 		/* Or, get the keypress event */
 		e->t = GUIEV_KEYPRESS;
 		e->k = getch(); //FIXME: use something more robust than that
-		if ((!e->k) || (e->k == ERR)) return true; //Event consumed 'cause there's no event!
+		if ((!e->k) || (e->k == ERR)) {
+			e->t = GUIEV_NONE; //reset event type to prevent loops
+			return true; //Event consumed 'cause there's no event!
+		}
 	}
 
 	for (i = windows.size() - 1; i >= 0; i--) {

@@ -24,8 +24,6 @@
 
 #define MAXPATHLEN 512
 
-#define DEFFARPLANE 64
-
 #define EVENTUSLEEP 2000
 #define WORLDUSLEEP 30000
 

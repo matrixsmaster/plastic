@@ -40,8 +40,8 @@ void WorldGen::GenerateChunk(PChunk buf)
 		for (y = 0; y < CHUNKBOX; y++) {
 			for (x = 0; x < CHUNKBOX; x++) {
 				if (z < 128) {
-//					t = (rand() & 3) + 1;
-					t = (((y % 2)? x:(x+1)) % 2) + 2;
+					t = (rand() & 3) + 1;
+//					t = (((y % 2)? x:(x+1)) % 2) + 2;
 					v = (voxel)t;
 				} else v = 0;
 				(*buf)[z][y][x] = v;
