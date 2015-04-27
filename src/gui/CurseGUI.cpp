@@ -265,6 +265,8 @@ CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 	if (wnd) {
 		g_w = w;
 		g_h = h;
+		g_x = x;
+		g_y = y;
 	}
 	focused = true;
 	boxed = true;
@@ -288,6 +290,8 @@ void CurseGUIWnd::Move(int x, int y)
 {
 	if ((x < 0) || (y < 0)) return;
 	mvderwin(wnd,y,x);
+	g_x = x;
+	g_y = y;
 }
 
 void CurseGUIWnd::Resize(int w, int h)

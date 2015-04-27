@@ -124,6 +124,7 @@ protected:
 	CurseGUI* parent;
 	bool focused;
 	bool boxed;
+	int g_x, g_y;
 
 public:
 	CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h);

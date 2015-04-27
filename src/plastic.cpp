@@ -73,7 +73,7 @@ static void* plastic_eventhread(void* ptr)
 					dbg_logstr("Testing OK Alice in Wonderland bla bla bla. Test if string is too long for add to one string");
 					break;
 					/* DEBUG */
-				case 'f': /* test overlay */
+				case KEY_F(5): /* test overlay */
 					ovrl->PutString("Testing overlay OK");
 					break;
 				case 'g': /* test overlay */
