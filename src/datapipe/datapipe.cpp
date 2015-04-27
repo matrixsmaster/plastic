@@ -177,3 +177,61 @@ SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
 	if (v < voxtablen) return &voxeltab[v];
 	else return NULL;
 }
+
+bool DataPipe::LoadIni(const std::string name)
+{
+	FILE* f;
+	int r;
+	char nm[MAXPATHLEN];
+	char key[MAXINISTRLEN],fld[MAXINISTRLEN];
+	IniData cur;
+
+	//make filepath and try to open file
+	snprintf(nm,MAXPATHLEN,"%s/%s.ini",root,name.c_str());
+	f = fopen(nm,"r");
+	if (!f) {
+		errout("Unable to open INI file '%s'\n",nm);
+		return false;
+	}
+
+	//loading
+	while (!feof(f)) {
+		r = fscanf(f,"%s = %s\n",key,fld);
+		if (r == 2)
+			cur.insert(make_pair(std::string(key),std::string(fld)));
+	}
+	fclose(f);
+
+	//append to ini map
+	ini.insert(make_pair(name,cur));
+
+	return true;
+}
+
+void DataPipe::GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen)
+{
+	/* for use in old-styled code */
+	std::string nm(ininame), fl(inifield);
+	if ((!dest) || (maxlen < 2)) return;
+	strncpy(dest,GetIniDataS(nm,fl).c_str(),maxlen);
+}
+
+std::string DataPipe::GetIniDataS(const std::string ininame, const std::string inifield)
+{
+	/* for use in new-styled code */
+	std::string res;
+	IniData* fnd;
+
+	//search for file in known files map
+	if (!ini.count(ininame)) {
+		//not found, try to load up
+		if (!LoadIni(ininame)) return res;
+	}
+
+	//search for field
+	fnd = &(ini[ininame]);
+	if (!fnd->count(inifield)) return res;
+	res = (*fnd)[inifield];
+
+	return res;
+}

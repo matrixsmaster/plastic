@@ -24,6 +24,7 @@ using namespace std;
 CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn, int x, int y) :
 	CurseGUIWnd(scrn,x,y,2,2)
 {
+	type = GUIWT_DEBUGUI;
 	hidden = true;
 	edit_line = ">";
 	key = 0;
@@ -47,6 +48,7 @@ void CurseGUIDebugWnd::Update(bool refr)
 
 	if (hidden) return;
 
+	wcolor_set(wnd,0,NULL);
 	werase(wnd);
 
 	if(g_h < ((boxed)? 3:2)) return;

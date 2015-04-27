@@ -20,16 +20,29 @@
 #ifndef ACTOR_H_
 #define ACTOR_H_
 
-#include <vecmath.h>
+#include <string>
+#include "vecmath.h"
+
 
 class PlasticActor {
-private:
-	vector3di pos;
-	int z_rot;
+protected:
+	vector3di pos,rot;
+	std::string name;
 
 public:
-	PlasticActor();
-	virtual ~PlasticActor();
+	PlasticActor() {}
+	virtual ~PlasticActor() {}
+
+	void SetPos(const vector3di p)		{ pos = p; }
+	void SetRot(const vector3di r)		{ rot = r; }
+	vector3di GetPos()					{ return pos; }
+	vector3di GetRot()					{ return rot; }
+};
+
+class Player : public PlasticActor {
+public:
+	Player() : PlasticActor() {}
+	virtual ~Player() {}
 };
 
 #endif /* ACTOR_H_ */

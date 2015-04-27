@@ -18,4 +18,145 @@
  */
 
 #include "world.h"
+#include "support.h"
+#include "debug.h"
 
+
+PlasticWorld::PlasticWorld(SGameSettings* settings)
+{
+	float alloc_gb;
+
+	/* Init internal variables */
+	result = 0;
+	sets = settings;
+	data = NULL;
+	lvr = NULL;
+	gui = NULL;
+	PC = new Player();
+	hud = NULL;
+
+	/* Create and set up DataPipe */
+	data = new DataPipe(sets->root);
+	if (data->GetStatus() == DPIPE_ERROR) {
+		errout("Unable to initialize data pipe. Possibly invalid root directory.\n");
+		result = 1;
+		return;
+	}
+	alloc_gb = (float)(data->GetAllocatedRAM()) / 1024.f / 1024.f / 1024.f;
+	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
+	printf("Allocated data pipe memory: %llu bytes (%.3f GiB)\n",data->GetAllocatedRAM(),alloc_gb);
+
+	/* Create LVR */
+	lvr = new LVR(data);
+
+	//FIXME: debugging stuff
+	scale = 1.0;
+	far = DEFFARPLANE;
+	fov = vector3d(DEFFOVX,DEFFOVY,1);
+	data->SetGP(vector3dulli(0));
+	lvr->SetPosition(vector3d(128));
+	PC->SetPos(vector3di(128));
+}
+
+PlasticWorld::~PlasticWorld()
+{
+	if (hud) delete hud;
+	if (PC) delete PC;
+	if (lvr) delete lvr;
+	if (data) delete data;
+}
+
+void PlasticWorld::Quantum()
+{
+	//TODO: world update (!)
+}
+
+void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
+{
+	gui = guiptr;
+	ConnectGUI();
+}
+
+void PlasticWorld::ConnectGUI()
+{
+	if ((!gui) || (!lvr)) {
+		result = 1;
+		return;
+	}
+
+	//resize LVR frame
+	if (!lvr->Resize(gui->GetWidth(),gui->GetHeight())) {
+		errout("Unable to resize LVR frame!\n");
+		result = 2;
+		return;
+	}
+
+	//Connect lvr output to CurseGUI main background
+	gui->SetBackgroundData(lvr->GetRender(),lvr->GetRenderLen());
+
+	//Update HUD sizes, positions etc (reset)
+	if (hud) delete hud;
+	hud = new HUD(gui);
+
+	//OK
+	result = 0;
+}
+
+void PlasticWorld::ProcessEvents(const CGUIEvent* e)
+{
+	//DEBUG:
+	vector3di r = PC->GetRot();
+	vector3di p = PC->GetPos();
+
+	result = 0;
+	switch (e->t) {
+	case GUIEV_KEYPRESS:
+		/* User pressed a key */
+		switch (e->k) {
+		case KEY_UP: r.X += 1; break;
+		case KEY_DOWN: r.X -= 1; break;
+		case KEY_LEFT: r.Z += 1; break;
+		case KEY_RIGHT: r.Z -= 1; break;
+		case 'w': p.Y += 1; break;
+		case 's': p.Y -= 1; break;
+		case 'a': p.X -= 1; break;
+		case 'd': p.X += 1; break;
+		case '-': p.Z -= 1; break;
+		case '=': p.Z += 1; break;
+		case '[': scale -= 0.01; break;
+		case ']': scale += 0.01; break;
+		case ',': fov.X -= 0.1; break;
+		case '.': fov.X += 0.1; break;
+		case 'n': fov.Y -= 0.1; break;
+		case 'm': fov.Y += 0.1; break;
+		case '<': fov.X -= 1; break;
+		case '>': fov.X += 1; break;
+		case 'N': fov.Y -= 1; break;
+		case 'M': fov.Y += 1; break;
+		case ';': far--; break;
+		case '\'': far++; break;
+		case KEY_F(4):
+				gui->GetColorManager()->Flush();
+				printf("TESTING: YOU SHOULDN'T SEE THIS!!!");
+				redrawwin(gui->GetWindow());
+				break;
+		}
+		lvr->SetEulerRotation(r.ToReal());
+		lvr->SetPosition(p.ToReal());
+		lvr->SetScale(scale);
+		lvr->SetFOV(fov);
+		lvr->SetFarDist(far);
+		PC->SetPos(p);
+		PC->SetRot(r);
+		break;
+
+	case GUIEV_RESIZE:
+		/* Size of terminal has changed */
+		ConnectGUI();
+		break;
+
+	default:
+		errout("Warning: unknown event type pumped. Possibly memory corruption.\n");
+		result = 1;
+	}
+}

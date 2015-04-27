@@ -28,21 +28,23 @@ LVR::LVR(DataPipe* pipe)
 	pipeptr = pipe;
 	render = NULL;
 	zbuf = NULL;
+	pbuf = NULL;
 	rendsize = 0;
 	g_w = g_h = 0;
 	far = DEFFARPLANE;
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
 	scale = vector3d(1);
-	skies = new AtmoSky(DEFSKYLEN);
+	skies = (pipe)? (new AtmoSky(DEFSKYLEN,pipe)):NULL;
 	for (i = 0; i < 3; i++) rot[i] = GenOMatrix();
 }
 
 LVR::~LVR()
 {
-	delete skies;
+	if (skies) delete skies;
 	if (render) free(render);
 	if (zbuf) free(zbuf);
+	if (pbuf) delete[] pbuf;
 }
 
 bool LVR::Resize(int w, int h)
@@ -62,8 +64,10 @@ bool LVR::Resize(int w, int h)
 	//reallocate buffers memory
 	render = (SGUIPixel*)realloc(render,rendsize*sizeof(SGUIPixel));
 	zbuf = (float*)realloc(zbuf,rendsize*sizeof(float));
+	if (pbuf) delete[] pbuf;
+	pbuf = new vector3di[rendsize];
 
-	return ((render != NULL) && (zbuf != NULL));
+	return ((render != NULL) && (zbuf != NULL) && (pbuf != NULL));
 }
 
 void LVR::SetEulerRotation(const vector3d r)
@@ -76,7 +80,6 @@ void LVR::SetEulerRotation(const vector3d r)
 
 void LVR::SetPosition(const vector3d pos)
 {
-//	offset = pos;
 	offset.X = pos.X;
 	offset.Y = pos.Z; //swap Y-Z axes
 	offset.Z = pos.Y;
@@ -89,20 +92,35 @@ void LVR::SetScale(const double s)
 	dbg_print("scale = %.4f",s);
 }
 
-void LVR::SetFOV(const vector2di f)
+void LVR::SetFOV(const vector3d f)
 {
 	fov = f;
-	dbg_print("FOV = [%d %d]",f.X,f.Y);
+	dbg_print("FOV = [%.2f %.2f]",f.X,f.Y);
+}
+
+void LVR::SetFarDist(const int d)
+{
+	far = d;
+	dbg_print("Far = %d",d);
+}
+
+vector3di LVR::GetProjection(const vector2di pnt)
+{
+	vector3di r(-1);
+	if ((!pbuf) || (pnt.X < 0) || (pnt.Y < 0)) return r;
+	if ((pnt.X >= CHUNKBOX) || (pnt.Y >= CHUNKBOX)) return r;
+	r = pbuf[pnt.Y * g_w + pnt.X];
+	return r;
 }
 
 void LVR::Frame()
 {
 	int x,y,z,l,i;
+	float fz;
 	vector3d v;
 	vector3di iv;
 	SVoxelInf* vox;
 
-//	memset(render,0,rendsize*sizeof(SGUIPixel));
 //	memset(zbuf,0,rendsize*sizeof(float));
 
 	skies->RenderTo(render,rendsize);
@@ -112,28 +130,31 @@ void LVR::Frame()
 		for (x = 0; x < g_w; x++,l++) {
 			//reverse painter's algorithm (+ z-buffer)?
 			for (z = 1; z <= far; z++) {
+//			for (fz = 0; fz <= far; fz += 0.1) {
 				//make current point vector
-				v.X = (double)x;// / (double)fov.X;
-				v.Y = (double)y;// / (double)fov.Y;
+				v.X = (double)x;
+				v.Y = (double)y;
 				v.Z = (double)z;
 				//calculate reverse projection into screen space
 				PerspectiveDInv(&v,&fov,&mid);
 
 				//apply transformations
-//				v *= vector3d((1.f/fov.X),(1.f/fov.Y),1);
 				v *= scale;
 				for (i = 0; i < 3; i++)
 					v = MtxPntMul(&rot[i],&v);
 				v += offset;
 
 				//round vector to use as a voxel space co-ord
-				iv.X = (int)(round(v.X));
-				iv.Y = (int)(round(v.Z)); //swap Y-Z axes
-				iv.Z = (int)(round(v.Y));
+				iv.X = (int)(floor(v.X)); //FIXME: used floor() instead of round() to make quantum error easily visible
+				iv.Y = (int)(floor(v.Z)); //swap Y-Z axes
+				iv.Z = (int)(floor(v.Y));
 				vox = pipeptr->GetVoxelI(&iv);
 
 				//if voxel place is occupied, break current z-axis loop
+//				if ((vox->type != VOXT_EMPTY) && ((zbuf[l] > v.Z) || (zbuf[l] == 0))) {
+//					zbuf[l] = v.Z;
 				if (vox->type != VOXT_EMPTY) {
+					pbuf[l] = iv;
 					render[l].bg = vox->pix.bg;
 					render[l].fg = vox->pix.fg;
 					render[l].sym = vox->sides[0]; //FIXME

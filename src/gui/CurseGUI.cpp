@@ -20,6 +20,7 @@
 /* CurseGUI is a set of wrapper classes to make easier to use ncurses in object-oriented environment */
 
 #include "CurseGUI.h"
+#include "CGUIControls.h"
 
 
 CurseGUIBase::CurseGUIBase()
@@ -113,6 +114,12 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 		return;
 	}
 
+	if (use_default_colors() == ERR) {
+		result = 4;
+		endwin();
+		return;
+	}
+
 	cmanager = new CGUIColorManager();
 
 	noecho();
@@ -134,13 +141,6 @@ CurseGUI::~CurseGUI()
 	refresh();
 }
 
-//void CurseGUI::SetColortable(const SGUIWCol* table, int count)
-//{
-//	int i;
-//	for (i = 0; i < count; i++)
-//		init_pair(i+1,table[i].f,table[i].b);
-//}
-
 void CurseGUI::Update(bool refr)
 {
 	std::vector<CurseGUIWnd*>::iterator it;
@@ -160,11 +160,12 @@ void CurseGUI::SoftReset()
 	Update(true);
 }
 
-CurseGUIWnd* CurseGUI::MkWindow(int x, int y, int w, int h)
+CurseGUIWnd* CurseGUI::MkWindow(int x, int y, int w, int h, const char* name)
 {
 	CurseGUIWnd* nwd;
 	if ((x<0) || (y<0) || (w<1) || (h<1)) return NULL;
 	nwd = new CurseGUIWnd(this,x,y,w,h);
+	nwd->SetName(name);
 	windows.push_back(nwd);
 	return nwd;
 }
@@ -194,6 +195,21 @@ bool CurseGUI::RmWindow(int no)
 	return (RmWindow(windows[no]));
 }
 
+bool CurseGUI::RmWindow(const char* name)
+{
+	std::vector<CurseGUIWnd*>::iterator it;
+	std::string nm(name);
+	if (nm.empty()) return false;
+
+	for (it = windows.begin(); it != windows.end(); it++)
+		if ((*it)->GetName() == nm) {
+			delete (*it);
+			windows.erase(it);
+			return true;
+		}
+	return false;
+}
+
 void CurseGUI::RmAllWindows()
 {
 	while (windows.size()) {
@@ -215,7 +231,10 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 	bool consumed = false;
 	result = 1;
 
-	if (will_close) return true; //to not process event furthermore
+	if (will_close) {
+		e->t = GUIEV_NONE; //reset event type to prevent loops
+		return true; //to not process event furthermore
+	}
 
 	/* Get the resize event */
 	if (UpdateSize()) {
@@ -224,7 +243,10 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 		/* Or, get the keypress event */
 		e->t = GUIEV_KEYPRESS;
 		e->k = getch(); //FIXME: use something more robust than that
-		if ((!e->k) || (e->k == ERR)) return true; //Event consumed 'cause there's no event!
+		if ((!e->k) || (e->k == ERR)) {
+			e->t = GUIEV_NONE; //reset event type to prevent loops
+			return true; //Event consumed 'cause there's no event!
+		}
 	}
 
 	for (i = windows.size() - 1; i >= 0; i--) {
@@ -260,7 +282,9 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 
 CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 {
+	type = GUIWT_BASIC;
 	parent = scrn;
+	cmanager = scrn->GetColorManager();
 	wnd = subwin(scrn->GetWindow(),h,w,y,x);
 	if (wnd) {
 		g_w = w;
@@ -270,11 +294,18 @@ CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 	}
 	focused = true;
 	boxed = true;
+	ctrls = new CurseGUICtrlHolder(this);
 }
 
 CurseGUIWnd::~CurseGUIWnd()
 {
+	if (ctrls) delete ctrls;
 	if (wnd) delwin(wnd);
+}
+
+void CurseGUIWnd::SetName(const char* nm)
+{
+	if (nm) name = std::string(nm);
 }
 
 void CurseGUIWnd::Update(bool refr)

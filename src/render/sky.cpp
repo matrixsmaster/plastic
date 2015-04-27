@@ -20,24 +20,31 @@
 #include "sky.h"
 
 
-AtmoSky::AtmoSky(uli sidelen)
+AtmoSky::AtmoSky(uli sidelen, DataPipe* pipeptr)
 {
-	//TODO
+	//init variables and allocate memory
+	square = sidelen * sidelen;
+	sky = (SGUIPixel*)malloc(square*sizeof(SGUIPixel));
+	pipe = pipeptr;
+	windsp = 0;
+
+	//load settings
+	day_sky.r = ((short)atoi(pipe->GetIniDataS(ATMOININAME,"DaySkyColorR").c_str()));
+	day_sky.g = ((short)atoi(pipe->GetIniDataS(ATMOININAME,"DaySkyColorG").c_str()));
+	day_sky.b = ((short)atoi(pipe->GetIniDataS(ATMOININAME,"DaySkyColorB").c_str()));
+	day_cld.r = ((short)atoi(pipe->GetIniDataS(ATMOININAME,"DayCloudColorR").c_str()));
+	day_cld.g = ((short)atoi(pipe->GetIniDataS(ATMOININAME,"DayCloudColorG").c_str()));
+	day_cld.b = ((short)atoi(pipe->GetIniDataS(ATMOININAME,"DayCloudColorB").c_str()));
 }
 
 AtmoSky::~AtmoSky()
 {
-	//TODO
+	if (sky) free(sky);
 }
 
-void AtmoSky::SetTime(const AtmoTime nwtime)
+void AtmoSky::Quantum()
 {
-	//TODO
-}
-
-void AtmoSky::SetEulerAngles(const vector3d nwang)
-{
-	//TODO
+	//TODO: updater
 }
 
 void AtmoSky::RenderTo(SGUIPixel* buf, const uli len)
@@ -47,13 +54,8 @@ void AtmoSky::RenderTo(SGUIPixel* buf, const uli len)
 
 	//FIXME
 	for (i = 0; i < len; i++) {
-		buf[i].bg.r = 0;
-		buf[i].bg.g = 500;
-		buf[i].bg.b = 00;
-		buf[i].fg.r = 500;
-		buf[i].fg.g = 100;
-		buf[i].fg.b = 100;
-
-		buf[i].sym = '9';
+		buf[i].bg = day_sky;
+		buf[i].fg = day_cld;
+		buf[i].sym = ' ';
 	}
 }

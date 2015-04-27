@@ -60,7 +60,10 @@ double InterpolateZQ(vector3d* pts, double x, double y);
 void SortVectors(vector3d* arr, const int n, const int axis);
 
 ///Default perspective projection.
-void PerspectiveD(vector3d* pnt, const vector2di* fov, const vector2di* mid);
-void PerspectiveDInv(vector3d* pnt, const vector2di* fov, const vector2di* mid);
+void PerspectiveD(vector3d* pnt, const vector3d* fov, const vector2di* mid);
+void PerspectiveDInv(vector3d* pnt, const vector3d* fov, const vector2di* mid);
+
+///Experimental reverse projection.
+void PerspectiveNInv(vector3d* pnt, const vector3d* fov, const vector2di* mid);
 
 #endif /* VECMISC_H_ */

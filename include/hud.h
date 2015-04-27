@@ -17,35 +17,30 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include <stdlib.h>
-#include "wrldgen.h"
+#ifndef HUD_H_
+#define HUD_H_
 
+#include <vector>
+#include "misconsts.h"
+#include "CurseGUI.h"
+#include "CGUIOverlay.h"
 
-WorldGen::WorldGen()
-{
-	//TODO: RLCG init
-}
+class HUD {
+private:
+	CurseGUI* gui;
+	std::vector<CurseGUIOverlay*> overlays;
 
-WorldGen::~WorldGen()
-{
-}
+	///Spawn an overlay window (for internal use only).
+	void Spawn(int x, int y, const char* txt);
 
-void WorldGen::GenerateChunk(PChunk buf)
-{
-	int x,y,z,t;
-	voxel v;
-	if (!buf) return;
-	//FIXME: for debug only
-	for (z = 0; z < CHUNKBOX; z++) {
-		for (y = 0; y < CHUNKBOX; y++) {
-			for (x = 0; x < CHUNKBOX; x++) {
-				if (z < 128) {
-//					t = (rand() & 3) + 1;
-					t = (((y % 2)? x:(x+1)) % 2) + 1 + (z % 2);
-					v = (voxel)t;
-				} else v = 0;
-				(*buf)[z][y][x] = v;
-			}
-		}
-	}
-}
+public:
+	HUD(CurseGUI* guiptr);
+	virtual ~HUD();
+
+	///Example of HUD info updater.
+	void UpdateFPS(uli fps);
+
+	void Testing(const char* str);
+};
+
+#endif /* HUD_H_ */

@@ -26,6 +26,7 @@ using namespace std;
 CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y) :
 		CurseGUIWnd(scrn,x,y,0,0)
 {
+	type = GUIWT_OVERLAY;
 	cnt = 0;
 
 	//TODO do something

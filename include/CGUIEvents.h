@@ -22,11 +22,9 @@
 
 #include <string>
 
-#define EVENTUSLEEP 2000
-
-
 
 enum CGUIEventType {
+	GUIEV_NONE,
 	GUIEV_KEYPRESS,
 	GUIEV_RESIZE,
 	GUIEV_COMMAND

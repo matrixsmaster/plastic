@@ -24,8 +24,7 @@ using namespace std;
 
 CGUIColorManager::CGUIColorManager()
 {
-	changed = true;
-	Flush(); //init defaults
+	Flush();
 }
 
 CGUIColorManager::~CGUIColorManager()
@@ -51,15 +50,16 @@ short CGUIColorManager::FindNearest(const SCTriple* cl)
 void CGUIColorManager::Flush()
 {
 	SCTriple tmp;
-	colors.clear();
 
-	//add default black and white
+	colors.clear();
+	pairs.clear();
+
+	//Add default black and white pair
 	tmp.r = 0; tmp.g = 0; tmp.b = 0;
 	colors.push_back(tmp);
 	tmp.r = 1000; tmp.g = 1000; tmp.b = 1000;
 	colors.push_back(tmp);
 
-	pairs.clear();
 	changed = true;
 }
 
