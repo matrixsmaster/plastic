@@ -31,7 +31,7 @@ private:
 	std::vector<CurseGUIOverlay*> overlays;
 
 	///Spawn an overlay window (for internal use only).
-	void Spawn(int x, int y, const char* txt);
+	void Spawn(int x, int y, int w, int h, const char* txt);
 
 public:
 	HUD(CurseGUI* guiptr);
@@ -41,6 +41,9 @@ public:
 	void UpdateFPS(uli fps);
 
 	void Testing(const char* str);
+	void PutStrBottom(const char* str);
+	bool GetTransparent();
+	void SetTransparent(bool t);
 };
 
 #endif /* HUD_H_ */

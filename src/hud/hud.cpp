@@ -17,6 +17,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <sstream>
 #include "hud.h"
 
 using namespace std;
@@ -26,8 +27,8 @@ HUD::HUD(CurseGUI* guiptr)
 	gui = guiptr;
 
 	//add some overlays
-	Spawn(0,0,"FPS = 0"); //top
-	Spawn(0,gui->GetHeight()-2,"Testing bottom overlay"); //bottom
+	Spawn(0,0, gui->GetWidth()/4, 1,"FPS = 0"); //top
+	Spawn(0,gui->GetHeight()-9, gui->GetWidth()/4, gui->GetHeight()/4,"Testing bottom overlay"); //bottom
 }
 
 HUD::~HUD()
@@ -40,10 +41,10 @@ HUD::~HUD()
 	overlays.clear();
 }
 
-void HUD::Spawn(int x, int y, const char* txt)
+void HUD::Spawn(int x, int y, int w, int h, const char* txt)
 {
 	CurseGUIOverlay* ptr;
-	ptr = new CurseGUIOverlay(gui,x,y);
+	ptr = new CurseGUIOverlay(gui,x,y, w, h);
 	overlays.push_back(ptr);
 	gui->AddWindow(ptr);
 	ptr->PutString(txt);
@@ -57,11 +58,41 @@ void HUD::UpdateFPS(uli fps)
 	 * Then, print() method will be great to pass some formatted information.
 	 * Use dbg_print() as example of very simple implementation.
 	 * */
-	//overlays[0]->PutString( bla -bla-bla
+	if(overlays.empty()) return;
+
+	string str;
+	ostringstream ss;
+	ss << fps;
+	str = "fps = ";
+	str += ss.str();
+	overlays[0]->PutString(str);
 }
 
 void HUD::Testing(const char* str)
 {
-	//That's doesn't work, Begemot! I can't see fucking projection points! I can't see anything usable!!! That sucks!
-	overlays[0]->PutString(str);
+	if(overlays.size() > 1) {
+		overlays[1]->PutString(str);
+	}
+}
+
+void HUD::PutStrBottom(const char* str)
+{
+	if(overlays.size() > 1) {
+		overlays[1]->PutString(str);
+	}
+}
+
+bool HUD::GetTransparent()
+{
+	//TODO
+	if(overlays.size() >  0)
+		return overlays[1]->GetTransparent();
+	return true;
+}
+
+void HUD::SetTransparent(bool t)
+{
+	//TODO
+	if(!overlays.empty())
+		overlays[1]->SetTransparent(t);
 }

@@ -23,17 +23,22 @@
 
 using namespace std;
 
-CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y) :
+CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h) :
 		CurseGUIWnd(scrn,x,y,0,0)
 {
 	type = GUIWT_OVERLAY;
 	cnt = 0;
+	m_x = x;
+	m_y = y;
+	m_w = w;
+	m_h = h;
 
 	//TODO do something
 	CGUIEvent e;
 	e.t = GUIEV_RESIZE;
 	PutEvent(&e);
 
+	transparent = true;
 }
 
 CurseGUIOverlay::~CurseGUIOverlay()
@@ -79,10 +84,7 @@ void CurseGUIOverlay::PutString(string str)
 
 void CurseGUIOverlay::ResizeWnd()
 {
-	int w, h;
-	h = parent->GetHeight()/4;
-	w = parent->GetWidth()/4;
-	Resize(w, h);
+	Resize(m_w, m_h);
 }
 
 void CurseGUIOverlay::PutLog()
@@ -90,28 +92,32 @@ void CurseGUIOverlay::PutLog()
 	//TODO
 	vector<string>::iterator it;
 	int h;
-	attr_t atr;
-	short pr;
 	h = g_h - 1;
+	chtype ch = 0, chclr;
+	int nl = h + 1;
+	int y = m_y+4;
 
-	//wcolor_set(wnd,pr,NULL);
-//	wattr_set(wnd, atr, pr, NULL);
+	if(!log.empty()) {
+		if(nl - log.size() >= 0)
+			nl = log.size() + 1;
 
-	for(it = log.begin(); it != log.end(); ++it) {
-		move(g_y + h, g_x);
-		touchline(wnd,g_y+h,1);
-		attr_get(&atr,&pr,NULL);
-		dbg_print("pair = %hd",pr);
-		for(int i = 0; i < it->size(); ++i) {
-			attr_get(&atr,&pr,NULL);
-//			wcolor_set(wnd,pr,NULL);
-			mvwaddch(wnd, h, i, it->at(i));
-			wmove(wnd, h, i);
-			wcolor_set(wnd,pr,NULL);
-//			wattr_set(wnd, atr, 2, NULL);
+		for(it = log.end() - 1; it != log.end() - nl; it--) {
+			for(int i = 0; i < it->size(); ++i) {
+				ch = mvinch(y, m_x+i);
+
+				if(transparent) {
+					chclr = ch & A_COLOR;
+				} else {
+					//TODO ?
+					chclr = 0;
+				}
+
+				ch = it->at(i);
+				ch ^= chclr;
+				mvwaddch(wnd, h, i, ch);
+			}
+			h--; y--;
 		}
-		h--;
-//		mvwaddnstr(wnd, h--, 1, it->c_str()+1, -1);
 	}
 }
 

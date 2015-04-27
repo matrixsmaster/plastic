@@ -68,7 +68,8 @@ static void* plastic_eventhread(void* ptr)
 		g_wrld->GetRenderer()->Frame();
 		cnt++;
 		if ((clock() - beg) >= CLOCKS_PER_SEC) {
-			dbg_print("fps = %llu",cnt);
+			g_wrld->GetHUD()->UpdateFPS(cnt);
+//			dbg_print("fps = %llu",cnt);
 			cnt = 0;
 			beg = clock();
 		}
@@ -88,7 +89,7 @@ static void* plastic_eventhread(void* ptr)
 		if (d) {
 			x = g_wrld->GetRenderer()->GetProjection(curso);
 			snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
-			//g_wrld->GetHUD()->Testing(s);
+			g_wrld->GetHUD()->PutStrBottom(s);
 			dbg_logstr(s);
 		}
 

@@ -30,23 +30,24 @@ class CurseGUIOverlay : public CurseGUIWnd {
 private:
 	std::vector<std::string> log;
 
-	//TODO
-	// if(transparent) getattr(), vcolorset background of symbol
-	// else wcolor_set(0)
-
 	int cnt;
+	int m_x, m_y;
+	int m_w, m_h;
+	bool transparent;
 
 	void ResizeWnd();
 	void PutLog();
 
 public:
-	CurseGUIOverlay(CurseGUI* scrn, int x, int y);
+	CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h);
 	virtual ~CurseGUIOverlay();
 
 	void Update(bool refr);
 	bool PutEvent(CGUIEvent* e);
 	void PutString(char* str);
 	void PutString(std::string str);
+	void SetTransparent(bool t)			{ transparent = t; }
+	bool GetTransparent() 				{ return transparent; }
 };
 
 

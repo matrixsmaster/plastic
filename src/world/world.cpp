@@ -140,7 +140,15 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 				printf("TESTING: YOU SHOULDN'T SEE THIS!!!");
 				redrawwin(gui->GetWindow());
 				break;
+		case KEY_F(2):
+			if(hud) {
+				if(hud->GetTransparent()) {
+					hud->SetTransparent(false);
+				} else hud->SetTransparent(true);
+			}
+			break;
 		}
+
 		lvr->SetEulerRotation(r.ToReal());
 		lvr->SetPosition(p.ToReal());
 		lvr->SetScale(scale);
