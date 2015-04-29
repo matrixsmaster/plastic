@@ -98,6 +98,9 @@ void PlasticWorld::ConnectGUI()
 	if (hud) delete hud;
 	hud = new HUD(gui);
 
+	//FIXME: DEBUGgin' stuff
+//	PC->SetPos(vector3di(128,128,(127 + gui->GetHeight()/2)));
+
 	//OK
 	result = 0;
 }

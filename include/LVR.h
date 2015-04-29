@@ -33,8 +33,8 @@
 
 
 #define DEFFARPLANE 32
-#define DEFFOVX 3
-#define DEFFOVY 2
+#define DEFFOVX 28
+#define DEFFOVY 14
 #define DEFSKYLEN 1024
 
 

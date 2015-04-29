@@ -83,25 +83,25 @@ void LVR::SetPosition(const vector3d pos)
 	offset.X = pos.X;
 	offset.Y = pos.Z; //swap Y-Z axes
 	offset.Z = pos.Y;
-	dbg_print("offset = [%.1f %.1f %.1f]",pos.X,pos.Z,pos.Y);
+	dbg_print("LVR Cam Pos = [%.1f %.1f %.1f]",pos.X,pos.Z,pos.Y);
 }
 
 void LVR::SetScale(const double s)
 {
 	scale = vector3d(s);
-	dbg_print("scale = %.4f",s);
+	dbg_print("LVR Scale = %.4f",s);
 }
 
 void LVR::SetFOV(const vector3d f)
 {
 	fov = f;
-	dbg_print("FOV = [%.2f %.2f]",f.X,f.Y);
+	dbg_print("LVR FOV = [%.2f %.2f]",f.X,f.Y);
 }
 
 void LVR::SetFarDist(const int d)
 {
 	far = d;
-	dbg_print("Far = %d",d);
+	dbg_print("LVR Far plane = %d",d);
 }
 
 vector3di LVR::GetProjection(const vector2di pnt)
@@ -116,38 +116,46 @@ vector3di LVR::GetProjection(const vector2di pnt)
 void LVR::Frame()
 {
 	int x,y,z,l,i;
-	float fz;
 	vector3d v;
 	vector3di iv;
 	SVoxelInf* vox;
 
-//	memset(zbuf,0,rendsize*sizeof(float));
+	memset(zbuf,0,rendsize*sizeof(float));
 
 	skies->RenderTo(render,rendsize);
 
+#if 0
+	//current tested: FOV(28,14), scale 0.33
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
 		for (x = 0; x < g_w; x++,l++) {
 			//reverse painter's algorithm (+ z-buffer)?
 			for (z = 1; z <= far; z++) {
-//			for (fz = 0; fz <= far; fz += 0.1) {
 				//make current point vector
 				v.X = (double)x;
 				v.Y = (double)y;
 				v.Z = (double)z;
 				//calculate reverse projection into screen space
 				PerspectiveDInv(&v,&fov,&mid);
+//				v.Y = -v.Y + mid.Y;
+//				v.X += mid.X;
 
 				//apply transformations
-				v *= scale;
-				for (i = 0; i < 3; i++)
-					v = MtxPntMul(&rot[i],&v);
+				//FIXME: use matrix product, not single matrices for each transform
+				v *= scale; //actually scales a camera frustrum, not a world
+//				for (i = 2; i >= 0; i--)
+//					v = MtxPntMul(&rot[i],&v);
+				SMatrix3d ft = Mtx3Mul(rot[0],rot[1]);
+//				ft = Mtx3Mul(ft,rot[0]);
+				v = MtxPntMul(&ft,&v);
+//				v = MtxPntMul(&rot[1],&v);
+
 				v += offset;
 
 				//round vector to use as a voxel space co-ord
-				iv.X = (int)(floor(v.X)); //FIXME: used floor() instead of round() to make quantum error easily visible
-				iv.Y = (int)(floor(v.Z)); //swap Y-Z axes
-				iv.Z = (int)(floor(v.Y));
+				iv.X = (int)(round(v.X));// * scale.X);
+				iv.Y = (int)(round(v.Z));// * scale.Y); //swap Y-Z axes
+				iv.Z = (int)(round(v.Y));// * scale.Z);
 				vox = pipeptr->GetVoxelI(&iv);
 
 				//if voxel place is occupied, break current z-axis loop
@@ -163,4 +171,119 @@ void LVR::Frame()
 			} //by Z
 		} //by X
 	} //by Y
+#elif 0
+	/* S-Cube */
+	vector3d tmp;
+	int j;
+	vox = pipeptr->GetVInfo(1);
+	for (z = 1; z <= far; z++) {
+		/*
+		 *    4
+		 *  2 0 3
+		 *    1
+		 */
+		for (i = 0; i < 5; i++) {
+			for (x = -z; x <= z; x++) {
+				for (y = -z; y <= z; y++) {
+					switch (i) {
+					case 0:
+						v.X = x;
+						v.Y = y;
+						v.Z = z;
+						break;
+					case 1:
+						v.X = x;
+						v.Y = -z;
+						v.Z = y;
+						break;
+					case 2:
+						v.X = -z;
+						v.Y = x;
+						v.Z = y;
+						break;
+					case 3:
+						v.X = z;
+						v.Y = x;
+						v.Z = y;
+						break;
+					case 4:
+						v.X = x;
+						v.Y = z;
+						v.Z = y;
+						break;
+					}
+					if (v.Z < 1) continue;
+
+					tmp = v;
+					for (j = 0; j < 3; j++)
+						v = MtxPntMul(&rot[j],&v);
+					v += offset;
+
+					iv.X = (int)(round(v.X));
+					iv.Y = (int)(round(v.Z)); //swap Y-Z axes
+					iv.Z = (int)(round(v.Y));
+					vox = pipeptr->GetVoxelI(&iv);
+					if (vox->type == VOXT_EMPTY) continue;
+
+//					v -= offset;
+//					v.Z = z;
+					v = tmp;
+					PerspectiveD(&v,&fov,&mid);
+//					v.Y = -v.Y + mid.Y;
+//					v.X += mid.X;
+
+					l = (int)v.Y * g_w + (int)v.X;
+					if ( 	(v.X >= 0) && (v.X < g_w) &&
+							(v.Y >= 0) && (v.Y < g_h) &&
+							(zbuf[l] == 0) ) {
+						pbuf[l] = iv;
+						zbuf[l] = v.Z;
+						render[l].bg = vox->pix.bg;
+						render[l].fg = vox->pix.fg;
+						render[l].sym = i + '0';//vox->sides[0]; //FIXME
+					}
+				} // by Y
+			} //by X
+		} //by sides
+	} //by Z
+#else
+	/*Brute force cube direct raster */
+	for (x = -far; x <= far; x++) {
+//		if ((x < 0) || (x >= CHUNKBOX)) continue;
+		for (y = -far; y <= far; y++) {
+//			if ((y < 0) || (y >= CHUNKBOX)) continue;
+			for (z = -far; z <= far; z++) {
+//				if ((z < 0) || (z >= CHUNKBOX)) continue;
+
+				iv.X = x + (int)(offset.X);
+				iv.Y = z + (int)(offset.Y); //swap!
+				iv.Z = y + (int)(offset.Z);
+
+				vox = pipeptr->GetVoxelI(&iv);
+				if (vox->type == VOXT_EMPTY) continue;
+
+				v.X = x;
+				v.Y = y;
+				v.Z = z;
+				for (i = 0; i < 3; i++)
+					v = MtxPntMul(&rot[i],&v);
+//				v += offset;
+
+				if (v.Z < 1) continue;
+				PerspectiveD(&v,&fov,&mid);
+
+				l = (int)v.Y * g_w + (int)v.X;
+				if ( 	(v.X >= 0) && (v.X < g_w) &&
+						(v.Y >= 0) && (v.Y < g_h) &&
+						((zbuf[l] == 0) || (zbuf[l] > v.Z))) {
+					pbuf[l] = iv;
+					zbuf[l] = v.Z;
+					render[l].bg = vox->pix.bg;
+					render[l].fg = vox->pix.fg;
+					render[l].sym = vox->sides[0];
+				}
+			}
+		}
+	}
+#endif
 }

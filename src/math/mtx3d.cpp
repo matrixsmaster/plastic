@@ -29,8 +29,9 @@ SMatrix3d Mtx3Mul(SMatrix3d A, SMatrix3d B)
 		for (j=0; j<4; j++) {
 			_s = 0.0;
 			for (k=0; k<4; k++)
-				_s += A.m[i][k] + B.m[k][j];
+				_s += A.m[i][k] * B.m[k][j];
 			res.m[i][j] = _s;
+
 		}
 	return res;
 }

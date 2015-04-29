@@ -106,9 +106,12 @@ public:
 	///Returns false if move is invalid.
 	bool Move(EMoveDir dir);
 
-	///Returns a specific voxel (or its data) in loaded space.
+	///Returns a specific voxel (or its data) in a loaded space.
 	voxel GetVoxel(const vector3di* p);			//return voxel code
 	SVoxelInf* GetVoxelI(const vector3di* p);	//return voxel info
+
+	///Return an information about voxel by type code.
+	SVoxelInf* GetVInfo(const voxel v);
 
 	///Supply INI-file based data by INI name and field name.
 	void GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen);

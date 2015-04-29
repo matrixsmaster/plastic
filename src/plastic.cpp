@@ -90,7 +90,7 @@ static void* plastic_eventhread(void* ptr)
 			x = g_wrld->GetRenderer()->GetProjection(curso);
 			snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
 			g_wrld->GetHUD()->PutStrBottom(s);
-			dbg_logstr(s);
+//			dbg_logstr(s);
 		}
 
 		/* To keep CPU load low(er) */

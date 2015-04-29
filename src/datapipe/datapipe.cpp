@@ -178,6 +178,12 @@ SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
 	else return NULL;
 }
 
+SVoxelInf* DataPipe::GetVInfo(const voxel v)
+{
+	if (v < voxtablen) return &voxeltab[v];
+	else return NULL;
+}
+
 bool DataPipe::LoadIni(const std::string name)
 {
 	FILE* f;
