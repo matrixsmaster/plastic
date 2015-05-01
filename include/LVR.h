@@ -43,6 +43,7 @@ private:
 	int g_w,g_h;
 	uli rendsize;
 	int far,fog;
+	double dfog;
 	vector2di mid;
 	vector3d fov;
 	SMatrix3d rot;
@@ -53,6 +54,9 @@ private:
 	float* zbuf;
 	vector3di* pbuf;
 	AtmoSky* skies;
+//	vector3d* fogtab;
+
+//	void UpdateFogTab();
 
 public:
 	LVR(DataPipe* pipe);

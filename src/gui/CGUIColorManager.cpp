@@ -61,6 +61,7 @@ void CGUIColorManager::Flush()
 	colors.push_back(tmp);
 
 	changed = true;
+	frameskip = 0;
 }
 
 short CGUIColorManager::CheckColor(const SCTriple* cl)
@@ -79,7 +80,7 @@ short CGUIColorManager::CheckColor(const SCTriple* cl)
 		colors.push_back(*cl);
 		return ((short)(colors.size()-1));
 	} else
-		return -1; //unable to append
+		return FindNearest(cl); //unable to append, find color as close as possible
 }
 
 short CGUIColorManager::CheckPair(const SGUIPixel* px)
@@ -90,17 +91,26 @@ short CGUIColorManager::CheckPair(const SGUIPixel* px)
 	//check for registered pair
 	for (i = 0; i < (short)pairs.size(); i++) {
 		if (	isEqual(&(px->bg),&(pairs.at(i).tb),COLTOLERANCE) &&
-				isEqual(&(px->fg),&(pairs.at(i).tf),COLTOLERANCE) )
+				isEqual(&(px->fg),&(pairs.at(i).tf),COLTOLERANCE) ) {
+			//increment (or restore) usage counter
+			if (pairs[i].use < 0) pairs[i].use = 1;
+			else pairs[i].use++;
+			//return pair number
 			return ++i;
+		}
 	}
 
 	//add new pair
 	if (((short)pairs.size()) < (COLOR_PAIRS-1)) {
 		changed = true;
+		//make new pair data
 		npr.tf = px->fg;
 		npr.tb = px->bg;
 		npr.cf = CheckColor(&(px->fg));
 		npr.cb = CheckColor(&(px->bg));
+		npr.use = 1;
+		npr.inited = false;
+		//add and return new pair index
 		pairs.push_back(npr);
 		return ((short)(pairs.size()));
 	}
@@ -116,13 +126,65 @@ void CGUIColorManager::Apply()
 
 	if (!changed) return;
 
+	//init color table (max 256 colors, so doesn't need to hold 'inited' flags)
 	for (i = 0, ic = colors.begin(); ic != colors.end(); ++ic,++i) {
 		init_color(i,ic->r,ic->g,ic->b);
 	}
 
+	//init pairs table (max 32767, so should rely on 'inited' flag data)
 	for (i = 1, ip = pairs.begin(); ip != pairs.end(); ++ip,++i) {
-		init_pair(i,ip->cf,ip->cb);
+		if (!ip->inited) {
+			init_pair(i,ip->cf,ip->cb);
+			ip->inited = true;
+		}
 	}
 
 	changed = false;
+}
+
+void CGUIColorManager::CollectGarbage()
+{
+	vector<SGUIExtPairs>::iterator ip,jp;
+	bool flg = false;
+
+	for (ip = pairs.begin(); ip != pairs.end(); ++ip) {
+		if (ip->use < PAIRGARBLEVEL) {
+			//table is now changed
+			changed = true;
+
+			//current element is subject to remove
+			ip = pairs.erase(ip);
+
+			//now we should re-init all pairs down (if it wasn't done earlier)
+			if (!flg) {
+				for (jp = ip; jp != pairs.end(); ++jp)
+					jp->inited = false;
+				flg = true; //this process will be committed just once
+			}
+
+			--ip;
+		}
+	}
+}
+
+void CGUIColorManager::StartFrame()
+{
+	vector<SGUIExtPairs>::iterator ip;
+
+	//decrement usage counters
+	for (ip = pairs.begin(); ip != pairs.end(); ++ip) {
+		ip->use--;
+	}
+
+	//collect garbage if enough frames passed
+	if (++frameskip >= PAIRGARBSKIP) {
+		frameskip = 0;
+		CollectGarbage();
+	}
+}
+
+void CGUIColorManager::EndFrame()
+{
+	//TODO: should we do something else here?
+	Apply();
 }

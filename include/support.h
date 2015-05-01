@@ -21,7 +21,9 @@
 #define SUPPORT_H_
 
 #include <stdarg.h>
+#include "vecmath.h"
 #include "plastic.h"
+#include "visual.h"
 
 #define BOOLSTR(X) ((X)? "ON":"OFF")
 
@@ -34,5 +36,10 @@ void errout(char const* fmt, ...);
 /// Argument parser. Supposed to be used for analyze startup environment.
 bool argparser(int argc, char* argv[], SGameSettings* sets);
 
+///Convert SCTriple to CPoint3D.
+vector3d tripletovecf(const SCTriple s);
+
+///Convert CPoint3D to SCTriple.
+SCTriple vecftotriple(const vector3d s);
 
 #endif /* SUPPORT_H_ */

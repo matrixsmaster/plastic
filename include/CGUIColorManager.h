@@ -25,30 +25,41 @@
 
 
 #define COLTOLERANCE 10
+#define PAIRGARBLEVEL -16
+#define PAIRGARBSKIP 3
+
 
 struct SGUIExtPairs {
 	SCTriple tf,tb;
 	short cf,cb;
+	int use;
+	bool inited;
 };
 
 class CGUIColorManager {
 protected:
 	bool changed;
+	int frameskip;
 
 	std::vector<SCTriple> colors;
 	std::vector<SGUIExtPairs> pairs;
 
 	bool isEqual(const SCTriple* a, const SCTriple* b, const short tol);
 	short FindNearest(const SCTriple* cl);
+	short CheckColor(const SCTriple* cl);
+	void CollectGarbage();
 
 public:
 	CGUIColorManager();
 	virtual ~CGUIColorManager();
 
-	void Flush();
-	short CheckColor(const SCTriple* cl);
 	short CheckPair(const SGUIPixel* px);
+
+	void Flush();
 	void Apply();
+
+	void StartFrame();
+	void EndFrame();
 };
 
 #endif /* CGUICOLORMANAGER_H_ */

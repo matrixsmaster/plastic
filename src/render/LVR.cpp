@@ -21,6 +21,8 @@
 #include <math.h>
 #include "LVR.h"
 #include "debug.h"
+#include "support.h"
+
 
 LVR::LVR(DataPipe* pipe)
 {
@@ -37,6 +39,7 @@ LVR::LVR(DataPipe* pipe)
 	scale = vector3d(1);
 	skies = (pipe)? (new AtmoSky(pipe)):NULL;
 	rot = GenOMatrix();
+//	fogtab = NULL;
 }
 
 LVR::~LVR()
@@ -45,6 +48,7 @@ LVR::~LVR()
 	if (render) free(render);
 	if (zbuf) free(zbuf);
 	if (pbuf) delete[] pbuf;
+//	if (fogtab) delete[] fogtab;
 }
 
 bool LVR::Resize(int w, int h)
@@ -80,15 +84,19 @@ void LVR::SetEulerRotation(const vector3d r)
 {
 	SMatrix3d rx,ry,rz,xy;
 
+	//store rotation in ordinary form
 	eulerot.X = r.X;
-	eulerot.Y = r.Z;
+	eulerot.Y = r.Z; //swap Y-Z axes
 	eulerot.Z = r.Y;
 
+	//update skies rotation
 	if (skies) skies->SetEulerAngles(eulerot);
 
+	//generate rotation matrices
 	rx = GenMtxRotX(r.X * M_PI / 180.f);
 	ry = GenMtxRotY(r.Z * M_PI / 180.f); //swap Y-Z axes
 	rz = GenMtxRotZ(r.Y * M_PI / 180.f);
+	//and combine them
 	xy = Mtx3Mul(rx,ry);
 	rot = Mtx3Mul(xy,rz);
 
@@ -118,34 +126,72 @@ void LVR::SetFOV(const vector3d f)
 void LVR::SetFarDist(const int d)
 {
 	far = d;
+	dfog = 1.f / (double)(far - fog);
+//	UpdateFogTab();
 	dbg_print("LVR Far plane = %d",d);
 }
 
 void LVR::SetFogStart(const int d)
 {
 	fog = d;
+	dfog = 1.f / (double)(far - fog);
+//	UpdateFogTab();
 	dbg_print("LVR Fog dist. = %d",d);
 }
 
 void LVR::SetFogColor(const vector3di nfc)
 {
 	fogcol = nfc;
+	dfog = 1.f / (double)(far - fog);
+//	UpdateFogTab();
 	dbg_print("LVR Fog color: [%d, %d, %d]",nfc.X,nfc.Y,nfc.Z);
 }
+
+//void LVR::UpdateFogTab()
+//{
+//	int i;
+//	int l = far - fog + 1;
+//	vector3d d,c;
+//
+//	//remove old tab
+//	if (fogtab) delete[] fogtab;
+//	fogtab = NULL;
+//
+//	//check for emptiness
+//	if (l < 1) return;
+//
+//	//create new
+//	fogtab = new vector3d[l];
+//	if (!fogtab) return;
+//
+//	//calculate d{R/G/B}
+//	d = fogcol / (double)l;
+//	c = d; //initial color
+//
+//	//fill in
+//	for (i = 0; i < l; i++) {
+//		fogtab[i]
+//	}
+//}
 
 vector3di LVR::GetProjection(const vector2di pnt)
 {
 	vector3di r(-1);
+
+	//check for valid co-ords
 	if ((!pbuf) || (pnt.X < 0) || (pnt.Y < 0)) return r;
 	if ((pnt.X >= CHUNKBOX) || (pnt.Y >= CHUNKBOX)) return r;
+
+	//get a result
 	r = pbuf[pnt.Y * g_w + pnt.X];
 	return r;
 }
 
 void LVR::Frame()
 {
-	int x,y,z,l;
-	vector3d v;
+	int x,y,z,l,fl;
+	double fg;
+	vector3d v,fo,fn;
 	vector3di iv;
 	SVoxelInf* vox;
 
@@ -157,6 +203,7 @@ void LVR::Frame()
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
 		for (x = 0; x < g_w; x++,l++) {
+			pbuf[l] = vector3di(-1);
 			//reverse painter's algorithm (+ z-buffer)?
 			for (z = 1; z <= far; z++) {
 				//make current point vector
@@ -177,14 +224,39 @@ void LVR::Frame()
 				iv.Z = (int)(round(v.Y));
 				vox = pipeptr->GetVoxelI(&iv);
 
-				//if voxel found isn't empty, break current z-axis loop
+				//if voxel found isn't empty, draw it and break current z-axis loop
 				if (vox->type != VOXT_EMPTY) {
+					//remember co-ords for screen raycast
 					pbuf[l] = iv;
+
+					//check visible side
+					render[l].sym = vox->sides[0]; //FIXME
+
+					//apply voxel' color information
 					render[l].bg = vox->pix.bg;
 					render[l].fg = vox->pix.fg;
-					render[l].sym = vox->sides[0]; //FIXME
+
+					//apply simple fog effect
+					fl = z - fog;
+					if (fl > 0) {
+						fg = dfog * fl;
+						fo = tripletovecf(render[l].bg);
+						fo *= (1.f - fg);
+						fn.X = fogcol.X;
+						fn.Y = fogcol.Y;
+						fn.Z = fogcol.Z;
+						fn *= fg;
+						fo += fn;
+						render[l].bg = vecftotriple(fo);
+
+						fo = tripletovecf(render[l].fg);
+						fo *= (1.f - fg);
+						fo += fn;
+						render[l].fg = vecftotriple(fo);
+					}
+
 					break;
-				}
+				} //voxel render
 			} //by Z
 		} //by X
 	} //by Y

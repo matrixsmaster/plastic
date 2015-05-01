@@ -94,6 +94,7 @@ void CurseGUIBase::UpdateBack()
 
 CurseGUI::CurseGUI() : CurseGUIBase()
 {
+	/* Create curses screen */
 	wnd = initscr();
 	if (!wnd) {
 		result = 1;
@@ -101,6 +102,7 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 		return;
 	}
 
+	/* Make it colorful */
 	if (has_colors() == FALSE) {
 		result = 2;
 		endwin();
@@ -108,25 +110,30 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 	}
 	start_color();
 
+	/* Make it even more colorful through a full RGB range */
 	if (can_change_color() == FALSE) {
 		result = 3;
 		endwin();
 		return;
 	}
 
+	/* Restore any previous changes to terminal' settings */
 	if (use_default_colors() == ERR) {
 		result = 4;
 		endwin();
 		return;
 	}
 
+	/* Spawn the color manager */
 	cmanager = new CGUIColorManager();
 
+	/* Initialize mode */
 	noecho();
 	cbreak();
 	keypad(wnd,TRUE);
 	nodelay(wnd,TRUE);
 
+	/* Ready to rock! */
 	refresh();
 	UpdateSize();
 	result = 0;
@@ -138,23 +145,36 @@ CurseGUI::~CurseGUI()
 	if (wnd) delwin(wnd);
 	if (cmanager) delete cmanager;
 	endwin();
+	use_default_colors();
 	refresh();
 }
 
 void CurseGUI::Update(bool refr)
 {
 	std::vector<CurseGUIWnd*>::iterator it;
+
+	//First of all, start color manager frame
+	cmanager->StartFrame();
+
+	//Update whole GUI background image
 	UpdateBack();
-	/*touchwin(wnd); //ncurses' man page suggests this, but this causes too much flicker*/
+
+	//Update all windows (FIFO)
 	for (it = windows.begin(); it != windows.end(); it++)
 		(*it)->Update(false);
-	cmanager->Apply();
-	if (refr) wrefresh(wnd);
+
+	//Stop color manager frame so it can apply changes (if any)
+	cmanager->EndFrame();
+
+	if (refr) wrefresh(wnd); //refresh if necessary
 }
 
 void CurseGUI::SoftReset()
 {
+	/* Will look like CurseGUI was reset, but it wasn't */
 	RmAllWindows();
+	cmanager->Flush();
+	cmanager->Apply();
 	clear();
 	refresh();
 	Update(true);
@@ -310,11 +330,12 @@ void CurseGUIWnd::SetName(const char* nm)
 
 void CurseGUIWnd::Update(bool refr)
 {
-	werase(wnd);
-	UpdateBack();
-	wcolor_set(wnd,0,NULL);
-	if (boxed) box(wnd,0,0);
-	if (refr) wrefresh(wnd);
+	//A template of GUI Window update process.
+	werase(wnd);				//make a room for window
+	UpdateBack();				//draw background image
+	wcolor_set(wnd,0,NULL);		//set default color pair
+	if (boxed) box(wnd,0,0);	//draw border
+	if (refr) wrefresh(wnd);	//and refresh if necessary
 }
 
 void CurseGUIWnd::Move(int x, int y)

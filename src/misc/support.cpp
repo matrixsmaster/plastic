@@ -20,9 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "support.h"
-#include "plastic.h"
 
 
 void printsettings(SGameSettings* s)
@@ -91,4 +89,18 @@ bool argparser(int argc, char* argv[], SGameSettings* sets)
 	}
 
 	return true;
+}
+
+vector3d tripletovecf(const SCTriple s)
+{
+	return vector3d(s.r,s.g,s.b);
+}
+
+SCTriple vecftotriple(const vector3d s)
+{
+	SCTriple r;
+	r.r = s.X;
+	r.g = s.Y;
+	r.b = s.Z;
+	return r;
 }

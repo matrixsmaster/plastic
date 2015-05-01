@@ -53,10 +53,13 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	scale = 0.33;
 	lvr->SetScale(0.33);
 	far = DEFFARPLANE;
+	fog = DEFFOGPLANE;
 	fov = vector3d(DEFFOVX,DEFFOVY,1);
 	data->SetGP(vector3dulli(0));
 	lvr->SetPosition(vector3d(128,128,135));
 	PC->SetPos(vector3di(128,128,135));
+	lvr->SetFogStart(fog);
+	lvr->SetFogColor(vector3di(100));
 }
 
 PlasticWorld::~PlasticWorld()
@@ -136,6 +139,8 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 		case 'M': fov.Y += 1; break;
 		case ';': far--; break;
 		case '\'': far++; break;
+		case 't': fog--; break;
+		case 'y': fog++; break;
 		case KEY_F(4):
 				gui->GetColorManager()->Flush();
 				printf("TESTING: YOU SHOULDN'T SEE THIS!!!");
@@ -155,6 +160,7 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 		lvr->SetScale(scale);
 		lvr->SetFOV(fov);
 		lvr->SetFarDist(far);
+		lvr->SetFogStart(fog);
 		PC->SetPos(p);
 		PC->SetRot(r);
 		break;

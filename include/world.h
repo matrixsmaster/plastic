@@ -46,7 +46,7 @@ private:
 	//FIXME: delete them
 	float scale;
 	vector3d fov;
-	int far;
+	int far,fog;
 
 public:
 	PlasticWorld(SGameSettings* settings);
