@@ -33,44 +33,55 @@
 
 
 #define DEFFARPLANE 32
+#define DEFFOGPLANE 21
 #define DEFFOVX 28
 #define DEFFOVY 14
-#define DEFSKYLEN 1024
 
 
 class LVR {
 private:
 	int g_w,g_h;
-	int far;
+	uli rendsize;
+	int far,fog;
 	vector2di mid;
 	vector3d fov;
+	SMatrix3d rot;
+	vector3d offset,eulerot,scale;
+	vector3di fogcol;
 	DataPipe* pipeptr;
 	SGUIPixel* render;
 	float* zbuf;
 	vector3di* pbuf;
-	uli rendsize;
-	SMatrix3d rot[3];
-	vector3d offset,scale;
 	AtmoSky* skies;
 
 public:
 	LVR(DataPipe* pipe);
 	virtual ~LVR();
 
-	SGUIPixel* GetRender()		{ return render; }
-	uli GetRenderLen()			{ return rendsize; }
+	SGUIPixel* GetRender()			{ return render; }
+	uli GetRenderLen()				{ return rendsize; }
 
 	bool Resize(int w, int h);
+	void RemoveSkies();
 
 	void SetEulerRotation(const vector3d r);
 	void SetPosition(const vector3d pos);
+
 	void SetScale(const double s);
+	double GetScale()				{ return scale.Z; }
 	void SetFOV(const vector3d f);
+	vector3d GetFOV()				{ return fov; }
 	void SetFarDist(const int d);
+	int GetFarDist()				{ return far; }
+	void SetFogStart(const int d);
+	int GetFogStart()				{ return fog; }
+	void SetFogColor(const vector3di nfc);
+	vector3di GetFogColor()			{ return fogcol; }
 
 	vector3di GetProjection(const vector2di pnt);
 
 	void Frame();
+	void Postprocess();
 };
 
 #endif /* LVR_H_ */

@@ -50,12 +50,13 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	lvr = new LVR(data);
 
 	//FIXME: debugging stuff
-	scale = 1.0;
+	scale = 0.33;
+	lvr->SetScale(0.33);
 	far = DEFFARPLANE;
 	fov = vector3d(DEFFOVX,DEFFOVY,1);
 	data->SetGP(vector3dulli(0));
-	lvr->SetPosition(vector3d(128));
-	PC->SetPos(vector3di(128));
+	lvr->SetPosition(vector3d(128,128,135));
+	PC->SetPos(vector3di(128,128,135));
 }
 
 PlasticWorld::~PlasticWorld()
@@ -97,9 +98,6 @@ void PlasticWorld::ConnectGUI()
 	//Update HUD sizes, positions etc (reset)
 	if (hud) delete hud;
 	hud = new HUD(gui);
-
-	//FIXME: DEBUGgin' stuff
-//	PC->SetPos(vector3di(128,128,(127 + gui->GetHeight()/2)));
 
 	//OK
 	result = 0;

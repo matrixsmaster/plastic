@@ -22,8 +22,8 @@
 
 #include "visual.h"
 
-///Number of voxels at a side of chunk.
-#define CHUNKBOX 768
+///Number of voxels at a side of a chunk.
+#define CHUNKBOX 256
 
 ///Number of chunks in current active buffers.
 #define HOLDCHUNKS 1
@@ -38,7 +38,8 @@ typedef unsigned short int voxel; //must be a 16-bit wide
 enum EVoxelType {
 	VOXT_EMPTY = 0,
 	VOXT_SOLID,
-	VOXT_WATER
+	VOXT_WATER,
+	VOXT_BODY
 };
 
 ///Voxel index info structure.

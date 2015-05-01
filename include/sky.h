@@ -26,31 +26,34 @@
 #include "misconsts.h"
 
 
+#define SKYANGLE 360
+#define SKYSIZE (SKYANGLE * SKYANGLE)
+#define SKYHEMI (SKYANGLE / 2)
+
 struct AtmoTime {
 	//TODO
 };
 
 class AtmoSky {
 private:
-	uli square;			//linear size of skies buffer
-	DataPipe* pipe;		//DataPipe access pointer
-	SGUIPixel* sky;		//skies buf
-	AtmoTime time;		//atmospheric time
-	vector3d scrot;		//scene rotation
-	float windsp;		//wind speed
-	vector3d wind;		//wind direction
-	SCTriple day_cld;	//clouds color (day)
-	SCTriple day_sky;	//sky main color (day)
+	DataPipe* pipe;			//DataPipe access pointer
+	SGUIPixel sky[SKYSIZE];	//skies buf
+	AtmoTime time;			//atmospheric time
+	vector3d scrot;			//scene rotation
+	float windsp;			//wind speed
+	vector3d wind;			//wind direction
+	SCTriple day_cld;		//clouds color (day)
+	SCTriple day_sky;		//sky main color (day)
 
 public:
-	AtmoSky(uli sidelen, DataPipe* pipeptr);
+	AtmoSky(DataPipe* pipeptr);
 	virtual ~AtmoSky();
 
 	void SetTime(const AtmoTime nwtime)				{ time = nwtime; }
-	void SetEulerAngles(const vector3d nwang)		{ scrot = nwang; }
+	void SetEulerAngles(const vector3d nwang);
 
 	void Quantum();
-	void RenderTo(SGUIPixel* buf, const uli len);
+	void RenderTo(SGUIPixel* buf, const uli w, const uli h);
 };
 
 #endif /* SKY_H_ */

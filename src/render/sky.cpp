@@ -18,13 +18,12 @@
  */
 
 #include "sky.h"
+#include "debug.h"
 
 
-AtmoSky::AtmoSky(uli sidelen, DataPipe* pipeptr)
+AtmoSky::AtmoSky(DataPipe* pipeptr)
 {
-	//init variables and allocate memory
-	square = sidelen * sidelen;
-	sky = (SGUIPixel*)malloc(square*sizeof(SGUIPixel));
+	//init variables
 	pipe = pipeptr;
 	windsp = 0;
 
@@ -35,27 +34,68 @@ AtmoSky::AtmoSky(uli sidelen, DataPipe* pipeptr)
 	day_cld.r = ((short)atoi(pipe->GetIniDataS(ATMOININAME,"DayCloudColorR").c_str()));
 	day_cld.g = ((short)atoi(pipe->GetIniDataS(ATMOININAME,"DayCloudColorG").c_str()));
 	day_cld.b = ((short)atoi(pipe->GetIniDataS(ATMOININAME,"DayCloudColorB").c_str()));
+
+	//Initial update
+	Quantum();
 }
 
 AtmoSky::~AtmoSky()
 {
-	if (sky) free(sky);
+	//FIXME
+}
+
+void AtmoSky::SetEulerAngles(const vector3d nwang)
+{
+	scrot = nwang;
+	scrot.Y *= -1; //inverse azimuth
+
+	//correct rotation vector XY
+	if (scrot.X >=  SKYHEMI) scrot.X = scrot.X - SKYANGLE;
+	if (scrot.X <= -SKYHEMI) scrot.X = SKYANGLE + scrot.X;
+	if (scrot.Y >=  SKYHEMI) scrot.Y = scrot.Y - SKYANGLE;
+	if (scrot.Y <= -SKYHEMI) scrot.Y = SKYANGLE + scrot.Y;
+
+	dbg_print("Sky rot. vector = [%.1f, %.1f]",scrot.X,scrot.Y);
 }
 
 void AtmoSky::Quantum()
 {
+	uli i;
 	//TODO: updater
+	for (i = 0; i < SKYSIZE; i++) {
+		sky[i].bg = day_sky;
+		sky[i].fg = day_cld;
+		sky[i].sym = (rand() < RAND_MAX/6)? '~':' ';
+	}
 }
 
-void AtmoSky::RenderTo(SGUIPixel* buf, const uli len)
+void AtmoSky::RenderTo(SGUIPixel* buf, const uli w, const uli h)
 {
-	uli i;
-	if ((!buf) || (len < 1)) return;
+	vector2di sp,ep;
+	int x,y,i,j,l;
 
-	//FIXME
-	for (i = 0; i < len; i++) {
-		buf[i].bg = day_sky;
-		buf[i].fg = day_cld;
-		buf[i].sym = ' ';
+	if (!buf) return;
+
+	//generate points
+	sp.X = SKYHEMI + scrot.Y;
+	sp.Y = SKYHEMI + scrot.X;
+	ep.X = sp.X + w;
+	ep.Y = sp.Y + h;
+//	dbg_print("Sky [%d %d] [%d %d]",sp.X,sp.Y,ep.X,ep.Y);
+
+	for (i = sp.Y, l = 0; i < ep.Y; i++) {
+		y = i;
+		//wrap
+		if (y >= SKYANGLE) y = SKYANGLE - y;
+		if (y < 0) y = SKYANGLE + y;
+
+		for (j = sp.X; j < ep.X; j++, l++) {
+			x = j;
+			//wrap
+			if (x >= SKYANGLE) x = SKYANGLE - x;
+			if (x < 0) x = SKYANGLE + x;
+
+			buf[l] = sky[y*SKYANGLE+x];
+		}
 	}
 }
