@@ -179,7 +179,7 @@ void DataPipe::SetGP(vector3dulli pos)
 	status = DPIPE_IDLE;
 }
 
-bool DataPipe::Move(EMoveDir dir)
+bool DataPipe::Move(EGMoveDir dir)
 {
 	//TODO
 	return false;

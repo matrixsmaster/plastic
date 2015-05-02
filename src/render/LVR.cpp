@@ -99,7 +99,7 @@ void LVR::SetEulerRotation(const vector3d r)
 	eulerot.X = r.X;
 	eulerot.Y = r.Z; //swap Y-Z axes
 	eulerot.Z = r.Y;
-	RotNormDeg(&eulerot); //norm it to form [0;360)
+	RotNormDegF(&eulerot); //norm it to form [0;360)
 
 	//update skies rotation
 	if (skies) skies->SetEulerAngles(eulerot);

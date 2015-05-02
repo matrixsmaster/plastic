@@ -68,13 +68,6 @@ void HUD::UpdateFPS(uli fps)
 	overlays[0]->PutString(str);
 }
 
-void HUD::Testing(const char* str)
-{
-	if(overlays.size() > 1) {
-		overlays[1]->PutString(str);
-	}
-}
-
 void HUD::PutStrBottom(const char* str)
 {
 	if(overlays.size() > 1) {

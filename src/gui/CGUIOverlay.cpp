@@ -102,7 +102,7 @@ void CurseGUIOverlay::PutLog()
 			nl = log.size() + 1;
 
 		for(it = log.end() - 1; it != log.end() - nl; it--) {
-			for(int i = 0; i < it->size(); ++i) {
+			for(int i = 0; i < (int)it->size(); ++i) {
 				ch = mvinch(y, m_x+i);
 
 				if(transparent) {

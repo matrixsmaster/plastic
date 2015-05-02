@@ -42,7 +42,7 @@ void errout(char const* fmt, ...)
 bool argparser(int argc, char* argv[], SGameSettings* sets)
 {
 	int i,j, fsm = 0;
-	EGameArgType curt;
+	EGameArgType curt = GAT_NOTHING;
 
 	for (i = 1; i < argc; i++) {
 		switch (fsm) {

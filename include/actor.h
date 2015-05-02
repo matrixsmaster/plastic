@@ -22,27 +22,87 @@
 
 #include <string>
 #include "vecmath.h"
+#include "vecmisc.h"
+#include "mtx3d.h"
+#include "misconsts.h"
+#include "CGUIEvents.h"
 
 
-class PlasticActor {
-protected:
-	vector3di pos,rot;
-	std::string name;
+#define MAXACTNAMELEN 25
 
-public:
-	PlasticActor() {}
-	virtual ~PlasticActor() {}
 
-	void SetPos(const vector3di p)		{ pos = p; }
-	void SetRot(const vector3di r)		{ rot = r; }
-	vector3di GetPos()					{ return pos; }
-	vector3di GetRot()					{ return rot; }
+//Basic classes of actors (used to determine initial basic values and actor's traits)
+enum EPAClass {
+	PCLS_INQUISITOR,
+	PCLS_GUARD,
+	PCLS_ROGUE,
+	PCLS_SEXBOT
 };
 
+//Actor's basic value used in game mechanics
+struct SPABase {
+	/* Main fields */
+	EPAClass Cls;		//Actor's class (mean of purpose)
+	bool autoinit;		//If true, all data below will be automatically filled
+
+	/* Status and condition */
+	int HP;				//Health points (means integral system condition)
+	float Qual;			//Overall actor's quality
+
+	/* Physical state */
+	int CC;				//Charge capacity or current charge
+	float Spd;			//Speed multiplier (rounded result used)
+	int Str;			//Basic strength on fully charged actor
+
+	/* Brain and psychology state */
+	int Intl;			//Intelligence
+	int Brv;			//Braveness
+	int Chr;			//Charisma (or beauty)
+
+	/* Battle-relevant values */
+	int AP;				//Armor points
+	int DT;				//Damage threshold
+	float DM;			//Damage multiplier
+};
+
+//Actor's stats
+struct SPAStats {
+	char name[MAXACTNAMELEN];	//Actor's Name
+	bool female;				//True for Female characters
+	SPABase base;				//Basic values
+};
+
+//Basic Actor Class
+class PlasticActor {
+protected:
+	vector3di pos,rot;		//Position and orientation
+	SPAStats stats;			//Basic stats
+	SPABase curr;			//Current values
+	SMatrix3d rotmat;		//Rotation in matrix form
+
+public:
+	PlasticActor(SPAStats s);
+	PlasticActor(EPAClass c);
+	virtual ~PlasticActor() {}
+
+	virtual void AutoInitStats();
+
+	void SetPos(const vector3di p)		{ pos = p; }
+	void SetRot(const vector3di r);
+	vector3di GetPos()					{ return pos; }
+	vector3di GetRot()					{ return rot; }
+
+	void Move(ELMoveDir d, float step);
+};
+
+//Special case for a player character
 class Player : public PlasticActor {
 public:
-	Player() : PlasticActor() {}
+	Player(SPAStats s) : PlasticActor(s) {}
+	Player(EPAClass c) : PlasticActor(c) {}
 	virtual ~Player() {}
+
+	void ProcessEvent(const CGUIEvent* e);
 };
 
 #endif /* ACTOR_H_ */

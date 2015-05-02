@@ -43,15 +43,6 @@ enum EDPipeStatus {
 	DPIPE_BUSY
 };
 
-enum EMoveDir {
-	PMOVE_UP,
-	PMOVE_DOWN,
-	PMOVE_NORTH,
-	PMOVE_SOUTH,
-	PMOVE_WEST,
-	PMOVE_EAST
-};
-
 struct SDataPlacement {
 	unsigned filenum;
 	vector3dulli pos;
@@ -104,7 +95,7 @@ public:
 	///Move the world to next chunk.
 	///Update chunks buffers either by loading or by generating.
 	///Returns false if move is invalid.
-	bool Move(EMoveDir dir);
+	bool Move(EGMoveDir dir);
 
 	///Returns a specific voxel (or its data) in a loaded space.
 	voxel GetVoxel(const vector3di* p);			//return voxel code

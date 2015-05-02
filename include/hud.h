@@ -37,10 +37,9 @@ public:
 	HUD(CurseGUI* guiptr);
 	virtual ~HUD();
 
-	///Example of HUD info updater.
+	///Updates FPS counter.
 	void UpdateFPS(uli fps);
 
-	void Testing(const char* str);
 	void PutStrBottom(const char* str);
 	bool GetTransparent();
 	void SetTransparent(bool t);

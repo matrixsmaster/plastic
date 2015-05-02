@@ -30,10 +30,12 @@ CPoint3D CPoint3D::HalfWay(const CPoint3D s)
 
 double CPoint3D::DistanceTo(const CPoint3D s)
 {
-	//TODO
+	double r = sqrt((s.X-X)*(s.X-X) + (s.Y-Y)*(s.Y-Y) + (s.Z-Z)*(s.Z-Z));
+	return r;
 }
 
 int CPoint3D::fcompare(const double a, const double b)
 {
-	//TODO
+	//TODO: urgently needed!
+	return 0;
 }

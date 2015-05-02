@@ -20,6 +20,7 @@
 #ifndef PLASTIC_H_
 #define PLASTIC_H_
 
+#include "actor.h"
 #include "misconsts.h"
 
 
@@ -42,13 +43,17 @@ under conditions of GNU GPL v2\n\n"
 #define GAMEARGTYPES 2
 
 struct SGameSettings {
-	char root[MAXPATHLEN];
-	bool use_shell;
+	char root[MAXPATHLEN];	//VFS root dir
+	bool use_shell;			//launch interactive shell
+	uli world_r;			//world radius
+	SPAStats PCData;		//player character settings
 };
 
-#define DEFAULT_SETTINGS { \
-	"./data",		\
-	false 			\
+#define DEFAULT_SETTINGS { 						\
+	"./data",									\
+	false, 										\
+	128,										\
+	{ "Mary", true, {PCLS_INQUISITOR, true} }	\
 }
 
 enum EGameArgType {

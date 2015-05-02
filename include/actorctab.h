@@ -17,43 +17,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Some not module-specific or widely used constants / defines / macros goes here */
+#ifndef ACTORCTAB_H_
+#define ACTORCTAB_H_
 
-#ifndef MISCONSTS_H_
-#define MISCONSTS_H_
+#include "actor.h"
 
-#define MAXPATHLEN 512
+//TODO: classes and values table
 
-#define EVENTUSLEEP 2000
-#define WORLDUSLEEP 30000
-
-
-//Global Movement Directions
-enum EGMoveDir {
-	GMOVE_UP,
-	GMOVE_DOWN,
-	GMOVE_NORTH,
-	GMOVE_SOUTH,
-	GMOVE_WEST,
-	GMOVE_EAST
-};
-
-//Local Movement Directions
-enum ELMoveDir {
-	LMOVE_UP,
-	LMOVE_DW,
-	LMOVE_FORW,
-	LMOVE_BACK,
-	LMOVE_LEFT,
-	LMOVE_RGHT
-};
-
-/*
- * I don't want to use <inttypes.h> because it causes all kinds of problems
- * on different platforms. Or even with different versions of glibc inclusion files.
- */
-typedef unsigned long long int ulli; //for short
-typedef unsigned long int uli;
-
-
-#endif /* MISCONSTS_H_ */
+#endif /* ACTORCTAB_H_ */

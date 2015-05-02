@@ -32,7 +32,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	data = NULL;
 	lvr = NULL;
 	gui = NULL;
-	PC = new Player();
+	PC = new Player(sets->PCData);
 	hud = NULL;
 
 	/* Create and set up DataPipe */
@@ -113,25 +113,11 @@ void PlasticWorld::ConnectGUI()
 
 void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 {
-	//DEBUG:
-	vector3di r = PC->GetRot();
-	vector3di p = PC->GetPos();
-
 	result = 0;
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
 		/* User pressed a key */
 		switch (e->k) {
-		case KEY_UP: r.X += 1; break;
-		case KEY_DOWN: r.X -= 1; break;
-		case KEY_LEFT: r.Z += 1; break;
-		case KEY_RIGHT: r.Z -= 1; break;
-		case 'w': p.Y += 1; break;
-		case 's': p.Y -= 1; break;
-		case 'a': p.X -= 1; break;
-		case 'd': p.X += 1; break;
-		case '-': p.Z -= 1; break;
-		case '=': p.Z += 1; break;
 		case '[': scale -= 0.01; break;
 		case ']': scale += 0.01; break;
 		case ',': fov.X -= 0.1; break;
@@ -160,14 +146,14 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 			break;
 		}
 
-		lvr->SetEulerRotation(r.ToReal());
-		lvr->SetPosition(p.ToReal());
 		lvr->SetScale(scale);
 		lvr->SetFOV(fov);
 		lvr->SetFarDist(far);
 		lvr->SetFogStart(fog);
-		PC->SetPos(p);
-		PC->SetRot(r);
+
+		PC->ProcessEvent(e);
+		lvr->SetEulerRotation(PC->GetRot().ToReal());
+		lvr->SetPosition(PC->GetPos().ToReal());
 		break;
 
 	case GUIEV_RESIZE:
