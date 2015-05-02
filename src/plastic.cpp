@@ -77,20 +77,24 @@ static void* plastic_eventhread(void* ptr)
 
 		//debug:
 		d = false;
-		if (my_e.t == GUIEV_KEYPRESS) {
-			switch (my_e.k) {
-			case 'i': curso.Y--; d = true; break;
-			case 'k': curso.Y++; d = true; break;
-			case 'j': curso.X--; d = true; break;
-			case 'l': curso.X++; d = true; break;
+		if (my_e.t == GUIEV_MOUSE) {
+//			switch (my_e.k) {
+//			case 'i': curso.Y--; d = true; break;
+//			case 'k': curso.Y++; d = true; break;
+//			case 'j': curso.X--; d = true; break;
+//			case 'l': curso.X++; d = true; break;
+//			}
+			if (my_e.m.bstate & BUTTON1_CLICKED) {
+				curso.X = my_e.m.x;
+				curso.Y = my_e.m.y;
+				d = true;
 			}
 		}
-		move(curso.Y,curso.X);
 		if (d) {
 			x = g_wrld->GetRenderer()->GetProjection(curso);
 			snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
 			g_wrld->GetHUD()->PutStrBottom(s);
-//			dbg_logstr(s);
+			g_gui->SetCursorPos(curso.X,curso.Y);
 		}
 
 		/* To keep CPU load low(er) */

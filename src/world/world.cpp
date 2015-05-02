@@ -175,6 +175,10 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 		ConnectGUI();
 		break;
 
+	case GUIEV_MOUSE:
+		/* Nothing to do now */
+		break;
+
 	default:
 		errout("Warning: unknown event type pumped. Possibly memory corruption.\n");
 		result = 1;

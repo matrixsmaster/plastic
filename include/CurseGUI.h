@@ -89,6 +89,8 @@ class CurseGUI : public CurseGUIBase {
 private:
 	std::vector<CurseGUIWnd*> windows;	//windows holder
 	char* backmask;						//background mask (used to estimate space occupied by windows)
+	mmask_t oldmouse;					//original terminal mouse driver state
+	int c_x,c_y;						//cursor position
 
 public:
 	CurseGUI();
@@ -119,7 +121,7 @@ public:
 	void RmAllWindows();
 
 	///Returns number of registered CurseGUI windows.
-	int GetNumWindows()		{ return windows.size(); }
+	int GetNumWindows()							{ return windows.size(); }
 
 	///Returns CurseGUI window pointer by window number.
 	CurseGUIWnd* GetWindowN(int no);
@@ -132,7 +134,10 @@ public:
 	void UpdateBackmask();
 
 	///Returns background mask.
-	char* GetBackmask()		{ return backmask; }
+	char* GetBackmask()							{ return backmask; }
+
+	///Moves cursor to position at the end of each frame.
+	void SetCursorPos(const int x, const int y) { c_x = x; c_y = y; }
 };
 
 /* ********************************** GUI WINDOWS ********************************** */

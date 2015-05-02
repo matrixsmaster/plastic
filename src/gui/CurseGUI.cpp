@@ -96,37 +96,27 @@ void CurseGUIBase::UpdateBack()
 
 /* ********************************** GUI MAIN ********************************** */
 
+#define CGABRT(X) { result = X; endwin(); return; }
+
 CurseGUI::CurseGUI() : CurseGUIBase()
 {
 	/* Create curses screen */
 	wnd = initscr();
-	if (!wnd) {
-		result = 1;
-		endwin();
-		return;
-	}
+	if (!wnd) CGABRT(1);
 
 	/* Make it colorful */
-	if (has_colors() == FALSE) {
-		result = 2;
-		endwin();
-		return;
-	}
+	if (has_colors() == FALSE) CGABRT(2);
 	start_color();
 
 	/* Make it even more colorful through a full RGB range */
-	if (can_change_color() == FALSE) {
-		result = 3;
-		endwin();
-		return;
-	}
+	if (can_change_color() == FALSE) CGABRT(3);
 
 	/* Restore any previous changes to terminal' settings */
-	if (use_default_colors() == ERR) {
-		result = 4;
-		endwin();
-		return;
-	}
+	if (use_default_colors() == ERR) CGABRT(4);
+
+	/* Make the mouse alive */
+	if (mousemask(ALL_MOUSE_EVENTS,&oldmouse) == 0) CGABRT(5);
+	if (has_mouse() == FALSE) CGABRT(6);
 
 	/* Spawn the color manager */
 	cmanager = new CGUIColorManager();
@@ -141,11 +131,14 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 	refresh();
 	UpdateSize();
 	backmask = NULL;
+	c_x = c_y = 0;
 	result = 0;
 }
 
 CurseGUI::~CurseGUI()
 {
+	mousemask(oldmouse,NULL);
+
 	RmAllWindows();
 
 	if (cmanager) delete cmanager;
@@ -175,7 +168,12 @@ void CurseGUI::Update(bool refr)
 	//Stop color manager frame so it can apply changes (if any)
 	cmanager->EndFrame();
 
-//	UpdateBackmask(); //FIXME: testing
+	//Check and update cursor position
+	if (c_x < 0) c_x = 0;
+	if (c_x >= g_w) c_x = g_w - 1;
+	if (c_y < 0) c_y = 0;
+	if (c_y >= g_h) c_y = g_h - 1;
+	move(c_y,c_x);
 
 	if (refr) wrefresh(wnd); //refresh if necessary
 }
@@ -267,16 +265,22 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 		return true; //to not process event furthermore
 	}
 
-	/* Get the resize event */
+	/* Get the resize event (most priority) */
 	if (UpdateSize()) {
 		e->t = GUIEV_RESIZE;
 	} else {
+
 		/* Or, get the keypress event */
 		e->t = GUIEV_KEYPRESS;
 		e->k = getch(); //FIXME: use something more robust than that
 		if ((!e->k) || (e->k == ERR)) {
-			e->t = GUIEV_NONE; //reset event type to prevent loops
-			return true; //Event consumed 'cause there's no event!
+
+			/* Or, get the mouse event (least priority) */
+			e->t = GUIEV_MOUSE;
+			if (getmouse(&(e->m)) == ERR) {
+				e->t = GUIEV_NONE; //reset event type to prevent loops
+				return true; //Event consumed 'cause there's no event!
+			}
 		}
 	}
 

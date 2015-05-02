@@ -21,12 +21,14 @@
 #define CGUIEVENTS_H_
 
 #include <string>
+#include <ncurses.h>
 
 
 enum CGUIEventType {
 	GUIEV_NONE,
 	GUIEV_KEYPRESS,
 	GUIEV_RESIZE,
+	GUIEV_MOUSE,
 	GUIEV_COMMAND
 };
 
@@ -42,9 +44,10 @@ struct CGUICommand {
 };
 
 struct CGUIEvent {
-	CGUIEventType t;	//event type
-	int k;				//pressed key code
-	CGUICommand* c;		//pointer to command structure
+	CGUIEventType	t;	//event type
+	int 			k;	//pressed key code
+	MEVENT			m;	//mouse event data
+	CGUICommand*	c;	//pointer to command structure
 };
 
 
