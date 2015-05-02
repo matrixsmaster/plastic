@@ -38,6 +38,7 @@
 #define DEFFOVY 14
 
 
+//TODO: comment it
 class LVR {
 private:
 	int g_w,g_h;
@@ -54,9 +55,7 @@ private:
 	float* zbuf;
 	vector3di* pbuf;
 	AtmoSky* skies;
-//	vector3d* fogtab;
-
-//	void UpdateFogTab();
+	char* mask;
 
 public:
 	LVR(DataPipe* pipe);
@@ -66,6 +65,7 @@ public:
 	uli GetRenderLen()				{ return rendsize; }
 
 	bool Resize(int w, int h);
+	void SetMask(char* m, int w, int h);
 	void RemoveSkies();
 
 	void SetEulerRotation(const vector3d r);

@@ -137,8 +137,9 @@ void DataPipe::PurgeChunks()
 		if (chunks[i]) {
 			free(chunks[i]);
 			chunks[i] = NULL;
+			allocated -= sizeof(VChunk);
 		}
-	allocated = 0;
+//	allocated = 0;
 }
 
 void DataPipe::SetGP(vector3dulli pos)
@@ -146,9 +147,34 @@ void DataPipe::SetGP(vector3dulli pos)
 	SDataPlacement plc;
 	gp = pos;
 
-	//FIXME: search in all directions
+#if HOLDCHUNKS == 1
+	/* One chunk right there, simplest scenario */
 	if (!FindChunk(pos,&plc))
 		wgen->GenerateChunk(chunks[0]);
+
+#elif HOLDCHUNKS == 9
+	/* One 3x3 plane of chunks, most widely used scenario */
+	int i,j,l;
+	vector3dulli cur(pos);
+	for (i = -1, l = 0; i < 2; i++) {
+		cur.Y = pos.Y + i;
+		for (j = -1; j < 2; j++, l++) {
+			cur.X = pos.X + j;
+			if (!FindChunk(cur,&plc))
+				wgen->GenerateChunk(chunks[l]);
+		}
+	}
+
+	//FIXME: all directions
+#elif HOLDCHUNKS == 18
+	/* Two 3x3 planes (one right there, and one upper) */
+
+#elif HOLDCHUNKS == 27
+	/* Full set of 3x3x3 (the most memory hungry scenario) */
+
+#else
+#error "Invalid value of HOLDCHUNKS!"
+#endif
 
 	status = DPIPE_IDLE;
 }
@@ -163,16 +189,43 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 {
 	PChunk ch;
 	if (status != DPIPE_IDLE) return 0;
-	//FIXME: use other chunks
+
+#if HOLDCHUNKS == 1
+	/* Simplest case */
+
 	if ((p->X < 0) || (p->Y < 0) || (p->Z < 0)) return 0;
 	if ((p->X >= CHUNKBOX) || (p->Y >= CHUNKBOX) || (p->Z >= CHUNKBOX)) return 0;
 	ch = chunks[0];
 	return ((*ch)[p->Z][p->Y][p->X]);
+
+#else
+
+	/* Other cases */
+	int x,y,z,px,py,pz;
+	x = p->X / CHUNKBOX - ((p->X < 0)? 1:0);
+	y = p->Y / CHUNKBOX - ((p->Y < 0)? 1:0);
+	z = p->Z / CHUNKBOX - ((p->Z < 0)? 1:0);
+	px = abs(p->X) % CHUNKBOX;
+	py = abs(p->Y) % CHUNKBOX;
+	pz = abs(p->Z) % CHUNKBOX;
+
+#if HOLDCHUNKS == 9
+	if ((x < -1) || (y < -1) || (z < 0)) return 0;
+	if ((x > 1) || (y > 1) || (z > 0)) return 0;
+	++y; ++x; //centerize
+	ch = chunks[y*3+x];
+
+	//FIXME: use other chunks
+#elif HOLDCHUNKS == 18
+#else
+#endif
+
+	return ((*ch)[pz][py][px]);
+#endif
 }
 
 SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
 {
-	if (status != DPIPE_IDLE) return NULL;
 	voxel v = GetVoxel(p);
 	if (v < voxtablen) return &voxeltab[v];
 	else return NULL;

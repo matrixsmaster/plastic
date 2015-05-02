@@ -21,6 +21,8 @@
 
 #include "CurseGUI.h"
 #include "CGUIControls.h"
+#include "CGUIOverlay.h"
+#include "CGUISpecWnd.h"
 
 
 CurseGUIBase::CurseGUIBase()
@@ -92,6 +94,8 @@ void CurseGUIBase::UpdateBack()
 	free(lbuf);
 }
 
+/* ********************************** GUI MAIN ********************************** */
+
 CurseGUI::CurseGUI() : CurseGUIBase()
 {
 	/* Create curses screen */
@@ -136,15 +140,20 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 	/* Ready to rock! */
 	refresh();
 	UpdateSize();
+	backmask = NULL;
 	result = 0;
 }
 
 CurseGUI::~CurseGUI()
 {
 	RmAllWindows();
-	if (wnd) delwin(wnd);
+
 	if (cmanager) delete cmanager;
+	if (backmask) free(backmask);
+
+	if (wnd) delwin(wnd);
 	endwin();
+
 	use_default_colors();
 	refresh();
 }
@@ -160,11 +169,13 @@ void CurseGUI::Update(bool refr)
 	UpdateBack();
 
 	//Update all windows (FIFO)
-	for (it = windows.begin(); it != windows.end(); it++)
+	for (it = windows.begin(); it != windows.end(); ++it)
 		(*it)->Update(false);
 
 	//Stop color manager frame so it can apply changes (if any)
 	cmanager->EndFrame();
+
+//	UpdateBackmask(); //FIXME: testing
 
 	if (refr) wrefresh(wnd); //refresh if necessary
 }
@@ -198,7 +209,7 @@ void CurseGUI::AddWindow(CurseGUIWnd* n_wnd)
 bool CurseGUI::RmWindow(CurseGUIWnd* ptr)
 {
 	std::vector<CurseGUIWnd*>::iterator it;
-	for (it = windows.begin(); it != windows.end(); it++)
+	for (it = windows.begin(); it != windows.end(); ++it)
 		if (*it == ptr) {
 			delete ptr;
 			windows.erase(it);
@@ -221,7 +232,7 @@ bool CurseGUI::RmWindow(const char* name)
 	std::string nm(name);
 	if (nm.empty()) return false;
 
-	for (it = windows.begin(); it != windows.end(); it++)
+	for (it = windows.begin(); it != windows.end(); ++it)
 		if ((*it)->GetName() == nm) {
 			delete (*it);
 			windows.erase(it);
@@ -287,18 +298,58 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 				break;
 			}
 			break;
-
-		case GUIEV_RESIZE:
-			//do nothing (at least for now)
-			break;
-
-		default: break;
+		default: break; //just to make compiler happy
 		}
 	}
+
+	if (e->t == GUIEV_RESIZE)
+		backmask = (char*)realloc(backmask,g_w*g_h);
+	UpdateBackmask();
 
 	result = 0;
 	return consumed;
 }
+
+void CurseGUI::UpdateBackmask()
+{
+	int i,j;
+	std::vector<CurseGUIWnd*>::iterator it;
+	bool skip;
+	CurseGUIOverlay* ovrl;
+	CurseGUIDebugWnd* dbug;
+
+	if (!backmask) return;
+
+	memset(backmask,0,g_w*g_h);
+
+	for (it = windows.begin(); it != windows.end(); ++it) {
+		skip = false;
+
+		//Deal with special cases
+		switch ((*it)->GetType()) {
+		case GUIWT_OVERLAY:
+			ovrl = reinterpret_cast<CurseGUIOverlay*> (*it);
+			if (ovrl->GetTransparent()) skip = true; //skip transparent overlays
+			break;
+
+		case GUIWT_DEBUGUI:
+			dbug = reinterpret_cast<CurseGUIDebugWnd*> (*it);
+			if (dbug->IsHidden()) skip = true;
+			break;
+
+		default: break;
+		}
+		if (skip) continue;
+
+		//Draw the mask
+		for (i = (*it)->GetPosY(); i < (*it)->GetHeight(); i++) {
+			j = (*it)->GetPosX();
+			memset(backmask+(i*g_w+j),1,(*it)->GetWidth());
+		}
+	}
+}
+
+/* ********************************** GUI WINDOWS ********************************** */
 
 CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 {

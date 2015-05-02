@@ -35,5 +35,5 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Add vehicle class (mountable actors??)
 
 -> Implement atmosphere (day/night cycle, stars, clouds etc)
- 
--> Fix CurseGUI pair0 (default) color bug!
+
+-> Add "distant landscape" right after DataPipe will be capable of saving/loading

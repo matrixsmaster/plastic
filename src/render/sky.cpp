@@ -49,7 +49,7 @@ void AtmoSky::SetEulerAngles(const vector3d nwang)
 	scrot = nwang;
 	scrot.Y *= -1; //inverse azimuth
 
-	//correct rotation vector XY
+	//correct rotation vector XY to conform our planar mapping
 	if (scrot.X >=  SKYHEMI) scrot.X = scrot.X - SKYANGLE;
 	if (scrot.X <= -SKYHEMI) scrot.X = SKYANGLE + scrot.X;
 	if (scrot.Y >=  SKYHEMI) scrot.Y = scrot.Y - SKYANGLE;
@@ -83,6 +83,8 @@ void AtmoSky::RenderTo(SGUIPixel* buf, const uli w, const uli h)
 	ep.Y = sp.Y + h;
 //	dbg_print("Sky [%d %d] [%d %d]",sp.X,sp.Y,ep.X,ep.Y);
 
+	//that's a very dumb implementation, so should be replaced later with
+	//a true spherical mapping
 	for (i = sp.Y, l = 0; i < ep.Y; i++) {
 		y = i;
 		//wrap

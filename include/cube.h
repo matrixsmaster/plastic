@@ -17,35 +17,14 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Special kinds of CurseGUI windows are defined here */
+#ifndef CUBE_H_
+#define CUBE_H_
 
-#ifndef INCLUDE_CGUISPECWND_H_
-#define INCLUDE_CGUISPECWND_H_
-
-#include <string>
-#include <vector>
-#include "CurseGUI.h"
+#include "vecmath.h"
+#include "vecmisc.h"
+#include "voxel.h"
 
 
-class CurseGUIDebugWnd : public CurseGUIWnd {
-private:
-	std::vector<std::string> log;
-	bool hidden;
-	int key;
-	bool edit;
-	std::string edit_line;
-	void ResizeWnd();
+int GetVCubeMajSide(/*const int scrx, const int scry, */const vector3d* rot, const voxel* area);
 
-public:
-	CurseGUIDebugWnd(CurseGUI* scrn, int x, int y);
-	virtual ~CurseGUIDebugWnd();
-
-	bool IsHidden()						{ return hidden; }
-
-	void Update(bool refr);
-	bool PutEvent(CGUIEvent* e);
-	void PutString(char* str);
-	void PutString(std::string str);
-};
-
-#endif /* INCLUDE_CGUISPECWND_H_ */
+#endif /* CUBE_H_ */

@@ -57,7 +57,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	fov = vector3d(DEFFOVX,DEFFOVY,1);
 	data->SetGP(vector3dulli(0));
 	lvr->SetPosition(vector3d(128,128,135));
-	PC->SetPos(vector3di(128,128,135));
+	PC->SetPos(vector3di(-128,100,135));
 	lvr->SetFogStart(fog);
 	lvr->SetFogColor(vector3di(100));
 }
@@ -83,13 +83,17 @@ void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
 
 void PlasticWorld::ConnectGUI()
 {
+	int nw,nh;
+
 	if ((!gui) || (!lvr)) {
 		result = 1;
 		return;
 	}
 
 	//resize LVR frame
-	if (!lvr->Resize(gui->GetWidth(),gui->GetHeight())) {
+	nw = gui->GetWidth();
+	nh = gui->GetHeight();
+	if (!lvr->Resize(nw,nh)) {
 		errout("Unable to resize LVR frame!\n");
 		result = 2;
 		return;
@@ -97,6 +101,7 @@ void PlasticWorld::ConnectGUI()
 
 	//Connect lvr output to CurseGUI main background
 	gui->SetBackgroundData(lvr->GetRender(),lvr->GetRenderLen());
+	lvr->SetMask(gui->GetBackmask(),nw,nh);
 
 	//Update HUD sizes, positions etc (reset)
 	if (hud) delete hud;

@@ -66,4 +66,7 @@ void PerspectiveDInv(vector3d* pnt, const vector3d* fov, const vector2di* mid);
 ///Experimental reverse projection.
 void PerspectiveNInv(vector3d* pnt, const vector3d* fov, const vector2di* mid);
 
+///Sets each vector component to range [0;360).
+void RotNormDeg(vector3d* r);
+
 #endif /* VECMISC_H_ */

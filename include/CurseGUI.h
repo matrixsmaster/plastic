@@ -38,13 +38,13 @@
 
 class CurseGUIBase {
 protected:
-	WINDOW* wnd;
-	int result;
-	int g_w, g_h;
-	SGUIPixel* backgr;
-	int backgr_size;
-	bool will_close;
-	CGUIColorManager* cmanager;
+	WINDOW* wnd;					//ncurses window struct
+	int result;						//last result
+	int g_w, g_h;					//graphic width and height
+	SGUIPixel* backgr;				//ptr to background image
+	int backgr_size;				//size of image (to keep track on changing)
+	bool will_close;				//'window is now closing' flag
+	CGUIColorManager* cmanager;		//main colormanager instance ptr
 
 	///Internal background updater.
 	void UpdateBack();
@@ -87,7 +87,8 @@ class CurseGUIWnd;
 /* Curse GUI Main class */
 class CurseGUI : public CurseGUIBase {
 private:
-	std::vector<CurseGUIWnd*> windows;
+	std::vector<CurseGUIWnd*> windows;	//windows holder
+	char* backmask;						//background mask (used to estimate space occupied by windows)
 
 public:
 	CurseGUI();
@@ -126,6 +127,12 @@ public:
 	///Push events through all windows and controls.
 	///Returns whatever event was consumed or not.
 	bool PumpEvents(CGUIEvent* e);
+
+	///Update background masking by opened windows.
+	void UpdateBackmask();
+
+	///Returns background mask.
+	char* GetBackmask()		{ return backmask; }
 };
 
 /* ********************************** GUI WINDOWS ********************************** */
@@ -167,6 +174,9 @@ public:
 	virtual void Move(int x, int y);
 	virtual void Resize(int w, int h);
 	virtual bool PutEvent(CGUIEvent* e);
+
+	int GetPosX()						{ return g_x; }
+	int GetPosY()						{ return g_y; }
 };
 
 #endif /* CURSEGUI_H_ */

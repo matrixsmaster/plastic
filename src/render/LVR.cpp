@@ -22,24 +22,30 @@
 #include "LVR.h"
 #include "debug.h"
 #include "support.h"
+#include "cube.h"
 
 
 LVR::LVR(DataPipe* pipe)
 {
 	pipeptr = pipe;
 	render = NULL;
+	rendsize = 0;
+	mask = NULL;
+
 	zbuf = NULL;
 	pbuf = NULL;
-	rendsize = 0;
+
 	g_w = g_h = 0;
-	far = DEFFARPLANE;
-	fog = DEFFOGPLANE;
+	rot = GenOMatrix();
+	scale = vector3d(1);
+
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
-	scale = vector3d(1);
+	far = DEFFARPLANE;
+	fog = DEFFOGPLANE;
+	dfog = 0; //no fog
+
 	skies = (pipe)? (new AtmoSky(pipe)):NULL;
-	rot = GenOMatrix();
-//	fogtab = NULL;
 }
 
 LVR::~LVR()
@@ -48,7 +54,6 @@ LVR::~LVR()
 	if (render) free(render);
 	if (zbuf) free(zbuf);
 	if (pbuf) delete[] pbuf;
-//	if (fogtab) delete[] fogtab;
 }
 
 bool LVR::Resize(int w, int h)
@@ -74,6 +79,12 @@ bool LVR::Resize(int w, int h)
 	return ((render != NULL) && (zbuf != NULL) && (pbuf != NULL));
 }
 
+void LVR::SetMask(char* m, int w, int h)
+{
+	mask = m;
+	if ((w != g_w) || (h != g_h)) mask = NULL;
+}
+
 void LVR::RemoveSkies()
 {
 	if (skies) delete skies;
@@ -88,19 +99,20 @@ void LVR::SetEulerRotation(const vector3d r)
 	eulerot.X = r.X;
 	eulerot.Y = r.Z; //swap Y-Z axes
 	eulerot.Z = r.Y;
+	RotNormDeg(&eulerot); //norm it to form [0;360)
 
 	//update skies rotation
 	if (skies) skies->SetEulerAngles(eulerot);
 
 	//generate rotation matrices
-	rx = GenMtxRotX(r.X * M_PI / 180.f);
-	ry = GenMtxRotY(r.Z * M_PI / 180.f); //swap Y-Z axes
-	rz = GenMtxRotZ(r.Y * M_PI / 180.f);
+	rx = GenMtxRotX(eulerot.X * M_PI / 180.f);
+	ry = GenMtxRotY(eulerot.Y * M_PI / 180.f);
+	rz = GenMtxRotZ(eulerot.Z * M_PI / 180.f);
 	//and combine them
 	xy = Mtx3Mul(rx,ry);
 	rot = Mtx3Mul(xy,rz);
 
-	dbg_print("LVR Cam Rot = [%.1f, %.1f, %.1f]",r.X,r.Z,r.Y);
+	dbg_print("LVR Cam Rot = [%.1f, %.1f, %.1f]",eulerot.X,eulerot.Y,eulerot.Z);
 }
 
 void LVR::SetPosition(const vector3d pos)
@@ -127,7 +139,6 @@ void LVR::SetFarDist(const int d)
 {
 	far = d;
 	dfog = 1.f / (double)(far - fog);
-//	UpdateFogTab();
 	dbg_print("LVR Far plane = %d",d);
 }
 
@@ -135,7 +146,6 @@ void LVR::SetFogStart(const int d)
 {
 	fog = d;
 	dfog = 1.f / (double)(far - fog);
-//	UpdateFogTab();
 	dbg_print("LVR Fog dist. = %d",d);
 }
 
@@ -143,36 +153,8 @@ void LVR::SetFogColor(const vector3di nfc)
 {
 	fogcol = nfc;
 	dfog = 1.f / (double)(far - fog);
-//	UpdateFogTab();
 	dbg_print("LVR Fog color: [%d, %d, %d]",nfc.X,nfc.Y,nfc.Z);
 }
-
-//void LVR::UpdateFogTab()
-//{
-//	int i;
-//	int l = far - fog + 1;
-//	vector3d d,c;
-//
-//	//remove old tab
-//	if (fogtab) delete[] fogtab;
-//	fogtab = NULL;
-//
-//	//check for emptiness
-//	if (l < 1) return;
-//
-//	//create new
-//	fogtab = new vector3d[l];
-//	if (!fogtab) return;
-//
-//	//calculate d{R/G/B}
-//	d = fogcol / (double)l;
-//	c = d; //initial color
-//
-//	//fill in
-//	for (i = 0; i < l; i++) {
-//		fogtab[i]
-//	}
-//}
 
 vector3di LVR::GetProjection(const vector2di pnt)
 {
@@ -189,11 +171,12 @@ vector3di LVR::GetProjection(const vector2di pnt)
 
 void LVR::Frame()
 {
-	int x,y,z,l,fl;
+	int x,y,z,l,fl,s,i,m;
 	double fg;
 	vector3d v,fo,fn;
-	vector3di iv;
+	vector3di iv,av;
 	SVoxelInf* vox;
+	voxel area[6];
 
 //	memset(zbuf,0,rendsize*sizeof(float));
 
@@ -204,6 +187,8 @@ void LVR::Frame()
 	for (y = 0, l = 0; y < g_h; y++) {
 		for (x = 0; x < g_w; x++,l++) {
 			pbuf[l] = vector3di(-1);
+			if ((mask) && (mask[l])) continue;
+
 			//reverse painter's algorithm (+ z-buffer)?
 			for (z = 1; z <= far; z++) {
 				//make current point vector
@@ -229,32 +214,57 @@ void LVR::Frame()
 					//remember co-ords for screen raycast
 					pbuf[l] = iv;
 
-					//check visible side
-					render[l].sym = vox->sides[0]; //FIXME
-
-					//apply voxel' color information
-					render[l].bg = vox->pix.bg;
-					render[l].fg = vox->pix.fg;
-
-					//apply simple fog effect
-					fl = z - fog;
-					if (fl > 0) {
-						fg = dfog * fl;
-						fo = tripletovecf(render[l].bg);
-						fo *= (1.f - fg);
-						fn.X = fogcol.X;
-						fn.Y = fogcol.Y;
-						fn.Z = fogcol.Z;
-						fn *= fg;
-						fo += fn;
-						render[l].bg = vecftotriple(fo);
-
-						fo = tripletovecf(render[l].fg);
-						fo *= (1.f - fg);
-						fo += fn;
-						render[l].fg = vecftotriple(fo);
+					//gather area information
+					m = 1;
+					for (i = 0; i < 6; i++) {
+						av = iv;
+						s = -1 + ((i & 1) * 2);
+						switch (i / 2) {
+						case 0: av.X += s; break;
+						case 1: av.Y += s; break;
+						case 2: av.Z += s; break;
+						}
+						area[i] = pipeptr->GetVoxel(&av);
+						m *= area[i]; //must be zero if at least one voxel isn't occupied
 					}
 
+					//check visible side
+					s = (m == 0)? GetVCubeMajSide(&eulerot,area):-1;
+
+					if ((s >= 0) && (s < 6)) {
+						//draw it!
+						render[l].sym = vox->sides[s];
+
+						//apply voxel' color information
+						render[l].bg = vox->pix.bg;
+						render[l].fg = vox->pix.fg;
+
+						//apply simple fog effect
+						//FIXME: maybe put this code somewhere outside?
+						fl = z - fog;
+						if (fl > 0) {
+							fg = dfog * fl;
+							fo = tripletovecf(render[l].bg);
+							fo *= (1.f - fg);
+							fn.X = fogcol.X;
+							fn.Y = fogcol.Y;
+							fn.Z = fogcol.Z;
+							fn *= fg;
+							fo += fn;
+							render[l].bg = vecftotriple(fo);
+
+							fo = tripletovecf(render[l].fg);
+							fo *= (1.f - fg);
+							fo += fn;
+							render[l].fg = vecftotriple(fo);
+						}
+					} else {
+						//something went wrong
+						render[l].bg.r = 0;
+						render[l].bg.g = 0;
+						render[l].bg.b = 0;
+						render[l].fg = render[l].bg;
+					}
 					break;
 				} //voxel render
 			} //by Z

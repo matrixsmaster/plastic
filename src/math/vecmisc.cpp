@@ -198,6 +198,16 @@ void PerspectiveNInv(vector3d* pnt, const vector3d* fov, const vector2di* mid)
 	pnt->Y =-(2.f * (double)(mid->Y) * (pnt->Y - (double)(mid->Y))) / (fov->Y * pnt->Z);
 }
 
+void RotNormDeg(vector3d* r)
+{
+	while (r->X >= 360)	r->X -= 360.f;
+	while (r->X < 0)	r->X += 360.f;
+	while (r->Y >= 360)	r->Y -= 360.f;
+	while (r->Y < 0)	r->Y += 360.f;
+	while (r->Z >= 360)	r->Z -= 360.f;
+	while (r->Z < 0)	r->Z += 360.f;
+}
+
 /*
  * PNPOLY - Point Inclusion in Polygon Test
  * (C) W. Randolph Franklin (WRF)
