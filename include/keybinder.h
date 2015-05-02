@@ -17,32 +17,28 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef SUPPORT_H_
-#define SUPPORT_H_
+#ifndef KEYBINDER_H_
+#define KEYBINDER_H_
 
-#include <stdarg.h>
-#include "vecmath.h"
-#include "plastic.h"
-#include "visual.h"
+#include <string>
+#include <map>
+#include "datapipe.h"
 
-#define BOOLSTR(X) ((X)? "ON":"OFF")
 
-/// Prints out SGameSettings data.
-void printsettings(SGameSettings* s);
+class KeyBinder {
+private:
+	DataPipe* pipe;
+	std::map<int,int> keymap;
 
-/// Prints a simple formatted message to stderr.
-void errout(char const* fmt, ...);
+public:
+	KeyBinder(DataPipe* pptr)		{ pipe = pptr; }
+	virtual ~KeyBinder()			{ keymap.clear(); }
 
-/// Argument parser. Supposed to be used for analyze startup environment.
-bool argparser(int argc, char* argv[], SGameSettings* sets);
+	///Returns a code associated with key.
+	int RegKeyByName(const char* name);
 
-///Help screen.
-void arghelp(char* pname);
+	///Returns code of registered key (if found).
+	int DecodeKey(int key);
+};
 
-///Convert SCTriple to CPoint3D.
-vector3d tripletovecf(const SCTriple s);
-
-///Convert CPoint3D to SCTriple.
-SCTriple vecftotriple(const vector3d s);
-
-#endif /* SUPPORT_H_ */
+#endif /* KEYBINDER_H_ */

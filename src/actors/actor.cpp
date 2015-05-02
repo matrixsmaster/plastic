@@ -24,17 +24,22 @@
 #include "actorctab.h"
 
 
-PlasticActor::PlasticActor(SPAStats s)
+PlasticActor::PlasticActor(SPAStats s, DataPipe* pptr)
 {
+	rotmat = GenOMatrix();
+	pipe = pptr;
+
 	stats = s;
 	if (s.base.autoinit) AutoInitStats();
 	curr = s.base;
 	curr.autoinit = false;
-	rotmat = GenOMatrix();
 }
 
-PlasticActor::PlasticActor(EPAClass c)
+PlasticActor::PlasticActor(EPAClass c, DataPipe* pptr)
 {
+	rotmat = GenOMatrix();
+	pipe = pptr;
+
 	strcpy(stats.name,"Auto"); //FIXME: namegen
 	stats.female = (rand() > RAND_MAX / 3); //kekeke
 	stats.base.Cls = c;
@@ -42,7 +47,6 @@ PlasticActor::PlasticActor(EPAClass c)
 	AutoInitStats();
 	curr = stats.base;
 	curr.autoinit = false;
-	rotmat = GenOMatrix();
 }
 
 void PlasticActor::AutoInitStats()
@@ -76,21 +80,52 @@ void PlasticActor::Move(ELMoveDir d, float step)
 	pos.Z += (int)round(v.Z);
 }
 
+Player::Player(SPAStats s, DataPipe* pptr) :
+		PlasticActor(s,pptr)
+{
+	binder = new KeyBinder(pptr);
+
+	binder->RegKeyByName("WALK_FORW");
+	binder->RegKeyByName("WALK_BACK");
+	binder->RegKeyByName("WALK_LEFT");
+	binder->RegKeyByName("WALK_RGHT");
+
+	binder->RegKeyByName("RUN_FORW");
+	binder->RegKeyByName("RUN_BACK");
+	binder->RegKeyByName("RUN_LEFT");
+	binder->RegKeyByName("RUN_RGHT");
+
+	binder->RegKeyByName("TURN_LEFT");
+	binder->RegKeyByName("TURN_RGHT");
+	binder->RegKeyByName("TURN_UP");
+	binder->RegKeyByName("TURN_DW");
+}
+
 void Player::ProcessEvent(const CGUIEvent* e)
 {
+	bool rc = false; //rotation change flag
 	if (e->t != GUIEV_KEYPRESS) return;
-	switch (e->k) {
-	case KEY_UP: rot.X += 1; break;
-	case KEY_DOWN: rot.X -= 1; break;
-	case KEY_LEFT: rot.Z += 1; break;
-	case KEY_RIGHT: rot.Z -= 1; break;
 
-	case 'w': Move(LMOVE_FORW,1.2f); break; //FIXME: use speed value
-	case 's': Move(LMOVE_BACK,1.2f); break;
-	case 'a': Move(LMOVE_LEFT,1.2f); break;
-	case 'd': Move(LMOVE_RGHT,1.2f); break;
-	case '=': Move(LMOVE_UP,1.2f); break;
-	case '-': Move(LMOVE_DW,1.2f); break;
+	switch (binder->DecodeKey(e->k)) {
+
+	case 0: Move(LMOVE_FORW,1.2f); break; //FIXME: use speed value
+	case 1: Move(LMOVE_BACK,1.2f); break;
+	case 2: Move(LMOVE_LEFT,1.2f); break;
+	case 3: Move(LMOVE_RGHT,1.2f); break;
+
+	case 4: Move(LMOVE_FORW,2.2f); break; //FIXME: use speed value
+	case 5: Move(LMOVE_BACK,2.2f); break;
+	case 6: Move(LMOVE_LEFT,2.2f); break;
+	case 7: Move(LMOVE_RGHT,2.2f); break;
+
+	case  8: rot.Z += 1; rc = true; break;
+	case  9: rot.Z -= 1; rc = true; break;
+	case 10: rot.X += 1; rc = true; break;
+	case 11: rot.X -= 1; rc = true; break;
+
+//	case : Move(LMOVE_UP,1.2f); break;
+//	case : Move(LMOVE_DW,1.2f); break;
 	}
-	SetRot(rot);
+
+	if (rc) SetRot(rot); //Update rotation
 }

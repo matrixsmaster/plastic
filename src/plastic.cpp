@@ -157,7 +157,11 @@ int main(int argc, char* argv[])
 	printf(HELLOSTR,PRODNAME,VERMAJOR,VERMINOR,BUILDNO,PRODNAME);
 
 	/* Parse and print current settings. */
-	if (!argparser(argc,argv,&g_set)) return 1;
+	if (!argparser(argc,argv,&g_set)) {
+		/* Print out some helpful information */
+		arghelp(argv[0]);
+		return 1;
+	}
 	printsettings(&g_set);
 
 	/* Show interactive startup shell if needed. */

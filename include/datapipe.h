@@ -34,6 +34,7 @@
 #define MAXINISTRLEN 256
 #define VOXTABFILENAME "voxtab.dat"
 #define ATMOININAME "atmosphere"
+#define KEYBINDNAME "controls"
 
 
 enum EDPipeStatus {

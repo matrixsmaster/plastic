@@ -32,7 +32,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	data = NULL;
 	lvr = NULL;
 	gui = NULL;
-	PC = new Player(sets->PCData);
+	PC = NULL;
 	hud = NULL;
 
 	/* Create and set up DataPipe */
@@ -49,6 +49,9 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	/* Create LVR */
 	lvr = new LVR(data);
 
+	/* Create Player */
+	PC = new Player(sets->PCData,data);
+
 	//FIXME: debugging stuff
 	scale = 0.33;
 	lvr->SetScale(0.33);
@@ -57,7 +60,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	fov = vector3d(DEFFOVX,DEFFOVY,1);
 	data->SetGP(vector3dulli(0));
 	lvr->SetPosition(vector3d(128,128,135));
-	PC->SetPos(vector3di(-128,100,135));
+	PC->SetPos(vector3di(128,100,135));
 	lvr->SetFogStart(fog);
 	lvr->SetFogColor(vector3di(100));
 }

@@ -17,32 +17,39 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef SUPPORT_H_
-#define SUPPORT_H_
+#include <stdlib.h>
+#include "keybinder.h"
 
-#include <stdarg.h>
-#include "vecmath.h"
-#include "plastic.h"
-#include "visual.h"
+using namespace std;
 
-#define BOOLSTR(X) ((X)? "ON":"OFF")
 
-/// Prints out SGameSettings data.
-void printsettings(SGameSettings* s);
+int KeyBinder::RegKeyByName(const char* name)
+{
+	int x,n;
+	if ((!name) || (!pipe)) return -1; //just in case
 
-/// Prints a simple formatted message to stderr.
-void errout(char const* fmt, ...);
+	//search INI
+	string dat = pipe->GetIniDataS(string(KEYBINDNAME),string(name));
+	//if not found, nothing can be registered
+	if (dat.empty()) return -1;
 
-/// Argument parser. Supposed to be used for analyze startup environment.
-bool argparser(int argc, char* argv[], SGameSettings* sets);
+	//try to interpret information
+	if (dat.size() == 1) /*char*/ {
+		x = (int)dat[0];
+	} else {
+		x = strtol(dat.c_str(),NULL,0);
+	}
+	if (!x) return -1; //something wrong, or trying to register zero key code
 
-///Help screen.
-void arghelp(char* pname);
+	//append new pair
+	n = keymap.size();
+	keymap.insert(make_pair(x,n));
+	return n;
+}
 
-///Convert SCTriple to CPoint3D.
-vector3d tripletovecf(const SCTriple s);
-
-///Convert CPoint3D to SCTriple.
-SCTriple vecftotriple(const vector3d s);
-
-#endif /* SUPPORT_H_ */
+int KeyBinder::DecodeKey(int key)
+{
+	const map<int,int>::iterator i = keymap.find(key);
+	if (i == keymap.end()) return -1;
+	else return (i->second);
+}

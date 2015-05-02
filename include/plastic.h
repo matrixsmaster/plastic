@@ -41,6 +41,7 @@ under conditions of GNU GPL v2\n\n"
 
 
 #define GAMEARGTYPES 2
+#define GAMEARGHELPLEN 160
 
 struct SGameSettings {
 	char root[MAXPATHLEN];	//VFS root dir
@@ -64,12 +65,15 @@ enum EGameArgType {
 
 struct SGameArg {
 	EGameArgType typ;
-	char sw;		//switch character
+	char sw;					//switch character
+	char desc[GAMEARGHELPLEN];	//description string
 };
 
 static const SGameArg argp_table[GAMEARGTYPES] = {
-		{ GAT_ROOTDIR,		'r' },
-		{ GAT_USESHELL,		's' }
+	{ GAT_ROOTDIR,	'r', "Set the root directory of game files." },
+	{ GAT_USESHELL,	's', "Show interactive shell after startup to "\
+						 "adjust game settings and/or generate "\
+						 "player character." },
 };
 
 #endif /* PLASTIC_H_ */

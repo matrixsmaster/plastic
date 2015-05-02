@@ -91,6 +91,20 @@ bool argparser(int argc, char* argv[], SGameSettings* sets)
 	return true;
 }
 
+void arghelp(char* pname)
+{
+	int i;
+	SGameSettings dflt = DEFAULT_SETTINGS;
+
+	printf("\nUsage: %s [OPTIONS]\nAvailable options are:\n",pname);
+
+	for (i = 0; i < GAMEARGTYPES; i++)
+		printf("\t-%c <arg>: %s\n",argp_table[i].sw,argp_table[i].desc);
+
+	printf("\nDefault setting are listed below.\n");
+	printsettings(&dflt);
+}
+
 vector3d tripletovecf(const SCTriple s)
 {
 	return vector3d(s.r,s.g,s.b);

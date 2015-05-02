@@ -26,6 +26,8 @@
 #include "mtx3d.h"
 #include "misconsts.h"
 #include "CGUIEvents.h"
+#include "datapipe.h"
+#include "keybinder.h"
 
 
 #define MAXACTNAMELEN 25
@@ -79,10 +81,11 @@ protected:
 	SPAStats stats;			//Basic stats
 	SPABase curr;			//Current values
 	SMatrix3d rotmat;		//Rotation in matrix form
+	DataPipe* pipe;			//DataPipe instance
 
 public:
-	PlasticActor(SPAStats s);
-	PlasticActor(EPAClass c);
+	PlasticActor(SPAStats s, DataPipe* pptr);
+	PlasticActor(EPAClass c, DataPipe* pptr);
 	virtual ~PlasticActor() {}
 
 	virtual void AutoInitStats();
@@ -97,9 +100,11 @@ public:
 
 //Special case for a player character
 class Player : public PlasticActor {
+private:
+	KeyBinder* binder;
+
 public:
-	Player(SPAStats s) : PlasticActor(s) {}
-	Player(EPAClass c) : PlasticActor(c) {}
+	Player(SPAStats s, DataPipe* pptr);
 	virtual ~Player() {}
 
 	void ProcessEvent(const CGUIEvent* e);
