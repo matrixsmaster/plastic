@@ -30,17 +30,19 @@ class VModel {
 private:
 	int s_x,s_y,s_z;		//extent
 	voxel* dat;				//original data
-	ulli datlen;
-	voxel* buf;				//modified buffer
-	ulli buflen;
-	int bufside;
-	vector3di pos;
-	vector3d rot;
-	SMatrix3d rotm;
-	bool changed;
-	vector3di oldrres;
-	vector3di dcenter;
-	vector3di center;
+	ulli datlen;			//linear length of single state buffer
+	int nstates;			//number of states available
+	voxel* buf;				//modified (working) buffer
+	ulli buflen;			//linear length of working buf
+	int bufside;			//side length of working buf
+	vector3di pos;			//world position (used passively)
+	vector3d rot;			//current rotation vector
+	SMatrix3d rotm;			//current rotation matrix
+	bool changed;			//optimization flag of rotations
+	vector3di oldrres;		//old rotational result
+	vector3di dcenter;		//original data center point
+	vector3di center;		//working buf center point
+	int state;				//current state
 
 	bool AllocBuf();
 
@@ -53,8 +55,10 @@ public:
 	int GetBoundSide()				{ return bufside; }
 	ulli GetOrgLen()				{ return datlen; }
 	ulli GetModLen()				{ return buflen; }
+	int GetNumStates()				{ return nstates; }
 
 	bool LoadFromFile(const char* fn);
+	ulli GetAllocatedRAM();
 
 	void SetPos(const vector3di p)	{ pos = p; }
 	vector3di GetPos()				{ return pos; }
@@ -65,6 +69,11 @@ public:
 	void ApplyRot();
 
 	voxel GetVoxelAt(const vector3di* p);
+};
+
+struct SVoxCharPair {
+	char c;
+	voxel v;
 };
 
 #endif /* VMODEL_H_ */

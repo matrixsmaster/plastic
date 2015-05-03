@@ -30,6 +30,7 @@
 #include "datapipe.h"
 #include "LVR.h"
 #include "actor.h"
+#include "vmodel.h"
 #include "hud.h"
 
 
@@ -47,6 +48,7 @@ private:
 	float scale;
 	vector3d fov;
 	int far,fog;
+	VModel* test;
 
 public:
 	PlasticWorld(SGameSettings* settings);

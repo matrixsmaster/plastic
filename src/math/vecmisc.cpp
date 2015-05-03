@@ -221,13 +221,13 @@ void RotNormDegI(vector3di* r)
 
 bool IsPntInsideCubeI(const vector3di* pnt, const vector3di* center, const int side)
 {
-	int x = pnt->X - center->X + side;
+	int x = pnt->X - center->X + side / 2;
 	if ((x < 0) || (x > side)) return false;
 
-	x = pnt->Y - center->Y + side;
+	x = pnt->Y - center->Y + side / 2;
 	if ((x < 0) || (x > side)) return false;
 
-	x = pnt->Z - center->Z + side;
+	x = pnt->Z - center->Z + side / 2;
 	if ((x < 0) || (x > side)) return false;
 
 	return true;

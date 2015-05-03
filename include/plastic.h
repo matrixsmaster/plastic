@@ -47,6 +47,7 @@ struct SGameSettings {
 	char root[MAXPATHLEN];	//VFS root dir
 	bool use_shell;			//launch interactive shell
 	uli world_r;			//world radius
+	ulli rammax;			//amount of memory that positively allowed to be used
 	SPAStats PCData;		//player character settings
 };
 
@@ -54,6 +55,7 @@ struct SGameSettings {
 	"./data",									\
 	false, 										\
 	128,										\
+	(4ULL*1024*1024*1024),						\
 	{ "Mary", true, {PCLS_INQUISITOR, true} }	\
 }
 

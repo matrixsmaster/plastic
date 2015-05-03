@@ -32,6 +32,7 @@
 #include "vmodel.h"
 
 
+#define DEFRAMMAX (2ULL * 1024*1024*1024)
 #define MAXINISTRLEN 256
 #define VOXTABFILENAME "voxtab.dat"
 #define ATMOININAME "atmosphere"
@@ -67,6 +68,7 @@ private:
 	int voxtablen;							//...its length
 	std::map<std::string,IniData> ini;		//map of known (and loaded) ini files
 	std::vector<VModel*> objs;				//objects in scene
+	ulli rammax;							//max amount of memory allowed to be allocated
 
 	bool ScanFiles();
 	bool FindChunk(vector3dulli pos, SDataPlacement* res);
@@ -82,6 +84,8 @@ public:
 
 	///Returns amount of RAM allocated by buffers.
 	ulli GetAllocatedRAM()		{ return allocated; }
+
+	void SetMaxRAM(ulli m)		{ rammax = m; }
 
 	///Returns a pointer to voxel info table.
 	SVoxelInf* GetVoxTable()	{ return voxeltab; }
@@ -112,7 +116,7 @@ public:
 	std::string GetIniDataS(const std::string ininame, const std::string inifield);
 
 	///Load dynamic object into current chunk.
-	bool LoadModel(const char* fname, const vector3di pos);
+	VModel* LoadModel(const char* fname, const vector3di pos);
 
 	///Purge all loaded models.
 	void PurgeModels();

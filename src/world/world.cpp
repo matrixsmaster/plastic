@@ -42,6 +42,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 		result = 1;
 		return;
 	}
+	data->SetMaxRAM(sets->rammax);
 	alloc_gb = (float)(data->GetAllocatedRAM()) / 1024.f / 1024.f / 1024.f;
 	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
 	printf("Allocated data pipe memory: %llu bytes (%.3f GiB)\n",data->GetAllocatedRAM(),alloc_gb);
@@ -59,7 +60,8 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	fog = DEFFOGPLANE;
 	fov = vector3d(DEFFOVX,DEFFOVY,1);
 	data->SetGP(vector3dulli(0));
-	data->LoadModel("testmodel.dat",vector3di(128,100,135));
+	test = data->LoadModel("testmodel.dat",vector3di(128,100,135));
+	if (!test) abort();
 	lvr->SetPosition(vector3d(128,90,135));
 	PC->SetPos(vector3di(128,90,135));
 	lvr->SetFogStart(fog);
@@ -117,6 +119,9 @@ void PlasticWorld::ConnectGUI()
 
 void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 {
+	//DEBUG:
+	vector3d tr = test->GetRot();
+
 	result = 0;
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
@@ -136,6 +141,12 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 		case '\'': far++; break;
 		case 't': fog--; break;
 		case 'y': fog++; break;
+		case '1': tr.X -= 2; break;
+		case '2': tr.X += 2; break;
+		case '3': tr.Y += 2; break;
+		case '4': tr.Y -= 2; break;
+		case '5': tr.Z -= 2; break;
+		case '6': tr.Z += 2; break;
 		case KEY_F(4):
 				gui->GetColorManager()->Flush();
 				printf("TESTING: YOU SHOULDN'T SEE THIS!!!");
@@ -154,6 +165,8 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 		lvr->SetFOV(fov);
 		lvr->SetFarDist(far);
 		lvr->SetFogStart(fog);
+
+		test->SetRot(tr);
 
 		PC->ProcessEvent(e);
 		lvr->SetEulerRotation(PC->GetRot().ToReal());

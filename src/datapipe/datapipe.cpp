@@ -34,6 +34,7 @@ DataPipe::DataPipe(char* root_dir)
 	memset(chunks,0,sizeof(chunks));
 	allocated = 0;
 	memset(root,0,MAXPATHLEN);
+	rammax = DEFRAMMAX;
 
 	/* Copy root path */
 	i = strlen(root_dir);
@@ -201,10 +202,10 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	/* Check for dynamic objects */
 	if (!objs.empty()) {
 		for (mi = objs.begin(); mi != objs.end(); ++mi) {
-//			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
+			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
 				tmp = (*mi)->GetVoxelAt(p);
 				if (tmp) return tmp;
-//			}
+			}
 		}
 	}
 
@@ -255,33 +256,35 @@ SVoxelInf* DataPipe::GetVInfo(const voxel v)
 	else return NULL;
 }
 
-bool DataPipe::LoadModel(const char* fname, const vector3di pos)
+VModel* DataPipe::LoadModel(const char* fname, const vector3di pos)
 {
 	VModel* m;
 	char fn[MAXPATHLEN];
-	if (status != DPIPE_IDLE) return false;
+	if ((status != DPIPE_IDLE) || (allocated >= rammax)) return NULL;
 
 	m = new VModel();
 
 	snprintf(fn,MAXPATHLEN,"%s/%s",root,fname);
 	if (!m->LoadFromFile(fn)) {
 		delete m;
-		return false;
+		return NULL;
 	}
 
-	allocated += (m->GetModLen() + m->GetOrgLen()) * sizeof(voxel);
+	allocated += m->GetAllocatedRAM();
 	m->SetPos(pos);
 	objs.push_back(m);
 
-	return true;
+	return m;
 }
 
 void DataPipe::PurgeModels()
 {
 	std::vector<VModel*>::iterator mi;
 
-	for (mi = objs.begin(); mi != objs.end(); ++mi)
-		allocated -= ((*mi)->GetModLen() + (*mi)->GetOrgLen()) * sizeof(voxel);
+	for (mi = objs.begin(); mi != objs.end(); ++mi) {
+		allocated -= (*mi)->GetAllocatedRAM();
+		delete (*mi);
+	}
 
 	objs.clear();
 }
