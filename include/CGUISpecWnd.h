@@ -45,12 +45,18 @@ public:
 	CurseGUIDebugWnd(CurseGUI* scrn);
 	virtual ~CurseGUIDebugWnd();
 
-	bool IsHidden()						{ return hidden; }
+	//Debug console is always focused if shown.
+	bool GainFocus()					{ return focused; }
+	bool LooseFocus()					{ return hidden; }
+
+	void ToggleShow();
 
 	void Update(bool refr);
 	bool PutEvent(CGUIEvent* e);
+
 	void PutString(char* str);
 	void PutString(std::string str);
+	//TODO: add ability to dump log to text file
 };
 
 /* ********************************** Inventory window ********************************** */

@@ -26,12 +26,16 @@ void dbg_init(CurseGUI* gui)
 {
 	debug_ui = new CurseGUIDebugWnd(gui);
 	gui->AddWindow(debug_ui);
-//	debug_ui->SetBoxed(false);
 }
 
 void dbg_finalize()
 {
 	//TODO
+}
+
+void dbg_toggle()
+{
+	if (debug_ui) debug_ui->ToggleShow();
 }
 
 void dbg_logstr(char* str)

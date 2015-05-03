@@ -38,7 +38,7 @@ void CurseGUIInventoryWnd::Update(bool refr)
 
 bool CurseGUIInventoryWnd::PutEvent(CGUIEvent* e)
 {
-	if (will_close || (!focused)) return false;
+	if (will_close) return false;
 
 	switch (e->t) {
 	case GUIEV_KEYPRESS:

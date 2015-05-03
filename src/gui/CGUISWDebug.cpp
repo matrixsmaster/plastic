@@ -41,6 +41,13 @@ CurseGUIDebugWnd::~CurseGUIDebugWnd()
 	//TODO
 }
 
+void CurseGUIDebugWnd::ToggleShow()
+{
+	hidden ^= true;
+	focused = !hidden;
+	edit_line = ">";
+}
+
 void CurseGUIDebugWnd::Update(bool refr)
 {
 	vector<string>::iterator it;
@@ -92,28 +99,24 @@ bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 		break;
 	case GUIEV_KEYPRESS:
 		switch (e->k) {
-		case '`':
-			hidden ^= true;
-			edit_line = ">";
-			break;
 		case KEY_ENTER:
 		case 10: /* in case enter isn't enter */
-			if(!hidden) {
+//			if(!hidden) { //FIXME: there's no need to do such a things :)
 				//TODO parse command
 				if(edit_line.size() > 1) {
 					PutString(edit_line.c_str()+1);
 					edit_line = ">";
 				}
-			}
+//			}
 			break;
 		case KEY_BACKSPACE:
 		case 127: /* in case backspace isn't delete */
-			if(!hidden)
+//			if(!hidden)
 				if(edit_line.size() > 1)
 					edit_line.erase(edit_line.end() - 1);
 			break;
 		default:
-			if(!hidden) {
+//			if(!hidden) {
 				if((e->k >= 'A' && e->k <= 'Z') ||
 						(e->k >= 'a' && e->k <= 'z') ||
 						(e->k == '-') ||
@@ -122,7 +125,7 @@ bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 					edit = true;
 					return true;
 				}
-			}
+//			}
 			break;
 		}
 		break;

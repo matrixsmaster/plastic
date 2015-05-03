@@ -29,6 +29,7 @@ extern CurseGUIDebugWnd* debug_ui;
 
 void dbg_init(CurseGUI* gui);
 void dbg_finalize();
+void dbg_toggle();
 void dbg_logstr(char* str);
 void dbg_print(const char* fmt, ...);
 

@@ -34,6 +34,7 @@ private:
 	int m_x, m_y;
 	int m_w, m_h;
 	bool transparent;
+	bool stayontop;
 
 	void ResizeWnd();
 	void PutLog();
@@ -42,12 +43,20 @@ public:
 	CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h);
 	virtual ~CurseGUIOverlay();
 
-	void Update(bool refr);
-	bool PutEvent(CGUIEvent* e);
-	void PutString(char* str);
-	void PutString(std::string str);
+	//Overlay willn't gain or loose the focus.
+	bool GainFocus()					{ return false; }
+	bool LooseFocus()					{ return true; }
+
 	void SetTransparent(bool t)			{ transparent = t; }
 	bool GetTransparent() 				{ return transparent; }
+	void StayOnTop(bool s)				{ stayontop = s; }
+	bool IsStayOnTop()					{ return stayontop; }
+
+	void Update(bool refr);
+	bool PutEvent(CGUIEvent* e);
+
+	void PutString(char* str);
+	void PutString(std::string str);
 };
 
 

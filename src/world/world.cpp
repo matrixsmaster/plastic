@@ -34,6 +34,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	gui = NULL;
 	PC = NULL;
 	hud = NULL;
+	binder = NULL;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets->root);
@@ -70,6 +71,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 PlasticWorld::~PlasticWorld()
 {
+	if (binder) delete binder;
 	if (hud) delete hud;
 	if (PC) delete PC;
 	if (lvr) delete lvr;
@@ -135,8 +137,9 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
 		/* User pressed a key */
-		switch (e->k) {
+		switch (e->k) { //FIXME: use binder
 		/* DEBUGging stuff */
+		case '`': dbg_toggle(); break;
 		case '[': scale -= 0.01; break;
 		case ']': scale += 0.01; break;
 		case ',': fov.X -= 0.1; break;

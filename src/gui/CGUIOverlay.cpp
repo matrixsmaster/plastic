@@ -38,6 +38,8 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h) :
 	e.t = GUIEV_RESIZE;
 	PutEvent(&e);
 
+	focused = false;
+	stayontop = false;
 	transparent = true;
 }
 
@@ -62,8 +64,6 @@ bool CurseGUIOverlay::PutEvent(CGUIEvent* e)
 	switch (e->t) {
 	case GUIEV_RESIZE:
 		ResizeWnd();
-		break;
-	case GUIEV_KEYPRESS:
 		break;
 	default: break;
 	}

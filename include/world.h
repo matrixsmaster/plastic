@@ -32,6 +32,7 @@
 #include "actor.h"
 #include "vmodel.h"
 #include "hud.h"
+#include "keybinder.h"
 
 
 class PlasticWorld {
@@ -43,6 +44,7 @@ private:
 	CurseGUI* gui;
 	Player* PC;
 	HUD* hud;
+	KeyBinder* binder;
 
 	//FIXME: delete them
 	float scale;

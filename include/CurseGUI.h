@@ -112,7 +112,7 @@ public:
 	bool RmWindow(CurseGUIWnd* ptr);
 
 	///Remove CurseGUI window by number.
-	bool RmWindow(int no);
+	bool RmWindow(const int no);
 
 	///Remove CurseGUI window by name.
 	bool RmWindow(const char* name);
@@ -124,7 +124,10 @@ public:
 	int GetNumWindows()							{ return windows.size(); }
 
 	///Returns CurseGUI window pointer by window number.
-	CurseGUIWnd* GetWindowN(int no);
+	CurseGUIWnd* GetWindowN(const int no);
+
+	///Returns CurseGUI window pointer by window name.
+	CurseGUIWnd* GetWindowN(const char* name);
 
 	///Push events through all windows and controls.
 	///Returns whatever event was consumed or not.
@@ -142,7 +145,7 @@ public:
 
 /* ********************************** GUI WINDOWS ********************************** */
 
-/* Window types enumeration to make windows sortable by its purpose */
+/* Window types enumeration to make windows distinguishable by its purpose */
 enum ECGUIWindowType {
 	GUIWT_BASIC,
 	GUIWT_OVERLAY,
@@ -154,7 +157,7 @@ class CurseGUICtrlHolder;
 /* CurseGUI Window Base Class */
 class CurseGUIWnd : public CurseGUIBase {
 protected:
-	CurseGUI* parent;
+	CurseGUI* parent;		//TODO: comment
 	ECGUIWindowType type;
 	std::string name;
 	bool focused;
@@ -166,18 +169,37 @@ public:
 	CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h);
 	virtual ~CurseGUIWnd();
 
+	///Sets drawing window border on or off.
 	virtual void SetBoxed(bool b)		{ boxed = b; }
-	virtual void GainFocus()			{ focused = true; }
-	virtual void LooseFocus()			{ focused = false; }
+
+	///Returns true if focus has gained.
+	virtual bool GainFocus()			{ focused = true; return true; }
+
+	///Returns true if focus has loosed.
+	virtual bool LooseFocus()			{ focused = false; return true; }
+
+	///Returns whether window is focused.
 	bool IsFocused()					{ return focused; }
 
+	///Sets a name for a window.
 	virtual void SetName(const char* nm);
+
+	///Returns window name.
 	std::string GetName()				{ return name; }
+
+	///Returns window type.
 	ECGUIWindowType GetType()			{ return type; }
 
+	///Update window content on the screen.
 	virtual void Update(bool refr);
+
+	///Move window on the screen.
 	virtual void Move(int x, int y);
+
+	///Resize window to a given columns and rows.
 	virtual void Resize(int w, int h);
+
+	///Window' event processor.
 	virtual bool PutEvent(CGUIEvent* e);
 
 	int GetPosX()						{ return g_x; }

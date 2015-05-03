@@ -207,6 +207,8 @@ void CurseGUI::AddWindow(CurseGUIWnd* n_wnd)
 bool CurseGUI::RmWindow(CurseGUIWnd* ptr)
 {
 	std::vector<CurseGUIWnd*>::iterator it;
+	if (!ptr) return false;
+
 	for (it = windows.begin(); it != windows.end(); ++it)
 		if (*it == ptr) {
 			delete ptr;
@@ -216,27 +218,14 @@ bool CurseGUI::RmWindow(CurseGUIWnd* ptr)
 	return false;
 }
 
-bool CurseGUI::RmWindow(int no)
+bool CurseGUI::RmWindow(const int no)
 {
-	if ((no < 0) || (no >= (int)windows.size()))
-		/* we don't want more than two billion windows, though */
-		return false;
-	return (RmWindow(windows[no]));
+	return (RmWindow(GetWindowN(no)));
 }
 
 bool CurseGUI::RmWindow(const char* name)
 {
-	std::vector<CurseGUIWnd*>::iterator it;
-	std::string nm(name);
-	if (nm.empty()) return false;
-
-	for (it = windows.begin(); it != windows.end(); ++it)
-		if ((*it)->GetName() == nm) {
-			delete (*it);
-			windows.erase(it);
-			return true;
-		}
-	return false;
+	return (RmWindow(GetWindowN(name)));
 }
 
 void CurseGUI::RmAllWindows()
@@ -247,16 +236,30 @@ void CurseGUI::RmAllWindows()
 	}
 }
 
-CurseGUIWnd* CurseGUI::GetWindowN(int no)
+CurseGUIWnd* CurseGUI::GetWindowN(const int no)
 {
 	if ((no < 0) || (no >= (int)windows.size()))
+		/* we don't want more than two billion windows, though */
 		return NULL;
 	return (windows[no]);
 }
 
+CurseGUIWnd* CurseGUI::GetWindowN(const char* name)
+{
+	std::vector<CurseGUIWnd*>::iterator it;
+	std::string nm(name);
+	if (nm.empty()) return NULL;
+
+	for (it = windows.begin(); it != windows.end(); ++it)
+		if ((*it)->GetName() == nm) {
+			return (*it);
+		}
+	return NULL;
+}
+
 bool CurseGUI::PumpEvents(CGUIEvent* e)
 {
-	int i;
+	std::vector<CurseGUIWnd*>::iterator it;
 	bool consumed = false;
 	result = 1;
 
@@ -284,14 +287,23 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 		}
 	}
 
-	for (i = windows.size() - 1; i >= 0; i--) {
-		if (windows[i]->PutEvent(e)) {
-			consumed = true;
-			if (windows[i]->WillClose()) RmWindow(i);
+	/* Pump down the events */
+	for (it = windows.begin(); it != windows.end(); ++it) {
+		if ((e->t == GUIEV_KEYPRESS) || (e->t == GUIEV_MOUSE)) {
+			//user input events will only be passed into focused windows
+			if (!(*it)->IsFocused()) continue;
+		}
+		//pass the event
+		if ((*it)->PutEvent(e)) {
+			consumed = true; //that's a 'private' event, stop pumping
+			if ((*it)->WillClose()) RmWindow(*it); //destroy closing window
 			break;
 		}
 	}
 
+	//TODO: window reordering by focus value
+
+	/* No one has consumed the event. Need to be processed in global GUI scope. */
 	if (!consumed) {
 		switch (e->t) {
 		case GUIEV_KEYPRESS:
@@ -306,6 +318,7 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 		}
 	}
 
+	/* Update the background masking */
 	if (e->t == GUIEV_RESIZE)
 		backmask = (char*)realloc(backmask,g_w*g_h);
 	UpdateBackmask();
@@ -338,7 +351,7 @@ void CurseGUI::UpdateBackmask()
 
 		case GUIWT_DEBUGUI:
 			dbug = reinterpret_cast<CurseGUIDebugWnd*> (*it);
-			if (dbug->IsHidden()) skip = true;
+			if (dbug->LooseFocus()) skip = true; //focus can leave debugUI only if it's hidden
 			break;
 
 		default: break;
@@ -367,7 +380,7 @@ CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 		g_x = x;
 		g_y = y;
 	}
-	focused = true;
+	focused = false;
 	boxed = true;
 	ctrls = new CurseGUICtrlHolder(this);
 }
@@ -410,7 +423,7 @@ void CurseGUIWnd::Resize(int w, int h)
 
 bool CurseGUIWnd::PutEvent(CGUIEvent* e)
 {
-	if (will_close || (!focused)) return false;
+	if (will_close) return false;
 
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
