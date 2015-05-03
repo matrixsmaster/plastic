@@ -79,6 +79,12 @@ PlasticWorld::~PlasticWorld()
 void PlasticWorld::Quantum()
 {
 	//TODO: world update (!)
+
+	//DEBUG:
+	if (test->GetState() == 0)
+		test->SetState(test->GetNumStates()-1);
+	else
+		test->SetState(test->GetState()-1);
 }
 
 void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
@@ -148,13 +154,6 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 		case '4': tr.Y -= 2; break;
 		case '5': tr.Z -= 2; break;
 		case '6': tr.Z += 2; break;
-		case KEY_F(9):
-			if (test->GetState() == 0)
-				test->SetState(test->GetNumStates()-1);
-			else
-				test->SetState(test->GetState()-1);
-			dbg_print("state = %d",test->GetState());
-			break;
 		case KEY_F(4):
 				gui->GetColorManager()->Flush();
 				printf("TESTING: YOU SHOULDN'T SEE THIS!!!");
