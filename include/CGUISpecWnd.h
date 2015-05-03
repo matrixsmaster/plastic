@@ -26,6 +26,10 @@
 #include <vector>
 #include "CurseGUI.h"
 
+#include "inventory.h"
+
+
+/* ********************************** Debug Console ********************************** */
 
 class CurseGUIDebugWnd : public CurseGUIWnd {
 private:
@@ -34,10 +38,11 @@ private:
 	int key;
 	bool edit;
 	std::string edit_line;
+
 	void ResizeWnd();
 
 public:
-	CurseGUIDebugWnd(CurseGUI* scrn, int x, int y);
+	CurseGUIDebugWnd(CurseGUI* scrn);
 	virtual ~CurseGUIDebugWnd();
 
 	bool IsHidden()						{ return hidden; }
@@ -46,6 +51,22 @@ public:
 	bool PutEvent(CGUIEvent* e);
 	void PutString(char* str);
 	void PutString(std::string str);
+};
+
+/* ********************************** Inventory window ********************************** */
+
+class CurseGUIInventoryWnd : public CurseGUIWnd {
+private:
+	Inventory* invent;
+
+	void ResizeWnd();
+
+public:
+	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);
+	virtual ~CurseGUIInventoryWnd();
+
+	void Update(bool refr);
+	bool PutEvent(CGUIEvent* e);
 };
 
 #endif /* INCLUDE_CGUISPECWND_H_ */

@@ -66,8 +66,7 @@ DataPipe::DataPipe(char* root_dir)
 		chunks[i] = (PChunk)malloc(sz);
 		if (!chunks[i]) {
 			errout("Unable to allocate RAM for voxel chunk %d.\n",i);
-			PurgeChunks();
-			return;
+			return; //destructor will purge all the chunks
 		}
 		allocated += sz;
 	}
@@ -79,7 +78,6 @@ DataPipe::DataPipe(char* root_dir)
 DataPipe::~DataPipe()
 {
 	status = DPIPE_NOTREADY;
-	pthread_mutex_destroy(&vmutex);
 
 	delete wgen;
 	voxtablen = 0;
@@ -87,6 +85,8 @@ DataPipe::~DataPipe()
 
 	PurgeModels();
 	PurgeChunks();
+
+	pthread_mutex_destroy(&vmutex);
 }
 
 bool DataPipe::ScanFiles()
@@ -141,19 +141,22 @@ bool DataPipe::LoadVoxTab()
 void DataPipe::PurgeChunks()
 {
 	int i;
+
+	Lock();
 	for (i = 0; i < HOLDCHUNKS; i++)
 		if (chunks[i]) {
 			free(chunks[i]);
 			chunks[i] = NULL;
 			allocated -= sizeof(VChunk);
 		}
-//	allocated = 0;
+	Unlock();
 }
 
 void DataPipe::SetGP(vector3dulli pos)
 {
 	SDataPlacement plc;
 	gp = pos;
+	Lock();
 
 #if HOLDCHUNKS == 1
 	/* One chunk right there, simplest scenario */
@@ -184,6 +187,7 @@ void DataPipe::SetGP(vector3dulli pos)
 #error "Invalid value of HOLDCHUNKS!"
 #endif
 
+	Unlock();
 	status = DPIPE_IDLE;
 }
 
@@ -300,10 +304,12 @@ void DataPipe::PurgeModels()
 {
 	std::vector<VModel*>::iterator mi;
 
+	Lock();
 	for (mi = objs.begin(); mi != objs.end(); ++mi) {
 		allocated -= (*mi)->GetAllocatedRAM();
 		delete (*mi);
 	}
 
 	objs.clear();
+	Unlock();
 }

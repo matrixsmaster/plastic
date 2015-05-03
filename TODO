@@ -12,8 +12,6 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 
 -> Add focus showing feature to GUI windows
 
--> Implement DataPipe chunks crossing
-
 -> Implement DataPipe sphere mapping feature
 
 -> Implement DataPipe chunks dumping (saving)

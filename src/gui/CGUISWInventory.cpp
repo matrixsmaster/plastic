@@ -17,35 +17,46 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "debug.h"
+#include "CGUISpecWnd.h"
 
-CurseGUIDebugWnd* debug_ui = NULL;
-
-
-void dbg_init(CurseGUI* gui)
+CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
+	CurseGUIWnd(scrn,0,0,2,2)
 {
-	debug_ui = new CurseGUIDebugWnd(gui);
-	gui->AddWindow(debug_ui);
-//	debug_ui->SetBoxed(false);
+	invent = iptr;
+	ResizeWnd();
 }
 
-void dbg_finalize()
+CurseGUIInventoryWnd::~CurseGUIInventoryWnd()
 {
 	//TODO
 }
 
-void dbg_logstr(char* str)
+void CurseGUIInventoryWnd::Update(bool refr)
 {
-	if (debug_ui) debug_ui->PutString(str);
+	//TODO
 }
 
-void dbg_print(const char* fmt, ...)
+bool CurseGUIInventoryWnd::PutEvent(CGUIEvent* e)
 {
-	if (!debug_ui) return;
-	char str[DBGUIMAXLEN];
-	va_list vl;
-	va_start(vl,fmt);
-	vsnprintf(str,DBGUIMAXLEN,fmt,vl);
-	va_end(vl);
-	debug_ui->PutString(str);
+	if (will_close || (!focused)) return false;
+
+	switch (e->t) {
+	case GUIEV_KEYPRESS:
+		switch (e->k) {
+		case GUI_DEFCLOSE: will_close = true; return true;
+		}
+		return false;
+
+	case GUIEV_RESIZE:
+		UpdateSize();
+		return false; //don't consume resize event!
+
+	default: break;
+	}
+	return false;
+}
+
+void CurseGUIInventoryWnd::ResizeWnd()
+{
+	//TODO
 }

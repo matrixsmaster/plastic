@@ -21,8 +21,8 @@
 
 using namespace std;
 
-CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn, int x, int y) :
-	CurseGUIWnd(scrn,x,y,2,2)
+CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn) :
+	CurseGUIWnd(scrn,0,0,2,2)
 {
 	type = GUIWT_DEBUGUI;
 	hidden = true;

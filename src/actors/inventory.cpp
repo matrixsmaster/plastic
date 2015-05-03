@@ -17,35 +17,35 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "debug.h"
+#include "inventory.h"
 
-CurseGUIDebugWnd* debug_ui = NULL;
+using namespace std;
 
 
-void dbg_init(CurseGUI* gui)
+Inventory::Inventory()
 {
-	debug_ui = new CurseGUIDebugWnd(gui);
-	gui->AddWindow(debug_ui);
-//	debug_ui->SetBoxed(false);
+	//DEBUG:
+	InventoryObject* oj = new InventoryObject();
+	oj->SetName("First");
+	oj->SetDesc("Just an object.");
+	items.push_back(oj);
+	oj = new InventoryObject();
+	oj->SetName("Second");
+	oj->SetDesc("Yet another useless piece of crap. But this piece has a long description.");
+	items.push_back(oj);
+	oj = new InventoryObject();
+	oj->SetName("Last");
+	oj->SetDesc("The last object.");
+	items.push_back(oj);
 }
 
-void dbg_finalize()
+Inventory::~Inventory()
 {
-	//TODO
-}
+	vector<InventoryObject*>::iterator it;
 
-void dbg_logstr(char* str)
-{
-	if (debug_ui) debug_ui->PutString(str);
-}
-
-void dbg_print(const char* fmt, ...)
-{
-	if (!debug_ui) return;
-	char str[DBGUIMAXLEN];
-	va_list vl;
-	va_start(vl,fmt);
-	vsnprintf(str,DBGUIMAXLEN,fmt,vl);
-	va_end(vl);
-	debug_ui->PutString(str);
+	if (!items.empty()) {
+		for (it = items.begin(); it != items.end(); ++it)
+			delete (*it);
+		items.clear();
+	}
 }

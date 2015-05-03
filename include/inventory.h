@@ -17,35 +17,34 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "debug.h"
+#ifndef INVENTORY_H_
+#define INVENTORY_H_
 
-CurseGUIDebugWnd* debug_ui = NULL;
+#include <string>
+#include <vector>
 
 
-void dbg_init(CurseGUI* gui)
-{
-	debug_ui = new CurseGUIDebugWnd(gui);
-	gui->AddWindow(debug_ui);
-//	debug_ui->SetBoxed(false);
-}
+/* Basic inventory item */
+class InventoryObject {
+private:
+	std::string name,desc;
 
-void dbg_finalize()
-{
-	//TODO
-}
+public:
+	InventoryObject()				{}
+	virtual ~InventoryObject()		{}
 
-void dbg_logstr(char* str)
-{
-	if (debug_ui) debug_ui->PutString(str);
-}
+	virtual void SetName(const std::string s)			{ name = s; }
+	virtual void SetDesc(const std::string s)			{ desc = s; }
+};
 
-void dbg_print(const char* fmt, ...)
-{
-	if (!debug_ui) return;
-	char str[DBGUIMAXLEN];
-	va_list vl;
-	va_start(vl,fmt);
-	vsnprintf(str,DBGUIMAXLEN,fmt,vl);
-	va_end(vl);
-	debug_ui->PutString(str);
-}
+/* Storage container for all of the inventory items */
+class Inventory {
+private:
+	std::vector<InventoryObject*> items;
+
+public:
+	Inventory();
+	virtual ~Inventory();
+};
+
+#endif /* INVENTORY_H_ */

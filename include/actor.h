@@ -17,6 +17,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+/* Main Game Actor Definition file. Used for all kinds of actors. */
+
 #ifndef ACTOR_H_
 #define ACTOR_H_
 
@@ -28,6 +30,7 @@
 #include "CGUIEvents.h"
 #include "datapipe.h"
 #include "keybinder.h"
+#include "inventory.h"
 
 
 #define MAXACTNAMELEN 25
@@ -82,6 +85,7 @@ protected:
 	SPABase curr;			//Current values
 	SMatrix3d rotmat;		//Rotation in matrix form
 	DataPipe* pipe;			//DataPipe instance
+	Inventory invent;		//Actor's inventory
 
 public:
 	PlasticActor(SPAStats s, DataPipe* pptr);
@@ -105,7 +109,7 @@ private:
 
 public:
 	Player(SPAStats s, DataPipe* pptr);
-	virtual ~Player() {}
+	virtual ~Player();
 
 	void ProcessEvent(const CGUIEvent* e);
 };
