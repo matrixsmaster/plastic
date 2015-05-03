@@ -25,6 +25,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <pthread.h>
 #include "voxel.h"
 #include "misconsts.h"
 #include "vecmath.h"
@@ -40,10 +41,10 @@
 
 
 enum EDPipeStatus {
-	DPIPE_NOTREADY,
-	DPIPE_ERROR,
-	DPIPE_IDLE,
-	DPIPE_BUSY
+	DPIPE_NOTREADY,		//pipe is partially initialized
+	DPIPE_ERROR,		//error state, pipe cannot be used
+	DPIPE_IDLE,			//normal state, use Lock()/Unlock() to modify the contents
+	DPIPE_BUSY			//I/O operations in progress
 };
 
 struct SDataPlacement {
@@ -59,6 +60,7 @@ class DataPipe {
 private:
 	PChunk chunks[HOLDCHUNKS];				//world chunk buffers
 	EDPipeStatus status;
+	pthread_mutex_t vmutex;
 	ulli allocated;							//amount of allocated RAM
 	vector3dulli gp;						//global position of central chunk
 	char root[MAXPATHLEN];					//root path
@@ -81,6 +83,11 @@ public:
 
 	///Returns a status of the pipe.
 	EDPipeStatus GetStatus()	{ return status; }
+
+	///Synchronization.
+	int Lock()					{ return pthread_mutex_lock(&vmutex); }
+	int TryLock()				{ return pthread_mutex_trylock(&vmutex); }
+	int Unlock()				{ return pthread_mutex_unlock(&vmutex); }
 
 	///Returns amount of RAM allocated by buffers.
 	ulli GetAllocatedRAM()		{ return allocated; }

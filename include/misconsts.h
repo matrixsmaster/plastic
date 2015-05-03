@@ -25,7 +25,7 @@
 #define MAXPATHLEN 512
 
 #define EVENTUSLEEP 2000
-#define WORLDUSLEEP 300000
+#define WORLDUSLEEP 90000
 
 
 //Global Movement Directions

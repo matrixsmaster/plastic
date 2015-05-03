@@ -31,6 +31,7 @@ DataPipe::DataPipe(char* root_dir)
 
 	/* Init variables */
 	status = DPIPE_ERROR;
+	pthread_mutex_init(&vmutex,NULL);
 	memset(chunks,0,sizeof(chunks));
 	allocated = 0;
 	memset(root,0,MAXPATHLEN);
@@ -77,7 +78,8 @@ DataPipe::DataPipe(char* root_dir)
 
 DataPipe::~DataPipe()
 {
-	status = DPIPE_IDLE;
+	status = DPIPE_NOTREADY;
+	pthread_mutex_destroy(&vmutex);
 
 	delete wgen;
 	voxtablen = 0;
@@ -198,13 +200,17 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	voxel tmp;
 
 	if (status != DPIPE_IDLE) return 0;
+	Lock();
 
 	/* Check for dynamic objects */
 	if (!objs.empty()) {
 		for (mi = objs.begin(); mi != objs.end(); ++mi) {
 			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
 				tmp = (*mi)->GetVoxelAt(p);
-				if (tmp) return tmp;
+				if (tmp) {
+					Unlock();
+					return tmp;
+				}
 			}
 		}
 	}
@@ -212,10 +218,15 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 #if HOLDCHUNKS == 1
 	/* Simplest case */
 
-	if ((p->X < 0) || (p->Y < 0) || (p->Z < 0)) return 0;
-	if ((p->X >= CHUNKBOX) || (p->Y >= CHUNKBOX) || (p->Z >= CHUNKBOX)) return 0;
+	if (	(p->X < 0) || (p->Y < 0) || (p->Z < 0) ||
+			(p->X >= CHUNKBOX) || (p->Y >= CHUNKBOX) || (p->Z >= CHUNKBOX) ) {
+		Unlock();
+		return 0;
+	}
 	ch = chunks[0];
-	return ((*ch)[p->Z][p->Y][p->X]);
+	tmp = (*ch)[p->Z][p->Y][p->X];
+	Unlock();
+	return tmp;
 
 #else
 
@@ -229,8 +240,11 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	pz = abs(p->Z) % CHUNKBOX;
 
 #if HOLDCHUNKS == 9
-	if ((x < -1) || (y < -1) || (z < 0)) return 0;
-	if ((x > 1) || (y > 1) || (z > 0)) return 0;
+	if (	(x < -1) || (y < -1) || (z < 0) ||
+			(x >  1) || (y >  1) || (z > 0) ) {
+		Unlock();
+		return 0;
+	}
 	++y; ++x; //centerize
 	ch = chunks[y*3+x];
 
@@ -239,7 +253,9 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 #else
 #endif
 
-	return ((*ch)[pz][py][px]);
+	tmp = (*ch)[pz][py][px];
+	Unlock();
+	return tmp;
 #endif
 }
 
@@ -272,7 +288,10 @@ VModel* DataPipe::LoadModel(const char* fname, const vector3di pos)
 
 	allocated += m->GetAllocatedRAM();
 	m->SetPos(pos);
+
+	Lock();
 	objs.push_back(m);
+	Unlock();
 
 	return m;
 }

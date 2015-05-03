@@ -81,10 +81,13 @@ void PlasticWorld::Quantum()
 	//TODO: world update (!)
 
 	//DEBUG:
+//	if (data->TryLock()) return;
+	data->Lock();
 	if (test->GetState() == 0)
 		test->SetState(test->GetNumStates()-1);
 	else
 		test->SetState(test->GetState()-1);
+	data->Unlock();
 }
 
 void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
