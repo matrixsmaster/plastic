@@ -127,6 +127,7 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 	case GUIEV_KEYPRESS:
 		/* User pressed a key */
 		switch (e->k) {
+		/* DEBUGging stuff */
 		case '[': scale -= 0.01; break;
 		case ']': scale += 0.01; break;
 		case ',': fov.X -= 0.1; break;
@@ -147,6 +148,13 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 		case '4': tr.Y -= 2; break;
 		case '5': tr.Z -= 2; break;
 		case '6': tr.Z += 2; break;
+		case KEY_F(9):
+			if (test->GetState() == 0)
+				test->SetState(test->GetNumStates()-1);
+			else
+				test->SetState(test->GetState()-1);
+			dbg_print("state = %d",test->GetState());
+			break;
 		case KEY_F(4):
 				gui->GetColorManager()->Flush();
 				printf("TESTING: YOU SHOULDN'T SEE THIS!!!");

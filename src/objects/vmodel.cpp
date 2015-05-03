@@ -40,20 +40,24 @@ VModel::VModel()
 
 VModel::~VModel()
 {
+	int i;
 	if (buf) free(buf);
-	if (dat) free(dat);
+	if (dat) {
+		for (i = 0; i < nstates; i++) free(dat[i]);
+		free(dat);
+	}
 }
 
 bool VModel::LoadFromFile(const char* fn)
 {
 	FILE* mf;
-	char* s;
+	char* s = NULL;
 	voxel v;
-	int i,k,y,z,l,vtc;
+	int i,k,l,x,y,z,sd,vtc;
 	ulli j;
 	vector3d rv;
 	SMatrix3d rm;
-	SVoxCharPair* tab;
+	SVoxCharPair* tab = NULL;
 
 	if ((dat) || (buf) || (!fn)) return false;
 
@@ -61,43 +65,41 @@ bool VModel::LoadFromFile(const char* fn)
 	if (!mf) return false;
 
 	//read dimensions, number of states, and number of voxel types used
-	if (fscanf(mf,"%d %d %d %d %d\n",&s_x,&s_y,&s_z,&nstates,&vtc) != 5) {
-		fclose(mf);
-		return false;
-	}
+	if ( (fscanf(mf,"%d %d %d %d %d\n",&s_x,&s_y,&s_z,&nstates,&vtc) != 5) ||
+			(nstates < 1) )
+		goto bad_exit;
 
 	//make a char to voxel table
 	j = vtc * sizeof(SVoxCharPair);
 	tab = (SVoxCharPair*)malloc(j);
-	if (!tab) { //this would happen if table dimension is invalid
-		fclose(mf);
-		return false;
-	}
+	if (!tab) goto bad_exit; //this would happen if table dimension is invalid
 	memset(tab,0,j);
 
 	//read voxel types table (skips empty lines and comments)
 	for (i = 0; ((i < vtc) && (!feof(mf)));) {
 		if (fscanf(mf,"%c = %hu\n",&(tab[i].c),&(tab[i].v)) == 2) i++;
 	}
-	if (feof(mf)) { //shouldn't be at the end of file
-		fclose(mf);
-		return false;
-	}
+	if (feof(mf)) goto bad_exit; //shouldn't be at the end of file
 
-	//allocate memory
+	//allocate memory: original data states map
 	datlen = s_x * s_y * s_z;
-	j = datlen * sizeof(voxel);
-	dat = (voxel*)malloc(j);
-	if (!dat) {
-		//Unable to allocate memory
-		fclose(mf);
-		return false;
-	}
+	j = nstates * sizeof(voxel*);
+	dat = (voxel**)malloc(j);
+	if (!dat) goto bad_exit; //Unable to allocate memory
 	memset(dat,0,j);
 
+	//allocate memory: original data buffers
+	j = datlen * sizeof(voxel);
+	for (i = 0; i < nstates; i++) {
+		dat[i] = (voxel*)malloc(j);
+		if (!dat[i]) goto bad_exit; //destructor will free memory just OK
+		memset(dat[i],0,j);
+	}
+
 	//make a string
-	l = s_x + 2; //reserve two chars for newline and zero
-	s = (char*)malloc(l); //if this fails, we're boned anyway, so doesn't check it
+	l = (s_x + 1) * nstates + 2; //reserve two chars for newline and zero
+	s = (char*)malloc(l);
+	if (!s) goto bad_exit;
 
 	//read data
 	y = z = 0;
@@ -106,7 +108,14 @@ bool VModel::LoadFromFile(const char* fn)
 		if ((s[0] == ';') || (s[0] == 0)) continue;
 
 		//for each symbol place
-		for (i = 0; i < s_x; i++) {
+		for (i = 0, sd = 0, x = 0; i < (int)strlen(s); i++,x++) {
+			//state delimiter
+			if (s[i] == '|') {
+				x = 0;
+				if (++sd >= nstates) break;
+				else continue;
+			}
+
 			//find voxel type
 			for (k = 0, v = 0; k < vtc; k++)
 				if (tab[k].c == s[i]) {
@@ -114,9 +123,9 @@ bool VModel::LoadFromFile(const char* fn)
 					break;
 				}
 			//calculate linear offset
-			j = z * s_x * s_y + y * s_x + i;
+			j = z * s_x * s_y + y * s_x + x;
 			if (j < datlen)
-				dat[j] = v;
+				dat[sd][j] = v;
 		}
 
 		//move on to next row or layer
@@ -126,6 +135,7 @@ bool VModel::LoadFromFile(const char* fn)
 				break;
 		}
 	}
+	free(tab);
 	free(s);
 	fclose(mf);
 
@@ -139,8 +149,15 @@ bool VModel::LoadFromFile(const char* fn)
 	bufside = (int)round(rv.Z * 2);
 	center = vector3di(bufside/2);
 
+	state = 0;
 	changed = true;
 	return AllocBuf();
+
+bad_exit:
+	fclose(mf);
+	if (tab) free(tab);
+	if (s) free(s);
+	return false;
 }
 
 bool VModel::AllocBuf()
@@ -191,6 +208,15 @@ void VModel::SetRot(const vector3d r)
 	if (changed) ApplyRot();
 }
 
+void VModel::SetState(int s)
+{
+	if (s < 0) state = 0;
+	else if (s >= nstates) state = nstates - 1;
+	else state = s;
+
+	ApplyRot(); //refresh working buffer
+}
+
 void VModel::ApplyRot()
 {
 	int x,y,z;
@@ -207,12 +233,13 @@ void VModel::ApplyRot()
 	ctrd = dcenter.ToReal();
 	ctrb = center.ToReal();
 
+	//rotate!
 	for (z = 0, l = 0; z < s_z; z++) {
 		iv.Z = z;
 		for (y = 0; y < s_y; y++) {
 			iv.Y = y;
 			for (x = 0; x < s_x; x++,l++) {
-				if (dat[l] == 0) continue; //skip empty voxels
+				if (dat[state][l] == 0) continue; //skip empty voxels
 				iv.X = x;
 
 				//calculate new voxel position at a given co-ords
@@ -227,7 +254,7 @@ void VModel::ApplyRot()
 
 				//apply the result
 				if (nl < buflen)
-					buf[nl] = dat[l];
+					buf[nl] = dat[state][l];
 			}
 		}
 	}

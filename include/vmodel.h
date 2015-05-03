@@ -29,7 +29,7 @@
 class VModel {
 private:
 	int s_x,s_y,s_z;		//extent
-	voxel* dat;				//original data
+	voxel** dat;			//original data
 	ulli datlen;			//linear length of single state buffer
 	int nstates;			//number of states available
 	voxel* buf;				//modified (working) buffer
@@ -52,10 +52,14 @@ public:
 
 	vector3di GetOrgSize()			{ return vector3di(s_x,s_y,s_z); }
 	vector3di GetModSize()			{ return vector3di(bufside); }
+
 	int GetBoundSide()				{ return bufside; }
 	ulli GetOrgLen()				{ return datlen; }
 	ulli GetModLen()				{ return buflen; }
+
 	int GetNumStates()				{ return nstates; }
+	int GetState()					{ return state; }
+	void SetState(int s);
 
 	bool LoadFromFile(const char* fn);
 	ulli GetAllocatedRAM();
