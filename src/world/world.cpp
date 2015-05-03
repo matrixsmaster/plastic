@@ -59,8 +59,9 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	fog = DEFFOGPLANE;
 	fov = vector3d(DEFFOVX,DEFFOVY,1);
 	data->SetGP(vector3dulli(0));
-	lvr->SetPosition(vector3d(128,128,135));
-	PC->SetPos(vector3di(128,100,135));
+	data->LoadModel("testmodel.dat",vector3di(128,100,135));
+	lvr->SetPosition(vector3d(128,90,135));
+	PC->SetPos(vector3di(128,90,135));
 	lvr->SetFogStart(fog);
 	lvr->SetFogColor(vector3di(100));
 }

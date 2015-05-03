@@ -29,6 +29,7 @@
 #include "misconsts.h"
 #include "vecmath.h"
 #include "wrldgen.h"
+#include "vmodel.h"
 
 
 #define MAXINISTRLEN 256
@@ -65,6 +66,7 @@ private:
 	SVoxelInf* voxeltab;					//voxel types table
 	int voxtablen;							//...its length
 	std::map<std::string,IniData> ini;		//map of known (and loaded) ini files
+	std::vector<VModel*> objs;				//objects in scene
 
 	bool ScanFiles();
 	bool FindChunk(vector3dulli pos, SDataPlacement* res);
@@ -108,6 +110,12 @@ public:
 	///Supply INI-file based data by INI name and field name.
 	void GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen);
 	std::string GetIniDataS(const std::string ininame, const std::string inifield);
+
+	///Load dynamic object into current chunk.
+	bool LoadModel(const char* fname, const vector3di pos);
+
+	///Purge all loaded models.
+	void PurgeModels();
 };
 
 #endif /* DATAPIPE_H_ */

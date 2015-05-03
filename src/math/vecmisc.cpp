@@ -219,6 +219,20 @@ void RotNormDegI(vector3di* r)
 	while (r->Z < 0)	r->Z += 360;
 }
 
+bool IsPntInsideCubeI(const vector3di* pnt, const vector3di* center, const int side)
+{
+	int x = pnt->X - center->X + side;
+	if ((x < 0) || (x > side)) return false;
+
+	x = pnt->Y - center->Y + side;
+	if ((x < 0) || (x > side)) return false;
+
+	x = pnt->Z - center->Z + side;
+	if ((x < 0) || (x > side)) return false;
+
+	return true;
+}
+
 /*
  * PNPOLY - Point Inclusion in Polygon Test
  * (C) W. Randolph Franklin (WRF)

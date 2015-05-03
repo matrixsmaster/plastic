@@ -70,4 +70,7 @@ void PerspectiveNInv(vector3d* pnt, const vector3d* fov, const vector2di* mid);
 void RotNormDegF(vector3d* r);
 void RotNormDegI(vector3di* r);
 
+///Check for point inclusion in some volume.
+bool IsPntInsideCubeI(const vector3di* pnt, const vector3di* center, const int side);
+
 #endif /* VECMISC_H_ */

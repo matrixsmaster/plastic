@@ -26,7 +26,7 @@
 #define CHUNKBOX 256
 
 ///Number of chunks in current active buffers.
-#define HOLDCHUNKS 9
+#define HOLDCHUNKS 1
 
 ///Number of intial voxel types.
 #define DEFVOXTYPES 5

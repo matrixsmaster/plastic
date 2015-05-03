@@ -77,7 +77,7 @@ void PlasticActor::Move(ELMoveDir d, float step)
 
 	pos.X += (int)round(v.X);
 	pos.Y += (int)round(v.Y);
-	pos.Z += (int)round(v.Z);
+	pos.Z -= (int)round(v.Z); //to conform rotation/movement of renderer (flipped Y axis)
 }
 
 Player::Player(SPAStats s, DataPipe* pptr) :

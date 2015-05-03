@@ -76,9 +76,14 @@ DataPipe::DataPipe(char* root_dir)
 
 DataPipe::~DataPipe()
 {
-	if (voxeltab) free(voxeltab);
-	PurgeChunks();
+	status = DPIPE_IDLE;
+
 	delete wgen;
+	voxtablen = 0;
+	if (voxeltab) free(voxeltab);
+
+	PurgeModels();
+	PurgeChunks();
 }
 
 bool DataPipe::ScanFiles()
@@ -188,7 +193,20 @@ bool DataPipe::Move(EGMoveDir dir)
 voxel DataPipe::GetVoxel(const vector3di* p)
 {
 	PChunk ch;
+	std::vector<VModel*>::iterator mi;
+	voxel tmp;
+
 	if (status != DPIPE_IDLE) return 0;
+
+	/* Check for dynamic objects */
+	if (!objs.empty()) {
+		for (mi = objs.begin(); mi != objs.end(); ++mi) {
+//			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
+				tmp = (*mi)->GetVoxelAt(p);
+				if (tmp) return tmp;
+//			}
+		}
+	}
 
 #if HOLDCHUNKS == 1
 	/* Simplest case */
@@ -237,60 +255,33 @@ SVoxelInf* DataPipe::GetVInfo(const voxel v)
 	else return NULL;
 }
 
-bool DataPipe::LoadIni(const std::string name)
+bool DataPipe::LoadModel(const char* fname, const vector3di pos)
 {
-	FILE* f;
-	int r;
-	char nm[MAXPATHLEN];
-	char key[MAXINISTRLEN],fld[MAXINISTRLEN];
-	IniData cur;
+	VModel* m;
+	char fn[MAXPATHLEN];
+	if (status != DPIPE_IDLE) return false;
 
-	//make filepath and try to open file
-	snprintf(nm,MAXPATHLEN,"%s/%s.ini",root,name.c_str());
-	f = fopen(nm,"r");
-	if (!f) {
-		errout("Unable to open INI file '%s'\n",nm);
+	m = new VModel();
+
+	snprintf(fn,MAXPATHLEN,"%s/%s",root,fname);
+	if (!m->LoadFromFile(fn)) {
+		delete m;
 		return false;
 	}
 
-	//loading
-	while (!feof(f)) {
-		r = fscanf(f,"%s = %s\n",key,fld);
-		if (r == 2)
-			cur.insert(make_pair(std::string(key),std::string(fld)));
-	}
-	fclose(f);
-
-	//append to ini map
-	ini.insert(make_pair(name,cur));
+	allocated += (m->GetModLen() + m->GetOrgLen()) * sizeof(voxel);
+	m->SetPos(pos);
+	objs.push_back(m);
 
 	return true;
 }
 
-void DataPipe::GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen)
+void DataPipe::PurgeModels()
 {
-	/* for use in old-styled code */
-	std::string nm(ininame), fl(inifield);
-	if ((!dest) || (maxlen < 2)) return;
-	strncpy(dest,GetIniDataS(nm,fl).c_str(),maxlen);
-}
+	std::vector<VModel*>::iterator mi;
 
-std::string DataPipe::GetIniDataS(const std::string ininame, const std::string inifield)
-{
-	/* for use in new-styled code */
-	std::string res;
-	IniData* fnd;
+	for (mi = objs.begin(); mi != objs.end(); ++mi)
+		allocated -= ((*mi)->GetModLen() + (*mi)->GetOrgLen()) * sizeof(voxel);
 
-	//search for file in known files map
-	if (!ini.count(ininame)) {
-		//not found, try to load up
-		if (!LoadIni(ininame)) return res;
-	}
-
-	//search for field
-	fnd = &(ini[ininame]);
-	if (!fnd->count(inifield)) return res;
-	res = (*fnd)[inifield];
-
-	return res;
+	objs.clear();
 }
