@@ -37,13 +37,12 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	binder = NULL;
 
 	/* Create and set up DataPipe */
-	data = new DataPipe(sets->root);
+	data = new DataPipe(sets);
 	if (data->GetStatus() == DPIPE_ERROR) {
 		errout("Unable to initialize data pipe. Possibly invalid root directory.\n");
 		result = 1;
 		return;
 	}
-	data->SetMaxRAM(sets->rammax);
 	alloc_gb = (float)(data->GetAllocatedRAM()) / 1024.f / 1024.f / 1024.f;
 	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
 	printf("Allocated data pipe memory: %llu bytes (%.3f GiB)\n",data->GetAllocatedRAM(),alloc_gb);

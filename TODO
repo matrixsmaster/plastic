@@ -30,7 +30,7 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 
 -> Add "distant landscape" right after DataPipe will be capable of saving/loading
 
--> Move to makefiles or implement "build counter" in eclipse builder
+-> Move to makefiles or implement "build counter" in eclipse builder (v0.1 and later)
 
 -> Implement some command processor and connect it to world's event pump
 

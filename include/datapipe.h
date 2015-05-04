@@ -31,6 +31,7 @@
 #include "vecmath.h"
 #include "wrldgen.h"
 #include "vmodel.h"
+#include "plastic.h"
 
 
 #define DEFRAMMAX (2ULL * 1024*1024*1024)
@@ -78,7 +79,7 @@ private:
 	bool LoadIni(const std::string name);
 
 public:
-	DataPipe(char*);
+	DataPipe(const SGameSettings*);
 	virtual ~DataPipe();
 
 	///Returns a status of the pipe.
@@ -93,6 +94,7 @@ public:
 	ulli GetAllocatedRAM()		{ return allocated; }
 
 	void SetMaxRAM(ulli m)		{ rammax = m; }
+	ulli GetMaxRAM()			{ return rammax; }
 
 	///Returns a pointer to voxel info table.
 	SVoxelInf* GetVoxTable()	{ return voxeltab; }

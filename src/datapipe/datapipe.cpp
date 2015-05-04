@@ -22,12 +22,14 @@
 #include <string.h>
 #include "datapipe.h"
 #include "support.h"
+#include "vecmisc.h"
 
 
-DataPipe::DataPipe(char* root_dir)
+DataPipe::DataPipe(const SGameSettings* sets)
 {
 	int i;
 	size_t sz;
+	char tmp[MAXPATHLEN];
 
 	/* Init variables */
 	status = DPIPE_ERROR;
@@ -35,15 +37,18 @@ DataPipe::DataPipe(char* root_dir)
 	memset(chunks,0,sizeof(chunks));
 	allocated = 0;
 	memset(root,0,MAXPATHLEN);
-	rammax = DEFRAMMAX;
+	rammax = sets->rammax;
 
 	/* Copy root path */
-	i = strlen(root_dir);
-	if (i > 0) memcpy(root,root_dir,i);
+	i = strlen(sets->root);
+	if (i > 0) memcpy(root,sets->root,i);
 	else return;
 
-	/* Create the world generator */
-	wgen = new WorldGen();
+	/* Create and init the world generator */
+	wgen = new WorldGen(sets->world_r);
+	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
+	if (wgen->LoadMap(tmp))
+		wgen->NewMap(rand());
 
 	/* Allocate voxel info table */
 	sz = DEFVOXTYPES * sizeof(SVoxelInf);

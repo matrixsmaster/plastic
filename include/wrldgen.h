@@ -21,21 +21,21 @@
 #define WRLDGEN_H_
 
 #include "voxel.h"
+#include "misconsts.h"
+#include "prngen.h"
 
-struct SWorldGenState {
-	int medium;
-	int water;
-	float slope;
-	//TODO
-};
 
 class WorldGen {
 private:
-	SWorldGenState state;
+	//TODO
 
 public:
-	WorldGen();
+	WorldGen(uli radius);
 	virtual ~WorldGen();
+
+	bool LoadMap(const char* fname);
+	void SaveMap(const char* fname);
+	void NewMap(int seed);
 
 	void GenerateChunk(PChunk buf);
 };

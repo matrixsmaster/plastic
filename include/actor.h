@@ -23,6 +23,7 @@
 #define ACTOR_H_
 
 #include <string>
+#include "actortypes.h"
 #include "vecmath.h"
 #include "vecmisc.h"
 #include "mtx3d.h"
@@ -33,55 +34,6 @@
 #include "vmodel.h"
 #include "inventory.h"
 
-
-#define MAXACTNAMELEN 25
-
-
-//Basic classes of actors (used to determine initial basic values and actor's traits)
-enum EPAClass {
-	PCLS_INQUISITOR,	//TODO: decide wisely!
-	PCLS_GUARD,
-	PCLS_ROGUE,
-	PCLS_SEXBOT,
-	PCLS_COMMONER,
-	PCLS_MAID,
-	PCLS_JANITOR,
-	PCLS_PSYCHO
-};
-
-//Actor's basic value used in game mechanics
-struct SPABase {
-	/* Main fields */
-	EPAClass Cls;		//Actor's class (mean of purpose)
-	bool autoinit;		//If true, all data below will be automatically filled
-
-	/* Status and condition */
-	int HP;				//Health points (means integral system condition)
-	float Qual;			//Overall actor's quality
-
-	/* Physical state */
-	int CC;				//Charge capacity or current charge
-	float Spd;			//Speed multiplier (rounded result used)
-	int Str;			//Basic strength on fully charged actor
-
-	/* Brain and psychology state */
-	int Intl;			//Intelligence
-	int Brv;			//Braveness
-	int Chr;			//Charisma (or beauty)
-
-	/* Battle-relevant values */
-	int AP;				//Armor points
-	int DT;				//Damage threshold
-	float DM;			//Damage multiplier
-};
-
-//Actor's stats
-struct SPAStats {
-	char name[MAXACTNAMELEN];	//Actor's name
-	bool female;				//True for Female characters
-	char model[MAXPATHLEN];		//Actor's model
-	SPABase base;				//Basic values
-};
 
 //Basic Actor Class
 class PlasticActor {

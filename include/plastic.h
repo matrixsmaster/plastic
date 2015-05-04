@@ -20,7 +20,7 @@
 #ifndef PLASTIC_H_
 #define PLASTIC_H_
 
-#include "actor.h"
+#include "actortypes.h"
 #include "misconsts.h"
 
 

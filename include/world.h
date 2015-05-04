@@ -27,7 +27,7 @@
 #include <vector>
 #include "vecmath.h"
 #include "CurseGUI.h"
-#include "plastic.h"
+#include "misconsts.h"
 #include "datapipe.h"
 #include "LVR.h"
 #include "actor.h"
