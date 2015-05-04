@@ -63,6 +63,14 @@ public:
  * 							after some input:	(Test__)
  * CurseGUICheckBox - (V) or (X) with switchable state. Use (O) for disabled.
  * CurseGUIProgrBar - basic progress bar like {#### 25%     }
+ * CurseGUITable - table utilizes ncurses' line drawings. Should be possible to navigate with keys.
+ * 					Ex.:	+------+-------*--+ (see curs_addch (3X) section Line graphics)
+ * 							|item  |  text | 1|
+ * 							+------+-------+--+
+ * 							|item 2|some lo| 2|
+ * 							|      |nger te|  |
+ * 							|      |xt     |  |
+ * 							+------+-------+--+
  */
 
 #endif /* CGUICONTROLS_H_ */

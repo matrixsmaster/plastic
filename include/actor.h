@@ -30,6 +30,7 @@
 #include "CGUIEvents.h"
 #include "datapipe.h"
 #include "keybinder.h"
+#include "vmodel.h"
 #include "inventory.h"
 
 
@@ -38,10 +39,14 @@
 
 //Basic classes of actors (used to determine initial basic values and actor's traits)
 enum EPAClass {
-	PCLS_INQUISITOR,
+	PCLS_INQUISITOR,	//TODO: decide wisely!
 	PCLS_GUARD,
 	PCLS_ROGUE,
-	PCLS_SEXBOT
+	PCLS_SEXBOT,
+	PCLS_COMMONER,
+	PCLS_MAID,
+	PCLS_JANITOR,
+	PCLS_PSYCHO
 };
 
 //Actor's basic value used in game mechanics
@@ -72,25 +77,30 @@ struct SPABase {
 
 //Actor's stats
 struct SPAStats {
-	char name[MAXACTNAMELEN];	//Actor's Name
+	char name[MAXACTNAMELEN];	//Actor's name
 	bool female;				//True for Female characters
+	char model[MAXPATHLEN];		//Actor's model
 	SPABase base;				//Basic values
 };
 
 //Basic Actor Class
 class PlasticActor {
 protected:
-	vector3di pos,rot;		//Position and orientation
+	vector3di gpos,pos;		//Global and local position
 	SPAStats stats;			//Basic stats
 	SPABase curr;			//Current values
+	vector3di rot;			//Orientation
 	SMatrix3d rotmat;		//Rotation in matrix form
 	DataPipe* pipe;			//DataPipe instance
+	VModel* model;			//Actor's model
 	Inventory invent;		//Actor's inventory
+
+	void InitVars();
 
 public:
 	PlasticActor(SPAStats s, DataPipe* pptr);
 	PlasticActor(EPAClass c, DataPipe* pptr);
-	virtual ~PlasticActor() {}
+	virtual ~PlasticActor();
 
 	virtual void AutoInitStats();
 
@@ -98,8 +108,13 @@ public:
 	void SetRot(const vector3di r);
 	vector3di GetPos()					{ return pos; }
 	vector3di GetRot()					{ return rot; }
+	void SetGPos(const vector3di p)		{ gpos = p; }
+	vector3di GetGPos()					{ return gpos; }
 
 	void Move(ELMoveDir d, float step);
+
+	bool Spawn();
+	void Delete();
 };
 
 //Special case for a player character

@@ -31,7 +31,7 @@ Inventory::Inventory()
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Second");
-	oj->SetDesc("Yet another useless piece of crap. But this piece has a long description.");
+	oj->SetDesc("Yet another useless piece of crap. But this piece have a long description.");
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Last");

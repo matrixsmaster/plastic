@@ -26,8 +26,8 @@
 
 PlasticActor::PlasticActor(SPAStats s, DataPipe* pptr)
 {
-	rotmat = GenOMatrix();
 	pipe = pptr;
+	InitVars();
 
 	stats = s;
 	if (s.base.autoinit) AutoInitStats();
@@ -37,8 +37,8 @@ PlasticActor::PlasticActor(SPAStats s, DataPipe* pptr)
 
 PlasticActor::PlasticActor(EPAClass c, DataPipe* pptr)
 {
-	rotmat = GenOMatrix();
 	pipe = pptr;
+	InitVars();
 
 	strcpy(stats.name,"Auto"); //FIXME: namegen
 	stats.female = (rand() > RAND_MAX / 3); //kekeke
@@ -49,9 +49,21 @@ PlasticActor::PlasticActor(EPAClass c, DataPipe* pptr)
 	curr.autoinit = false;
 }
 
+PlasticActor::~PlasticActor()
+{
+	Delete();
+}
+
+void PlasticActor::InitVars()
+{
+	rotmat = GenOMatrix();
+	model = NULL;
+}
+
 void PlasticActor::AutoInitStats()
 {
-	//TODO
+	//TODO: use the tab!
+	strcpy(stats.model,"alice.dat"); //debug
 }
 
 void PlasticActor::SetRot(const vector3di r)
@@ -78,4 +90,16 @@ void PlasticActor::Move(ELMoveDir d, float step)
 	pos.X += (int)round(v.X);
 	pos.Y += (int)round(v.Y);
 	pos.Z -= (int)round(v.Z); //to conform rotation/movement of renderer (flipped Y axis)
+}
+
+bool PlasticActor::Spawn()
+{
+	model = pipe->LoadModel(stats.model,pos);
+	return (model != NULL);
+}
+
+void PlasticActor::Delete()
+{
+	if (!model) return;
+	//TODO
 }

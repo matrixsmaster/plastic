@@ -24,6 +24,7 @@
 #ifndef WORLD_H_
 #define WORLD_H_
 
+#include <vector>
 #include "vecmath.h"
 #include "CurseGUI.h"
 #include "plastic.h"
@@ -37,6 +38,7 @@
 
 class PlasticWorld {
 private:
+	//core variables and instances
 	int result;
 	SGameSettings* sets;
 	DataPipe* data;
@@ -46,11 +48,17 @@ private:
 	HUD* hud;
 	KeyBinder* binder;
 
+	//holders
+	std::vector<PlasticActor*> actors;
+
 	//FIXME: delete them
 	float scale;
 	vector3d fov;
 	int far,fog;
 	VModel* test;
+
+	//internal facilities
+	bool CreateActor();
 
 public:
 	PlasticWorld(SGameSettings* settings);
@@ -62,7 +70,7 @@ public:
 	///Returns result of latest operation (mainly for outsiders).
 	int GetLastResult()						{ return result; }
 
-	///Connects CurseGUI to World.
+	///Connects the game world to CurseGUI.
 	void ConnectGUI(CurseGUI* guiptr);
 
 	///Restore or update CurseGUI connection.

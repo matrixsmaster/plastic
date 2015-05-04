@@ -24,10 +24,6 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 
 -> Start working on physics system
 
--> Implement static actors
-
--> Add actor animation system
-
 -> Add vehicle class (mountable actors??)
 
 -> Implement atmosphere (day/night cycle, stars, clouds etc)
@@ -37,3 +33,5 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Move to makefiles or implement "build counter" in eclipse builder
 
 -> Implement some command processor and connect it to world's event pump
+
+-> Implement table control UI class (needed for inventory window)

@@ -76,6 +76,7 @@ PlasticWorld::~PlasticWorld()
 	if (PC) delete PC;
 	if (lvr) delete lvr;
 	if (data) delete data;
+	/* Actors: we don't need to purge them, it's the DataPipe responsibility */
 }
 
 void PlasticWorld::Quantum()
@@ -128,6 +129,13 @@ void PlasticWorld::ConnectGUI()
 	result = 0;
 }
 
+bool PlasticWorld::CreateActor()
+{
+	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,data);
+	npc->SetPos(PC->GetPos());
+	return (npc->Spawn());
+}
+
 void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 {
 	//DEBUG:
@@ -160,11 +168,15 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 		case '4': tr.Y -= 2; break;
 		case '5': tr.Z -= 2; break;
 		case '6': tr.Z += 2; break;
+		case KEY_F(5):
+				if (CreateActor()) dbg_print("CA Success");
+				else dbg_print("CA FAILED");
+				return;
 		case KEY_F(4):
 				gui->GetColorManager()->Flush();
 				printf("TESTING: YOU SHOULDN'T SEE THIS!!!");
 				redrawwin(gui->GetWindow());
-				break;
+				return;
 		case KEY_F(2):
 			if(hud) {
 				if(hud->GetTransparent()) {
