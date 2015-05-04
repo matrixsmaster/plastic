@@ -83,8 +83,9 @@ static void* plastic_eventhread(void* ptr)
 				d = true;
 			}
 		} else if (my_e.t == GUIEV_KEYPRESS) {
-			if (my_e.k == KEY_F(1)) {
-				g_gui->MkWindow(curso.X,curso.Y,10,5,"Test");
+			switch (my_e.k) {
+			case KEY_F(1): g_gui->MkWindow(curso.X,curso.Y,10,5,"Test"); break;
+			case '0': g_gui->MkWindow(g_gui->GetWidth()/2,g_gui->GetHeight()/2,10,5,"Test"); break;
 			}
 		}
 		if (d) {

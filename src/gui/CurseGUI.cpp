@@ -100,6 +100,8 @@ void CurseGUIBase::UpdateBack()
 
 CurseGUI::CurseGUI() : CurseGUIBase()
 {
+	CGUIEvent e;
+
 	/* Create curses screen */
 	wnd = initscr();
 	if (!wnd) CGABRT(1);
@@ -127,10 +129,11 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 	keypad(wnd,TRUE);
 	nodelay(wnd,TRUE);
 
+	/* Deal with size */
+	PumpEvents(&e);
+
 	/* Ready to rock! */
 	refresh();
-	UpdateSize();
-	backmask = NULL;
 	c_x = c_y = 0;
 	result = 0;
 }
@@ -403,7 +406,7 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 
 void CurseGUI::UpdateBackmask()
 {
-	int i,j;
+	int i,j,k;
 	std::vector<CurseGUIWnd*>::iterator it;
 	bool skip;
 	CurseGUIOverlay* ovrl;
@@ -433,7 +436,8 @@ void CurseGUI::UpdateBackmask()
 		if (skip) continue;
 
 		//Draw the mask
-		for (i = (*it)->GetPosY(); i < (*it)->GetHeight(); i++) {
+		k = (*it)->GetHeight() + (*it)->GetPosY();
+		for (i = (*it)->GetPosY(); i < k; i++) {
 			j = (*it)->GetPosX();
 			memset(backmask+(i*g_w+j),1,(*it)->GetWidth());
 		}
