@@ -51,6 +51,6 @@ struct CGUIEvent {
 };
 
 
-#define GUI_DEFCLOSE 'q'
+#define GUI_DEFCLOSE KEY_F(10)
 
 #endif /* CGUIEVENTS_H_ */

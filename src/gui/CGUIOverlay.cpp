@@ -28,18 +28,18 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h) :
 {
 	type = GUIWT_OVERLAY;
 	cnt = 0;
-	m_x = x;
+	m_x = x; //FIXME: what's this?
 	m_y = y;
 	m_w = w;
 	m_h = h;
+
+	name = "Overlay";
 
 	//TODO do something
 	CGUIEvent e;
 	e.t = GUIEV_RESIZE;
 	PutEvent(&e);
 
-	focused = false;
-	stayontop = false;
 	transparent = true;
 }
 

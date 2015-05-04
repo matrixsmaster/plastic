@@ -69,7 +69,6 @@ static void* plastic_eventhread(void* ptr)
 		cnt++;
 		if ((clock() - beg) >= CLOCKS_PER_SEC) {
 			g_wrld->GetHUD()->UpdateFPS(cnt);
-//			dbg_print("fps = %llu",cnt);
 			cnt = 0;
 			beg = clock();
 		}
@@ -78,16 +77,14 @@ static void* plastic_eventhread(void* ptr)
 		//debug:
 		d = false;
 		if (my_e.t == GUIEV_MOUSE) {
-//			switch (my_e.k) {
-//			case 'i': curso.Y--; d = true; break;
-//			case 'k': curso.Y++; d = true; break;
-//			case 'j': curso.X--; d = true; break;
-//			case 'l': curso.X++; d = true; break;
-//			}
 			if (my_e.m.bstate & BUTTON1_CLICKED) {
 				curso.X = my_e.m.x;
 				curso.Y = my_e.m.y;
 				d = true;
+			}
+		} else if (my_e.t == GUIEV_KEYPRESS) {
+			if (my_e.k == KEY_F(1)) {
+				g_gui->MkWindow(curso.X,curso.Y,10,5,"Test");
 			}
 		}
 		if (d) {

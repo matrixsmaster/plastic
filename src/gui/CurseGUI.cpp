@@ -111,7 +111,7 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 	/* Make it even more colorful through a full RGB range */
 	if (can_change_color() == FALSE) CGABRT(3);
 
-	/* Restore any previous changes to terminal' settings */
+	/* Restore any previous changes to terminal settings */
 	if (use_default_colors() == ERR) CGABRT(4);
 
 	/* Make the mouse alive */
@@ -211,6 +211,7 @@ bool CurseGUI::RmWindow(CurseGUIWnd* ptr)
 
 	for (it = windows.begin(); it != windows.end(); ++it)
 		if (*it == ptr) {
+			//TODO: set the last 'not stay-on-top' window focused
 			delete ptr;
 			windows.erase(it);
 			return true;
@@ -225,7 +226,14 @@ bool CurseGUI::RmWindow(const int no)
 
 bool CurseGUI::RmWindow(const char* name)
 {
-	return (RmWindow(GetWindowN(name)));
+	CurseGUIWnd* p;
+	bool r = false;
+
+	while ((p = GetWindowN(name))) {
+		r = true;
+		RmWindow(p);
+	}
+	return r;
 }
 
 void CurseGUI::RmAllWindows()
@@ -257,9 +265,54 @@ CurseGUIWnd* CurseGUI::GetWindowN(const char* name)
 	return NULL;
 }
 
+void CurseGUI::SetFocus(CurseGUIWnd* ptr)
+{
+	std::vector<CurseGUIWnd*>::iterator it;
+
+	for (it = windows.begin(); it != windows.end(); ++it) {
+		if ((*it) == ptr)
+			(*it)->GainFocus();
+		else
+			(*it)->LooseFocus();
+	}
+}
+
+void CurseGUI::SetFocus(const int no)
+{
+	SetFocus(GetWindowN(no));
+}
+
+void CurseGUI::SetFocus(const char* name)
+{
+	SetFocus(GetWindowN(name));
+}
+
+void CurseGUI::Reorder(int by)
+{
+	std::vector<CurseGUIWnd*>::iterator it;
+	CurseGUIWnd* tmp;
+	bool flg;
+
+	for (it = windows.begin(); it != windows.end()-1; ++it) {
+		tmp = (*it);
+		switch (by) {
+		case 0: flg = tmp->IsFocused(); break;
+		case 1: flg = tmp->IsStayOnTop(); break;
+		default: flg = false;
+		}
+		if (flg) {
+			//move it to the tail
+			it = windows.erase(it);
+			windows.push_back(tmp);
+		}
+	}
+}
+
 bool CurseGUI::PumpEvents(CGUIEvent* e)
 {
 	std::vector<CurseGUIWnd*>::iterator it;
+	std::vector<CurseGUIWnd*>::reverse_iterator rt;
+	int x,y;
 	bool consumed = false;
 	result = 1;
 
@@ -287,33 +340,54 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 		}
 	}
 
-	/* Pump down the events */
-	for (it = windows.begin(); it != windows.end(); ++it) {
-		if ((e->t == GUIEV_KEYPRESS) || (e->t == GUIEV_MOUSE)) {
-			//user input events will only be passed into focused windows
-			if (!(*it)->IsFocused()) continue;
-		}
-		//pass the event
-		if ((*it)->PutEvent(e)) {
-			consumed = true; //that's a 'private' event, stop pumping
-			if ((*it)->WillClose()) RmWindow(*it); //destroy closing window
-			break;
-		}
-	}
+	if (!windows.empty()) {
 
-	//TODO: window reordering by focus value
+		/* Pump down the events (in order of drawing) */
+		for (it = windows.begin(); it != windows.end(); ++it) {
+			if ((e->t == GUIEV_KEYPRESS) || (e->t == GUIEV_MOUSE)) {
+				//user input events will only be passed into focused windows
+				if (!(*it)->IsFocused()) continue;
+			}
+			//pass the event
+			if ((*it)->PutEvent(e)) {
+				consumed = true; //that's a 'private' event, stop pumping
+				if ((*it)->WillClose()) RmWindow(*it); //destroy closing window
+				break;
+			}
+		}
+
+		Reorder(0); //Windows reordering by focus value
+		Reorder(1); //Windows reordering by stayontop property
+	}
 
 	/* No one has consumed the event. Need to be processed in global GUI scope. */
 	if (!consumed) {
 		switch (e->t) {
 		case GUIEV_KEYPRESS:
 			switch (e->k) {
-			case GUI_DEFCLOSE:
+			case GUI_DEFCLOSE: /* Default 'Close' key in GUI scope -> exit */
 				will_close = true;
 				consumed = true;
 				break;
 			}
 			break;
+
+		case GUIEV_MOUSE:
+			if ((windows.empty()) || (e->m.bstate != BUTTON1_CLICKED)) break;
+			for (rt = windows.rbegin(); rt != windows.rend(); ++rt) {
+				//check mouse pointer is inside window
+				if (((*rt)->GetPosX() > e->m.x) || (((*rt)->GetPosY() > e->m.y))) continue;
+				x = (*rt)->GetPosX() + (*rt)->GetWidth();
+				y = (*rt)->GetPosY() + (*rt)->GetHeight();
+				if ((e->m.x >= x) || (e->m.y >= y)) continue;
+				//try to set focus. If it's impossible, move on.
+				if (!(*rt)->GainFocus()) continue;
+				SetFocus(*rt); //do this to send 'focus lost' message to others
+				consumed = true;
+				break; //make sure only one window will gain focus
+			}
+			break;
+
 		default: break; //just to make compiler happy
 		}
 	}
@@ -382,7 +456,9 @@ CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 	}
 	focused = false;
 	boxed = true;
+	stayontop = false;
 	ctrls = new CurseGUICtrlHolder(this);
+	name = "Unnamed";
 }
 
 CurseGUIWnd::~CurseGUIWnd()

@@ -29,6 +29,7 @@ CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn) :
 	edit_line = ">";
 	key = 0;
 	edit = false;
+	name = "DebugUI";
 
 	//TODO: do something
 	CGUIEvent e;
@@ -45,6 +46,7 @@ void CurseGUIDebugWnd::ToggleShow()
 {
 	hidden ^= true;
 	focused = !hidden;
+	stayontop = focused;
 	edit_line = ">";
 }
 

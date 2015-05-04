@@ -92,6 +92,8 @@ private:
 	mmask_t oldmouse;					//original terminal mouse driver state
 	int c_x,c_y;						//cursor position
 
+	void Reorder(int by);
+
 public:
 	CurseGUI();
 	virtual ~CurseGUI();
@@ -108,13 +110,13 @@ public:
 	///Register CurseGUI window created outside.
 	void AddWindow(CurseGUIWnd* n_wnd);
 
-	///Remove CurseGUI window by its' pointer.
+	///Remove CurseGUI window by its pointer.
 	bool RmWindow(CurseGUIWnd* ptr);
 
 	///Remove CurseGUI window by number.
 	bool RmWindow(const int no);
 
-	///Remove CurseGUI window by name.
+	///Remove all CurseGUI windows with a given name.
 	bool RmWindow(const char* name);
 
 	///Destroy all active CurseGUI windows.
@@ -128,6 +130,15 @@ public:
 
 	///Returns CurseGUI window pointer by window name.
 	CurseGUIWnd* GetWindowN(const char* name);
+
+	///Set window focus by pointer.
+	void SetFocus(CurseGUIWnd* ptr);
+
+	///Set window focus by number.
+	void SetFocus(const int no);
+
+	///Set window focus by name.
+	void SetFocus(const char* name);
 
 	///Push events through all windows and controls.
 	///Returns whatever event was consumed or not.
@@ -162,6 +173,7 @@ protected:
 	std::string name;
 	bool focused;
 	bool boxed;
+	bool stayontop;
 	int g_x, g_y;
 	CurseGUICtrlHolder* ctrls;
 
@@ -180,6 +192,12 @@ public:
 
 	///Returns whether window is focused.
 	bool IsFocused()					{ return focused; }
+
+	///Lets a window to stay on top (in most cases).
+	void StayOnTop(bool s)				{ stayontop = s; }
+
+	///Returns if this window wants to stay on top.
+	bool IsStayOnTop()					{ return stayontop; }
 
 	///Sets a name for a window.
 	virtual void SetName(const char* nm);

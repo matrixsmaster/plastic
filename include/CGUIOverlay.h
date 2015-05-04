@@ -34,7 +34,6 @@ private:
 	int m_x, m_y;
 	int m_w, m_h;
 	bool transparent;
-	bool stayontop;
 
 	void ResizeWnd();
 	void PutLog();
@@ -49,8 +48,6 @@ public:
 
 	void SetTransparent(bool t)			{ transparent = t; }
 	bool GetTransparent() 				{ return transparent; }
-	void StayOnTop(bool s)				{ stayontop = s; }
-	bool IsStayOnTop()					{ return stayontop; }
 
 	void Update(bool refr);
 	bool PutEvent(CGUIEvent* e);

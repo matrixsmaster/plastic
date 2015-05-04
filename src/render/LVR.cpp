@@ -20,10 +20,12 @@
 #include <stdlib.h>
 #include <math.h>
 #include "LVR.h"
-#include "debug.h"
 #include "support.h"
 #include "cube.h"
 
+#ifdef LVRDEBUG
+#include "debug.h"
+#endif
 
 LVR::LVR(DataPipe* pipe)
 {
@@ -112,7 +114,9 @@ void LVR::SetEulerRotation(const vector3d r)
 	xy = Mtx3Mul(rx,ry);
 	rot = Mtx3Mul(xy,rz);
 
+#ifdef LVRDEBUG
 	dbg_print("LVR Cam Rot = [%.1f, %.1f, %.1f]",eulerot.X,eulerot.Y,eulerot.Z);
+#endif
 }
 
 void LVR::SetPosition(const vector3d pos)
@@ -120,40 +124,58 @@ void LVR::SetPosition(const vector3d pos)
 	offset.X = pos.X;
 	offset.Y = pos.Z; //swap Y-Z axes
 	offset.Z = pos.Y;
+
+#ifdef LVRDEBUG
 	dbg_print("LVR Cam Pos = [%.1f, %.1f, %.1f]",pos.X,pos.Z,pos.Y);
+#endif
 }
 
 void LVR::SetScale(const double s)
 {
 	scale = vector3d(s);
+
+#ifdef LVRDEBUG
 	dbg_print("LVR Scale = %.4f",s);
+#endif
 }
 
 void LVR::SetFOV(const vector3d f)
 {
 	fov = f;
+
+#ifdef LVRDEBUG
 	dbg_print("LVR FOV = [%.2f, %.2f]",f.X,f.Y);
+#endif
 }
 
 void LVR::SetFarDist(const int d)
 {
 	far = d;
 	dfog = 1.f / (double)(far - fog);
+
+#ifdef LVRDEBUG
 	dbg_print("LVR Far plane = %d",d);
+#endif
 }
 
 void LVR::SetFogStart(const int d)
 {
 	fog = d;
 	dfog = 1.f / (double)(far - fog);
+
+#ifdef LVRDEBUG
 	dbg_print("LVR Fog dist. = %d",d);
+#endif
 }
 
 void LVR::SetFogColor(const vector3di nfc)
 {
 	fogcol = nfc;
 	dfog = 1.f / (double)(far - fog);
+
+#ifdef LVRDEBUG
 	dbg_print("LVR Fog color: [%d, %d, %d]",nfc.X,nfc.Y,nfc.Z);
+#endif
 }
 
 vector3di LVR::GetProjection(const vector2di pnt)

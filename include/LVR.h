@@ -32,6 +32,7 @@
 #include "sky.h"
 
 
+//#define LVRDEBUG 1
 #define DEFFARPLANE 32
 #define DEFFOGPLANE 21
 #define DEFFOVX 28
