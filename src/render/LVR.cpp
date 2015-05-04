@@ -184,7 +184,7 @@ vector3di LVR::GetProjection(const vector2di pnt)
 
 	//check for valid co-ords
 	if ((!pbuf) || (pnt.X < 0) || (pnt.Y < 0)) return r;
-	if ((pnt.X >= CHUNKBOX) || (pnt.Y >= CHUNKBOX)) return r;
+	if ((pnt.X >= g_w) || (pnt.Y >= g_h)) return r;
 
 	//get a result
 	r = pbuf[pnt.Y * g_w + pnt.X];
