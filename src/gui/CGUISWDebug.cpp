@@ -113,12 +113,10 @@ bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 			break;
 		case KEY_BACKSPACE:
 		case 127: /* in case backspace isn't delete */
-//			if(!hidden)
 				if(edit_line.size() > 1)
 					edit_line.erase(edit_line.end() - 1);
 			break;
 		default:
-//			if(!hidden) {
 				if((e->k >= 'A' && e->k <= 'Z') ||
 						(e->k >= 'a' && e->k <= 'z') ||
 						(e->k == '-') ||
@@ -127,7 +125,6 @@ bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
 					edit = true;
 					return true;
 				}
-//			}
 			break;
 		}
 		break;

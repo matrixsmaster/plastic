@@ -54,6 +54,16 @@ public:
 	void Update();
 };
 
+//TODO CurseGuiTable
+class CurseGUITable
+{
+private:
+public:
+	CurseGUITable(CurseGUIWnd* parent) {}
+	virtual ~CurseGUITable() {}
+
+};
+
 /*
  * TODO:
  * CurseGUIPicture - blit picture to window backbuffer

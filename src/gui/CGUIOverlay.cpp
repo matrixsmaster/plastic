@@ -35,7 +35,6 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h) :
 
 	name = "Overlay";
 
-	//TODO do something
 	CGUIEvent e;
 	e.t = GUIEV_RESIZE;
 	PutEvent(&e);
@@ -72,7 +71,6 @@ bool CurseGUIOverlay::PutEvent(CGUIEvent* e)
 
 void CurseGUIOverlay::PutString(char* str)
 {
-	//TODO
 	string log_str(str);
 	log.push_back(log_str);
 }
@@ -89,20 +87,19 @@ void CurseGUIOverlay::ResizeWnd()
 
 void CurseGUIOverlay::PutLog()
 {
-	//TODO
 	vector<string>::iterator it;
 	int h;
 	h = g_h - 1;
 	chtype ch = 0, chclr;
 	int nl = h + 1;
-	int y = m_y+4;
+	int y = m_y+h;
 
 	if(!log.empty()) {
 		if(nl - log.size() >= 0)
 			nl = log.size() + 1;
 
 		for(it = log.end() - 1; it != log.end() - nl; it--) {
-			for(int i = 0; i < (int)it->size(); ++i) {
+			for(size_t i = 0; i < it->size(); ++i) {
 				ch = mvinch(y, m_x+i);
 
 				if(transparent) {
