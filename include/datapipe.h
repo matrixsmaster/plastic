@@ -122,8 +122,11 @@ public:
 	void GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen);
 	std::string GetIniDataS(const std::string ininame, const std::string inifield);
 
-	///Load dynamic object into current chunk.
+	///Load dynamic object into scene.
 	VModel* LoadModel(const char* fname, const vector3di pos);
+
+	///Delete model from scene by pointer.
+	bool UnloadModel(const VModel* ptr);
 
 	///Purge all loaded models.
 	void PurgeModels();

@@ -71,12 +71,17 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 PlasticWorld::~PlasticWorld()
 {
+	//Game data
+	if (PC) delete PC;
+	RemoveAllActors();
+
+	//UI parts
 	if (binder) delete binder;
 	if (hud) delete hud;
-	if (PC) delete PC;
 	if (lvr) delete lvr;
+
+	//The last one: DataPipe
 	if (data) delete data;
-	/* Actors: we don't need to purge them, it's the DataPipe responsibility */
 }
 
 void PlasticWorld::Quantum()
@@ -134,6 +139,14 @@ bool PlasticWorld::CreateActor()
 	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,data);
 	npc->SetPos(PC->GetPos());
 	return (npc->Spawn());
+}
+
+void PlasticWorld::RemoveAllActors()
+{
+	std::vector<PlasticActor*>::iterator it;
+	for (it = actors.begin(); it != actors.end(); ++it)
+		delete ((*it));
+	actors.clear();
 }
 
 void PlasticWorld::ProcessEvents(const CGUIEvent* e)

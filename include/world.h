@@ -59,6 +59,7 @@ private:
 
 	//internal facilities
 	bool CreateActor();
+	void RemoveAllActors();
 
 public:
 	PlasticWorld(SGameSettings* settings);

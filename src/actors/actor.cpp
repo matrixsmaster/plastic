@@ -100,6 +100,6 @@ bool PlasticActor::Spawn()
 
 void PlasticActor::Delete()
 {
-	if (!model) return;
-	//TODO
+	pipe->UnloadModel(model);
+	model = NULL;
 }

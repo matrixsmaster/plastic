@@ -300,6 +300,24 @@ VModel* DataPipe::LoadModel(const char* fname, const vector3di pos)
 	return m;
 }
 
+bool DataPipe::UnloadModel(const VModel* ptr)
+{
+	std::vector<VModel*>::iterator it;
+	if (!ptr) return false;
+
+	for (it = objs.begin(); it != objs.end(); ++it)
+		if ((*it) == ptr) {
+			Lock();
+			allocated -= (*it)->GetAllocatedRAM();
+			delete ((*it));
+			objs.erase(it);
+			Unlock();
+			return true;
+		}
+
+	return false;
+}
+
 void DataPipe::PurgeModels()
 {
 	std::vector<VModel*>::iterator mi;
