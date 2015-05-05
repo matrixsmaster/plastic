@@ -61,8 +61,6 @@ LVR::~LVR()
 
 bool LVR::Resize(int w, int h)
 {
-	size_t l;
-
 	if (w < 1) w = 0;
 	if (h < 1) h = 0;
 
@@ -75,6 +73,11 @@ bool LVR::Resize(int w, int h)
 	mid.X = w / 2;
 	mid.Y = h / 2;
 
+	if (pbuf) delete[] pbuf;
+
+#ifdef LVRDOUBLEBUFFERED
+	size_t l;
+
 	//reallocate buffers memory (double-buffered output)
 	l = rendsize * sizeof(SGUIPixel) * 2;
 	render = (SGUIPixel*)realloc(render,l);
@@ -84,16 +87,26 @@ bool LVR::Resize(int w, int h)
 	zbuf = (int*)realloc(zbuf,l);
 	memset(zbuf,0,l);
 
-	if (pbuf) delete[] pbuf;
 	pbuf = new vector3di[rendsize*2];
+
+#else
+	render = (SGUIPixel*)realloc(render,rendsize*sizeof(SGUIPixel));
+	zbuf = (int*)realloc(zbuf,rendsize*sizeof(int));
+	pbuf = new vector3di[rendsize];
+
+#endif
 
 	return ((render != NULL) && (zbuf != NULL) && (pbuf != NULL));
 }
 
 SGUIPixel* LVR::GetRender()
 {
+#ifdef LVRDOUBLEBUFFERED
 	//return NOT active buffer data
 	return (render + ((activebuf)? 0:rendsize));
+#else
+	return render;
+#endif
 }
 
 void LVR::SetMask(char* m, int w, int h)
@@ -201,8 +214,13 @@ vector3di LVR::GetProjection(const vector2di pnt)
 	if ((!pbuf) || (pnt.X < 0) || (pnt.Y < 0)) return r;
 	if ((pnt.X >= g_w) || (pnt.Y >= g_h)) return r;
 
+#ifdef LVRDOUBLEBUFFERED
 	//get a result (NOT active)
 	r = pbuf[pnt.Y * g_w + pnt.X + ((activebuf)? 0:rendsize)];
+#else
+	r = pbuf[pnt.Y * g_w + pnt.X];
+#endif
+
 	return r;
 }
 
@@ -218,16 +236,17 @@ void LVR::Frame()
 	vector3di* curpbuf;
 	voxel area[6];
 
-	if (activebuf == 0) {
-		frame = render;
-		curzbuf = zbuf;
-		curpbuf = pbuf;
-	} else {
+	frame = render;
+	curzbuf = zbuf;
+	curpbuf = pbuf;
+
+#ifdef LVRDOUBLEBUFFERED
+	if (activebuf) {
 		frame = &render[rendsize];
 		curzbuf = &zbuf[rendsize];
 		curpbuf = &pbuf[rendsize];
 	}
-
+#endif
 
 	memset(curzbuf,0,rendsize*sizeof(int));
 

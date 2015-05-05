@@ -114,8 +114,8 @@ static void* plastic_renderthread(void* ptr)
 		}
 
 		pthread_mutex_lock(&m_render);
-		lvr->SwapBuffers();
-		g_gui->SetBackgroundData(lvr->GetRender(),lvr->GetRenderLen());
+//		lvr->SwapBuffers();
+//		g_gui->SetBackgroundData(lvr->GetRender(),lvr->GetRenderLen());
 		g_gui->Update(true);
 		pthread_mutex_unlock(&m_render);
 	}

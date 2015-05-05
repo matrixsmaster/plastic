@@ -33,6 +33,8 @@
 
 
 #define LVRDEBUG 1
+//#define LVRDOUBLEBUFFERED 1
+
 #define DEFFARPLANE 32
 #define DEFFOGPLANE 21
 #define DEFFOVX 28
