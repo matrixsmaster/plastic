@@ -54,16 +54,15 @@ static void* plastic_eventhread(void* ptr)
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 
+		pthread_mutex_lock(&m_render);
+
 		/* Events pump */
 		if (!g_gui->PumpEvents(&my_e)) {
 			/* No one consumed event, need to be processed inside the core */
 			g_wrld->ProcessEvents(&my_e);
 		}
 
-		pthread_mutex_lock(&m_render);
 		g_wrld->GetHUD()->UpdateFPS(g_fps);
-		g_gui->Update(true);
-		pthread_mutex_unlock(&m_render);
 
 		//debug:
 		d = false;
@@ -85,6 +84,8 @@ static void* plastic_eventhread(void* ptr)
 			g_wrld->GetHUD()->PutStrBottom(s);
 			g_gui->SetCursorPos(curso.X,curso.Y);
 		}
+
+		pthread_mutex_unlock(&m_render);
 
 		/* To keep CPU load low(er) */
 		usleep(EVENTUSLEEP);
@@ -115,6 +116,7 @@ static void* plastic_renderthread(void* ptr)
 		pthread_mutex_lock(&m_render);
 		lvr->SwapBuffers();
 		g_gui->SetBackgroundData(lvr->GetRender(),lvr->GetRenderLen());
+		g_gui->Update(true);
 		pthread_mutex_unlock(&m_render);
 	}
 
