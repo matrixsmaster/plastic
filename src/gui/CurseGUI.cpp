@@ -436,11 +436,10 @@ void CurseGUI::UpdateBackmask()
 		if (skip) continue;
 
 		//Draw the mask
+		j = (*it)->GetPosX();
 		k = (*it)->GetHeight() + (*it)->GetPosY();
-		for (i = (*it)->GetPosY(); i < k; i++) {
-			j = (*it)->GetPosX();
+		for (i = (*it)->GetPosY(); i < k; i++)
 			memset(backmask+(i*g_w+j),1,(*it)->GetWidth());
-		}
 	}
 }
 

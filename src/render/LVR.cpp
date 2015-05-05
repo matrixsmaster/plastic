@@ -31,6 +31,7 @@ LVR::LVR(DataPipe* pipe)
 {
 	pipeptr = pipe;
 	render = NULL;
+	activebuf = 0;
 	rendsize = 0;
 	mask = NULL;
 
@@ -60,6 +61,8 @@ LVR::~LVR()
 
 bool LVR::Resize(int w, int h)
 {
+	size_t l;
+
 	if (w < 1) w = 0;
 	if (h < 1) h = 0;
 
@@ -72,13 +75,25 @@ bool LVR::Resize(int w, int h)
 	mid.X = w / 2;
 	mid.Y = h / 2;
 
-	//reallocate buffers memory
-	render = (SGUIPixel*)realloc(render,rendsize*sizeof(SGUIPixel));
-	zbuf = (float*)realloc(zbuf,rendsize*sizeof(float));
+	//reallocate buffers memory (double-buffered output)
+	l = rendsize * sizeof(SGUIPixel) * 2;
+	render = (SGUIPixel*)realloc(render,l);
+	memset(render,0,l);
+
+	l = rendsize * sizeof(int) * 2;
+	zbuf = (int*)realloc(zbuf,l);
+	memset(zbuf,0,l);
+
 	if (pbuf) delete[] pbuf;
-	pbuf = new vector3di[rendsize];
+	pbuf = new vector3di[rendsize*2];
 
 	return ((render != NULL) && (zbuf != NULL) && (pbuf != NULL));
+}
+
+SGUIPixel* LVR::GetRender()
+{
+	//return NOT active buffer data
+	return (render + ((activebuf)? 0:rendsize));
 }
 
 void LVR::SetMask(char* m, int w, int h)
@@ -186,8 +201,8 @@ vector3di LVR::GetProjection(const vector2di pnt)
 	if ((!pbuf) || (pnt.X < 0) || (pnt.Y < 0)) return r;
 	if ((pnt.X >= g_w) || (pnt.Y >= g_h)) return r;
 
-	//get a result
-	r = pbuf[pnt.Y * g_w + pnt.X];
+	//get a result (NOT active)
+	r = pbuf[pnt.Y * g_w + pnt.X + ((activebuf)? 0:rendsize)];
 	return r;
 }
 
@@ -198,20 +213,34 @@ void LVR::Frame()
 	vector3d v,fo,fn;
 	vector3di iv,av;
 	SVoxelInf* vox;
+	SGUIPixel* frame;
+	int* curzbuf;
+	vector3di* curpbuf;
 	voxel area[6];
 
-//	memset(zbuf,0,rendsize*sizeof(float));
+	if (activebuf == 0) {
+		frame = render;
+		curzbuf = zbuf;
+		curpbuf = pbuf;
+	} else {
+		frame = &render[rendsize];
+		curzbuf = &zbuf[rendsize];
+		curpbuf = &pbuf[rendsize];
+	}
+
+
+	memset(curzbuf,0,rendsize*sizeof(int));
 
 	if (skies)
-		skies->RenderTo(render,g_w,g_h);
+		skies->RenderTo(frame,g_w,g_h);
 
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
 		for (x = 0; x < g_w; x++,l++) {
-			pbuf[l] = vector3di(-1);
+			curpbuf[l] = vector3di(-1);
 			if ((mask) && (mask[l])) continue;
 
-			//reverse painter's algorithm (+ z-buffer)?
+			//reverse painter's algorithm
 			for (z = 1; z <= far; z++) {
 				//make current point vector
 				v.X = (double)x;
@@ -234,7 +263,8 @@ void LVR::Frame()
 				//if voxel found isn't empty, draw it and break current z-axis loop
 				if (vox->type != VOXT_EMPTY) {
 					//remember co-ords for screen raycast
-					pbuf[l] = iv;
+					curpbuf[l] = iv;
+					curzbuf[l] = z;
 
 					//gather area information
 					m = 1;
@@ -255,41 +285,51 @@ void LVR::Frame()
 
 					if ((s >= 0) && (s < 6)) {
 						//draw it!
-						render[l].sym = vox->sides[s];
+						frame[l].sym = vox->sides[s];
 
 						//apply voxel' color information
-						render[l].bg = vox->pix.bg;
-						render[l].fg = vox->pix.fg;
+						frame[l].bg = vox->pix.bg;
+						frame[l].fg = vox->pix.fg;
 
 						//apply simple fog effect
-						//FIXME: maybe put this code somewhere outside?
+						//FIXME: maybe put this code somewhere outside? To Postprocess
 						fl = z - fog;
 						if (fl > 0) {
 							fg = dfog * fl;
-							fo = tripletovecf(render[l].bg);
+							fo = tripletovecf(frame[l].bg);
 							fo *= (1.f - fg);
 							fn.X = fogcol.X;
 							fn.Y = fogcol.Y;
 							fn.Z = fogcol.Z;
 							fn *= fg;
 							fo += fn;
-							render[l].bg = vecftotriple(fo);
+							frame[l].bg = vecftotriple(fo);
 
-							fo = tripletovecf(render[l].fg);
+							fo = tripletovecf(frame[l].fg);
 							fo *= (1.f - fg);
 							fo += fn;
-							render[l].fg = vecftotriple(fo);
+							frame[l].fg = vecftotriple(fo);
 						}
 					} else {
 						//something went wrong
-						render[l].bg.r = 0;
-						render[l].bg.g = 0;
-						render[l].bg.b = 0;
-						render[l].fg = render[l].bg;
+						frame[l].bg.r = 0;
+						frame[l].bg.g = 0;
+						frame[l].bg.b = 0;
+						frame[l].fg = frame[l].bg;
 					}
 					break;
-				} //voxel render
+				} //voxel frame
 			} //by Z
 		} //by X
 	} //by Y
+}
+
+void LVR::Postprocess()
+{
+	//TODO: move fog here
+}
+
+void LVR::SwapBuffers()
+{
+	activebuf = 1 - activebuf;
 }

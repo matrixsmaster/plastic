@@ -27,11 +27,14 @@
 
 #define BOOLSTR(X) ((X)? "ON":"OFF")
 
+/// Prints a simple formatted message to stderr.
+void errout(char const* fmt, ...);
+
 /// Prints out SGameSettings data.
 void printsettings(SGameSettings* s);
 
-/// Prints a simple formatted message to stderr.
-void errout(char const* fmt, ...);
+///Interactive shell for adjusting settings.
+void interactive_shell(SGameSettings* s);
 
 /// Argument parser. Supposed to be used for analyze startup environment.
 bool argparser(int argc, char* argv[], SGameSettings* sets);

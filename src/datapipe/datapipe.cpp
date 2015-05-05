@@ -47,7 +47,7 @@ DataPipe::DataPipe(const SGameSettings* sets)
 	/* Create and init the world generator */
 	wgen = new WorldGen(sets->world_r);
 	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
-	if (wgen->LoadMap(tmp))
+	if (!wgen->LoadMap(tmp))
 		wgen->NewMap(rand());
 
 	/* Allocate voxel info table */
@@ -74,6 +74,10 @@ DataPipe::DataPipe(const SGameSettings* sets)
 			return; //destructor will purge all the chunks
 		}
 		allocated += sz;
+		if (allocated >= rammax) {
+			errout("Maximum amount of memory allowed to be used is reached.\n");
+			return;
+		}
 	}
 
 	/* All clear. */

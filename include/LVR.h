@@ -53,7 +53,8 @@ private:
 	vector3di fogcol;
 	DataPipe* pipeptr;
 	SGUIPixel* render;
-	float* zbuf;
+	int activebuf;
+	int* zbuf;
 	vector3di* pbuf;
 	AtmoSky* skies;
 	char* mask;
@@ -62,7 +63,7 @@ public:
 	LVR(DataPipe* pipe);
 	virtual ~LVR();
 
-	SGUIPixel* GetRender()			{ return render; }
+	SGUIPixel* GetRender();
 	uli GetRenderLen()				{ return rendsize; }
 
 	bool Resize(int w, int h);
@@ -87,6 +88,7 @@ public:
 
 	void Frame();
 	void Postprocess();
+	void SwapBuffers();
 };
 
 #endif /* LVR_H_ */

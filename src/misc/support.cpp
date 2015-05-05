@@ -23,6 +23,14 @@
 #include "support.h"
 
 
+void errout(char const* fmt, ...)
+{
+	va_list vl;
+	va_start(vl,fmt);
+	vfprintf(stderr,fmt,vl);
+	va_end(vl);
+}
+
 void printsettings(SGameSettings* s)
 {
 	printf("\n%s settings:\n",PRODNAME);
@@ -31,12 +39,9 @@ void printsettings(SGameSettings* s)
 	printf("\n");
 }
 
-void errout(char const* fmt, ...)
+void interactive_shell(SGameSettings* s)
 {
-	va_list vl;
-	va_start(vl,fmt);
-	vfprintf(stderr,fmt,vl);
-	va_end(vl);
+	//TODO: interactive startup shell
 }
 
 bool argparser(int argc, char* argv[], SGameSettings* sets)

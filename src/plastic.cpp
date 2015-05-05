@@ -34,22 +34,18 @@ static SGameSettings	g_set = DEFAULT_SETTINGS;
 static PlasticWorld*	g_wrld = NULL;
 static CurseGUI*		g_gui = NULL;
 static pthread_t		t_event = 0;
+static pthread_t		t_render = 0;
+static pthread_mutex_t	m_render;
+static bool				g_quit = false;
+static uli				g_fps = 0;
 
 
 /* *********************************************************** */
 
-static void plastic_shell()
-{
-	//TODO: interactive startup shell
-}
-
 static void* plastic_eventhread(void* ptr)
 {
 	CGUIEvent my_e;
-	//temporary FPS counter:
-	time_t beg;
-	ulli cnt = 0;
-	beg = clock();
+
 	//projection testing:
 	vector2di curso;
 	char s[128];
@@ -64,15 +60,10 @@ static void* plastic_eventhread(void* ptr)
 			g_wrld->ProcessEvents(&my_e);
 		}
 
-		//FIXME: create separate rendering thread
-		g_wrld->GetRenderer()->Frame();
-		cnt++;
-		if ((clock() - beg) >= CLOCKS_PER_SEC) {
-			g_wrld->GetHUD()->UpdateFPS(cnt);
-			cnt = 0;
-			beg = clock();
-		}
+		pthread_mutex_lock(&m_render);
+		g_wrld->GetHUD()->UpdateFPS(g_fps);
 		g_gui->Update(true);
+		pthread_mutex_unlock(&m_render);
 
 		//debug:
 		d = false;
@@ -98,8 +89,39 @@ static void* plastic_eventhread(void* ptr)
 		/* To keep CPU load low(er) */
 		usleep(EVENTUSLEEP);
 	}
+	g_quit = true;
+
 	return NULL;
 }
+
+static void* plastic_renderthread(void* ptr)
+{
+	LVR* lvr;
+	time_t beg;
+	uli fps = 0;
+
+	lvr = g_wrld->GetRenderer();
+	beg = clock();
+
+	while (!g_quit) {
+		lvr->Frame();
+		fps++;
+		if ((clock() - beg) >= CLOCKS_PER_SEC) {
+			g_fps = fps;
+			fps = 0;
+			beg = clock();
+		}
+
+		pthread_mutex_lock(&m_render);
+		lvr->SwapBuffers();
+		g_gui->SetBackgroundData(lvr->GetRender(),lvr->GetRenderLen());
+		pthread_mutex_unlock(&m_render);
+	}
+
+	return NULL;
+}
+
+/* *********************************************************** */
 
 static void plastic_start()
 {
@@ -127,18 +149,32 @@ static void plastic_start()
 	/* Init debug UI */
 	dbg_init(g_gui);
 
+	/* Create mutex */
+	pthread_mutex_init(&m_render,NULL);
+
 	/* Start events processing thread */
 	pthread_create(&t_event,NULL,plastic_eventhread,NULL);
+
+	/* Start rendering thread */
+	pthread_create(&t_render,NULL,plastic_renderthread,NULL);
 }
 
 static void plastic_cleanup()
 {
 	/* Join all active threads */
+	if (t_render) {
+		errout("Closing render thread... ");
+		pthread_join(t_render,NULL);
+		errout("OK\n");
+	}
 	if (t_event) {
 		errout("Closing events thread... ");
 		pthread_join(t_event,NULL);
 		errout("OK\n");
 	}
+
+	/* Destroy mutex */
+	pthread_mutex_destroy(&m_render);
 
 	/* Destroy debugging UI */
 	dbg_finalize();
@@ -163,13 +199,13 @@ int main(int argc, char* argv[])
 	printsettings(&g_set);
 
 	/* Show interactive startup shell if needed. */
-	if (g_set.use_shell) plastic_shell();
+	if (g_set.use_shell) interactive_shell(&g_set);
 
 	/* Prepare and start the game. */
 	plastic_start();
 
 	/* Keep updating world until quit event is fired. */
-	while ((g_gui) && (!g_gui->WillClose())) {
+	while (!g_quit) {
 		g_wrld->Quantum();
 		usleep(WORLDUSLEEP);
 	}
