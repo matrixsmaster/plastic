@@ -45,13 +45,17 @@ protected:
 	int backgr_size;				//size of image (to keep track on changing)
 	bool will_close;				//'window is now closing' flag
 	CGUIColorManager* cmanager;		//main colormanager instance ptr
+	bool autoalloc;					//automatic memory allocation flag
 
 	///Internal background updater.
 	void UpdateBack();
 
+	///Internal auto-allocated background resizer.
+	void ResizeBack();
+
 public:
 	CurseGUIBase();
-	virtual ~CurseGUIBase()	{}
+	virtual ~CurseGUIBase();
 
 	///Returns result of last operation (0 if everything is OK).
 	int GetLastResult()		{ return result; }
@@ -70,6 +74,10 @@ public:
 
 	///Specify background data buffer.
 	void SetBackgroundData(SGUIPixel* ptr, int size);
+
+	//TODO:write comments
+	bool SetAutoAlloc(bool a);
+	bool GetAutoAlloc()		{ return autoalloc; }
 
 	///Returns if the window or frame is going to close.
 	bool WillClose()		{ return will_close; }
@@ -160,7 +168,8 @@ public:
 enum ECGUIWindowType {
 	GUIWT_BASIC,
 	GUIWT_OVERLAY,
-	GUIWT_DEBUGUI
+	GUIWT_DEBUGUI,
+	GUIWT_INVENTORY
 };
 
 class CurseGUICtrlHolder;

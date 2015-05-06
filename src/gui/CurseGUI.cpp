@@ -34,24 +34,64 @@ CurseGUIBase::CurseGUIBase()
 	g_w = g_h = 0;
 	will_close = false;
 	cmanager = NULL;
+	autoalloc = false;
+}
+
+CurseGUIBase::~CurseGUIBase()
+{
+	if (autoalloc && backgr) free(backgr);
 }
 
 bool CurseGUIBase::UpdateSize()
 {
 	int w,h;
 	bool r = false;
+
 	getmaxyx(wnd,h,w);
-	if ((h != g_h) || (w != g_w)) r = true;
+
+	if ((h != g_h) || (w != g_w)) {
+		//size was changed
+		ResizeBack();
+		r = true;
+	}
 	g_h = h;
 	g_w = w;
+
 	return r;
 }
 
 void CurseGUIBase::SetBackgroundData(SGUIPixel* ptr, int size)
 {
-	backgr = ptr;
-	backgr_size = size;
-	if (!ptr) backgr_size = 0;
+	if (autoalloc) {
+		if (!backgr) return;
+		memcpy(backgr,ptr,((size < backgr_size)? size:backgr_size));
+	} else {
+		backgr = ptr;
+		backgr_size = size;
+		if (!ptr) backgr_size = 0;
+	}
+}
+
+bool CurseGUIBase::SetAutoAlloc(bool a)
+{
+	if (autoalloc) {
+		if (a) {
+			//nothing to do, exit to not destruct current data
+			return true;
+		}
+		//free old memory
+		free(backgr);
+		backgr = NULL;
+	}
+
+	autoalloc = a;
+
+	if (a) {
+		backgr_size = g_w * g_h;
+		backgr = (SGUIPixel*)malloc(backgr_size*sizeof(SGUIPixel));
+		if (!backgr) return false;
+	}
+	return true;
 }
 
 void CurseGUIBase::UpdateBack()
@@ -92,6 +132,15 @@ void CurseGUIBase::UpdateBack()
 
 	wcolor_set(wnd,1,NULL);
 	free(lbuf);
+}
+
+void CurseGUIBase::ResizeBack()
+{
+	if (!autoalloc) return;
+	backgr_size = g_w * g_h;
+	backgr = (SGUIPixel*)realloc(backgr,backgr_size*sizeof(SGUIPixel));
+	if (backgr) memset(backgr,0,backgr_size*sizeof(SGUIPixel));
+	else backgr_size = 0;
 }
 
 /* ********************************** GUI MAIN ********************************** */

@@ -21,16 +21,6 @@
 
 using namespace std;
 
-CurseGUIControl::CurseGUIControl(CurseGUIWnd* p, int x, int y)
-{
-	owner = p;
-	g_x = x;
-	g_y = y;
-	back.r = 0;
-	back.g = 0;
-	back.b = 0;
-	//TODO: init something here :)
-}
 
 CurseGUICtrlHolder::~CurseGUICtrlHolder()
 {
@@ -42,6 +32,23 @@ CurseGUICtrlHolder::~CurseGUICtrlHolder()
 	controls.clear();
 }
 
+void CurseGUICtrlHolder::Append(CurseGUIControl* ctl)
+{
+	if (ctl) controls.push_back(ctl);
+}
+
+void CurseGUICtrlHolder::Delete(CurseGUIControl* ctl)
+{
+	vector<CurseGUIControl*>::iterator it;
+
+	for (it = controls.begin(); it != controls.end(); ++it)
+		if ((*it) == ctl) {
+			delete ctl;
+			controls.erase(it);
+			break;
+		}
+}
+
 void CurseGUICtrlHolder::Update()
 {
 	vector<CurseGUIControl*>::iterator it;
@@ -49,4 +56,71 @@ void CurseGUICtrlHolder::Update()
 
 	for (it = controls.begin(); it != controls.end(); ++it)
 		(*it)->Update();
+}
+
+CurseGUIControl::CurseGUIControl(CurseGUICtrlHolder* p, int x, int y)
+{
+	holder = p;
+	g_x = x;
+	g_y = y;
+	back.r = 0;
+	back.g = 0;
+	back.b = 0;
+	wnd = p->GetWindow();
+	p->Append(this);
+}
+
+void CurseGUIControl::Delete()
+{
+	holder->Delete(this);
+}
+
+CurseGUIPicture::CurseGUIPicture(CurseGUICtrlHolder* p, int x, int y, int w, int h) :
+		CurseGUIControl(p,x,y)
+{
+	pict = NULL;
+	autoalloc = false;
+	length = w * h * sizeof(SGUIPixel);
+}
+
+CurseGUIPicture::~CurseGUIPicture()
+{
+	if (autoalloc && pict) free(pict);
+}
+
+bool CurseGUIPicture::SetAutoAlloc(bool a)
+{
+	//free memory if auto-allocated
+	if (autoalloc && pict) {
+		free(pict);
+		pict = NULL;
+	}
+	//set new flag
+	autoalloc = a;
+	//allocate memory
+	if (a) {
+		pict = (SGUIPixel*)malloc(length);
+		if (!pict) {
+			autoalloc = false;
+			return false;
+		}
+	}
+	//All operations are completed successfully
+	return true;
+}
+
+void CurseGUIPicture::SetPicture(SGUIPixel* p)
+{
+	if (autoalloc) {
+		if (!pict) return; //fail silently
+		memcpy(pict,p,length);
+	} else
+		pict = p;
+
+}
+
+void CurseGUIPicture::Update()
+{
+	if (!pict) return;
+	//TODO
 }

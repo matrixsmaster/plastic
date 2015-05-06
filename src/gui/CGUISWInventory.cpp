@@ -22,6 +22,7 @@
 CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
 	CurseGUIWnd(scrn,0,0,2,2)
 {
+	type = GUIWT_INVENTORY;
 	invent = iptr;
 	ResizeWnd();
 }

@@ -35,3 +35,5 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Implement some command processor and connect it to world's event pump
 
 -> Implement table control UI class (needed for inventory window)
+
+-> Add auto register function of GUI controls to GUI windows (?)

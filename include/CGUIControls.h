@@ -23,23 +23,8 @@
 #include <vector>
 #include "CurseGUI.h"
 
-/* Base class for Curse GUI controls and other UI elements */
-class CurseGUIControl
-{
-private:
-	CurseGUIWnd* owner;
-	int g_x, g_y;
-	SCTriple back;
 
-public:
-	CurseGUIControl(CurseGUIWnd* p, int x, int y);
-	virtual ~CurseGUIControl()				{}
-
-	virtual void SetBackColor(SCTriple c)	{ back = c; }
-
-	virtual void Update() = 0;
-};
-
+class CurseGUIControl;
 /* Automated storage container for window controls */
 class CurseGUICtrlHolder
 {
@@ -51,18 +36,62 @@ public:
 	CurseGUICtrlHolder(CurseGUIWnd* parent)	{ owner = parent; }
 	virtual ~CurseGUICtrlHolder();
 
+	CurseGUIWnd* GetWindow()				{ return owner; }
+
+	void Append(CurseGUIControl* ctl);
+	void Delete(CurseGUIControl* ctl);
+
+	void Update();
+};
+
+/* Base class for Curse GUI controls and other UI elements */
+class CurseGUIControl
+{
+protected:
+	CurseGUICtrlHolder* holder;
+	CurseGUIWnd* wnd;
+	int g_x, g_y;
+	SCTriple back;
+
+public:
+	CurseGUIControl(CurseGUICtrlHolder* p, int x, int y);
+	virtual ~CurseGUIControl()				{}
+
+	virtual void SetBackColor(SCTriple c)	{ back = c; }
+
+	virtual void Update() = 0;
+
+	virtual void Delete();
+};
+
+class CurseGUIPicture : public CurseGUIControl
+{
+private:
+	SGUIPixel* pict;
+	bool autoalloc;
+	unsigned length;
+
+public:
+	CurseGUIPicture(CurseGUICtrlHolder* p, int x, int y, int w, int h);
+	virtual ~CurseGUIPicture();
+
+	bool SetAutoAlloc(bool a);
+	bool GetAutoAlloc()						{ return autoalloc; }
+
+	void SetPicture(SGUIPixel* p);
+	SGUIPixel* GetPicture()					{ return pict; }
+
 	void Update();
 };
 
 //TODO CurseGuiTable
-class CurseGUITable
-{
-private:
-public:
-	CurseGUITable(CurseGUIWnd* parent) {}
-	virtual ~CurseGUITable() {}
-
-};
+//class CurseGUITable : public CurseGUIControl
+//{
+//private:
+//public:
+//	CurseGUITable() {}
+//	virtual ~CurseGUITable() {}
+//};
 
 /*
  * TODO:

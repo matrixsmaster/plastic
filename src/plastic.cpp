@@ -75,7 +75,10 @@ static void* plastic_eventhread(void* ptr)
 		} else if (my_e.t == GUIEV_KEYPRESS) {
 			switch (my_e.k) {
 			case KEY_F(1): g_gui->MkWindow(curso.X,curso.Y,10,5,"Test"); break;
-			case '0': g_gui->MkWindow(g_gui->GetWidth()/2,g_gui->GetHeight()/2,10,5,"Test"); break;
+			case '0':
+				g_gui->MkWindow(g_gui->GetWidth()/2,g_gui->GetHeight()/2,10,5,"SomeWin");
+				g_gui->GetWindowN("SomeWin")->SetAutoAlloc(true);
+				break;
 			}
 		}
 		if (d) {
@@ -114,8 +117,6 @@ static void* plastic_renderthread(void* ptr)
 		}
 
 		pthread_mutex_lock(&m_render);
-//		lvr->SwapBuffers();
-//		g_gui->SetBackgroundData(lvr->GetRender(),lvr->GetRenderLen());
 		g_gui->Update(true);
 		pthread_mutex_unlock(&m_render);
 	}
