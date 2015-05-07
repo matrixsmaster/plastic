@@ -26,20 +26,31 @@
 #include <string>
 #include "CurseGUI.h"
 
+
+// structure to show in status overlay
+struct SOVRLStats {
+	int fps;
+	int w, h;
+};
+
+//
 class CurseGUIOverlay : public CurseGUIWnd {
 private:
 	std::vector<std::string> log;
 
-	int cnt;
-	int m_x, m_y;
-	int m_w, m_h;
-	bool transparent;
+	int m_x, m_y;		//window position
+	int m_w, m_h;		//width and height
+	bool transparent;	//window transparency
+	bool logging;		//window logging
+
+	SGUIPixel pxl;
+
 
 	void ResizeWnd();
 	void PutLog();
 
 public:
-	CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h);
+	CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, bool logg);
 	virtual ~CurseGUIOverlay();
 
 	//Overlay willn't gain or loose the focus.
@@ -49,11 +60,15 @@ public:
 	void SetTransparent(bool t)			{ transparent = t; }
 	bool GetTransparent() 				{ return transparent; }
 
+	void SetBckgrMask(SGUIPixel* pxl);
+
 	void Update(bool refr);
 	bool PutEvent(CGUIEvent* e);
 
 	void PutString(char* str);
 	void PutString(std::string str);
+
+	void ClearLog();
 };
 
 

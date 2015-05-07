@@ -25,13 +25,23 @@
 #include "CurseGUI.h"
 #include "CGUIOverlay.h"
 
+#define FPS_OVRL 0
+#define BTM_OVRL 1
+#define STAT_OVRL 2
+
+#define STAT_OVRL_HEIGHT 3
+
+
+
 class HUD {
 private:
 	CurseGUI* gui;
 	std::vector<CurseGUIOverlay*> overlays;
+	SOVRLStats stats;
 
 	///Spawn an overlay window (for internal use only).
-	void Spawn(int x, int y, int w, int h, const char* txt);
+	void Spawn(int x, int y, int w, int h, bool logging, const char* txt);
+	std::string intToString(int n);
 
 public:
 	HUD(CurseGUI* guiptr);
@@ -39,10 +49,13 @@ public:
 
 	///Updates FPS counter.
 	void UpdateFPS(uli fps);
+	//Update status message (fps etc)
+	void UpdateStatusOvrl();
 
 	void PutStrBottom(const char* str);
 	bool GetTransparent();
 	void SetTransparent(bool t);
+	void SetBckgrMask(SGUIPixel* pxl);
 };
 
 #endif /* HUD_H_ */

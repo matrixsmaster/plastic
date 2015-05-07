@@ -23,15 +23,15 @@
 
 using namespace std;
 
-CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h) :
-		CurseGUIWnd(scrn,x,y,0,0)
+CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, bool logg) :
+		CurseGUIWnd(scrn,x,y,0,0),
+		m_x(x),
+		m_y(y),
+		m_w(w),
+		m_h(h),
+		logging(logg)
 {
 	type = GUIWT_OVERLAY;
-	cnt = 0;
-	m_x = x; //FIXME: what's this?
-	m_y = y;
-	m_w = w;
-	m_h = h;
 
 	name = "Overlay";
 
@@ -40,6 +40,9 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h) :
 	PutEvent(&e);
 
 	transparent = true;
+
+	pxl.bg.r = 0; pxl.bg.g = 0; pxl.bg.b = 0;
+	pxl.fg.r = 1000; pxl.fg.g = 500; pxl.fg.b = 1000;
 }
 
 CurseGUIOverlay::~CurseGUIOverlay()
@@ -49,11 +52,8 @@ CurseGUIOverlay::~CurseGUIOverlay()
 
 void CurseGUIOverlay::Update(bool refr)
 {
-	//TODO
-
-	wcolor_set(wnd,0,NULL);
 	PutLog();
-
+	wcolor_set(wnd,0,NULL);
 	if (refr) wrefresh(wnd);
 }
 
@@ -71,14 +71,27 @@ bool CurseGUIOverlay::PutEvent(CGUIEvent* e)
 
 void CurseGUIOverlay::PutString(char* str)
 {
+	//Put string to OverlayUI log
 	string log_str(str);
 	log.push_back(log_str);
 }
 
 void CurseGUIOverlay::PutString(string str)
 {
+	//Put string to OverlayUI log
 	log.push_back(str);
 }
+
+void CurseGUIOverlay::SetBckgrMask(SGUIPixel* pxl)
+{
+	//TODO
+}
+
+void CurseGUIOverlay::ClearLog()
+{
+	log.clear();
+}
+
 
 void CurseGUIOverlay::ResizeWnd()
 {
@@ -91,30 +104,32 @@ void CurseGUIOverlay::PutLog()
 	int h;
 	h = g_h - 1;
 	chtype ch = 0, chclr;
-	int nl = h + 1;
+	int nl = g_h;
 	int y = m_y+h;
 
 	if(!log.empty()) {
+		if (!transparent)
+			wcolor_set(wnd, cmanager->CheckPair(&pxl), NULL);
+
 		if(nl - log.size() >= 0)
 			nl = log.size() + 1;
 
 		for(it = log.end() - 1; it != log.end() - nl; it--) {
-			for(size_t i = 0; i < it->size(); ++i) {
-				ch = mvinch(y, m_x+i);
 
-				if(transparent) {
+			if (transparent) {
+
+				for(size_t i = 0; i < it->size(); ++i) {
+					ch = mvinch(y, m_x+i);
 					chclr = ch & A_COLOR;
-				} else {
-					//TODO ?
-					chclr = 0;
+					ch = it->at(i);
+					ch ^= chclr;
+					mvwaddch(wnd, h, i, ch);
 				}
 
-				ch = it->at(i);
-				ch ^= chclr;
-				mvwaddch(wnd, h, i, ch);
+			} else {
+				mvwaddnstr(wnd,h,m_x,it->c_str(),g_w);
 			}
 			h--; y--;
 		}
 	}
 }
-

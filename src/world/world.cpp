@@ -189,7 +189,7 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 				printf("TESTING: YOU SHOULDN'T SEE THIS!!!");
 				redrawwin(gui->GetWindow());
 				return;
-		case KEY_F(2):
+		case 'z': //KEY_F(2): //tmp
 			if(hud) {
 				if(hud->GetTransparent()) {
 					hud->SetTransparent(false);

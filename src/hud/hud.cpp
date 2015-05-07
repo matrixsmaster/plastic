@@ -26,9 +26,14 @@ HUD::HUD(CurseGUI* guiptr)
 {
 	gui = guiptr;
 
+	stats.fps = 0;
+	stats.h = 0;
+	stats.w = 0;
+
 	//add some overlays
-	Spawn(0,0, gui->GetWidth()/4, 1,"FPS = 0"); //top
-	Spawn(0,gui->GetHeight()-9, gui->GetWidth()/4, gui->GetHeight()/4,"Testing bottom overlay"); //bottom
+	Spawn(0,0, gui->GetWidth()/4, 1, false, "fps = 0"); //top
+	Spawn(0,gui->GetHeight()-gui->GetHeight()/4, gui->GetWidth()/4, gui->GetHeight()/4, true, "Testing bottom overlay"); //bottom
+	Spawn(gui->GetWidth()/5, 0, gui->GetWidth()/5, STAT_OVRL_HEIGHT, false, "fps = 0");
 }
 
 HUD::~HUD()
@@ -41,51 +46,72 @@ HUD::~HUD()
 	overlays.clear();
 }
 
-void HUD::Spawn(int x, int y, int w, int h, const char* txt)
+void HUD::Spawn(int x, int y, int w, int h, bool logging, const char* txt)
 {
 	CurseGUIOverlay* ptr;
-	ptr = new CurseGUIOverlay(gui,x,y, w, h);
+	ptr = new CurseGUIOverlay(gui,x,y, w, h, logging);
 	overlays.push_back(ptr);
 	gui->AddWindow(ptr);
 	ptr->PutString(txt);
 }
 
+string HUD::intToString(int n)
+{
+	ostringstream ss;
+	ss << n;
+	return ss.str();
+}
+
 void HUD::UpdateFPS(uli fps)
 {
-	/* Begemot, do something here!
-	 * we need to show just one number, so need something like Flush() method,
-	 * which will eventually clear overlay' log (prevent creating memory leak)
-	 * Then, print() method will be great to pass some formatted information.
-	 * Use dbg_print() as example of very simple implementation.
-	 * */
 	if(overlays.empty()) return;
 
+	stats.fps = fps;
+	UpdateStatusOvrl();
+}
+
+void HUD::UpdateStatusOvrl()
+{
+	//TODO
 	string str;
-	ostringstream ss;
-	ss << fps;
-	str = "fps = ";
-	str += ss.str();
-	overlays[0]->PutString(str);
+
+	if(overlays.size() > 2) {
+		overlays[STAT_OVRL]->ClearLog();
+		str = "fps = ";
+		str += intToString(stats.fps);
+		overlays[STAT_OVRL]->PutString(str);
+		str = "width: ";
+		str += intToString(stats.h);
+		overlays[STAT_OVRL]->PutString(str);
+		str = "height: ";
+		str += intToString(stats.h);
+		overlays[STAT_OVRL]->PutString(str);
+	}
 }
 
 void HUD::PutStrBottom(const char* str)
 {
 	if(overlays.size() > 1) {
-		overlays[1]->PutString(str);
+		overlays[BTM_OVRL]->PutString(str);
 	}
 }
 
 bool HUD::GetTransparent()
 {
-	//TODO
+	//TODO check focus
 	if(overlays.size() >  0)
-		return overlays[1]->GetTransparent();
-	return true;
+		return overlays[BTM_OVRL]->GetTransparent();
+	return false;
 }
 
 void HUD::SetTransparent(bool t)
 {
-	//TODO
+	//TODO check focus
 	if(!overlays.empty())
-		overlays[1]->SetTransparent(t);
+		overlays[BTM_OVRL]->SetTransparent(t);
+}
+
+void HUD::SetBckgrMask(SGUIPixel* pxl)
+{
+	//TODO
 }
