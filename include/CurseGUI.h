@@ -58,16 +58,16 @@ public:
 	virtual ~CurseGUIBase();
 
 	///Returns result of last operation (0 if everything is OK).
-	int GetLastResult()		{ return result; }
+	int GetLastResult()					{ return result; }
 
 	///Returns ncurses' WINDOW struct pointer.
-	WINDOW* GetWindow()		{ return wnd; }
+	WINDOW* GetWindow()					{ return wnd; }
 
 	///Returns width (overall) of the window.
-	int GetWidth()			{ return g_w; }
+	int GetWidth()						{ return g_w; }
 
 	///Returns height (overall) of the window.
-	int GetHeight()			{ return g_h; }
+	int GetHeight()						{ return g_h; }
 
 	///Updates size variables and returns true if they are had changed.
 	bool UpdateSize();
@@ -75,9 +75,12 @@ public:
 	///Specify background data buffer.
 	void SetBackgroundData(SGUIPixel* ptr, int size);
 
+	///Returns pointer to background data buffer.
+	SGUIPixel* GetBackgroundData()		{ return backgr; }
+
 	//TODO:write comments
 	bool SetAutoAlloc(bool a);
-	bool GetAutoAlloc()		{ return autoalloc; }
+	bool GetAutoAlloc()					{ return autoalloc; }
 
 	///Returns if the window or frame is going to close.
 	bool WillClose()		{ return will_close; }
@@ -228,6 +231,9 @@ public:
 
 	///Window' event processor.
 	virtual bool PutEvent(CGUIEvent* e);
+
+	///Returns window controls holder.
+	CurseGUICtrlHolder* GetControls()	{ return ctrls; }
 
 	int GetPosX()						{ return g_x; }
 	int GetPosY()						{ return g_y; }

@@ -28,6 +28,7 @@
 #include "CurseGUI.h"
 #include "world.h"
 #include "LVR.h"
+#include "CGUIControls.h"
 
 
 static SGameSettings	g_set = DEFAULT_SETTINGS;
@@ -51,6 +52,9 @@ static void* plastic_eventhread(void* ptr)
 	char s[128];
 	vector3di x;
 	bool d;
+	//other debug
+	CurseGUIWnd* wnd;
+	CurseGUIControl* ctl;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 
@@ -76,8 +80,14 @@ static void* plastic_eventhread(void* ptr)
 			switch (my_e.k) {
 			case KEY_F(1): g_gui->MkWindow(curso.X,curso.Y,10,5,"Test"); break;
 			case '0':
-				g_gui->MkWindow(g_gui->GetWidth()/2,g_gui->GetHeight()/2,10,5,"SomeWin");
-				g_gui->GetWindowN("SomeWin")->SetAutoAlloc(true);
+				//testing window
+				g_gui->MkWindow(g_gui->GetWidth()/2,g_gui->GetHeight()/2,20,10,"SomeWin");
+				wnd = g_gui->GetWindowN("SomeWin");
+				wnd->SetAutoAlloc(true);
+				ctl = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
+				break;
+			case '9':
+				ctl->Delete();
 				break;
 			}
 		}

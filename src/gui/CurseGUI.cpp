@@ -89,7 +89,8 @@ bool CurseGUIBase::SetAutoAlloc(bool a)
 	if (a) {
 		backgr_size = g_w * g_h;
 		backgr = (SGUIPixel*)malloc(backgr_size*sizeof(SGUIPixel));
-		if (!backgr) return false;
+		if (backgr) memset(backgr,0,backgr_size*sizeof(SGUIPixel));
+		else return false;
 	}
 	return true;
 }
