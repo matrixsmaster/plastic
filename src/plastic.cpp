@@ -87,13 +87,14 @@ static void* plastic_eventhread(void* ptr)
 			case KEY_F(1): g_gui->MkWindow(curso.X,curso.Y,10,5,"Test"); break;
 			case '0':
 				//testing window
-				g_gui->MkWindow(g_gui->GetWidth()/2,g_gui->GetHeight()/2,20,10,"SomeWin");
-				wnd = g_gui->GetWindowN("SomeWin");
+				wnd = g_gui->MkWindow(curso.X,curso.Y,20,10,"SomeWin");
+//				wnd = g_gui->GetWindowN("SomeWin");
 				g_gui->SetFocus(wnd);
 				wnd->SetBoxed(false);
 				wnd->SetAutoAlloc(true);
 				pct = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
-				btn = new CurseGUIButton(wnd->GetControls(),2,7,6,"Test");
+				btn = new CurseGUIButton(wnd->GetControls(),2,7,10,"Test 1");
+				btn = new CurseGUIButton(wnd->GetControls(),2,8,10,"Test 2");
 				break;
 			case '9':
 				test.r = 1000;

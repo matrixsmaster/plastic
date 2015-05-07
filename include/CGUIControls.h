@@ -43,7 +43,10 @@ public:
 
 	void Update();
 	bool PutEvent(SGUIEvent* e);
+	void Rotate();
 };
+
+/* ******************************************************************** */
 
 /* Base class for Curse GUI controls and other UI elements */
 class CurseGUIControl
@@ -53,19 +56,35 @@ protected:
 	CurseGUIWnd* wnd;
 	int g_x, g_y;
 	SCTriple back;
+	bool selected;
 
 public:
+	///Control constructor will automatically register control in controls holder.
 	CurseGUIControl(CurseGUICtrlHolder* p, int x, int y);
+
+	///Don't call destructor directly in the code outside of CurseGUI!
 	virtual ~CurseGUIControl()				{}
 
+	//FIXME: are we need it?!
 	virtual void SetBackColor(SCTriple c)	{ back = c; }
 
+	///Method will return true if the control can be slected.
+	virtual bool Select(bool s)				{ selected = s; return true; }
+
+	///Returns selection state of control.
+	virtual bool IsSelected()				{ return selected; }
+
+	///Updates graphical representation of control.
 	virtual void Update() = 0;
 
-	virtual bool PutEvent(SGUIEvent* e) = 0;
+	///Events pump endpoint.
+	virtual bool PutEvent(SGUIEvent*) = 0;
 
+	///Call this method to destroy and unregister control from its holder.
 	virtual void Delete();
 };
+
+/* ******************************************************************** */
 
 class CurseGUIPicture : public CurseGUIControl
 {
@@ -82,6 +101,10 @@ public:
 	bool SetAutoAlloc(bool a);
 	bool GetAutoAlloc()						{ return autoalloc; }
 
+	//Picture is a static element, cannot be selected.
+	bool Select(bool s)						{ return false; }
+	bool IsSelected()						{ return false; }
+
 	void SetPicture(SGUIPixel* p);
 	SGUIPixel* GetPicture()					{ return pict; }
 	void ColorFill(SCTriple col);
@@ -89,6 +112,8 @@ public:
 	void Update();
 	bool PutEvent(SGUIEvent* e)				{ return false; }
 };
+
+/* ******************************************************************** */
 
 class CurseGUIButton : public CurseGUIControl
 {
@@ -109,6 +134,8 @@ public:
 	bool PutEvent(SGUIEvent* e);
 };
 
+/* ******************************************************************** */
+
 //TODO CurseGuiTable
 //class CurseGUITable : public CurseGUIControl
 //{
@@ -121,7 +148,7 @@ public:
 /*
  * TODO:
  * V CurseGUIPicture - blit picture to window backbuffer
- *   CurseGUIButton - renders a simple button like [BUTTON]
+ * V CurseGUIButton - renders a simple button like [BUTTON]
  *   CurseGUIEditBox - an underline (_) fillable with some text or user input.
  * 					Example: EditBox(6 chars):	(______)
  * 							after some input:	(Test__)

@@ -58,7 +58,9 @@ void CurseGUIButton::Update()
 	butt += ']';
 
 	wcolor_set(wd,wnd->GetColorManager()->CheckPair(&fmt),NULL);
+	if (selected) wattrset(wd,A_BOLD);
 	mvwaddnstr(wd,g_y,g_x,butt.c_str(),g_w);
+	if (selected) wattrset(wd,A_NORMAL);
 }
 
 void CurseGUIButton::Click()
@@ -77,6 +79,9 @@ bool CurseGUIButton::PutEvent(SGUIEvent* e)
 
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
+		if (!selected) return false;
+
+		//Process key on selected button
 		switch (e->k) {
 		case ' ': /*push button by space*/
 			Click();
@@ -86,10 +91,13 @@ bool CurseGUIButton::PutEvent(SGUIEvent* e)
 		break;
 
 	case GUIEV_MOUSE:
+		//Check co-ords is in range
 		x = e->m.x - wnd->GetPosX() - g_x;
 		y = e->m.y - wnd->GetPosY() - g_y;
 		if ((x < 0) || (x >= g_w)) return false;
 		if ((y < 0) || (y >= 1)) return false;
+
+		//Do some action with button
 		if (e->m.bstate & BUTTON1_CLICKED) {
 			Click();
 			return true;

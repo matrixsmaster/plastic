@@ -400,7 +400,6 @@ bool CurseGUI::PumpEvents(SGUIEvent* e)
 	if (!eventFIFO.empty()) {
 		//pop the first element - next event in the queue
 		memcpy(e,&(eventFIFO.at(0)),sizeof(SGUIEvent));
-//		intevent = eventFIFO.at(0);			//copy to internal holder to make it accessible
 		eventFIFO.erase(eventFIFO.begin()); //after delete
 
 	} else {
@@ -600,6 +599,7 @@ bool CurseGUIWnd::PutEvent(SGUIEvent* e)
 	case GUIEV_KEYPRESS:
 		switch (e->k) {
 		case GUI_DEFCLOSE: will_close = true; return true;
+		case '\t': ctrls->Rotate(); return true;
 		}
 		return false;
 

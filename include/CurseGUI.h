@@ -106,7 +106,6 @@ private:
 	char* backmask;						//background mask (used to estimate space occupied by windows)
 	mmask_t oldmouse;					//original terminal mouse driver state
 	int c_x,c_y;						//cursor position
-	SGUIEvent intevent;					//currently processing internal event
 
 	void Reorder(int by);
 

@@ -74,6 +74,27 @@ bool CurseGUICtrlHolder::PutEvent(SGUIEvent* e)
 	return r;
 }
 
+void CurseGUICtrlHolder::Rotate()
+{
+	vector<CurseGUIControl*>::iterator it;
+	bool flg = false;
+
+	for (it = controls.begin(); it != controls.end(); ++it) {
+		if ((!flg) && ((*it)->IsSelected())) {
+			flg = true;
+			(*it)->Select(false);
+		} else if ((flg) && ((*it)->Select(true))) {
+			return;
+		}
+	}
+
+	//second pass
+	for (it = controls.begin(); it != controls.end(); ++it)
+		if ((*it)->Select(true)) return;
+}
+
+/* ******************************************************************** */
+
 CurseGUIControl::CurseGUIControl(CurseGUICtrlHolder* p, int x, int y)
 {
 	holder = p;
@@ -82,6 +103,7 @@ CurseGUIControl::CurseGUIControl(CurseGUICtrlHolder* p, int x, int y)
 	back.r = 0;
 	back.g = 0;
 	back.b = 0;
+	selected = false;
 	wnd = p->GetWindow();
 	p->Append(this);
 }
