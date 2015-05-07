@@ -45,7 +45,7 @@ static uli				g_fps = 0;
 
 static void* plastic_eventhread(void* ptr)
 {
-	CGUIEvent my_e;
+	SGUIEvent my_e;
 
 	//projection testing:
 	vector2di curso;
@@ -54,8 +54,9 @@ static void* plastic_eventhread(void* ptr)
 	bool d;
 	//other debug
 	CurseGUIWnd* wnd;
-	CurseGUIControl* ctl;
+//	CurseGUIControl* ctl;
 	CurseGUIPicture* pct;
+	CurseGUIButton* btn;
 	SCTriple test;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
@@ -72,33 +73,42 @@ static void* plastic_eventhread(void* ptr)
 
 		//debug:
 		d = false;
-		if (my_e.t == GUIEV_MOUSE) {
+		switch (my_e.t) {
+		case GUIEV_MOUSE:
 			if (my_e.m.bstate & BUTTON1_CLICKED) {
 				curso.X = my_e.m.x;
 				curso.Y = my_e.m.y;
 				d = true;
 			}
-		} else if (my_e.t == GUIEV_KEYPRESS) {
+			break;
+
+		case GUIEV_KEYPRESS:
 			switch (my_e.k) {
 			case KEY_F(1): g_gui->MkWindow(curso.X,curso.Y,10,5,"Test"); break;
 			case '0':
 				//testing window
-				g_gui->MkWindow(g_gui->GetWidth()/2,g_gui->GetHeight()/2,20,10,"SomeWin");
-				wnd = g_gui->GetWindowN("SomeWin");
+				wnd = g_gui->MkWindow(curso.X,curso.Y,20,10,"SomeWin");
+//				wnd = g_gui->GetWindowN("SomeWin");
+				g_gui->SetFocus(wnd);
 				wnd->SetBoxed(false);
 				wnd->SetAutoAlloc(true);
-				ctl = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
+				pct = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
+				btn = new CurseGUIButton(wnd->GetControls(),2,7,10,"Test 1");
+				btn = new CurseGUIButton(wnd->GetControls(),2,8,10,"Test 2");
 				break;
 			case '9':
 				test.r = 1000;
 				test.g = 0;
 				test.b = 500;
-				pct = (CurseGUIPicture*)ctl;
 				pct->SetAutoAlloc(true);
 				pct->ColorFill(test);
 				break;
 			}
+			break;
+
+		default: break;
 		}
+
 		if (d) {
 			x = g_wrld->GetRenderer()->GetProjection(curso);
 			snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);

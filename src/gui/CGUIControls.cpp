@@ -17,6 +17,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+/* Implementation file of Controls Holder and Controls base class */
+
 #include "CGUIControls.h"
 
 using namespace std;
@@ -58,6 +60,41 @@ void CurseGUICtrlHolder::Update()
 		(*it)->Update();
 }
 
+bool CurseGUICtrlHolder::PutEvent(SGUIEvent* e)
+{
+	vector<CurseGUIControl*>::iterator it;
+	bool r = false;
+	if (controls.empty()) return false;
+
+	for (it = controls.begin(); it != controls.end(); ++it)
+		if ((*it)->PutEvent(e)) {
+			r = true;
+			break;
+		}
+	return r;
+}
+
+void CurseGUICtrlHolder::Rotate()
+{
+	vector<CurseGUIControl*>::iterator it;
+	bool flg = false;
+
+	for (it = controls.begin(); it != controls.end(); ++it) {
+		if ((!flg) && ((*it)->IsSelected())) {
+			flg = true;
+			(*it)->Select(false);
+		} else if ((flg) && ((*it)->Select(true))) {
+			return;
+		}
+	}
+
+	//second pass
+	for (it = controls.begin(); it != controls.end(); ++it)
+		if ((*it)->Select(true)) return;
+}
+
+/* ******************************************************************** */
+
 CurseGUIControl::CurseGUIControl(CurseGUICtrlHolder* p, int x, int y)
 {
 	holder = p;
@@ -66,6 +103,7 @@ CurseGUIControl::CurseGUIControl(CurseGUICtrlHolder* p, int x, int y)
 	back.r = 0;
 	back.g = 0;
 	back.b = 0;
+	selected = false;
 	wnd = p->GetWindow();
 	p->Append(this);
 }
@@ -73,79 +111,4 @@ CurseGUIControl::CurseGUIControl(CurseGUICtrlHolder* p, int x, int y)
 void CurseGUIControl::Delete()
 {
 	holder->Delete(this);
-}
-
-CurseGUIPicture::CurseGUIPicture(CurseGUICtrlHolder* p, int x, int y, int w, int h) :
-		CurseGUIControl(p,x,y)
-{
-	pict = NULL;
-	autoalloc = false;
-	g_w = w;
-	g_h = h;
-	length = w * h * sizeof(SGUIPixel);
-}
-
-CurseGUIPicture::~CurseGUIPicture()
-{
-	if (autoalloc && pict) free(pict);
-}
-
-bool CurseGUIPicture::SetAutoAlloc(bool a)
-{
-	SCTriple fill;
-	fill.r = 0; fill.g = 0; fill.b = 0;
-
-	//free memory if auto-allocated
-	if (autoalloc && pict) {
-		free(pict);
-		pict = NULL;
-	}
-	//set new flag
-	autoalloc = a;
-	//allocate memory
-	if (a) {
-		pict = (SGUIPixel*)malloc(length);
-		if (!pict) {
-			autoalloc = false;
-			return false;
-		}
-		ColorFill(fill);
-	}
-	//All operations are completed successfully
-	return true;
-}
-
-void CurseGUIPicture::SetPicture(SGUIPixel* p)
-{
-	if (autoalloc) {
-		if (!pict) return; //fail silently
-		memcpy(pict,p,length);
-	} else
-		pict = p;
-
-}
-
-void CurseGUIPicture::ColorFill(SCTriple col)
-{
-	int i;
-
-	if (!pict) return;
-
-	for (i = 0; i < (g_w*g_h); i++) {
-		pict[i].bg = col;
-		pict[i].fg = col;
-		pict[i].sym = ' ';
-	}
-}
-
-void CurseGUIPicture::Update()
-{
-	int i,wh;
-	SGUIPixel* rcv = wnd->GetBackgroundData();
-	wh = wnd->GetWidth();
-
-	if ((!pict) || (!rcv)) return;
-
-	for (i = 0; i < g_h; i++)
-		memcpy(rcv+((i+g_y)*wh+g_x),pict+(i*g_w),g_w*sizeof(SGUIPixel));
 }

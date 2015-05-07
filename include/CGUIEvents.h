@@ -24,30 +24,45 @@
 #include <ncurses.h>
 
 
-enum CGUIEventType {
+enum EGUIEventType {
 	GUIEV_NONE,
 	GUIEV_KEYPRESS,
 	GUIEV_RESIZE,
 	GUIEV_MOUSE,
+	GUIEV_CTLBACK,
 	GUIEV_COMMAND
 };
 
-enum CGUICommandType {
-	GUICT_NONE,
-	GUICT_LSTWINDOWS
+enum EGUIFeedbackType {
+	GUIFB_NONE,
+	GUIFB_SELECTED,
+	GUIFB_SWITCHED
 };
 
-struct CGUICommand {
-	CGUICommandType t;
+class CurseGUIControl;
+struct SGUICtlFeedback {
+	EGUIFeedbackType t;
+	CurseGUIControl* ctl;
+};
+
+enum EGUICommandType {
+	GUICT_NONE,
+	GUICT_GETRAM,		//TODO: not implemented
+	GUICT_LSTWINDOWS	//TODO: not implemented
+};
+
+struct SGUICommand {
+	EGUICommandType t;
 	std::string arg_str;
 	int arg_int;
 };
 
-struct CGUIEvent {
-	CGUIEventType	t;	//event type
+struct SGUIEvent { /* Use one-char names to make it simpler, keep this structure small */
+	EGUIEventType	t;	//event type
 	int 			k;	//pressed key code
 	MEVENT			m;	//mouse event data
-	CGUICommand*	c;	//pointer to command structure
+	SGUICtlFeedback b;	//feedback from UI controls
+	SGUICommand*	c;	//pointer to command structure
 };
 
 

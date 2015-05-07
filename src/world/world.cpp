@@ -20,6 +20,7 @@
 #include "world.h"
 #include "support.h"
 #include "debug.h"
+#include "CGUIControls.h"
 
 
 PlasticWorld::PlasticWorld(SGameSettings* settings)
@@ -148,10 +149,11 @@ void PlasticWorld::RemoveAllActors()
 	actors.clear();
 }
 
-void PlasticWorld::ProcessEvents(const CGUIEvent* e)
+void PlasticWorld::ProcessEvents(SGUIEvent* e)
 {
 	//DEBUG:
 	vector3d tr = test->GetRot();
+	CurseGUIButton* btn;
 
 	result = 0;
 	switch (e->t) {
@@ -217,6 +219,16 @@ void PlasticWorld::ProcessEvents(const CGUIEvent* e)
 
 	case GUIEV_MOUSE:
 		/* Nothing to do now */
+		break;
+
+	case GUIEV_CTLBACK:
+		//DEBUG:
+		if (e->b.t == GUIFB_SWITCHED) {
+			btn = (CurseGUIButton*)e->b.ctl;
+			if (btn) {
+				btn->SetCaption("OK");
+			}
+		}
 		break;
 
 	default:

@@ -37,7 +37,7 @@ void CurseGUIInventoryWnd::Update(bool refr)
 	//TODO
 }
 
-bool CurseGUIInventoryWnd::PutEvent(CGUIEvent* e)
+bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 {
 	if (will_close) return false;
 

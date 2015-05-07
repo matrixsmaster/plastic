@@ -78,7 +78,7 @@ public:
 	Player(SPAStats s, DataPipe* pptr);
 	virtual ~Player();
 
-	void ProcessEvent(const CGUIEvent* e);
+	void ProcessEvent(const SGUIEvent* e);
 };
 
 #endif /* ACTOR_H_ */

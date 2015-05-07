@@ -171,7 +171,7 @@ void CurseGUIBase::ResizeBack()
 
 CurseGUI::CurseGUI() : CurseGUIBase()
 {
-	CGUIEvent e;
+	SGUIEvent e;
 
 	/* Create curses screen */
 	wnd = initscr();
@@ -201,6 +201,7 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 	nodelay(wnd,TRUE);
 
 	/* Deal with size */
+	backmask = NULL;
 	PumpEvents(&e);
 
 	/* Ready to rock! */
@@ -382,7 +383,7 @@ void CurseGUI::Reorder(int by)
 	}
 }
 
-bool CurseGUI::PumpEvents(CGUIEvent* e)
+bool CurseGUI::PumpEvents(SGUIEvent* e)
 {
 	std::vector<CurseGUIWnd*>::iterator it;
 	std::vector<CurseGUIWnd*>::reverse_iterator rt;
@@ -395,21 +396,30 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 		return true; //to not process event furthermore
 	}
 
-	/* Get the resize event (most priority) */
-	if (UpdateSize()) {
-		e->t = GUIEV_RESIZE;
+	/* Internal events */
+	if (!eventFIFO.empty()) {
+		//pop the first element - next event in the queue
+		memcpy(e,&(eventFIFO.at(0)),sizeof(SGUIEvent));
+		eventFIFO.erase(eventFIFO.begin()); //after delete
+
 	} else {
 
-		/* Or, get the keypress event */
-		e->t = GUIEV_KEYPRESS;
-		e->k = getch(); //FIXME: use something more robust than that
-		if ((!e->k) || (e->k == ERR)) {
+		/* External events: resize event (most priority) */
+		if (UpdateSize()) {
+			e->t = GUIEV_RESIZE;
+		} else {
 
-			/* Or, get the mouse event (least priority) */
-			e->t = GUIEV_MOUSE;
-			if (getmouse(&(e->m)) == ERR) {
-				e->t = GUIEV_NONE; //reset event type to prevent loops
-				return true; //Event consumed 'cause there's no event!
+			/* Or, get the keypress event */
+			e->t = GUIEV_KEYPRESS;
+			e->k = getch(); //FIXME: use something more robust than that
+			if ((!e->k) || (e->k == ERR)) {
+
+				/* Or, get the mouse event (least priority) */
+				e->t = GUIEV_MOUSE;
+				if (getmouse(&(e->m)) == ERR) {
+					e->t = GUIEV_NONE; //reset event type to prevent loops
+					return true; //Event consumed 'cause there's no event!
+				}
 			}
 		}
 	}
@@ -473,6 +483,11 @@ bool CurseGUI::PumpEvents(CGUIEvent* e)
 
 	result = 0;
 	return consumed;
+}
+
+void CurseGUI::AddEvent(SGUIEvent* e)
+{
+	eventFIFO.push_back(*e);
 }
 
 void CurseGUI::UpdateBackmask()
@@ -573,14 +588,19 @@ void CurseGUIWnd::Resize(int w, int h)
 	UpdateSize();
 }
 
-bool CurseGUIWnd::PutEvent(CGUIEvent* e)
+bool CurseGUIWnd::PutEvent(SGUIEvent* e)
 {
 	if (will_close) return false;
 
+	/* Put the event to controls first */
+	if (ctrls->PutEvent(e)) return true;
+
+	/* Window-wide event */
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
 		switch (e->k) {
 		case GUI_DEFCLOSE: will_close = true; return true;
+		case '\t': ctrls->Rotate(); return true;
 		}
 		return false;
 
@@ -590,5 +610,7 @@ bool CurseGUIWnd::PutEvent(CGUIEvent* e)
 
 	default: break;
 	}
+
+	/* That's not our event, pass thru */
 	return false;
 }

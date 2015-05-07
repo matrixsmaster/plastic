@@ -32,7 +32,7 @@ CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn) :
 	name = "DebugUI";
 
 	//TODO: do something
-	CGUIEvent e;
+	SGUIEvent e;
 	e.t = GUIEV_RESIZE;
 	PutEvent(&e);
 }
@@ -92,7 +92,7 @@ void CurseGUIDebugWnd::Update(bool refr)
 	if (refr) wrefresh(wnd);
 }
 
-bool CurseGUIDebugWnd::PutEvent(CGUIEvent* e)
+bool CurseGUIDebugWnd::PutEvent(SGUIEvent* e)
 {
 	//DebugUI events processing
 	switch (e->t) {

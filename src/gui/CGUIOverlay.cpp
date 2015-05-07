@@ -35,7 +35,7 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, boo
 
 	name = "Overlay";
 
-	CGUIEvent e;
+	SGUIEvent e;
 	e.t = GUIEV_RESIZE;
 	PutEvent(&e);
 
@@ -57,7 +57,7 @@ void CurseGUIOverlay::Update(bool refr)
 	if (refr) wrefresh(wnd);
 }
 
-bool CurseGUIOverlay::PutEvent(CGUIEvent* e)
+bool CurseGUIOverlay::PutEvent(SGUIEvent* e)
 {
 	//OverlayUI events processing
 	switch (e->t) {

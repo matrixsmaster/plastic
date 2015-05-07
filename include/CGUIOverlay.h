@@ -63,7 +63,7 @@ public:
 	void SetBckgrMask(SGUIPixel* pxl);
 
 	void Update(bool refr);
-	bool PutEvent(CGUIEvent* e);
+	bool PutEvent(SGUIEvent* e);
 
 	void PutString(char* str);
 	void PutString(std::string str);

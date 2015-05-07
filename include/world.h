@@ -84,7 +84,7 @@ public:
 	HUD* GetHUD()							{ return hud; }
 
 	///Main events processing facility.
-	void ProcessEvents(const CGUIEvent* e);
+	void ProcessEvents(SGUIEvent* e);
 };
 
 

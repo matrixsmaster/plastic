@@ -45,7 +45,7 @@ Player::~Player()
 	delete binder;
 }
 
-void Player::ProcessEvent(const CGUIEvent* e)
+void Player::ProcessEvent(const SGUIEvent* e)
 {
 	bool rc = false; //rotation change flag
 	if (e->t != GUIEV_KEYPRESS) return;
