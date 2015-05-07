@@ -171,7 +171,7 @@ void CurseGUIBase::ResizeBack()
 
 CurseGUI::CurseGUI() : CurseGUIBase()
 {
-	CGUIEvent e;
+	SGUIEvent e;
 
 	/* Create curses screen */
 	wnd = initscr();
@@ -382,7 +382,7 @@ void CurseGUI::Reorder(int by)
 	}
 }
 
-bool CurseGUI::PumpEvents(CGUIEvent* e)
+bool CurseGUI::PumpEvents(SGUIEvent* e)
 {
 	std::vector<CurseGUIWnd*>::iterator it;
 	std::vector<CurseGUIWnd*>::reverse_iterator rt;
@@ -572,10 +572,14 @@ void CurseGUIWnd::Resize(int w, int h)
 	UpdateSize();
 }
 
-bool CurseGUIWnd::PutEvent(CGUIEvent* e)
+bool CurseGUIWnd::PutEvent(SGUIEvent* e)
 {
 	if (will_close) return false;
 
+	/* Put the event to controls first */
+	if (ctrls->PutEvent(e)) return true;
+
+	/* Window-wide event */
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
 		switch (e->k) {
@@ -589,5 +593,7 @@ bool CurseGUIWnd::PutEvent(CGUIEvent* e)
 
 	default: break;
 	}
+
+	/* That's not our event, pass thru */
 	return false;
 }

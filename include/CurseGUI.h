@@ -156,7 +156,7 @@ public:
 
 	///Push events through all windows and controls.
 	///Returns whatever event was consumed or not.
-	bool PumpEvents(CGUIEvent* e);
+	bool PumpEvents(SGUIEvent* e);
 
 	///Update background masking by opened windows.
 	void UpdateBackmask();
@@ -233,7 +233,7 @@ public:
 	virtual void Resize(int w, int h);
 
 	///Window' event processor.
-	virtual bool PutEvent(CGUIEvent* e);
+	virtual bool PutEvent(SGUIEvent* e);
 
 	///Returns window controls holder.
 	CurseGUICtrlHolder* GetControls()	{ return ctrls; }

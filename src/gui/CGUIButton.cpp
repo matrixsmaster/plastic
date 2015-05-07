@@ -17,47 +17,10 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "CGUISpecWnd.h"
+/* Implementation file of Button control class */
 
-CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
-	CurseGUIWnd(scrn,0,0,2,2)
-{
-	type = GUIWT_INVENTORY;
-	invent = iptr;
-	ResizeWnd();
-}
+#include "CGUIControls.h"
 
-CurseGUIInventoryWnd::~CurseGUIInventoryWnd()
-{
-	//TODO
-}
+using namespace std;
 
-void CurseGUIInventoryWnd::Update(bool refr)
-{
-	//TODO
-}
 
-bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
-{
-	if (will_close) return false;
-
-	switch (e->t) {
-	case GUIEV_KEYPRESS:
-		switch (e->k) {
-		case GUI_DEFCLOSE: will_close = true; return true;
-		}
-		return false;
-
-	case GUIEV_RESIZE:
-		UpdateSize();
-		return false; //don't consume resize event!
-
-	default: break;
-	}
-	return false;
-}
-
-void CurseGUIInventoryWnd::ResizeWnd()
-{
-	//TODO
-}

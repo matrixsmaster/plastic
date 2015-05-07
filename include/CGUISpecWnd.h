@@ -52,7 +52,7 @@ public:
 	void ToggleShow();
 
 	void Update(bool refr);
-	bool PutEvent(CGUIEvent* e);
+	bool PutEvent(SGUIEvent* e);
 
 	void PutString(char* str);
 	void PutString(std::string str);
@@ -72,7 +72,7 @@ public:
 	virtual ~CurseGUIInventoryWnd();
 
 	void Update(bool refr);
-	bool PutEvent(CGUIEvent* e);
+	bool PutEvent(SGUIEvent* e);
 };
 
 #endif /* INCLUDE_CGUISPECWND_H_ */

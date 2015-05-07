@@ -42,6 +42,7 @@ public:
 	void Delete(CurseGUIControl* ctl);
 
 	void Update();
+	bool PutEvent(SGUIEvent* e);
 };
 
 /* Base class for Curse GUI controls and other UI elements */
@@ -60,6 +61,8 @@ public:
 	virtual void SetBackColor(SCTriple c)	{ back = c; }
 
 	virtual void Update() = 0;
+
+	virtual bool PutEvent(SGUIEvent* e) = 0;
 
 	virtual void Delete();
 };
@@ -84,6 +87,7 @@ public:
 	void ColorFill(SCTriple col);
 
 	void Update();
+	bool PutEvent(SGUIEvent* e)				{ return false; }
 };
 
 //TODO CurseGuiTable

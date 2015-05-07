@@ -45,7 +45,7 @@ static uli				g_fps = 0;
 
 static void* plastic_eventhread(void* ptr)
 {
-	CGUIEvent my_e;
+	SGUIEvent my_e;
 
 	//projection testing:
 	vector2di curso;

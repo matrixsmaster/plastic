@@ -148,7 +148,7 @@ void PlasticWorld::RemoveAllActors()
 	actors.clear();
 }
 
-void PlasticWorld::ProcessEvents(const CGUIEvent* e)
+void PlasticWorld::ProcessEvents(const SGUIEvent* e)
 {
 	//DEBUG:
 	vector3d tr = test->GetRot();
