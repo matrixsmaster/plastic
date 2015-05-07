@@ -102,9 +102,11 @@ class CurseGUIWnd;
 class CurseGUI : public CurseGUIBase {
 private:
 	std::vector<CurseGUIWnd*> windows;	//windows holder
+	std::vector<SGUIEvent> eventFIFO;	//internal events buffer
 	char* backmask;						//background mask (used to estimate space occupied by windows)
 	mmask_t oldmouse;					//original terminal mouse driver state
 	int c_x,c_y;						//cursor position
+	SGUIEvent intevent;					//currently processing internal event
 
 	void Reorder(int by);
 
@@ -158,6 +160,10 @@ public:
 	///Returns whatever event was consumed or not.
 	bool PumpEvents(SGUIEvent* e);
 
+	///Append new event into current event queue.
+	///Pointer may be freed after this call.
+	void AddEvent(SGUIEvent* e);
+
 	///Update background masking by opened windows.
 	void UpdateBackmask();
 
@@ -195,6 +201,9 @@ protected:
 public:
 	CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h);
 	virtual ~CurseGUIWnd();
+
+	///Returns parent (main GUI instance) of the window.
+	CurseGUI* GetParent()				{ return parent; }
 
 	///Sets drawing window border on or off.
 	virtual void SetBoxed(bool b)		{ boxed = b; }

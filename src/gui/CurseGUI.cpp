@@ -201,6 +201,7 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 	nodelay(wnd,TRUE);
 
 	/* Deal with size */
+	backmask = NULL;
 	PumpEvents(&e);
 
 	/* Ready to rock! */
@@ -395,21 +396,31 @@ bool CurseGUI::PumpEvents(SGUIEvent* e)
 		return true; //to not process event furthermore
 	}
 
-	/* Get the resize event (most priority) */
-	if (UpdateSize()) {
-		e->t = GUIEV_RESIZE;
+	/* Internal events */
+	if (!eventFIFO.empty()) {
+		//pop the first element - next event in the queue
+		memcpy(e,&(eventFIFO.at(0)),sizeof(SGUIEvent));
+//		intevent = eventFIFO.at(0);			//copy to internal holder to make it accessible
+		eventFIFO.erase(eventFIFO.begin()); //after delete
+
 	} else {
 
-		/* Or, get the keypress event */
-		e->t = GUIEV_KEYPRESS;
-		e->k = getch(); //FIXME: use something more robust than that
-		if ((!e->k) || (e->k == ERR)) {
+		/* External events: resize event (most priority) */
+		if (UpdateSize()) {
+			e->t = GUIEV_RESIZE;
+		} else {
 
-			/* Or, get the mouse event (least priority) */
-			e->t = GUIEV_MOUSE;
-			if (getmouse(&(e->m)) == ERR) {
-				e->t = GUIEV_NONE; //reset event type to prevent loops
-				return true; //Event consumed 'cause there's no event!
+			/* Or, get the keypress event */
+			e->t = GUIEV_KEYPRESS;
+			e->k = getch(); //FIXME: use something more robust than that
+			if ((!e->k) || (e->k == ERR)) {
+
+				/* Or, get the mouse event (least priority) */
+				e->t = GUIEV_MOUSE;
+				if (getmouse(&(e->m)) == ERR) {
+					e->t = GUIEV_NONE; //reset event type to prevent loops
+					return true; //Event consumed 'cause there's no event!
+				}
 			}
 		}
 	}
@@ -473,6 +484,11 @@ bool CurseGUI::PumpEvents(SGUIEvent* e)
 
 	result = 0;
 	return consumed;
+}
+
+void CurseGUI::AddEvent(SGUIEvent* e)
+{
+	eventFIFO.push_back(*e);
 }
 
 void CurseGUI::UpdateBackmask()

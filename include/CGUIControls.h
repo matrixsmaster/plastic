@@ -90,6 +90,25 @@ public:
 	bool PutEvent(SGUIEvent* e)				{ return false; }
 };
 
+class CurseGUIButton : public CurseGUIControl
+{
+private:
+	SGUIPixel fmt;
+	int g_w;
+	std::string text;
+
+	void Click();
+
+public:
+	CurseGUIButton(CurseGUICtrlHolder* p, int x, int y, int w, std::string capt);
+	virtual ~CurseGUIButton()				{}
+
+	void SetCaption(std::string capt)		{ text = capt; }
+
+	void Update();
+	bool PutEvent(SGUIEvent* e);
+};
+
 //TODO CurseGuiTable
 //class CurseGUITable : public CurseGUIControl
 //{
@@ -101,14 +120,14 @@ public:
 
 /*
  * TODO:
- * CurseGUIPicture - blit picture to window backbuffer
- * CurseGUIButton - renders a simple button like [BUTTON]
- * CurseGUIEditBox - an underline (_) fillable with some text or user input.
+ * V CurseGUIPicture - blit picture to window backbuffer
+ *   CurseGUIButton - renders a simple button like [BUTTON]
+ *   CurseGUIEditBox - an underline (_) fillable with some text or user input.
  * 					Example: EditBox(6 chars):	(______)
  * 							after some input:	(Test__)
- * CurseGUICheckBox - (V) or (X) with switchable state. Use (O) for disabled.
- * CurseGUIProgrBar - basic progress bar like {#### 25%     }
- * CurseGUITable - table utilizes ncurses' line drawings. Should be possible to navigate with keys.
+ *   CurseGUICheckBox - (V) or (X) with switchable state. Use (O) for disabled.
+ *   CurseGUIProgrBar - basic progress bar like {#### 25%     }
+ *   CurseGUITable - table utilizes ncurses' line drawings. Should be possible to navigate with keys.
  * 					Ex.:	+------+-------*--+ (see curs_addch (3X) section Line graphics)
  * 							|item  |  text | 1|
  * 							+------+-------+--+
