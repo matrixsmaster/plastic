@@ -72,8 +72,22 @@ void CurseGUIBase::SetBackgroundData(SGUIPixel* ptr, int size)
 	}
 }
 
+void CurseGUIBase::FillBackgroundData(const SGUIPixel p)
+{
+	int i;
+	if ((!backgr) || (backgr_size < 1)) return;
+
+	for (i = 0; i < backgr_size; i++)
+		backgr[i] = p;
+}
+
 bool CurseGUIBase::SetAutoAlloc(bool a)
 {
+	SGUIPixel fill;
+	fill.bg.r = 0; fill.bg.g = 0; fill.bg.b = 0;
+	fill.fg.r = 1000; fill.fg.g = 1000; fill.fg.b = 1000;
+	fill.sym = ' ';
+
 	if (autoalloc) {
 		if (a) {
 			//nothing to do, exit to not destruct current data
@@ -89,7 +103,7 @@ bool CurseGUIBase::SetAutoAlloc(bool a)
 	if (a) {
 		backgr_size = g_w * g_h;
 		backgr = (SGUIPixel*)malloc(backgr_size*sizeof(SGUIPixel));
-		if (backgr) memset(backgr,0,backgr_size*sizeof(SGUIPixel));
+		if (backgr) FillBackgroundData(fill);
 		else return false;
 	}
 	return true;
@@ -137,10 +151,17 @@ void CurseGUIBase::UpdateBack()
 
 void CurseGUIBase::ResizeBack()
 {
+	SGUIPixel fill;
+	fill.bg.r = 0; fill.bg.g = 0; fill.bg.b = 0;
+	fill.fg.r = 1000; fill.fg.g = 1000; fill.fg.b = 1000;
+	fill.sym = ' ';
+
 	if (!autoalloc) return;
+
 	backgr_size = g_w * g_h;
 	backgr = (SGUIPixel*)realloc(backgr,backgr_size*sizeof(SGUIPixel));
-	if (backgr) memset(backgr,0,backgr_size*sizeof(SGUIPixel));
+
+	if (backgr) FillBackgroundData(fill);
 	else backgr_size = 0;
 }
 
@@ -530,6 +551,7 @@ void CurseGUIWnd::Update(bool refr)
 	//A template of GUI Window update process.
 	werase(wnd);				//make a room for window
 	UpdateBack();				//draw background image
+	ctrls->Update();			//update controls
 	wcolor_set(wnd,0,NULL);		//set default color pair
 	if (boxed) box(wnd,0,0);	//draw border
 	if (refr) wrefresh(wnd);	//and refresh if necessary

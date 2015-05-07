@@ -80,6 +80,8 @@ CurseGUIPicture::CurseGUIPicture(CurseGUICtrlHolder* p, int x, int y, int w, int
 {
 	pict = NULL;
 	autoalloc = false;
+	g_w = w;
+	g_h = h;
 	length = w * h * sizeof(SGUIPixel);
 }
 
@@ -90,6 +92,9 @@ CurseGUIPicture::~CurseGUIPicture()
 
 bool CurseGUIPicture::SetAutoAlloc(bool a)
 {
+	SCTriple fill;
+	fill.r = 0; fill.g = 0; fill.b = 0;
+
 	//free memory if auto-allocated
 	if (autoalloc && pict) {
 		free(pict);
@@ -104,6 +109,7 @@ bool CurseGUIPicture::SetAutoAlloc(bool a)
 			autoalloc = false;
 			return false;
 		}
+		ColorFill(fill);
 	}
 	//All operations are completed successfully
 	return true;
@@ -119,8 +125,27 @@ void CurseGUIPicture::SetPicture(SGUIPixel* p)
 
 }
 
+void CurseGUIPicture::ColorFill(SCTriple col)
+{
+	int i;
+
+	if (!pict) return;
+
+	for (i = 0; i < (g_w*g_h); i++) {
+		pict[i].bg = col;
+		pict[i].fg = col;
+		pict[i].sym = ' ';
+	}
+}
+
 void CurseGUIPicture::Update()
 {
-	if (!pict) return;
-	//TODO
+	int i,wh;
+	SGUIPixel* rcv = wnd->GetBackgroundData();
+	wh = wnd->GetWidth();
+
+	if ((!pict) || (!rcv)) return;
+
+	for (i = 0; i < g_h; i++)
+		memcpy(rcv+((i+g_y)*wh+g_x),pict+(i*g_w),g_w*sizeof(SGUIPixel));
 }

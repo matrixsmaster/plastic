@@ -55,6 +55,8 @@ static void* plastic_eventhread(void* ptr)
 	//other debug
 	CurseGUIWnd* wnd;
 	CurseGUIControl* ctl;
+	CurseGUIPicture* pct;
+	SCTriple test;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 
@@ -83,11 +85,17 @@ static void* plastic_eventhread(void* ptr)
 				//testing window
 				g_gui->MkWindow(g_gui->GetWidth()/2,g_gui->GetHeight()/2,20,10,"SomeWin");
 				wnd = g_gui->GetWindowN("SomeWin");
+				wnd->SetBoxed(false);
 				wnd->SetAutoAlloc(true);
 				ctl = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
 				break;
 			case '9':
-				ctl->Delete();
+				test.r = 1000;
+				test.g = 0;
+				test.b = 500;
+				pct = (CurseGUIPicture*)ctl;
+				pct->SetAutoAlloc(true);
+				pct->ColorFill(test);
 				break;
 			}
 		}

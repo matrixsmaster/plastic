@@ -68,6 +68,7 @@ class CurseGUIPicture : public CurseGUIControl
 {
 private:
 	SGUIPixel* pict;
+	int g_w, g_h;
 	bool autoalloc;
 	unsigned length;
 
@@ -80,6 +81,7 @@ public:
 
 	void SetPicture(SGUIPixel* p);
 	SGUIPixel* GetPicture()					{ return pict; }
+	void ColorFill(SCTriple col);
 
 	void Update();
 };

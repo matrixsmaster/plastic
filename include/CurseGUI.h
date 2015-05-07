@@ -78,6 +78,9 @@ public:
 	///Returns pointer to background data buffer.
 	SGUIPixel* GetBackgroundData()		{ return backgr; }
 
+	///Fills the background with the pixel provided.
+	void FillBackgroundData(const SGUIPixel p);
+
 	//TODO:write comments
 	bool SetAutoAlloc(bool a);
 	bool GetAutoAlloc()					{ return autoalloc; }
