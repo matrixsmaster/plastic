@@ -154,6 +154,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	//DEBUG:
 	vector3d tr = test->GetRot();
 	CurseGUIButton* btn;
+	CurseGUIEditBox* edb;
 
 	result = 0;
 	switch (e->t) {
@@ -223,10 +224,17 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 	case GUIEV_CTLBACK:
 		//DEBUG:
-		if (e->b.t == GUIFB_SWITCHED) {
+		switch (e->b.t) {
+		case GUIFB_SWITCHED:
 			btn = (CurseGUIButton*)e->b.ctl;
 			if (btn) {
 				btn->SetCaption("OK");
+			}
+			break;
+		case GUIFB_EDITOK:
+			edb = (CurseGUIEditBox*)e->b.ctl;
+			if (edb) {
+				edb->SetText(edb->GetText()+"!");
 			}
 		}
 		break;

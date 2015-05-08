@@ -64,11 +64,10 @@ void CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 	int x = c*(w-1);
 	int y = r*(h-1);
 
-	//Calculate height cell
-//	g_hght = data.size()/g_wdth;
-
 
 	string str = tbl.at(c).at(r);
+	//Calculate height cell
+	//	g_hght = strsize()/g_wdth;
 
 	//Draw table like a deer
 	for(int i = y; i < y+h; ++i) {

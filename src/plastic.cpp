@@ -57,6 +57,9 @@ static void* plastic_eventhread(void* ptr)
 //	CurseGUIControl* ctl;
 	CurseGUIPicture* pct;
 	CurseGUIButton* btn;
+	CurseGUIEditBox* edb;
+	CurseGUICheckBox* chk;
+	CurseGUIProgrBar* prb;
 	CurseGUITable* tbl;
 	SCTriple test;
 
@@ -88,22 +91,32 @@ static void* plastic_eventhread(void* ptr)
 			case KEY_F(1): g_gui->MkWindow(curso.X,curso.Y,10,5,"Test"); break;
 			case '0':
 				//testing window
-				wnd = g_gui->MkWindow(curso.X,curso.Y,20,10,"SomeWin");
+				wnd = g_gui->MkWindow(curso.X,curso.Y,35,10,"SomeWin");
 //				wnd = g_gui->GetWindowN("SomeWin");
 				g_gui->SetFocus(wnd);
-				wnd->SetBoxed(false);
+//				wnd->SetBoxed(false);
 				wnd->SetAutoAlloc(true);
 				pct = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
+				pct->SetAutoAlloc(true);
 				btn = new CurseGUIButton(wnd->GetControls(),2,7,10,"Test 1");
-				btn = new CurseGUIButton(wnd->GetControls(),2,8,10,"Test 2");
+
+				btn = new CurseGUIButton(wnd->GetControls(),12,2,10,"Test 2");
+				edb = new CurseGUIEditBox(wnd->GetControls(),12,3,10,"");
+				chk = new CurseGUICheckBox(wnd->GetControls(),12,5,10,"Test A HIDDEN");
+				chk = new CurseGUICheckBox(wnd->GetControls(),12,6,10,"Test B");
+//				chk->SetChecked(true);
+				chk->SetDisabled(true);
+				prb = new CurseGUIProgrBar(wnd->GetControls(),12,8,16,0,100);
+				prb->SetShowPercent(true);
 				tbl = new CurseGUITable(wnd->GetControls(), 0, 0, 7, 2, 2, 7);
+
 				break;
 			case '9':
 				test.r = 1000;
 				test.g = 0;
 				test.b = 500;
-				pct->SetAutoAlloc(true);
 				pct->ColorFill(test);
+				prb->Step();
 				break;
 			case '8':
 				tbl->SetData("item", 0, 0);

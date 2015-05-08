@@ -93,6 +93,14 @@ void CurseGUICtrlHolder::Rotate()
 		if ((*it)->Select(true)) return;
 }
 
+void CurseGUICtrlHolder::Select(CurseGUIControl* ctl)
+{
+	vector<CurseGUIControl*>::iterator it;
+
+	for (it = controls.begin(); it != controls.end(); ++it)
+		(*it)->Select(((*it) == ctl));
+}
+
 /* ******************************************************************** */
 
 CurseGUIControl::CurseGUIControl(CurseGUICtrlHolder* p, int x, int y)

@@ -36,14 +36,26 @@ public:
 	CurseGUICtrlHolder(CurseGUIWnd* parent)	{ owner = parent; }
 	virtual ~CurseGUICtrlHolder();
 
+	///Returns a pointer to a window owning this controls holder.
 	CurseGUIWnd* GetWindow()				{ return owner; }
 
+	///Appends control to holder.
 	void Append(CurseGUIControl* ctl);
+
+	///Removes control from holder and destroys it.
 	void Delete(CurseGUIControl* ctl);
 
+	///Updates visual representation of all controls in this holder.
 	void Update();
+
+	///Pumps event through all controls.
 	bool PutEvent(SGUIEvent* e);
+
+	///Rotates selection through all controls in holder.
 	void Rotate();
+
+	///Selects particular control, deselects others.
+	void Select(CurseGUIControl* ctl);
 };
 
 /* ******************************************************************** */
@@ -66,7 +78,14 @@ public:
 	///Don't call destructor directly in the code outside of CurseGUI!
 	virtual ~CurseGUIControl()				{}
 
-	//TODO: SetFormat
+	///Set visible format (color pair) of control element.
+	virtual void SetFormat(SGUIPixel f)		{ fmt = f; }
+
+	///Returns current format.
+	SGUIPixel GetFormat()					{ return fmt; }
+
+	///Fills in format info to given address.
+	void GetFormat(SGUIPixel* p)			{ if (p) *p = fmt; }
 
 	///Method will return true if the control can be slected.
 	virtual bool Select(bool s)				{ selected = s; return true; }
@@ -141,9 +160,65 @@ public:
 	virtual ~CurseGUIEditBox()				{}
 
 	void SetText(std::string txt)			{ text = txt; }
+	std::string GetText()					{ return text; }
 
 	void Update();
 	bool PutEvent(SGUIEvent* e);
+};
+
+/* ******************************************************************** */
+
+class CurseGUICheckBox : public CurseGUIControl
+{
+private:
+	bool checked,disabled;
+
+	void Check();
+
+public:
+	CurseGUICheckBox(CurseGUICtrlHolder* p, int x, int y, int w, std::string capt);
+	virtual ~CurseGUICheckBox()				{}
+
+	void SetCaption(std::string capt)		{ text = capt; }
+	void SetChecked(bool c)					{ checked = c; }
+	bool GetChecked()						{ return checked; }
+	void SetDisabled(bool d)				{ disabled = d; }
+	bool GetDisabled()						{ return disabled; }
+
+	bool Select(bool s);
+
+	void Update();
+	bool PutEvent(SGUIEvent* e);
+};
+
+/* ******************************************************************** */
+
+class CurseGUIProgrBar : public CurseGUIControl
+{
+private:
+	int g_min, g_max;
+	int step, pos;
+	bool showprc;			//show percent as text
+	SGUIPixel foregr;		//foreground colors template
+
+public:
+	CurseGUIProgrBar(CurseGUICtrlHolder* p, int x, int y, int w, int min, int max);
+	virtual ~CurseGUIProgrBar()				{}
+
+	void SetNumSteps(int n);
+	void Step();
+
+	void SetForegrFormat(SGUIPixel f)		{ foregr = f; }
+
+	void SetShowPercent(bool s)				{ showprc = s; }
+	bool GetShowPercent()					{ return showprc; }
+
+	//Progress bar is a static element, cannot be selected.
+	bool Select(bool s)						{ return false; }
+	bool IsSelected()						{ return false; }
+
+	void Update();
+	bool PutEvent(SGUIEvent* e)				{ return false; }
 };
 
 /* ******************************************************************** */
@@ -189,11 +264,11 @@ public:
  * TODO:
  * V CurseGUIPicture - blit picture to window backbuffer
  * V CurseGUIButton - renders a simple button like [BUTTON]
- *   CurseGUIEditBox - an underline (_) fillable with some text or user input.
+ * V CurseGUIEditBox - an underline (_) fillable with some text or user input.
  * 					Example: EditBox(6 chars):	(______)
  * 							after some input:	(Test__)
- *   CurseGUICheckBox - (V) or (X) with switchable state. Use (O) for disabled.
- *   CurseGUIProgrBar - basic progress bar like {#### 25%     }
+ * V CurseGUICheckBox - (V) or (X) with switchable state. Use (O) for disabled.
+ * V CurseGUIProgrBar - basic progress bar like {#### 25%     }
  *   CurseGUITable - table utilizes ncurses' line drawings. Should be possible to navigate with keys.
  * 					Ex.:	+------+-------*--+ (see curs_addch (3X) section Line graphics)
  * 							|item  |  text | 1|
