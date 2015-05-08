@@ -43,7 +43,9 @@ public:
 
 	void Update();
 	bool PutEvent(SGUIEvent* e);
+
 	void Rotate();
+	void Select(CurseGUIControl* ctl);
 };
 
 /* ******************************************************************** */
@@ -141,6 +143,7 @@ public:
 	virtual ~CurseGUIEditBox()				{}
 
 	void SetText(std::string txt)			{ text = txt; }
+	std::string GetText()					{ return text; }
 
 	void Update();
 	bool PutEvent(SGUIEvent* e);
@@ -161,7 +164,7 @@ public:
  * TODO:
  * V CurseGUIPicture - blit picture to window backbuffer
  * V CurseGUIButton - renders a simple button like [BUTTON]
- *   CurseGUIEditBox - an underline (_) fillable with some text or user input.
+ * V CurseGUIEditBox - an underline (_) fillable with some text or user input.
  * 					Example: EditBox(6 chars):	(______)
  * 							after some input:	(Test__)
  *   CurseGUICheckBox - (V) or (X) with switchable state. Use (O) for disabled.

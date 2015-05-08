@@ -22,3 +22,89 @@
 #include "CGUIControls.h"
 
 using namespace std;
+
+
+CurseGUIEditBox::CurseGUIEditBox(CurseGUICtrlHolder* p, int x, int y, int w, std::string txt) :
+		CurseGUIControl(p,x,y)
+{
+	g_w = w;
+	text = txt;
+}
+
+void CurseGUIEditBox::Enter()
+{
+	SGUIEvent ne;
+
+	ne.t = GUIEV_CTLBACK;
+	ne.b.t = GUIFB_EDITOK;
+	ne.b.ctl = this;
+	ne.b.wnd = holder->GetWindow();
+	ne.b.wnd->GetParent()->AddEvent(&ne);
+}
+
+void CurseGUIEditBox::Update()
+{
+	int r;
+	string capt;
+	WINDOW* wd = wnd->GetWindow();
+
+	capt.reserve(g_w+2);
+
+	r = g_w - 2 - (int)text.size();
+
+	capt = "(" + text.substr(0,g_w-2);
+	while (r-- > 0) capt += '_';
+	capt += ')';
+
+	wcolor_set(wd,wnd->GetColorManager()->CheckPair(&fmt),NULL);
+	if (selected) wattrset(wd,A_BOLD);
+	mvwaddnstr(wd,g_y,g_x,capt.c_str(),g_w);
+	if (selected) wattrset(wd,A_NORMAL);
+}
+
+bool CurseGUIEditBox::PutEvent(SGUIEvent* e)
+{
+	int x,y;
+
+	switch (e->t) {
+	case GUIEV_KEYPRESS:
+		if (!selected) return false;
+
+		//Process key on selected button
+		switch (e->k) {
+		case 10:
+		case 13:
+		case KEY_ENTER: /*input confirmation*/
+			Enter();
+			return true;
+
+		case 127:
+		case KEY_BACKSPACE:
+			if (!text.empty()) text.erase(text.end()-1);
+			return true;
+
+		default:
+			if (!isprint(e->k)) return false;
+			text += e->k;
+			return true;
+		}
+		break;
+
+	case GUIEV_MOUSE:
+		//Check co-ords is in range
+		x = e->m.x - wnd->GetPosX() - g_x;
+		y = e->m.y - wnd->GetPosY() - g_y;
+		if ((x < 0) || (x >= g_w)) return false;
+		if ((y < 0) || (y >= 1)) return false;
+
+		//Do some action with button
+		if (e->m.bstate & BUTTON1_CLICKED) {
+			holder->Select(this);
+			return true;
+		}
+		break;
+
+	default: break;
+	}
+	return false;
+}

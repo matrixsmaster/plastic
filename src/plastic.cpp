@@ -57,6 +57,7 @@ static void* plastic_eventhread(void* ptr)
 //	CurseGUIControl* ctl;
 	CurseGUIPicture* pct;
 	CurseGUIButton* btn;
+	CurseGUIEditBox* edb;
 	SCTriple test;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
@@ -87,14 +88,15 @@ static void* plastic_eventhread(void* ptr)
 			case KEY_F(1): g_gui->MkWindow(curso.X,curso.Y,10,5,"Test"); break;
 			case '0':
 				//testing window
-				wnd = g_gui->MkWindow(curso.X,curso.Y,20,10,"SomeWin");
+				wnd = g_gui->MkWindow(curso.X,curso.Y,35,10,"SomeWin");
 //				wnd = g_gui->GetWindowN("SomeWin");
 				g_gui->SetFocus(wnd);
-				wnd->SetBoxed(false);
+//				wnd->SetBoxed(false);
 				wnd->SetAutoAlloc(true);
 				pct = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
 				btn = new CurseGUIButton(wnd->GetControls(),2,7,10,"Test 1");
-				btn = new CurseGUIButton(wnd->GetControls(),2,8,10,"Test 2");
+				btn = new CurseGUIButton(wnd->GetControls(),12,2,10,"Test 2");
+				edb = new CurseGUIEditBox(wnd->GetControls(),12,3,10,"");
 				break;
 			case '9':
 				test.r = 1000;
