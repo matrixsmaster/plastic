@@ -118,6 +118,9 @@ static void* plastic_eventhread(void* ptr)
 				pct->ColorFill(test);
 				prb->Step();
 				break;
+			case '7':
+				tbl->Show(true);
+				break;
 			case '8':
 				tbl->SetData("item", 0, 0);
 				break;

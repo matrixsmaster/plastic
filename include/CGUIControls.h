@@ -234,6 +234,7 @@ private:
 	int auto_height;
 	int g_wdth;
 	int g_hght;
+	bool show;
 
 	void DrawCell(WINDOW* wd, int x, int y);
 
@@ -247,6 +248,7 @@ public:
 
 	void Update();
 	bool PutEvent(SGUIEvent* e);
+	void Show(bool s) 				{ show = s; }
 };
 
 /* ******************************************************************** */

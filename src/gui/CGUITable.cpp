@@ -35,6 +35,7 @@ CurseGUITable::CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int w, int row
 	auto_height = 1;
 	g_wdth = wdth;
 	g_hght = 1;
+	show = false;
 
 	//temporarily? like a deer? )
 	tbl.resize(g_col);
@@ -63,7 +64,6 @@ void CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 	int h = g_hght + 2;
 	int x = c*(w-1);
 	int y = r*(h-1);
-
 
 	string str = tbl.at(c).at(r);
 	//Calculate height cell
@@ -100,6 +100,8 @@ void CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 void CurseGUITable::Update()
 {
 	WINDOW* wd = wnd->GetWindow();
+
+	if(!show) return;
 
 	//draw rows and columns
 	for(int i = 0; i < g_rows; ++i) {
