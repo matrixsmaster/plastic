@@ -47,8 +47,10 @@ DataPipe::DataPipe(const SGameSettings* sets)
 	/* Create and init the world generator */
 	wgen = new WorldGen(sets->world_r);
 	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
-	if (!wgen->LoadMap(tmp))
-		wgen->NewMap(rand());
+	if (!wgen->LoadMap(tmp)) {
+		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
+		wgen->SaveMap(tmp);
+	}
 
 	/* Allocate voxel info table */
 	sz = DEFVOXTYPES * sizeof(SVoxelInf);
@@ -106,13 +108,9 @@ bool DataPipe::ScanFiles()
 
 bool DataPipe::FindChunk(vector3dulli pos, SDataPlacement* res)
 {
-	std::vector<SDataPlacement>::iterator it;
 	if (!res) return false;
 
 	//TODO
-	for (it = placetab.begin(); it != placetab.end(); ++it) {
-//		if ((*it)->)
-	}
 
 	return false; //FIXME
 }
@@ -209,7 +207,7 @@ bool DataPipe::Move(EGMoveDir dir)
 voxel DataPipe::GetVoxel(const vector3di* p)
 {
 	PChunk ch;
-	std::vector<VModel*>::iterator mi;
+	VModVec::iterator mi;
 	voxel tmp;
 
 	if (status != DPIPE_IDLE) return 0;
@@ -311,7 +309,7 @@ VModel* DataPipe::LoadModel(const char* fname, const vector3di pos)
 
 bool DataPipe::UnloadModel(const VModel* ptr)
 {
-	std::vector<VModel*>::iterator it;
+	VModVec::iterator it;
 	if (!ptr) return false;
 
 	for (it = objs.begin(); it != objs.end(); ++it)
@@ -329,7 +327,7 @@ bool DataPipe::UnloadModel(const VModel* ptr)
 
 void DataPipe::PurgeModels()
 {
-	std::vector<VModel*>::iterator mi;
+	VModVec::iterator mi;
 
 	Lock();
 	for (mi = objs.begin(); mi != objs.end(); ++mi) {

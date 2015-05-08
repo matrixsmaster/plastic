@@ -54,24 +54,28 @@ struct SDataPlacement {
 	long offset;
 };
 
+//Some shortcuts for long-named types
 typedef std::map<std::string,std::string> IniData;
+typedef std::map<std::string,IniData> IniMap;
+typedef std::vector<VModel*> VModVec;
+typedef std::map<vector3dulli,SDataPlacement> PlaceMap;
 
 
 class DataPipe {
 private:
-	PChunk chunks[HOLDCHUNKS];				//world chunk buffers
+	PChunk chunks[HOLDCHUNKS];		//world chunk buffers
 	EDPipeStatus status;
 	pthread_mutex_t vmutex;
-	ulli allocated;							//amount of allocated RAM
-	vector3dulli gp;						//global position of central chunk
-	char root[MAXPATHLEN];					//root path
-	std::vector<SDataPlacement> placetab;	//chunk displacement table
-	WorldGen* wgen;							//world generator instance
-	SVoxelInf* voxeltab;					//voxel types table
-	int voxtablen;							//...its length
-	std::map<std::string,IniData> ini;		//map of known (and loaded) ini files
-	std::vector<VModel*> objs;				//objects in scene
-	ulli rammax;							//max amount of memory allowed to be allocated
+	ulli allocated;					//amount of allocated RAM
+	vector3dulli gp;				//global position of central chunk
+	char root[MAXPATHLEN];			//root path
+	PlaceMap placetab;				//chunk displacement map
+	WorldGen* wgen;					//world generator instance
+	SVoxelInf* voxeltab;			//voxel types table
+	int voxtablen;					//...its length
+	IniMap ini;						//map of known (and loaded) ini files
+	VModVec objs;					//objects in scene
+	ulli rammax;					//max amount of memory allowed to be allocated
 
 	bool ScanFiles();
 	bool FindChunk(vector3dulli pos, SDataPlacement* res);

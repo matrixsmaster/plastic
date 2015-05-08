@@ -27,7 +27,7 @@
 
 class WorldGen {
 private:
-	//TODO
+	PRNGen* rng;
 
 public:
 	WorldGen(uli radius);
@@ -35,7 +35,7 @@ public:
 
 	bool LoadMap(const char* fname);
 	void SaveMap(const char* fname);
-	void NewMap(int seed);
+	void NewMap(long seed);
 
 	void GenerateChunk(PChunk buf);
 };

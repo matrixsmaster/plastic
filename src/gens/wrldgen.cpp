@@ -24,11 +24,12 @@
 
 WorldGen::WorldGen(uli radius)
 {
-	//TODO: RLCG init
+	rng = new PRNGen(true);
 }
 
 WorldGen::~WorldGen()
 {
+	delete rng;
 }
 
 void WorldGen::GenerateChunk(PChunk buf)
@@ -44,6 +45,7 @@ void WorldGen::GenerateChunk(PChunk buf)
 //					t = (rand() & 3) + 1;
 					t = (((y % 2)? x:(x+1)) % 2) + 1 + (z % 2);
 					v = (voxel)t;
+					if (rand() < RAND_MAX / 10) v = 0;
 				} else v = 0;
 				if ((x > 108) && (x < 148) && (y > 108) && (y < 148) && (z > 126) && (z < 135)) v = 4;
 				(*buf)[z][y][x] = v;
@@ -72,7 +74,8 @@ void WorldGen::SaveMap(const char* fname)
 	//TODO
 }
 
-void WorldGen::NewMap(int seed)
+void WorldGen::NewMap(long seed)
 {
+	rng->SetSeed(seed);
 	//TODO
 }

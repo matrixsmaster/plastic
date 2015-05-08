@@ -17,4 +17,56 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <time.h>
 #include "prngen.h"
+
+
+PRNGen::PRNGen(bool time_seed)
+{
+	if (time_seed) TimeSeed();
+}
+
+void PRNGen::SetSeed(long new_seed)
+{
+	m_seed = new_seed ^ PRNG_X;
+}
+
+long PRNGen::TimeSeed()
+{
+	time_t t;
+	time(&t);
+	long tt = (long)t;
+	SetSeed(tt);
+	return tt;
+}
+
+int PRNGen::NextNumber()
+{
+	m_seed = ( PRNG_A * m_seed + PRNG_C ) % PRNG_M;
+	return m_seed;
+}
+
+int PRNGen::RangedNumber(int Max)
+{
+	float a;
+	int p = 1;
+	int tmp = Max;
+	if (Max < 1) return 0;
+	do {
+		tmp /= 10;
+		p *= 10;
+	} while (tmp >= 1.0);
+	do {
+		a = FloatNum();
+		a *= p;
+		tmp = static_cast<int> (a);
+	} while (tmp >= Max);
+	return tmp;
+}
+
+float PRNGen::FloatNum()
+{
+	int v = NextNumber();
+	v &= 0x7FFFFFF;
+	return float(v) / float(0x8000000);
+}
