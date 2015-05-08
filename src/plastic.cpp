@@ -57,6 +57,7 @@ static void* plastic_eventhread(void* ptr)
 //	CurseGUIControl* ctl;
 	CurseGUIPicture* pct;
 	CurseGUIButton* btn;
+	CurseGUITable* tbl;
 	SCTriple test;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
@@ -95,6 +96,7 @@ static void* plastic_eventhread(void* ptr)
 				pct = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
 				btn = new CurseGUIButton(wnd->GetControls(),2,7,10,"Test 1");
 				btn = new CurseGUIButton(wnd->GetControls(),2,8,10,"Test 2");
+				tbl = new CurseGUITable(wnd->GetControls(), 0, 0, 7, 2, 2, 7);
 				break;
 			case '9':
 				test.r = 1000;
@@ -102,6 +104,9 @@ static void* plastic_eventhread(void* ptr)
 				test.b = 500;
 				pct->SetAutoAlloc(true);
 				pct->ColorFill(test);
+				break;
+			case '8':
+				tbl->SetData("item", 0, 0);
 				break;
 			}
 			break;
