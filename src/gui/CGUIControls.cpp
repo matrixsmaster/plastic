@@ -100,10 +100,16 @@ CurseGUIControl::CurseGUIControl(CurseGUICtrlHolder* p, int x, int y)
 	holder = p;
 	g_x = x;
 	g_y = y;
-	back.r = 0;
-	back.g = 0;
-	back.b = 0;
+	g_w = 0;
+	g_h = 0;
+
+	//default white on black color format
+	fmt.bg.r = 0; fmt.bg.g = 0; fmt.bg.b = 0;
+	fmt.fg.r = 1000; fmt.fg.g = 1000; fmt.fg.b = 1000;
+	fmt.sym = ' ';
+
 	selected = false;
+
 	wnd = p->GetWindow();
 	p->Append(this);
 }

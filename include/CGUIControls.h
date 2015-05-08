@@ -54,9 +54,10 @@ class CurseGUIControl
 protected:
 	CurseGUICtrlHolder* holder;
 	CurseGUIWnd* wnd;
-	int g_x, g_y;
-	SCTriple back;
+	int g_x, g_y, g_w, g_h;
+	SGUIPixel fmt;
 	bool selected;
+	std::string text;
 
 public:
 	///Control constructor will automatically register control in controls holder.
@@ -65,8 +66,7 @@ public:
 	///Don't call destructor directly in the code outside of CurseGUI!
 	virtual ~CurseGUIControl()				{}
 
-	//FIXME: are we need it?!
-	virtual void SetBackColor(SCTriple c)	{ back = c; }
+	//TODO: SetFormat
 
 	///Method will return true if the control can be slected.
 	virtual bool Select(bool s)				{ selected = s; return true; }
@@ -90,7 +90,6 @@ class CurseGUIPicture : public CurseGUIControl
 {
 private:
 	SGUIPixel* pict;
-	int g_w, g_h;
 	bool autoalloc;
 	unsigned length;
 
@@ -118,10 +117,6 @@ public:
 class CurseGUIButton : public CurseGUIControl
 {
 private:
-	SGUIPixel fmt;
-	int g_w;
-	std::string text;
-
 	void Click();
 
 public:
@@ -129,6 +124,23 @@ public:
 	virtual ~CurseGUIButton()				{}
 
 	void SetCaption(std::string capt)		{ text = capt; }
+
+	void Update();
+	bool PutEvent(SGUIEvent* e);
+};
+
+/* ******************************************************************** */
+
+class CurseGUIEditBox : public CurseGUIControl
+{
+private:
+	void Enter();
+
+public:
+	CurseGUIEditBox(CurseGUICtrlHolder* p, int x, int y, int w, std::string txt);
+	virtual ~CurseGUIEditBox()				{}
+
+	void SetText(std::string txt)			{ text = txt; }
 
 	void Update();
 	bool PutEvent(SGUIEvent* e);

@@ -29,11 +29,6 @@ CurseGUIButton::CurseGUIButton(CurseGUICtrlHolder* p, int x, int y, int w, std::
 {
 	text = capt;
 	g_w = w;
-
-	//default white on black color format
-	fmt.bg.r = 0; fmt.bg.g = 0; fmt.bg.b = 0;
-	fmt.fg.r = 1000; fmt.fg.g = 1000; fmt.fg.b = 1000;
-	fmt.sym = ' ';
 }
 
 void CurseGUIButton::Update()
@@ -70,7 +65,8 @@ void CurseGUIButton::Click()
 	ne.t = GUIEV_CTLBACK;
 	ne.b.t = GUIFB_SWITCHED;
 	ne.b.ctl = this;
-	holder->GetWindow()->GetParent()->AddEvent(&ne);
+	ne.b.wnd = holder->GetWindow();
+	ne.b.wnd->GetParent()->AddEvent(&ne);
 }
 
 bool CurseGUIButton::PutEvent(SGUIEvent* e)

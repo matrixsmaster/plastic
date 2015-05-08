@@ -25,28 +25,33 @@
 
 
 enum EGUIEventType {
-	GUIEV_NONE,
-	GUIEV_KEYPRESS,
-	GUIEV_RESIZE,
-	GUIEV_MOUSE,
-	GUIEV_CTLBACK,
-	GUIEV_COMMAND
+	GUIEV_NONE,			//Nothing or error
+	GUIEV_KEYPRESS,		//Simple keyboard event
+	GUIEV_RESIZE,		//Terminal window resized
+	GUIEV_MOUSE,		//Mouse event
+	GUIEV_CTLBACK,		//GUI Controls feedback
+	GUIEV_COMMAND		//Command pipe event
 };
 
 enum EGUIFeedbackType {
-	GUIFB_NONE,
-	GUIFB_SELECTED,
-	GUIFB_SWITCHED
+	GUIFB_NONE,			//Nothing or error
+	GUIFB_SELECTED,		//Control selected (remove this?)
+	GUIFB_SWITCHED,		//Button switched
+	GUIFB_CHECKON,		//CheckBox checked
+	GUIFB_CHECKOFF,		//CheckBox cleared
+	GUIFB_EDITOK		//EditBox Enter key hit
 };
 
+class CurseGUIWnd;
 class CurseGUIControl;
 struct SGUICtlFeedback {
-	EGUIFeedbackType t;
-	CurseGUIControl* ctl;
+	EGUIFeedbackType t;		//feedback type
+	CurseGUIWnd* 	 wnd;	//owner of the control element
+	CurseGUIControl* ctl;	//control element, which generated this event
 };
 
 enum EGUICommandType {
-	GUICT_NONE,
+	GUICT_NONE,			//Nothing or error
 	GUICT_GETRAM,		//TODO: not implemented
 	GUICT_LSTWINDOWS	//TODO: not implemented
 };

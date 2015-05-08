@@ -508,8 +508,8 @@ void CurseGUI::UpdateBackmask()
 		//Deal with special cases
 		switch ((*it)->GetType()) {
 		case GUIWT_OVERLAY:
-//			ovrl = reinterpret_cast<CurseGUIOverlay*> (*it);
-//			if (ovrl->GetTransparent()) skip = true; //skip transparent overlays
+			ovrl = reinterpret_cast<CurseGUIOverlay*> (*it);
+			if (ovrl->GetTransparent()) skip = true; //skip transparent overlays
 			skip = true;
 			break;
 
