@@ -223,6 +223,36 @@ public:
 
 /* ******************************************************************** */
 
+class CurseGUITable : public CurseGUIControl
+{
+private:
+	std::vector<std::vector<std::string> > tbl;
+
+	bool showt;
+	int g_col;
+	int g_rows;
+	int auto_height;
+	int g_wdth;
+	int g_hght;
+	bool show;
+
+	void DrawCell(WINDOW* wd, int x, int y);
+
+public:
+	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int w, int col, int rows, int wdth);
+	virtual ~CurseGUITable()	{}
+
+
+	void SetData(std::string data, int r, int c);
+	void SetWidth(int width);
+
+	void Update();
+	bool PutEvent(SGUIEvent* e);
+	void Show(bool s) 				{ show = s; }
+};
+
+/* ******************************************************************** */
+
 //TODO CurseGuiTable
 //class CurseGUITable : public CurseGUIControl
 //{

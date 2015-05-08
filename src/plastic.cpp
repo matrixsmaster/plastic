@@ -60,6 +60,7 @@ static void* plastic_eventhread(void* ptr)
 	CurseGUIEditBox* edb;
 	CurseGUICheckBox* chk;
 	CurseGUIProgrBar* prb;
+	CurseGUITable* tbl;
 	SCTriple test;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
@@ -98,6 +99,7 @@ static void* plastic_eventhread(void* ptr)
 				pct = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
 				pct->SetAutoAlloc(true);
 				btn = new CurseGUIButton(wnd->GetControls(),2,7,10,"Test 1");
+
 				btn = new CurseGUIButton(wnd->GetControls(),12,2,10,"Test 2");
 				edb = new CurseGUIEditBox(wnd->GetControls(),12,3,10,"");
 				chk = new CurseGUICheckBox(wnd->GetControls(),12,5,10,"Test A HIDDEN");
@@ -106,6 +108,8 @@ static void* plastic_eventhread(void* ptr)
 				chk->SetDisabled(true);
 				prb = new CurseGUIProgrBar(wnd->GetControls(),12,8,16,0,100);
 				prb->SetShowPercent(true);
+				tbl = new CurseGUITable(wnd->GetControls(), 0, 0, 7, 2, 2, 7);
+
 				break;
 			case '9':
 				test.r = 1000;
@@ -113,6 +117,12 @@ static void* plastic_eventhread(void* ptr)
 				test.b = 500;
 				pct->ColorFill(test);
 				prb->Step();
+				break;
+			case '7':
+				tbl->Show(true);
+				break;
+			case '8':
+				tbl->SetData("item", 0, 0);
 				break;
 			}
 			break;
