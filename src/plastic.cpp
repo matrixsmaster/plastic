@@ -169,6 +169,8 @@ static void plastic_start()
 {
 	int r;
 
+	printf("Starting...\n\n");
+
 	/* Create a world! */
 	g_wrld = new PlasticWorld(&g_set);
 	r = g_wrld->GetLastResult();
@@ -224,6 +226,8 @@ static void plastic_cleanup()
 	/* Destroy all main classes instances */
 	if (g_wrld) delete g_wrld;
 	if (g_gui) delete g_gui;
+
+	printf("\nCleanup complete.\n");
 }
 
 /* *********************************************************** */
@@ -255,6 +259,6 @@ int main(int argc, char* argv[])
 	/* Free resources. */
 	plastic_cleanup();
 
-	printf("\n\n\nGood exit.\n");
+	printf("\n\nGood exit.\n");
 	return 0;
 }

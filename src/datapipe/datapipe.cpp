@@ -51,6 +51,7 @@ DataPipe::DataPipe(const SGameSettings* sets)
 		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
 		wgen->SaveMap(tmp);
 	}
+	allocated += wgen->GetAllocatedRAM();
 
 	/* Allocate voxel info table */
 	sz = DEFVOXTYPES * sizeof(SVoxelInf);

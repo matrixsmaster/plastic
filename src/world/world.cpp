@@ -46,7 +46,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	}
 	alloc_gb = (float)(data->GetAllocatedRAM()) / 1024.f / 1024.f / 1024.f;
 	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
-	printf("Allocated data pipe memory: %llu bytes (%.3f GiB)\n",data->GetAllocatedRAM(),alloc_gb);
+	printf("Core allocated memory: %llu bytes (%.3f GiB)\n",data->GetAllocatedRAM(),alloc_gb);
 
 	/* Create LVR */
 	lvr = new LVR(data);

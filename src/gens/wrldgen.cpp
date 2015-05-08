@@ -19,17 +19,36 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <math.h>
 #include "wrldgen.h"
 
 
-WorldGen::WorldGen(uli radius)
+WorldGen::WorldGen(uli r)
 {
+	ulli l;
+
+	radius = r;
 	rng = new PRNGen(true);
+	allocated = 0;
+	org_seed = 0;
+
+	wrldsz.X = (int)ceil(2.f * M_PI * radius);
+	wrldsz.Y = wrldsz.X;
+	wrldsz.Z = (int)radius;
+	plane = wrldsz.X * wrldsz.Y;
+
+	//allocate map memory
+	l = plane * sizeof(SWGCell);
+	map = (SWGCell*)malloc(l);
+	memset(map,0,l);
+	if (map) allocated = l;
 }
 
 WorldGen::~WorldGen()
 {
 	delete rng;
+	if (map) free(map);
 }
 
 void WorldGen::GenerateChunk(PChunk buf)
@@ -58,7 +77,7 @@ bool WorldGen::LoadMap(const char* fname)
 {
 	FILE* mf;
 
-	if (!fname) return false;
+	if ((!fname) || (!map)) return false;
 
 	mf = fopen(fname,"rb");
 	if (!mf) return false;
@@ -71,11 +90,81 @@ bool WorldGen::LoadMap(const char* fname)
 
 void WorldGen::SaveMap(const char* fname)
 {
+	char txtname[MAXPATHLEN];
+	FILE* mf,*mt;
+	int i,j,k;
+	SWGCell* ptr;
+
+	if ((!fname) || (!map)) return;
+
+	snprintf(txtname,MAXPATHLEN,"%s.txt",fname);
+	mt = fopen(txtname,"w");
+	if (!mt) return;
+
+	fprintf(mt,"World radius = %lu\n",radius);
+	fprintf(mt,"World size = [%d, %d, %d]\n",wrldsz.X,wrldsz.Y,wrldsz.Z);
+	fprintf(mt,"World map seed = %ld\n",org_seed);
+
+	fputc('\n',mt);
+	for (i = 0, ptr = map; i < wrldsz.Y; i++) {
+		for (j = 0; j < wrldsz.X; j++, ptr++) {
+			for (k = 0; k < WGNUMKINDS; k++)
+				if (wrld_tab[k].t == ptr->t)
+					fputc(wrld_tab[k].sym,mt);
+		}
+		fputc('\n',mt);
+	}
+
+	fclose(mt);
+/*
+	mf = fopen(fname,"wb");
+	if (!mf) return;
+
 	//TODO
+
+	fclose(mf);
+	*/
 }
 
 void WorldGen::NewMap(long seed)
 {
+	int i,j,k;
+	SWGMapCount mapcnt[WGNUMKINDS];
+	SWGCell* ptr;
+	float p,d,fd,maxd;
+	vector2di cur,cnt;
+
+	if (!map) return;
+
+	org_seed = seed;
 	rng->SetSeed(seed);
-	//TODO
+
+	cnt.X = wrldsz.X / 2;
+	cnt.Y = wrldsz.Y / 2;
+	maxd = cnt.Module();
+
+	for (k = 0; k < WGNUMKINDS; k++) {
+		mapcnt[k].cur = 0;
+		mapcnt[k].max = plane / 100 * wrld_tab[k].prc;
+	}
+
+	for (i = 0, ptr = map; i < wrldsz.Y; i++) {
+		for (j = 0; j < wrldsz.X; j++, ptr++) {
+			d = (vector2di(j,i) - cnt).Module();
+			fd = d / maxd * 100.f;
+			for (k = 0; k < WGNUMKINDS; k++) {
+				if ((mapcnt[k].max > 0) && (mapcnt[k].cur >= mapcnt[k].max))
+					continue;
+				p = rng->FloatNum() * fd;
+				if (wrld_tab[k].cprob > p) {
+					mapcnt[k].cur++;
+					ptr->t = wrld_tab[k].t;
+					rng->NextNumber();
+					ptr->seed = rng->GetSeed();
+					ptr->elev = '0';
+					break;
+				}
+			}
+		}
+	}
 }

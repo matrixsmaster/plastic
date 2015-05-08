@@ -27,7 +27,7 @@
 #define PRNG_A 16807
 #define PRNG_C 0
 #define PRNG_M 2147483647
-#define PRNG_X 0x5EECE66D
+#define PRNG_X 0
 
 class PRNGen
 {

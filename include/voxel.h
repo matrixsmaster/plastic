@@ -25,6 +25,9 @@
 ///Number of voxels at a side of a chunk.
 #define CHUNKBOX 256
 
+///Number of voxels to be interpreted as one map cell.
+#define VOXGRAIN 8
+
 ///Number of chunks in current active buffers.
 #define HOLDCHUNKS 9
 
