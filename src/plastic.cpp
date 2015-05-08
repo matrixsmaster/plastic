@@ -58,6 +58,7 @@ static void* plastic_eventhread(void* ptr)
 	CurseGUIPicture* pct;
 	CurseGUIButton* btn;
 	CurseGUIEditBox* edb;
+	CurseGUICheckBox* chk;
 	SCTriple test;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
@@ -97,6 +98,10 @@ static void* plastic_eventhread(void* ptr)
 				btn = new CurseGUIButton(wnd->GetControls(),2,7,10,"Test 1");
 				btn = new CurseGUIButton(wnd->GetControls(),12,2,10,"Test 2");
 				edb = new CurseGUIEditBox(wnd->GetControls(),12,3,10,"");
+				chk = new CurseGUICheckBox(wnd->GetControls(),12,5,10,"Test A HIDDEN");
+				chk = new CurseGUICheckBox(wnd->GetControls(),12,6,10,"Test B");
+				chk->SetChecked(true);
+				chk->SetDisabled(true);
 				break;
 			case '9':
 				test.r = 1000;

@@ -151,6 +151,29 @@ public:
 
 /* ******************************************************************** */
 
+class CurseGUICheckBox : public CurseGUIControl
+{
+private:
+	bool checked,disabled;
+
+	void Check();
+
+public:
+	CurseGUICheckBox(CurseGUICtrlHolder* p, int x, int y, int w, std::string capt);
+	virtual ~CurseGUICheckBox()				{}
+
+	void SetCaption(std::string capt)		{ text = capt; }
+	void SetChecked(bool c)					{ checked = c; }
+	bool GetChecked()						{ return checked; }
+	void SetDisabled(bool d)				{ disabled = d; }
+	bool GetDisabled()						{ return disabled; }
+
+	bool Select(bool s);
+
+	void Update();
+	bool PutEvent(SGUIEvent* e);
+};
+
 //TODO CurseGuiTable
 //class CurseGUITable : public CurseGUIControl
 //{
@@ -167,7 +190,7 @@ public:
  * V CurseGUIEditBox - an underline (_) fillable with some text or user input.
  * 					Example: EditBox(6 chars):	(______)
  * 							after some input:	(Test__)
- *   CurseGUICheckBox - (V) or (X) with switchable state. Use (O) for disabled.
+ * V CurseGUICheckBox - (V) or (X) with switchable state. Use (O) for disabled.
  *   CurseGUIProgrBar - basic progress bar like {#### 25%     }
  *   CurseGUITable - table utilizes ncurses' line drawings. Should be possible to navigate with keys.
  * 					Ex.:	+------+-------*--+ (see curs_addch (3X) section Line graphics)
