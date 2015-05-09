@@ -17,11 +17,15 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef ACTORCTAB_H_
-#define ACTORCTAB_H_
+#ifndef ACTORHELPERS_H_
+#define ACTORHELPERS_H_
 
-#include "actor.h"
+#include "datapipe.h"
+#include "actortypes.h"
 
-//TODO: classes and values table
 
-#endif /* ACTORCTAB_H_ */
+bool FillActorBasicStats(SPAStats* stats, DataPipe* pipe);
+
+void GetActorClassDescr(EPAClass c, char* str, unsigned len, DataPipe* pipe);
+
+#endif /* ACTORHELPERS_H_ */

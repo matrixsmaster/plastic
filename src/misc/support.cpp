@@ -24,6 +24,7 @@
 #include "support.h"
 #include "vecmath.h"
 #include "wrldgen.h"
+#include "actorhelpers.h"
 
 
 void errout(char const* fmt, ...)
@@ -153,6 +154,8 @@ opts_begin:
 		printf("Total city cells: %.2f%%\n",cov);
 		cov = (float)wgen->GetNumCellsOf(WGCC_TREEGRASS) / wgen->GetPlaneArea() * 100.f;
 		printf("Park cells: %.2f%%\n",cov);
+		cov = (float)wgen->GetNumCellsOf(WGCC_WATERONLY) / wgen->GetPlaneArea() * 100.f;
+		printf("Water cells: %.2f%%\n",cov);
 		cov = (float)wgen->GetNumCellsOf(WGCC_WASTELAND) / wgen->GetPlaneArea() * 100.f;
 		printf("Pure wasteland cells: %.2f%%\n",cov);
 
@@ -166,7 +169,64 @@ opts_begin:
 
 static void ishell_player(SGameSettings* s)
 {
-	//TODO
+	int i,in;
+	char sfmt[16], descr[1024];
+	DataPipeDummy* pdum;
+	SPAStats cbas;
+
+	pdum = new DataPipeDummy(s);
+	if (pdum->GetStatus() != DPIPE_IDLE) {
+		delete pdum;
+		errout("Unable to initialize data pipe. Check root directory setting.\n");
+		return;
+	}
+
+chargen_begin:
+	puts("\nCharacter options:");
+	printf("1) Name\t\t(%s)\n",s->PCData.name);
+	printf("2) Gender\t(%c)\n",((s->PCData.female)? 'F':'M'));
+	printf("3) Class\t(%s)\n",paclass_to_str[s->PCData.base.Cls].s);
+	puts("4) Review information about selected class");
+	puts("0) Exit ot main menu");
+
+	while (!isprint(in = getchar())) ; //trash non-printable chars (NL,LF,EOF etc)
+	switch (in) {
+	case '0':
+		delete pdum;
+		return;
+
+	case '1':
+		printf("New player character name> ");
+		snprintf(sfmt,sizeof(sfmt),"%%%ds\\n",MAXACTNAMELEN);
+		scanf(sfmt,s->PCData.name);
+		break;
+
+	case '2':
+		break;
+
+	case '3':
+		puts("Pick new class:");
+		for (i = 0; i < NUMCLASSES; i++)
+			printf("%1X: %s\n",(i+1),paclass_to_str[i].s);
+		while (!isprint(in = getchar())) ; //trash non-printable chars (NL,LF,EOF etc)
+		i = (in < '9')? (in - '1'):(in - 'A' + 9); //convert hex character to value
+		if ((i < 0) || (i >= NUMCLASSES)) break; //and check the result
+		memcpy(&(s->PCData.base.Cls),&i,sizeof(EPAClass));
+		break;
+
+	case '4':
+		if (!FillActorBasicStats(&cbas,pdum)) {
+			errout("Unable to download data from pipe!\n");
+			delete pdum;
+			return;
+		}
+		GetActorClassDescr(s->PCData.base.Cls,descr,sizeof(descr),pdum);
+		printf("\n\nClass: %s\n\n",paclass_to_str[s->PCData.base.Cls].s);
+		printf("%s\n",descr);
+		break;
+	}
+
+	goto chargen_begin;
 }
 
 bool interactive_shell(SGameSettings* s)

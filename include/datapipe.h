@@ -39,6 +39,7 @@
 #define VOXTABFILENAME "voxtab.dat"
 #define ATMOININAME "atmosphere"
 #define KEYBINDNAME "controls"
+#define CLASNFONAME "classes"
 
 
 enum EDPipeStatus {
@@ -61,8 +62,10 @@ typedef std::vector<VModel*> VModVec;
 typedef std::map<vector3dulli,SDataPlacement> PlaceMap;
 
 
+/* ********************************** DATA PIPE MAIN ********************************** */
+
 class DataPipe {
-private:
+protected:
 	PChunk chunks[HOLDCHUNKS];		//world chunk buffers
 	EDPipeStatus status;
 	pthread_mutex_t vmutex;
@@ -77,65 +80,83 @@ private:
 	VModVec objs;					//objects in scene
 	ulli rammax;					//max amount of memory allowed to be allocated
 
+	bool Allocator(const SGameSettings* sets);
 	bool ScanFiles();
 	bool FindChunk(vector3dulli pos, SDataPlacement* res);
 	bool LoadVoxTab();
 	bool LoadIni(const std::string name);
 
 public:
-	DataPipe(const SGameSettings*);
+	DataPipe(const SGameSettings* sets, bool allocate = true);
 	virtual ~DataPipe();
 
 	///Returns a status of the pipe.
-	EDPipeStatus GetStatus()	{ return status; }
+	virtual EDPipeStatus GetStatus()	{ return status; }
 
 	///Synchronization.
-	int Lock()					{ return pthread_mutex_lock(&vmutex); }
-	int TryLock()				{ return pthread_mutex_trylock(&vmutex); }
-	int Unlock()				{ return pthread_mutex_unlock(&vmutex); }
+	int Lock()							{ return pthread_mutex_lock(&vmutex); }
+	int TryLock()						{ return pthread_mutex_trylock(&vmutex); }
+	int Unlock()						{ return pthread_mutex_unlock(&vmutex); }
 
 	///Returns amount of RAM allocated by buffers.
-	ulli GetAllocatedRAM()		{ return allocated; }
+	ulli GetAllocatedRAM()				{ return allocated; }
 
-	void SetMaxRAM(ulli m)		{ rammax = m; }
-	ulli GetMaxRAM()			{ return rammax; }
+	void SetMaxRAM(ulli m)				{ rammax = m; }
+	ulli GetMaxRAM()					{ return rammax; }
 
 	///Returns a pointer to voxel info table.
-	SVoxelInf* GetVoxTable()	{ return voxeltab; }
+	SVoxelInf* GetVoxTable()			{ return voxeltab; }
 
 	///Returns voxel info table length.
-	int GetVoxTableLen()		{ return voxtablen; }
+	int GetVoxTableLen()				{ return voxtablen; }
 
 	///Discards all chunks buffers and release memory.
-	void PurgeChunks();
+	virtual void PurgeChunks();
 
 	///Set up the global position of central chunk.
-	void SetGP(vector3dulli pos);
+	virtual void SetGP(vector3dulli pos);
 
 	///Move the world to next chunk.
 	///Update chunks buffers either by loading or by generating.
 	///Returns false if move is invalid.
-	bool Move(EGMoveDir dir);
+	virtual bool Move(EGMoveDir dir);
 
 	///Returns a specific voxel (or its data) in a loaded space.
-	voxel GetVoxel(const vector3di* p);			//return voxel code
-	SVoxelInf* GetVoxelI(const vector3di* p);	//return voxel info
+	virtual voxel GetVoxel(const vector3di* p);			//return voxel code
+	virtual SVoxelInf* GetVoxelI(const vector3di* p);	//return voxel info
 
 	///Return an information about voxel by type code.
-	SVoxelInf* GetVInfo(const voxel v);
+	virtual SVoxelInf* GetVInfo(const voxel v);
 
 	///Supply INI-file based data by INI name and field name.
 	void GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen);
 	std::string GetIniDataS(const std::string ininame, const std::string inifield);
 
 	///Load dynamic object into scene.
-	VModel* LoadModel(const char* fname, const vector3di pos);
+	virtual VModel* LoadModel(const char* fname, const vector3di pos);
 
 	///Delete model from scene by pointer.
-	bool UnloadModel(const VModel* ptr);
+	virtual bool UnloadModel(const VModel* ptr);
 
 	///Purge all loaded models.
-	void PurgeModels();
+	virtual void PurgeModels();
+};
+
+/* ********************************** DATA PIPE DUMMY ********************************** */
+/* This class can be used as a lightweight version of DataPipe.
+ * Capable of INI reading and model management, this class uses much less RAM.
+ */
+class DataPipeDummy : public DataPipe
+{
+public:
+	DataPipeDummy(const SGameSettings* sets);
+
+	void SetVoxTab(SVoxelInf* p, int l)	{ voxtablen = l; voxeltab = p; }
+
+	void SetGP(vector3dulli pos)		{}
+	bool Move(EGMoveDir dir)			{ return false; }
+
+	voxel GetVoxel(const vector3di* p);
 };
 
 #endif /* DATAPIPE_H_ */

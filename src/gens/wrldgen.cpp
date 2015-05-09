@@ -100,7 +100,7 @@ void WorldGen::SaveMap(const char* fname)
 {
 	char txtname[MAXPATHLEN];
 	FILE* mf,*mt;
-	int i,j,k;
+	int i,j;
 	SWGCell* ptr;
 	SWGMapHeader hdr;
 

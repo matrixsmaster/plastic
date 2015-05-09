@@ -21,7 +21,6 @@
 #include <string.h>
 #include <math.h>
 #include "actor.h"
-#include "actorctab.h"
 
 
 PlasticActor::PlasticActor(SPAStats s, DataPipe* pptr)

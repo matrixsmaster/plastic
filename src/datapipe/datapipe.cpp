@@ -25,11 +25,9 @@
 #include "vecmisc.h"
 
 
-DataPipe::DataPipe(const SGameSettings* sets)
+DataPipe::DataPipe(const SGameSettings* sets, bool allocate)
 {
 	int i;
-	size_t sz;
-	char tmp[MAXPATHLEN];
 
 	/* Init variables */
 	status = DPIPE_ERROR;
@@ -37,6 +35,9 @@ DataPipe::DataPipe(const SGameSettings* sets)
 	memset(chunks,0,sizeof(chunks));
 	allocated = 0;
 	memset(root,0,MAXPATHLEN);
+	wgen = NULL;
+	voxeltab = NULL;
+	voxtablen = 0;
 	rammax = sets->rammax;
 
 	/* Copy root path */
@@ -44,13 +45,42 @@ DataPipe::DataPipe(const SGameSettings* sets)
 	if (i > 0) memcpy(root,sets->root,i);
 	else return;
 
+	/* Allocate everything */
+	if (allocate) {
+		if (!Allocator(sets)) return;
+	}
+
+	/* OK */
+	status = DPIPE_NOTREADY;
+}
+
+DataPipe::~DataPipe()
+{
+	status = DPIPE_NOTREADY;
+
+	if (wgen) delete wgen;
+	voxtablen = 0;
+	if (voxeltab) free(voxeltab);
+
+	PurgeModels();
+	PurgeChunks();
+
+	pthread_mutex_destroy(&vmutex);
+}
+
+bool DataPipe::Allocator(const SGameSettings* sets)
+{
+	int i;
+	size_t sz;
+	char tmp[MAXPATHLEN];
+
 	/* Allocate voxel info table */
 	sz = DEFVOXTYPES * sizeof(SVoxelInf);
 	voxtablen = DEFVOXTYPES;
 	voxeltab = (SVoxelInf*)malloc(sz);
 	if (!voxeltab) {
 		errout("Unable to allocate RAM for voxel table.\n");
-		return;
+		return false;
 	}
 	memset(voxeltab,0,sz);
 	allocated += sz;
@@ -65,8 +95,8 @@ DataPipe::DataPipe(const SGameSettings* sets)
 	allocated += wgen->GetAllocatedRAM();
 
 	/* Load external files */
-	if (!LoadVoxTab()) return;	//Voxel table
-	ScanFiles();				//map known chunks
+	if (!LoadVoxTab()) return false;	//Voxel table
+	ScanFiles();						//map known chunks
 
 	/* Allocate chunks buffers memory */
 	sz = sizeof(VChunk);
@@ -74,31 +104,17 @@ DataPipe::DataPipe(const SGameSettings* sets)
 		chunks[i] = (PChunk)malloc(sz);
 		if (!chunks[i]) {
 			errout("Unable to allocate RAM for voxel chunk %d.\n",i);
-			return; //destructor will purge all the chunks
+			return false; //destructor will purge all the chunks
 		}
 		allocated += sz;
 		if (allocated >= rammax) {
 			errout("Maximum amount of memory allowed to be used is reached.\n");
-			return;
+			return false;
 		}
 	}
 
 	/* All clear. */
-	status = DPIPE_NOTREADY;
-}
-
-DataPipe::~DataPipe()
-{
-	status = DPIPE_NOTREADY;
-
-	delete wgen;
-	voxtablen = 0;
-	if (voxeltab) free(voxeltab);
-
-	PurgeModels();
-	PurgeChunks();
-
-	pthread_mutex_destroy(&vmutex);
+	return true;
 }
 
 bool DataPipe::ScanFiles()

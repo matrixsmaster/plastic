@@ -24,17 +24,20 @@
 
 #include "misconsts.h"
 
+#define NUMCLASSES 10
 
 //Basic classes of actors (used to determine initial basic values and actor's traits)
 enum EPAClass {
-	PCLS_INQUISITOR,	//TODO: decide wisely!
-	PCLS_GUARD,
+	PCLS_INQUISITOR,
 	PCLS_ROGUE,
+	PCLS_GUARD,
 	PCLS_SEXBOT,
 	PCLS_COMMONER,
 	PCLS_MAID,
-	PCLS_JANITOR,
-	PCLS_PSYCHO
+	PCLS_PSYCHO,
+	PCLS_MECHANIC,
+	PCLS_SMUGGLER,
+	PCLS_TRADER
 };
 
 //Actor's basic value used in game mechanics
@@ -53,9 +56,11 @@ struct SPABase {
 	int Str;			//Basic strength on fully charged actor
 
 	/* Brain and psychology state */
-	int Intl;			//Intelligence
+	int Eng;			//Engineering
+	int Spch;			//Speechcraft
 	int Brv;			//Braveness
 	int Chr;			//Charisma (or beauty)
+	int Trd;			//Trade
 
 	/* Battle-relevant values */
 	int AP;				//Armor points
@@ -69,6 +74,25 @@ struct SPAStats {
 	bool female;				//True for Female characters
 	char model[MAXPATHLEN];		//Actor's model
 	SPABase base;				//Basic values
+};
+
+//Class to string conversion data
+struct SEPACRecord {
+	EPAClass c;
+	const char* s;
+};
+
+static const SEPACRecord paclass_to_str[NUMCLASSES] = {
+		{ PCLS_INQUISITOR,	"Inquisitor" },
+		{ PCLS_ROGUE,		"Rogue" },
+		{ PCLS_GUARD,		"Guard" },
+		{ PCLS_SEXBOT,		"Sexbot" },
+		{ PCLS_COMMONER,	"Commoner" },
+		{ PCLS_MAID,		"Maid" },
+		{ PCLS_PSYCHO,		"Psycho" },
+		{ PCLS_MECHANIC,	"Mechanic" },
+		{ PCLS_SMUGGLER,	"Smuggler" },
+		{ PCLS_TRADER,		"Merchant" },
 };
 
 #endif /* ACTORTYPES_H_ */
