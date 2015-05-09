@@ -40,8 +40,8 @@ This is free software, and you are welcome to redistribute it\n\
 under conditions of GNU GPL v2\n\n"
 
 
-#define GAMEARGTYPES 2
-#define GAMEARGHELPLEN 160
+#define GAMEARGTYPES 6
+#define GAMEARGHELPLEN 360
 
 struct SGameSettings {
 	char root[MAXPATHLEN];	//VFS root dir
@@ -64,20 +64,35 @@ struct SGameSettings {
 enum EGameArgType {
 	GAT_NOTHING,
 	GAT_ROOTDIR,
-	GAT_USESHELL
+	GAT_USESHELL,
+	GAT_WORLDRAD,
+	GAT_RAMMAX,
+	GAT_SEED,
+	GAT_PLAYER
 };
 
 struct SGameArg {
 	EGameArgType typ;
 	char sw;					//switch character
+	bool edit;					//is this setting is editable in interactive shell
 	char desc[GAMEARGHELPLEN];	//description string
 };
 
 static const SGameArg argp_table[GAMEARGTYPES] = {
-	{ GAT_ROOTDIR,	'r', "Set the root directory of game files." },
-	{ GAT_USESHELL,	's', "Show interactive shell after startup to "\
-						 "adjust game settings and/or generate "\
-						 "player character." },
+	{ GAT_ROOTDIR,	'r', true,	"Set the root directory of game files." },
+	{ GAT_USESHELL,	's', false,	"Show interactive shell after startup to "\
+								"adjust game settings and/or generate "\
+								"player character." },
+	{ GAT_WORLDRAD,	'R', true,	"Set the radius of the world spheroid." },
+	{ GAT_RAMMAX,	'm', true,	"Set the memory threshold for the main "\
+								"data holding facilities. This amount is "\
+								"only the rough approximation. "\
+								"Real memory consumption will be higher, "\
+								"but not too much." },
+	{ GAT_SEED,		'S', true,	"Set the seed value used to generate the world. "\
+								"Should be zero to generate random seed." },
+	{ GAT_PLAYER,	'P', false,	"String of data used to create player "\
+								"character. See details in documentation." },
 };
 
 #endif /* PLASTIC_H_ */

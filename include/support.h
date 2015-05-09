@@ -34,7 +34,7 @@ void errout(char const* fmt, ...);
 void printsettings(SGameSettings* s);
 
 ///Interactive shell for adjusting settings.
-void interactive_shell(SGameSettings* s);
+bool interactive_shell(SGameSettings* s);
 
 /// Argument parser. Supposed to be used for analyze startup environment.
 bool argparser(int argc, char* argv[], SGameSettings* sets);

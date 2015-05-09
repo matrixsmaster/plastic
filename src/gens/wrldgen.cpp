@@ -31,7 +31,7 @@ WorldGen::WorldGen(uli r, SVoxelInf* tab, int tablen)
 	radius = r;
 	vtab = tab;
 	vtablen = tablen;
-	rng = new PRNGen(true);
+	rng = new PRNGen(false);
 	allocated = 0;
 	org_seed = 0;
 

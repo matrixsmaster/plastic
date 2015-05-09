@@ -187,7 +187,7 @@ static void plastic_start()
 	g_wrld = new PlasticWorld(&g_set);
 	r = g_wrld->GetLastResult();
 	if (r) {
-		errout("Unable to create world (error #%d)\n",r);
+		errout("Unable to create the world (error #%d)\n",r);
 		abort();
 	}
 
@@ -196,6 +196,8 @@ static void plastic_start()
 	r = g_gui->GetLastResult();
 	if (r) {
 		errout("Unable to create CurseGUI (error #%d)\n",r);
+		if (r == 3)
+			errout("Note: setting 'TERM=xterm-256color' helps in most Linux systems.\n");
 		abort();
 	}
 
@@ -259,7 +261,9 @@ int main(int argc, char* argv[])
 	printsettings(&g_set);
 
 	/* Show interactive startup shell if needed. */
-	if (g_set.use_shell) interactive_shell(&g_set);
+	if (g_set.use_shell) {
+		if (!interactive_shell(&g_set)) return 0;
+	}
 
 	/* Prepare and start the game. */
 	plastic_start();

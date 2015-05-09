@@ -57,54 +57,12 @@ enum EWGCellContent {
 
 static const char wrld_code[WGNUMKINDS+1] = ".#^%~$=SMHPC";
 
-/* Map parameters for each content type */
-//struct SWGMapParam {
-//	EWGCellContent t;
-//	char sym;
-//	float prc;
-//	float cprob;		//probability of presence v. distance
-//};
-//
-///* Counting helper for map generation */
-//struct SWGMapCount {
-//	int cur,max;
-//};
-
-/* Distribution table (max percent, sorted by) */
-//static const SWGMapParam wrld_tab[WGNUMKINDS] = {
-//		{ WGCC_HUGEBUILD, 'L', 2,   1 },
-//		{ WGCC_MIDDLBLDS, 'M', 5,   3 },
-//		{ WGCC_SMALLBLDS, 'S', 10,  5 },
-//		{ WGCC_SPECBUILD, 'P', 4,   7 },
-//		{ WGCC_TREEGRASS, '$', 10, 20 },
-//		{ WGCC_WATERONLY, '~', 10, 25 },
-//		{ WGCC_WATERSIDE, '%', 9,  30 },
-//		{ WGCC_DIRTNSAND, '#', 4,  41 },
-//		{ WGCC_ROCKSTONE, '^', 5,  50 },
-//		{ WGCC_WASTELAND, '.', 0, 100 },
-//};
-
 /* Map cell data */
 struct SWGCell {
 	EWGCellContent t;
 	char elev;
 	long seed;
 };
-
-//enum EWGChunkType {
-//	WGCT_AIR,
-//	WGCT_SURFACE,
-//	WGCT_UNDERGR,
-//	WGCT_WATER
-//};
-//
-///* Map chunk data */
-//struct SWGChunk {
-//	EWGChunkType t;
-//	EWGCellContent c;
-//	long seed;
-//	voxel lead;
-//};
 
 struct SWGMapHeader {
 	int sx,sy,sz;
@@ -131,12 +89,20 @@ public:
 	WorldGen(uli r, SVoxelInf* tab, int tablen);
 	virtual ~WorldGen();
 
+	/* Map management */
 	bool LoadMap(const char* fname);
 	void SaveMap(const char* fname);
 	void NewMap(long seed);
 
-	ulli GetAllocatedRAM()			{ return allocated; }
+	/* Statistics functions */
+	vector3di GetVolume()				{ return wrldsz; }
+	ulli GetAllocatedRAM()				{ return allocated; }
+	ulli GetPlaneArea()					{ return plane; }
+	int GetNumCities()					{ return cities; }
+	int GetNumFactories()				{ return factories; }
+	uli GetNumCellsOf(EWGCellContent c)	{ return cover[c]; }
 
+	/* Main chunk generation facility */
 	void GenerateChunk(PChunk buf);
 };
 
