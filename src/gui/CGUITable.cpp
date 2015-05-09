@@ -21,10 +21,8 @@
 
 #include "CGUIControls.h"
 
-
-#define WIDTH 5
-
 using namespace std;
+
 
 CurseGUITable::CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int w, int rows, int col, int wdth) :
 		CurseGUIControl(p,x,y)
@@ -48,6 +46,7 @@ CurseGUITable::CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int w, int row
 
 void CurseGUITable::SetData(string data, int r, int c)
 {
+	//TODO: check bounds of 'r' and 'c' !
 	tbl[c][r] = data;
 }
 
@@ -71,7 +70,8 @@ void CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 
 	//Draw table like a deer
 	for(int i = y; i < y+h; ++i) {
-		(i == y || i == y+h-1) ? border = true : border = false;
+//		(i == y || i == y+h-1) ? border = true : border = false; //fucking black magic, how you do that, man? :)
+		border = ((i == y) || (i == y+h-1)); //that's simpler, eh?
 
 		for(int j = x; j < x+w; ++j) {
 
@@ -91,8 +91,15 @@ void CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 					}
 				}
 			}
+
+			//Make table outline bold, if the table is selected
+			if (border && selected) wattrset(wd,A_BOLD);
+
 			mvwaddch(wd, i, j, ch);
 			ch = ' ';
+
+			//restore attribute
+			wattrset(wd,A_NORMAL);
 		}
 	}
 }

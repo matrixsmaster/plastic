@@ -108,7 +108,7 @@ static void* plastic_eventhread(void* ptr)
 				chk->SetDisabled(true);
 				prb = new CurseGUIProgrBar(wnd->GetControls(),12,8,16,0,100);
 				prb->SetShowPercent(true);
-				tbl = new CurseGUITable(wnd->GetControls(), 0, 0, 7, 2, 2, 7);
+				tbl = new CurseGUITable(wnd->GetControls(), 1, 1, 7, 2, 2, 7);
 
 				break;
 			case '9':

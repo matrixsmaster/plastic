@@ -55,7 +55,7 @@ struct SGameSettings {
 #define DEFAULT_SETTINGS { 						\
 	"./data",									\
 	false, 										\
-	64,										\
+	64,											\
 	(4ULL*1024*1024*1024),						\
 	0,											\
 	{ "Mary", true, {PCLS_INQUISITOR, true} }	\

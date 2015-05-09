@@ -25,10 +25,14 @@
 #include "vecmath.h"
 #include "prngen.h"
 
-#define WGCHUNKSZ (CHUNKBOX / VOXGRAIN)
+//#define WGCHUNKSZ (CHUNKBOX / VOXGRAIN)
+
+#define WGRIVERQPRC 0.02
+#define WGPLANTQPRC 0.06
+#define WGPLANTSZ  0.01
 
 /* Map cell content type (surface cells) */
-#define WGNUMKINDS 10
+#define WGNUMKINDS 12
 
 enum EWGCellContent {
 	WGCC_WASTELAND,	//wasteland - nothing but sand
@@ -36,39 +40,43 @@ enum EWGCellContent {
 	WGCC_ROCKSTONE,	//rocks and stones
 	WGCC_WATERSIDE, //waterside areas
 	WGCC_WATERONLY,	//nothing but water
-	WGCC_TREEGRASS, //just a grass plus some trees
+	WGCC_TREEGRASS, //a grass and some trees
+	WGCC_CONCRETEB,	//just a concrete on a few top layers
 	WGCC_SMALLBLDS, //3 or 4 small buildings
 	WGCC_MIDDLBLDS, //2 middle-size buildings
 	WGCC_HUGEBUILD,	//one huge building right in the center
-	WGCC_SPECBUILD	//special (factory, plant) building
+	WGCC_SPECBUILD,	//special (factory, plant) building
+	WGCC_CITYCENTR,	//city or small town center marker
 };
+
+static const char wrld_code[WGNUMKINDS+1] = ".#^%~$=SMHPC";
 
 /* Map parameters for each content type */
-struct SWGMapParam {
-	EWGCellContent t;
-	char sym;
-	float prc;
-	float cprob;		//probability of presence v. distance
-};
-
-/* Counting helper for map generation */
-struct SWGMapCount {
-	int cur,max;
-};
+//struct SWGMapParam {
+//	EWGCellContent t;
+//	char sym;
+//	float prc;
+//	float cprob;		//probability of presence v. distance
+//};
+//
+///* Counting helper for map generation */
+//struct SWGMapCount {
+//	int cur,max;
+//};
 
 /* Distribution table (max percent, sorted by) */
-static const SWGMapParam wrld_tab[WGNUMKINDS] = {
-		{ WGCC_HUGEBUILD, 'L', 2,   1 },
-		{ WGCC_MIDDLBLDS, 'M', 5,   3 },
-		{ WGCC_SMALLBLDS, 'S', 10,  5 },
-		{ WGCC_SPECBUILD, 'P', 4,   7 },
-		{ WGCC_TREEGRASS, '$', 10, 20 },
-		{ WGCC_WATERONLY, '~', 10, 25 },
-		{ WGCC_WATERSIDE, '%', 9,  30 },
-		{ WGCC_DIRTNSAND, '#', 4,  41 },
-		{ WGCC_ROCKSTONE, '^', 5,  50 },
-		{ WGCC_WASTELAND, '.', 0, 100 },
-};
+//static const SWGMapParam wrld_tab[WGNUMKINDS] = {
+//		{ WGCC_HUGEBUILD, 'L', 2,   1 },
+//		{ WGCC_MIDDLBLDS, 'M', 5,   3 },
+//		{ WGCC_SMALLBLDS, 'S', 10,  5 },
+//		{ WGCC_SPECBUILD, 'P', 4,   7 },
+//		{ WGCC_TREEGRASS, '$', 10, 20 },
+//		{ WGCC_WATERONLY, '~', 10, 25 },
+//		{ WGCC_WATERSIDE, '%', 9,  30 },
+//		{ WGCC_DIRTNSAND, '#', 4,  41 },
+//		{ WGCC_ROCKSTONE, '^', 5,  50 },
+//		{ WGCC_WASTELAND, '.', 0, 100 },
+//};
 
 /* Map cell data */
 struct SWGCell {
@@ -91,6 +99,12 @@ struct SWGCell {
 //	long seed;
 //	voxel lead;
 //};
+
+struct SWGMapHeader {
+	int sx,sy,sz;
+	uli radius;
+	long seed;
+};
 
 class WorldGen {
 private:

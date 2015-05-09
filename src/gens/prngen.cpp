@@ -18,6 +18,7 @@
  */
 
 #include <time.h>
+#include <math.h>
 #include "prngen.h"
 
 
@@ -49,19 +50,8 @@ int PRNGen::NextNumber()
 int PRNGen::RangedNumber(int Max)
 {
 	float a;
-	int p = 1;
-	int tmp = Max;
-	if (Max < 1) return 0;
-	do {
-		tmp /= 10;
-		p *= 10;
-	} while (tmp >= 1.0);
-	do {
-		a = FloatNum();
-		a *= p;
-		tmp = static_cast<int> (a);
-	} while (tmp >= Max);
-	return tmp;
+	a = (float)Max * FloatNum();
+	return ((int)floor(a));
 }
 
 float PRNGen::FloatNum()

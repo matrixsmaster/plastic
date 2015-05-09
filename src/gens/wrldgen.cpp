@@ -76,6 +76,7 @@ void WorldGen::GenerateChunk(PChunk buf)
 bool WorldGen::LoadMap(const char* fname)
 {
 	FILE* mf;
+	SWGMapHeader hdr;
 
 	if ((!fname) || (!map)) return false;
 
@@ -94,9 +95,11 @@ void WorldGen::SaveMap(const char* fname)
 	FILE* mf,*mt;
 	int i,j,k;
 	SWGCell* ptr;
+	SWGMapHeader hdr;
 
 	if ((!fname) || (!map)) return;
 
+	/* Store the map information in human-readable form (for reference) */
 	snprintf(txtname,MAXPATHLEN,"%s.txt",fname);
 	mt = fopen(txtname,"w");
 	if (!mt) return;
@@ -111,9 +114,10 @@ void WorldGen::SaveMap(const char* fname)
 	for (i = 0; i < wrldsz.Y; i++) {
 		ptr = map + ((wrldsz.Y-i-1)*wrldsz.X); //invert Y axis
 		for (j = 0; j < wrldsz.X; j++, ptr++) {
-			for (k = 0; k < WGNUMKINDS; k++)
-				if (wrld_tab[k].t == ptr->t)
-					fputc(wrld_tab[k].sym,mt);
+//			for (k = 0; k < WGNUMKINDS; k++)
+//				if (wrld_tab[k].t == ptr->t)
+//					fputc(wrld_tab[k].sym,mt);
+			fputc(wrld_code[ptr->t],mt);
 		}
 		fputc('\n',mt);
 	}
@@ -133,6 +137,14 @@ void WorldGen::SaveMap(const char* fname)
 	}
 
 	fclose(mt);
+
+	/* Store the actual usable binary map information */
+	hdr.radius = radius;
+	hdr.sx = wrldsz.X;
+	hdr.sy = wrldsz.Y;
+	hdr.sz = wrldsz.Z;
+	hdr.seed = org_seed;
+
 /*
 	mf = fopen(fname,"wb");
 	if (!mf) return;
@@ -145,7 +157,7 @@ void WorldGen::SaveMap(const char* fname)
 
 void WorldGen::NewMap(long seed)
 {
-	int i,j,k,u,v,elv;
+	int i,j,k,u,v,w,q,t,elv;
 //	SWGMapCount mapcnt[WGNUMKINDS];
 	SWGCell* ptr,*tmp;
 	bool flg;
@@ -175,7 +187,7 @@ void WorldGen::NewMap(long seed)
 	}
 
 	/* Generate rivers and banks */
-	u = rng->RangedNumber(radius / 4) + 1;
+	u = (int)floor(rng->FloatNum() * (WGRIVERQPRC * (float)plane / 100.f) + 1);
 	for (k = 0; k < u; k++) {
 		i = rng->RangedNumber(wrldsz.Y);
 		j = rng->RangedNumber(wrldsz.X);
@@ -204,6 +216,8 @@ void WorldGen::NewMap(long seed)
 				ptr = map + (i * wrldsz.X + j);
 				ptr->t = WGCC_WATERONLY;
 				ptr->elev = 1; //to flatten the river :)
+
+				/* Create realistic waterside */
 				for (v = 0; v < 8; v++) {
 					switch (v) {
 					case 0: tmp = ptr - wrldsz.X; break;
@@ -225,4 +239,46 @@ void WorldGen::NewMap(long seed)
 		} while (!flg);
 	}
 
+	/* Generate plants and industrial areas */
+	u = (int)floor(rng->FloatNum() * (WGPLANTQPRC * (float)plane / 100.f) + 1);
+	for (k = 0; k < u; k++) {
+		i = rng->RangedNumber(wrldsz.Y);
+		j = rng->RangedNumber(wrldsz.X);
+		v = (int)floor(rng->FloatNum() * (WGPLANTSZ * (float)plane / 100.f) + 2);
+		w = (int)floor(rng->FloatNum() * (WGPLANTSZ * (float)plane / 100.f) + 2);
+
+		/* Create the bridge from the center point to the west or east shore */
+		ptr = map + ((i + v/2) * wrldsz.X + (j + w/2));
+		while ((ptr >= map) && (ptr < map + plane) && (ptr->t == WGCC_WATERONLY)) {
+			ptr->t = WGCC_CONCRETEB;
+			(j > wrldsz.X / 2)? ptr--:ptr++;
+		}
+
+		/* Fill plant area */
+		for (q = i; q < i + v; q++) {
+			if ((q < 0) || (q >= wrldsz.Y))
+				continue;
+
+			ptr = map + (q * wrldsz.X + j);
+			for (t = j; t < j + w; t++, ptr++) {
+				if ((t < 0) || (t >= wrldsz.X))
+					break;
+
+				ptr->t = (rng->FloatNum() < 0.5)? WGCC_CONCRETEB:WGCC_SPECBUILD;
+				ptr->elev = 1;
+			}
+		}
+	}
+
+	/* Generate cities */
+	//TODO
+
+	/* Store RNG data */
+	for (i = 0, ptr = map; i < wrldsz.Y; i++)
+		for (j = 0; j < wrldsz.X; j++, ptr++) {
+			u = rng->RangedNumber(100);
+			for (k = 0; k < u; k++)
+				rng->NextNumber(); //trash out one more number
+			ptr->seed = rng->GetSeed();
+		}
 }

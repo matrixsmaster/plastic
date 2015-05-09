@@ -248,19 +248,13 @@ public:
 
 	void Update();
 	bool PutEvent(SGUIEvent* e);
+
+	//FIXME: why are you need hidden table?
 	void Show(bool s) 				{ show = s; }
 };
 
 /* ******************************************************************** */
 
-//TODO CurseGuiTable
-//class CurseGUITable : public CurseGUIControl
-//{
-//private:
-//public:
-//	CurseGUITable() {}
-//	virtual ~CurseGUITable() {}
-//};
 
 /*
  * TODO:
