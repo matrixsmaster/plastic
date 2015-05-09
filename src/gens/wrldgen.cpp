@@ -101,16 +101,33 @@ void WorldGen::SaveMap(const char* fname)
 	mt = fopen(txtname,"w");
 	if (!mt) return;
 
+	/* Print out basic information about the map */
 	fprintf(mt,"World radius = %lu\n",radius);
 	fprintf(mt,"World size = [%d, %d, %d]\n",wrldsz.X,wrldsz.Y,wrldsz.Z);
 	fprintf(mt,"World map seed = %ld\n",org_seed);
 
+	/* Print out the map itself */
 	fputc('\n',mt);
-	for (i = 0, ptr = map; i < wrldsz.Y; i++) {
+	for (i = 0; i < wrldsz.Y; i++) {
+		ptr = map + ((wrldsz.Y-i-1)*wrldsz.X); //invert Y axis
 		for (j = 0; j < wrldsz.X; j++, ptr++) {
 			for (k = 0; k < WGNUMKINDS; k++)
 				if (wrld_tab[k].t == ptr->t)
 					fputc(wrld_tab[k].sym,mt);
+		}
+		fputc('\n',mt);
+	}
+
+	/* Print out some topography information */
+	fprintf(mt,"\nTopography map:\n");
+	for (i = 0; i < wrldsz.Y; i++) {
+		ptr = map + ((wrldsz.Y-i-1)*wrldsz.X); //invert Y axis
+		for (j = 0; j < wrldsz.X; j++, ptr++) {
+			switch (ptr->elev) {
+			case 0: fputc('-',mt); break;
+			case 2: fputc('+',mt); break;
+			default: fputc('0',mt);
+			}
 		}
 		fputc('\n',mt);
 	}
@@ -128,43 +145,84 @@ void WorldGen::SaveMap(const char* fname)
 
 void WorldGen::NewMap(long seed)
 {
-	int i,j,k;
-	SWGMapCount mapcnt[WGNUMKINDS];
-	SWGCell* ptr;
-	float p,d,fd,maxd;
-	vector2di cur,cnt;
+	int i,j,k,u,v,elv;
+//	SWGMapCount mapcnt[WGNUMKINDS];
+	SWGCell* ptr,*tmp;
+	bool flg;
 
 	if (!map) return;
 
 	org_seed = seed;
 	rng->SetSeed(seed);
 
-	cnt.X = wrldsz.X / 2;
-	cnt.Y = wrldsz.Y / 2;
-	maxd = cnt.Module();
-
-	for (k = 0; k < WGNUMKINDS; k++) {
-		mapcnt[k].cur = 0;
-		mapcnt[k].max = plane / 100 * wrld_tab[k].prc;
-	}
-
+	/* Generate the basic landscape. Rocks and sand and nothing more */
+	elv = 1;
 	for (i = 0, ptr = map; i < wrldsz.Y; i++) {
 		for (j = 0; j < wrldsz.X; j++, ptr++) {
-			d = (vector2di(j,i) - cnt).Module();
-			fd = d / maxd * 100.f;
-			for (k = 0; k < WGNUMKINDS; k++) {
-				if ((mapcnt[k].max > 0) && (mapcnt[k].cur >= mapcnt[k].max))
-					continue;
-				p = rng->FloatNum() * fd;
-				if (wrld_tab[k].cprob > p) {
-					mapcnt[k].cur++;
-					ptr->t = wrld_tab[k].t;
-					rng->NextNumber();
-					ptr->seed = rng->GetSeed();
-					ptr->elev = '0';
-					break;
-				}
+			switch (rng->RangedNumber(3)) {
+			case 1: ptr->t = WGCC_ROCKSTONE; break;
+			case 2: ptr->t = WGCC_DIRTNSAND; break;
+			default: ptr->t = WGCC_WASTELAND;
 			}
+			//height mapping:
+			if (rng->FloatNum() > 0.5) {
+				if (--elv < 0) elv = 0;
+			} else if (rng->FloatNum() > 0.5) {
+				if (++elv > 2) elv = 2;
+			}
+			ptr->elev = elv;
 		}
 	}
+
+	/* Generate rivers and banks */
+	u = rng->RangedNumber(radius / 4) + 1;
+	for (k = 0; k < u; k++) {
+		i = rng->RangedNumber(wrldsz.Y);
+		j = rng->RangedNumber(wrldsz.X);
+
+		flg = false;
+		do {
+			switch (rng->RangedNumber(4)) {
+			default: /* north */
+				i++;
+				break;
+			case 1: /* east */
+				j++;
+				break;
+			case 2: /* south */
+				i--;
+				break;
+			case 3: /* west */
+				j--;
+				break;
+			}
+
+			flg = ((i < 0) || (i >= wrldsz.Y));
+			flg = (flg || (j < 0) || (j >= wrldsz.X));
+
+			if (!flg) {
+				ptr = map + (i * wrldsz.X + j);
+				ptr->t = WGCC_WATERONLY;
+				ptr->elev = 1; //to flatten the river :)
+				for (v = 0; v < 8; v++) {
+					switch (v) {
+					case 0: tmp = ptr - wrldsz.X; break;
+					case 1: tmp = ptr - wrldsz.X + 1; break;
+					case 2: tmp = ptr + 1; break;
+					case 3: tmp = ptr + wrldsz.X + 1; break;
+					case 4: tmp = ptr + wrldsz.X; break;
+					case 5: tmp = ptr + wrldsz.X - 1; break;
+					case 6: tmp = ptr - 1; break;
+					case 7: tmp = ptr - wrldsz.X - 1; break;
+					}
+					if ((tmp < map) || (tmp >= map + plane))
+						continue;
+					if (tmp->t != WGCC_WATERONLY)
+						tmp->t = WGCC_WATERSIDE;
+				}
+			}
+
+		} while (!flg);
+	}
+
 }

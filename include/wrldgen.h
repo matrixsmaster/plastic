@@ -62,11 +62,11 @@ static const SWGMapParam wrld_tab[WGNUMKINDS] = {
 		{ WGCC_MIDDLBLDS, 'M', 5,   3 },
 		{ WGCC_SMALLBLDS, 'S', 10,  5 },
 		{ WGCC_SPECBUILD, 'P', 4,   7 },
-		{ WGCC_TREEGRASS, '$', 10, 60 },
-		{ WGCC_WATERONLY, '~', 10, 50 },
-		{ WGCC_WATERSIDE, '%', 9,  70 },
-		{ WGCC_DIRTNSAND, '#', 4,  90 },
-		{ WGCC_ROCKSTONE, '^', 5, 100 },
+		{ WGCC_TREEGRASS, '$', 10, 20 },
+		{ WGCC_WATERONLY, '~', 10, 25 },
+		{ WGCC_WATERSIDE, '%', 9,  30 },
+		{ WGCC_DIRTNSAND, '#', 4,  41 },
+		{ WGCC_ROCKSTONE, '^', 5,  50 },
 		{ WGCC_WASTELAND, '.', 0, 100 },
 };
 
