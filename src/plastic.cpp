@@ -20,6 +20,8 @@
 /* Defines the entry point of the application. Please keep this file as clean as possible. */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <pthread.h>
 #include <unistd.h>
 #include "plastic.h"
@@ -244,6 +246,8 @@ static void plastic_cleanup()
 
 int main(int argc, char* argv[])
 {
+	srand(time(NULL));
+
 	printf(HELLOSTR,PRODNAME,VERMAJOR,VERMINOR,BUILDNO,PRODNAME);
 
 	/* Parse and print current settings. */

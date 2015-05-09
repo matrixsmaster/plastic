@@ -24,11 +24,13 @@
 #include "wrldgen.h"
 
 
-WorldGen::WorldGen(uli r)
+WorldGen::WorldGen(uli r, SVoxelInf* tab, int tablen)
 {
 	ulli l;
 
 	radius = r;
+	vtab = tab;
+	vtablen = tablen;
 	rng = new PRNGen(true);
 	allocated = 0;
 	org_seed = 0;
@@ -43,6 +45,11 @@ WorldGen::WorldGen(uli r)
 	map = (SWGCell*)malloc(l);
 	memset(map,0,l);
 	if (map) allocated = l;
+
+	//reset covering stats
+	memset(cover,0,sizeof(cover));
+	cities = 0;
+	factories = 0;
 }
 
 WorldGen::~WorldGen()
@@ -113,12 +120,8 @@ void WorldGen::SaveMap(const char* fname)
 	fputc('\n',mt);
 	for (i = 0; i < wrldsz.Y; i++) {
 		ptr = map + ((wrldsz.Y-i-1)*wrldsz.X); //invert Y axis
-		for (j = 0; j < wrldsz.X; j++, ptr++) {
-//			for (k = 0; k < WGNUMKINDS; k++)
-//				if (wrld_tab[k].t == ptr->t)
-//					fputc(wrld_tab[k].sym,mt);
+		for (j = 0; j < wrldsz.X; j++, ptr++)
 			fputc(wrld_code[ptr->t],mt);
-		}
 		fputc('\n',mt);
 	}
 
@@ -158,9 +161,10 @@ void WorldGen::SaveMap(const char* fname)
 void WorldGen::NewMap(long seed)
 {
 	int i,j,k,u,v,w,q,t,elv;
-//	SWGMapCount mapcnt[WGNUMKINDS];
 	SWGCell* ptr,*tmp;
 	bool flg;
+	float df,pr,mm;
+	vector2di cnt;
 
 	if (!map) return;
 
@@ -187,26 +191,19 @@ void WorldGen::NewMap(long seed)
 	}
 
 	/* Generate rivers and banks */
-	u = (int)floor(rng->FloatNum() * (WGRIVERQPRC * (float)plane / 100.f) + 1);
+	u = (int)floor(rng->FloatNum() * (WGRIVERQ * (float)plane / 100.f) + 1);
 	for (k = 0; k < u; k++) {
 		i = rng->RangedNumber(wrldsz.Y);
 		j = rng->RangedNumber(wrldsz.X);
 
 		flg = false;
 		do {
+			/* Move to a random direction */
 			switch (rng->RangedNumber(4)) {
-			default: /* north */
-				i++;
-				break;
-			case 1: /* east */
-				j++;
-				break;
-			case 2: /* south */
-				i--;
-				break;
-			case 3: /* west */
-				j--;
-				break;
+			default:	/* north */	i++; break;
+			case 1:		/* east */	j++; break;
+			case 2:		/* south */	i--; break;
+			case 3:		/* west */	j--; break;
 			}
 
 			flg = ((i < 0) || (i >= wrldsz.Y));
@@ -217,7 +214,7 @@ void WorldGen::NewMap(long seed)
 				ptr->t = WGCC_WATERONLY;
 				ptr->elev = 1; //to flatten the river :)
 
-				/* Create realistic waterside */
+				/* Create realistic waterside (full eight directions) */
 				for (v = 0; v < 8; v++) {
 					switch (v) {
 					case 0: tmp = ptr - wrldsz.X; break;
@@ -240,7 +237,8 @@ void WorldGen::NewMap(long seed)
 	}
 
 	/* Generate plants and industrial areas */
-	u = (int)floor(rng->FloatNum() * (WGPLANTQPRC * (float)plane / 100.f) + 1);
+	u = (int)floor(rng->FloatNum() * (WGPLANTQ * (float)plane / 100.f) + 1);
+	factories += u;
 	for (k = 0; k < u; k++) {
 		i = rng->RangedNumber(wrldsz.Y);
 		j = rng->RangedNumber(wrldsz.X);
@@ -249,20 +247,19 @@ void WorldGen::NewMap(long seed)
 
 		/* Create the bridge from the center point to the west or east shore */
 		ptr = map + ((i + v/2) * wrldsz.X + (j + w/2));
-		while ((ptr >= map) && (ptr < map + plane) && (ptr->t == WGCC_WATERONLY)) {
+		while (	(ptr >= map) && (ptr < map + plane) &&
+				((ptr->t == WGCC_WATERONLY) || ((ptr->t == WGCC_WATERSIDE))) ) {
 			ptr->t = WGCC_CONCRETEB;
 			(j > wrldsz.X / 2)? ptr--:ptr++;
 		}
 
 		/* Fill plant area */
 		for (q = i; q < i + v; q++) {
-			if ((q < 0) || (q >= wrldsz.Y))
-				continue;
+			if (q >= wrldsz.Y) continue; //check position
 
 			ptr = map + (q * wrldsz.X + j);
 			for (t = j; t < j + w; t++, ptr++) {
-				if ((t < 0) || (t >= wrldsz.X))
-					break;
+				if (t >= wrldsz.X) break; //check position
 
 				ptr->t = (rng->FloatNum() < 0.5)? WGCC_CONCRETEB:WGCC_SPECBUILD;
 				ptr->elev = 1;
@@ -271,14 +268,52 @@ void WorldGen::NewMap(long seed)
 	}
 
 	/* Generate cities */
-	//TODO
+	u = (int)floor(rng->FloatNum() * (WGCITYQ * (float)plane / 100.f) + 1);
+	for (k = 0; k < u; k++) {
+		i = rng->RangedNumber(wrldsz.Y);
+		j = rng->RangedNumber(wrldsz.X);
+		v = (int)floor(rng->FloatNum() * (WGCITYSZ * (float)plane / 100.f) + 2);
+		w = (int)floor(rng->FloatNum() * (WGCITYSZ * (float)plane / 200.f) + v);
+		if ((i+v >= wrldsz.Y) || (j+w >= wrldsz.X)) continue; //check position
 
-	/* Store RNG data */
+		cities++;
+		cnt = vector2di(w/2,v/2);
+		mm = cnt.Module();
+		cnt += vector2di(j,i);
+		elv = rng->RangedNumber(3);
+
+		for (q = i; q < i + v; q++) {
+			ptr = map + (q * wrldsz.X + j);
+			for (t = j; t < j + w; t++, ptr++) {
+				df = ((vector2di(t,q) - cnt).Module()) / mm;
+				pr = (rng->FloatNum() - 0.5) * WGCITYNOISE;
+				df += pr;
+				if (df < WGCITYCNTS) {
+					//center
+					ptr->t = WGCC_HUGEBUILD;
+				} else if (df < WGCITYENDS) {
+					//ends
+					ptr->t = WGCC_MIDDLBLDS;
+				} else if (df < WGCITYSUBS) {
+					//suburbs
+					ptr->t = WGCC_SMALLBLDS;
+				} else if (rng->FloatNum() > 0.5) {
+					//parks
+					ptr->t = WGCC_TREEGRASS;
+				} else
+					continue; //or just doesn't touch anything
+				ptr->elev = elv;
+			}
+		}
+	}
+
+	/* Store RNG data and calculate covering */
 	for (i = 0, ptr = map; i < wrldsz.Y; i++)
 		for (j = 0; j < wrldsz.X; j++, ptr++) {
 			u = rng->RangedNumber(100);
 			for (k = 0; k < u; k++)
 				rng->NextNumber(); //trash out one more number
 			ptr->seed = rng->GetSeed();
+			cover[ptr->t]++;
 		}
 }

@@ -44,15 +44,6 @@ DataPipe::DataPipe(const SGameSettings* sets)
 	if (i > 0) memcpy(root,sets->root,i);
 	else return;
 
-	/* Create and init the world generator */
-	wgen = new WorldGen(sets->world_r);
-	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
-	if (!wgen->LoadMap(tmp)) {
-		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
-		wgen->SaveMap(tmp);
-	}
-	allocated += wgen->GetAllocatedRAM();
-
 	/* Allocate voxel info table */
 	sz = DEFVOXTYPES * sizeof(SVoxelInf);
 	voxtablen = DEFVOXTYPES;
@@ -63,6 +54,15 @@ DataPipe::DataPipe(const SGameSettings* sets)
 	}
 	memset(voxeltab,0,sz);
 	allocated += sz;
+
+	/* Create and init the world generator */
+	wgen = new WorldGen(sets->world_r,voxeltab,voxtablen);
+	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
+	if (!wgen->LoadMap(tmp)) {
+		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
+		wgen->SaveMap(tmp);
+	}
+	allocated += wgen->GetAllocatedRAM();
 
 	/* Load external files */
 	if (!LoadVoxTab()) return;	//Voxel table

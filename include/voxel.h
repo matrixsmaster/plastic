@@ -38,7 +38,7 @@
 typedef unsigned short int voxel; //must be a 16-bit wide
 
 ///Voxel physical type.
-enum EVoxelType {
+enum EVoxelPType {
 	VOXT_EMPTY = 0,
 	VOXT_SOLID,
 	VOXT_WATER,
@@ -47,7 +47,7 @@ enum EVoxelType {
 
 ///Voxel index info structure.
 struct SVoxelInf {
-	EVoxelType type;
+	EVoxelPType type;
 	SGUIPixel pix;
 	char sides[6];
 };

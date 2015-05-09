@@ -27,9 +27,15 @@
 
 //#define WGCHUNKSZ (CHUNKBOX / VOXGRAIN)
 
-#define WGRIVERQPRC 0.02
-#define WGPLANTQPRC 0.06
-#define WGPLANTSZ  0.01
+#define WGRIVERQ 0.02
+#define WGPLANTQ 0.06
+#define WGPLANTSZ 0.01
+#define WGCITYQ 0.005
+#define WGCITYSZ 0.05
+#define WGCITYCNTS 0.1
+#define WGCITYENDS 0.35
+#define WGCITYSUBS 0.6
+#define WGCITYNOISE 0.2
 
 /* Map cell content type (surface cells) */
 #define WGNUMKINDS 12
@@ -109,15 +115,20 @@ struct SWGMapHeader {
 class WorldGen {
 private:
 	uli radius;
+	SVoxelInf* vtab;
+	int vtablen;
 	PRNGen* rng;
 	ulli allocated;
 	long org_seed;
 	vector3di wrldsz;
 	ulli plane;
 	SWGCell* map;
+	uli cover[WGNUMKINDS];
+	int cities;
+	int factories;
 
 public:
-	WorldGen(uli r);
+	WorldGen(uli r, SVoxelInf* tab, int tablen);
 	virtual ~WorldGen();
 
 	bool LoadMap(const char* fname);

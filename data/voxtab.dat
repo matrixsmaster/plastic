@@ -1,4 +1,9 @@
-;V type foreground_color background_color 6 sides chars
+;Default voxel types are:
+;0 - air
+;
+;Voxel info format:
+;V_type foreground_color background_color 6 sides chars
+;
 V0 000 000 000 000 000 000 000000
 V1 900 900 900 100 100 100 123456
 V1 900 900 900 900 000 000 abcdef
