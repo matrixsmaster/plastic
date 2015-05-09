@@ -17,15 +17,30 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <string>
+#include <string.h>
 #include "actorhelpers.h"
+
+using namespace std;
 
 
 bool FillActorBasicStats(SPAStats* stats, DataPipe* pipe)
 {
-	return false;
+	if (!pipe) return false;
+
+	//TODO
+
+//	return false;
+	return true;
 }
 
 void GetActorClassDescr(EPAClass c, char* str, unsigned len, DataPipe* pipe)
 {
-	//TODO
+	string fld;
+	if (!pipe) return;
+
+	fld = paclass_to_str[c].s;
+	fld += "_Descr";
+
+	pipe->GetIniDataC(CLASNFONAME,fld.c_str(),str,len);
 }

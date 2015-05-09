@@ -70,7 +70,7 @@ protected:
 	EDPipeStatus status;
 	pthread_mutex_t vmutex;
 	ulli allocated;					//amount of allocated RAM
-	vector3dulli gp;				//global position of central chunk
+	vector3dulli GP;				//global position of central chunk
 	char root[MAXPATHLEN];			//root path
 	PlaceMap placetab;				//chunk displacement map
 	WorldGen* wgen;					//world generator instance

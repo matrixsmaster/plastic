@@ -21,6 +21,7 @@
 #include <string.h>
 #include <math.h>
 #include "actor.h"
+#include "actorhelpers.h"
 
 
 PlasticActor::PlasticActor(SPAStats s, DataPipe* pptr)
@@ -61,8 +62,9 @@ void PlasticActor::InitVars()
 
 void PlasticActor::AutoInitStats()
 {
-	//TODO: use the tab!
-	strcpy(stats.model,"alice.dat"); //debug
+	SPAStats ns = stats;
+	if (FillActorBasicStats(&ns,pipe))
+		stats = ns;
 }
 
 void PlasticActor::SetRot(const vector3di r)

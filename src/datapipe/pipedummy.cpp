@@ -17,6 +17,8 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+/* Implementation file of a lightweight version of DataPipe */
+
 #include "vecmisc.h"
 #include "datapipe.h"
 

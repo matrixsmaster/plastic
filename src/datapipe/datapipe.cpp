@@ -179,7 +179,7 @@ void DataPipe::PurgeChunks()
 void DataPipe::SetGP(vector3dulli pos)
 {
 	SDataPlacement plc;
-	gp = pos;
+	GP = pos;
 	Lock();
 
 #if HOLDCHUNKS == 1
