@@ -46,7 +46,8 @@ enum EPAClass {
 	PCLS_NOBLE,
 	PCLS_MECHANIC,
 	PCLS_SMUGGLER,
-	PCLS_TRADER
+	PCLS_TRADER,
+	PCLS_NONE			//Not a class actually; endpoint
 };
 
 //Actor's basic value used in game mechanics
@@ -65,6 +66,7 @@ struct SPABase {
 	int Acc;			//Accuracy (%)
 
 	/* Brain and psychology state */
+	EPAClass Oppos;		//Opposing class (those who should be hated)
 	int Eng;			//Engineering
 	int Spch;			//Speechcraft
 	int Brv;			//Braveness
@@ -92,7 +94,7 @@ struct SEPACRecord {
 	const char* s;
 };
 
-static const SEPACRecord paclass_to_str[NUMCLASSES] = {
+static const SEPACRecord paclass_to_str[NUMCLASSES+1] = {
 		{ PCLS_INQUISITOR,	"Inquisitor" },
 		{ PCLS_ROGUE,		"Rogue" },
 		{ PCLS_GUARD,		"Guard" },
@@ -103,6 +105,7 @@ static const SEPACRecord paclass_to_str[NUMCLASSES] = {
 		{ PCLS_MECHANIC,	"Mechanic" },
 		{ PCLS_SMUGGLER,	"Smuggler" },
 		{ PCLS_TRADER,		"Merchant" },
+		{ PCLS_NONE,		"Nobody" },
 };
 
 //Body type to string conversion data

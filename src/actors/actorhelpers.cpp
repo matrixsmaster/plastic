@@ -18,19 +18,69 @@
  */
 
 #include <string>
+#include <stdlib.h>
 #include <string.h>
 #include "actorhelpers.h"
 
 using namespace std;
 
 
+#define GETSTATFIELD(X,Y)	fld = pipe->GetIniDataS(CLASNFONAME,cls + Y); \
+							if (fld.empty()) return false; \
+							stat->X = atoi(fld.c_str());
+
+#define GETBODYFIELD(X,Y)	fld = pipe->GetIniDataS(CLASNFONAME,bod + Y); \
+							if (fld.empty()) return false; \
+							stat->X = atoi(fld.c_str());
+
 bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe)
 {
-	string dat,fld;
+	int i;
+	string fld,cls,bod;
 
 	if (!pipe) return false;
 
-	return false;
+	cls = paclass_to_str[attr->cls].s;
+	bod = pabody_to_str[attr->body].s;
+
+	GETSTATFIELD(Body,"_BMask");
+
+	//get body-related data
+	if (attr->body & stat->Body) {
+		GETBODYFIELD(Str,"_Str");
+		GETBODYFIELD(Spd,"_Spd");
+		GETBODYFIELD(Eff,"_Eff");
+		GETBODYFIELD(RS,"_RS");
+		GETBODYFIELD(Acc,"_Acc");
+	} else {
+		stat->Str = -3;
+		stat->Spd = -3;
+		stat->Eff = -3;
+		stat->RS = -3;
+		stat->Acc = -3;
+	}
+
+	GETSTATFIELD(CC,"_CC");
+	GETSTATFIELD(Eng,"_Eng");
+	GETSTATFIELD(Spch,"_Spch");
+	GETSTATFIELD(Brv,"_Brv");
+	GETSTATFIELD(Chr,"_Chr");
+	GETSTATFIELD(Trd,"_Trd");
+	GETSTATFIELD(AP,"_AP");
+	GETSTATFIELD(DT,"_DT");
+	GETSTATFIELD(DM,"_DM");
+
+	//determine opposition class
+	fld = pipe->GetIniDataS(CLASNFONAME,cls + "_Oppos");
+	if (fld.empty()) return false;
+	stat->Oppos = PCLS_NONE;
+	for (i = 0; i < NUMCLASSES; i++)
+		if (!strcmp(fld.c_str(),paclass_to_str[i].s)) {
+			stat->Oppos = paclass_to_str[i].c;
+			break;
+		}
+
+	return true;
 }
 
 void GetActorClassDescr(EPAClass c, char* str, unsigned len, DataPipe* pipe)

@@ -204,6 +204,9 @@ chargen_begin:
 		break;
 
 	case '2':
+		puts("New gender> Enter F or M");
+		while (!isprint(in = getchar())) ; //trash non-printable chars (NL,LF,EOF etc)
+		s->PCData.female = ((in == 'f') || (in == 'F'));
 		break;
 
 	case '3':
@@ -228,7 +231,21 @@ chargen_begin:
 		}
 		GetActorClassDescr(s->PCData.cls,descr,sizeof(descr),pdum);
 		printf("\n\nClass: %s\n\n",paclass_to_str[s->PCData.cls].s);
-		printf("%s\n",descr);
+		printf("%s\n\n",descr);
+		//print out class default stats
+		puts("Basic stats:");
+		printf("Charge capacity\t%d\tEngineering\t%d\n",cbas.CC,cbas.Eng);
+		printf("Speed\t\t%d\tSpeechcraft\t%d\n",cbas.Spd,cbas.Spch);
+		printf("Strength\t%d\tBraveness\t%d\n",cbas.Str,cbas.Brv);
+		if (s->PCData.female)
+			printf("Efficiency\t%d\tBeauty\t\t%d\n",cbas.Eff,cbas.Chr);
+		else
+			printf("Efficiency\t%d\tCharisma\t%d\n",cbas.Eff,cbas.Chr);
+		printf("Reaction speed\t%d\tTrade\t\t%d\n",cbas.RS,cbas.Trd);
+		printf("Accuracy\t%d\n",cbas.Acc);
+		printf("AP\t%d\tDT\t%d\tDM\t%d\n\n",cbas.AP,cbas.DT,cbas.DM);
+		if (!(cbas.Body & s->PCData.body))
+			printf("Current body type is not applicable for this class.\n");
 		break;
 	}
 
