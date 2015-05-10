@@ -136,7 +136,7 @@ void PlasticWorld::ConnectGUI()
 
 bool PlasticWorld::CreateActor()
 {
-	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,data);
+	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,data);
 	npc->SetPos(PC->GetPos());
 	return (npc->Spawn());
 }

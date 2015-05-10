@@ -39,8 +39,8 @@
 class PlasticActor {
 protected:
 	vector3di gpos,pos;		//Global and local position
-	SPAStats stats;			//Basic stats
-	SPABase curr;			//Current values
+	SPAAttrib attrib;		//Basic attribs
+	SPABase base,curr;		//Base and current stats
 	vector3di rot;			//Orientation
 	SMatrix3d rotmat;		//Rotation in matrix form
 	DataPipe* pipe;			//DataPipe instance
@@ -50,8 +50,8 @@ protected:
 	void InitVars();
 
 public:
-	PlasticActor(SPAStats s, DataPipe* pptr);
-	PlasticActor(EPAClass c, DataPipe* pptr);
+	PlasticActor(SPAAttrib a, DataPipe* pptr);
+	PlasticActor(EPAClass c, EPABodyType b, DataPipe* pptr);
 	virtual ~PlasticActor();
 
 	virtual void AutoInitStats();
@@ -75,7 +75,7 @@ private:
 	KeyBinder* binder;
 
 public:
-	Player(SPAStats s, DataPipe* pptr);
+	Player(SPAAttrib s, DataPipe* pptr);
 	virtual ~Player();
 
 	void ProcessEvent(const SGUIEvent* e);

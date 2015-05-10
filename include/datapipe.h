@@ -35,7 +35,10 @@
 
 
 #define DEFRAMMAX (2ULL * 1024*1024*1024)
+
 #define MAXINISTRLEN 256
+#define FMTINISTRING "%s = %255[^\n]"
+
 #define VOXTABFILENAME "voxtab.dat"
 #define ATMOININAME "atmosphere"
 #define KEYBINDNAME "controls"

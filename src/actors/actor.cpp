@@ -24,29 +24,26 @@
 #include "actorhelpers.h"
 
 
-PlasticActor::PlasticActor(SPAStats s, DataPipe* pptr)
+PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr)
 {
 	pipe = pptr;
 	InitVars();
 
-	stats = s;
-	if (s.base.autoinit) AutoInitStats();
-	curr = s.base;
-	curr.autoinit = false;
+	attrib = a;
+	AutoInitStats();
 }
 
-PlasticActor::PlasticActor(EPAClass c, DataPipe* pptr)
+PlasticActor::PlasticActor(EPAClass c, EPABodyType b, DataPipe* pptr)
 {
 	pipe = pptr;
 	InitVars();
 
-	strcpy(stats.name,"Auto"); //FIXME: namegen
-	stats.female = (rand() > RAND_MAX / 3); //kekeke
-	stats.base.Cls = c;
-	stats.base.autoinit = true;
+	strcpy(attrib.name,"Auto"); //FIXME: namegen
+	attrib.female = (rand() > RAND_MAX / 3); //kekeke
+	attrib.cls = c;
+	attrib.body = b;
+
 	AutoInitStats();
-	curr = stats.base;
-	curr.autoinit = false;
 }
 
 PlasticActor::~PlasticActor()
@@ -62,9 +59,13 @@ void PlasticActor::InitVars()
 
 void PlasticActor::AutoInitStats()
 {
-	SPAStats ns = stats;
-	if (FillActorBasicStats(&ns,pipe))
-		stats = ns;
+	SPAAttrib na = attrib;
+	SPABase ns;
+	if (FillActorBasicStats(&na,&ns,pipe)) {
+		attrib = na;
+		base = ns;
+		curr = ns;
+	}
 }
 
 void PlasticActor::SetRot(const vector3di r)
@@ -95,7 +96,7 @@ void PlasticActor::Move(ELMoveDir d, float step)
 
 bool PlasticActor::Spawn()
 {
-	model = pipe->LoadModel(stats.model,pos);
+	model = pipe->LoadModel(attrib.model,pos);
 	return (model != NULL);
 }
 

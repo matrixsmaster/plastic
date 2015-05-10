@@ -172,7 +172,8 @@ static void ishell_player(SGameSettings* s)
 	int i,in;
 	char sfmt[16], descr[1024];
 	DataPipeDummy* pdum;
-	SPAStats cbas;
+	SPAAttrib catr;
+	SPABase cbas;
 
 	pdum = new DataPipeDummy(s);
 	if (pdum->GetStatus() != DPIPE_IDLE) {
@@ -185,8 +186,9 @@ chargen_begin:
 	puts("\nCharacter options:");
 	printf("1) Name\t\t(%s)\n",s->PCData.name);
 	printf("2) Gender\t(%c)\n",((s->PCData.female)? 'F':'M'));
-	printf("3) Class\t(%s)\n",paclass_to_str[s->PCData.base.Cls].s);
-	puts("4) Review information about selected class");
+	printf("3) Class\t(%s)\n",paclass_to_str[s->PCData.cls].s);
+	printf("4) Body type\t(%s)\n",pabody_to_str[s->PCData.body].s);
+	puts("5) Review information about selected class and body");
 	puts("0) Exit ot main menu");
 
 	while (!isprint(in = getchar())) ; //trash non-printable chars (NL,LF,EOF etc)
@@ -211,17 +213,21 @@ chargen_begin:
 		while (!isprint(in = getchar())) ; //trash non-printable chars (NL,LF,EOF etc)
 		i = (in < '9')? (in - '1'):(in - 'A' + 9); //convert hex character to value
 		if ((i < 0) || (i >= NUMCLASSES)) break; //and check the result
-		memcpy(&(s->PCData.base.Cls),&i,sizeof(EPAClass));
+		memcpy(&(s->PCData.cls),&i,sizeof(EPAClass));
 		break;
 
 	case '4':
-		if (!FillActorBasicStats(&cbas,pdum)) {
+		break;
+
+	case '5':
+		catr = s->PCData;
+		if (!FillActorBasicStats(&catr,&cbas,pdum)) {
 			errout("Unable to download data from pipe!\n");
 			delete pdum;
 			return;
 		}
-		GetActorClassDescr(s->PCData.base.Cls,descr,sizeof(descr),pdum);
-		printf("\n\nClass: %s\n\n",paclass_to_str[s->PCData.base.Cls].s);
+		GetActorClassDescr(s->PCData.cls,descr,sizeof(descr),pdum);
+		printf("\n\nClass: %s\n\n",paclass_to_str[s->PCData.cls].s);
 		printf("%s\n",descr);
 		break;
 	}

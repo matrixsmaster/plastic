@@ -49,16 +49,16 @@ struct SGameSettings {
 	uli world_r;			//world radius
 	ulli rammax;			//amount of memory that positively allowed to be used
 	long wg_seed;			//seed for world map generation (zero for random seed)
-	SPAStats PCData;		//player character settings
+	SPAAttrib PCData;		//player character settings
 };
 
-#define DEFAULT_SETTINGS { 						\
-	"./data",									\
-	false, 										\
-	64,											\
-	(4ULL*1024*1024*1024),						\
-	0,											\
-	{ "Mary", true, {PCLS_INQUISITOR, true} }	\
+#define DEFAULT_SETTINGS { 							\
+	"./data",										\
+	false, 											\
+	64,												\
+	(4ULL*1024*1024*1024),							\
+	0,												\
+	{ "Mary", true, PCLS_INQUISITOR, PBOD_PNEUMO, },\
 }
 
 enum EGameArgType {

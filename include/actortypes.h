@@ -24,7 +24,16 @@
 
 #include "misconsts.h"
 
+
+#define NUMBODTYPE 3
 #define NUMCLASSES 10
+
+//Basic types of robotic bodies
+enum EPABodyType {
+	PBOD_ELMECH = 1,
+	PBOD_PNEUMO = 2,
+	PBOD_HYDROL = 4
+};
 
 //Basic classes of actors (used to determine initial basic values and actor's traits)
 enum EPAClass {
@@ -34,7 +43,7 @@ enum EPAClass {
 	PCLS_SEXBOT,
 	PCLS_COMMONER,
 	PCLS_MAID,
-	PCLS_PSYCHO,
+	PCLS_NOBLE,
 	PCLS_MECHANIC,
 	PCLS_SMUGGLER,
 	PCLS_TRADER
@@ -42,18 +51,18 @@ enum EPAClass {
 
 //Actor's basic value used in game mechanics
 struct SPABase {
-	/* Main fields */
-	EPAClass Cls;		//Actor's class (mean of purpose)
-	bool autoinit;		//If true, all data below will be automatically filled
-
 	/* Status and condition */
+	int Body;			//Body type mask or current body type
 	int HP;				//Health points (means integral system condition)
-	float Qual;			//Overall actor's quality
+	int Qual;			//Overall actor's quality (%)
 
 	/* Physical state */
 	int CC;				//Charge capacity or current charge
-	float Spd;			//Speed multiplier (rounded result used)
+	int Spd;			//Speed (%)
 	int Str;			//Basic strength on fully charged actor
+	int Eff;			//Efficiency (%)
+	int RS;				//Reaction speed
+	int Acc;			//Accuracy (%)
 
 	/* Brain and psychology state */
 	int Eng;			//Engineering
@@ -65,15 +74,16 @@ struct SPABase {
 	/* Battle-relevant values */
 	int AP;				//Armor points
 	int DT;				//Damage threshold
-	float DM;			//Damage multiplier
+	int DM;				//Damage multiplier (%)
 };
 
-//Actor's stats
-struct SPAStats {
+//Actor's attributes
+struct SPAAttrib {
 	char name[MAXACTNAMELEN];	//Actor's name
 	bool female;				//True for Female characters
+	EPAClass cls;				//Actor's class (mean of purpose)
+	EPABodyType body;			//Actor's body type
 	char model[MAXPATHLEN];		//Actor's model
-	SPABase base;				//Basic values
 };
 
 //Class to string conversion data
@@ -89,10 +99,22 @@ static const SEPACRecord paclass_to_str[NUMCLASSES] = {
 		{ PCLS_SEXBOT,		"Sexbot" },
 		{ PCLS_COMMONER,	"Commoner" },
 		{ PCLS_MAID,		"Maid" },
-		{ PCLS_PSYCHO,		"Psycho" },
+		{ PCLS_NOBLE,		"Noble" },
 		{ PCLS_MECHANIC,	"Mechanic" },
 		{ PCLS_SMUGGLER,	"Smuggler" },
 		{ PCLS_TRADER,		"Merchant" },
+};
+
+//Body type to string conversion data
+struct SEPABRecord {
+	EPABodyType b;
+	const char* s;
+};
+
+static const SEPABRecord pabody_to_str[NUMBODTYPE] = {
+		{ PBOD_ELMECH,	"Electromech" },
+		{ PBOD_PNEUMO,	"Pneumatic" },
+		{ PBOD_HYDROL,	"Hydraulic" },
 };
 
 #endif /* ACTORTYPES_H_ */

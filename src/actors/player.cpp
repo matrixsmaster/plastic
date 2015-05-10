@@ -19,7 +19,7 @@
 
 #include "actor.h"
 
-Player::Player(SPAStats s, DataPipe* pptr) :
+Player::Player(SPAAttrib s, DataPipe* pptr) :
 		PlasticActor(s,pptr)
 {
 	binder = new KeyBinder(pptr);

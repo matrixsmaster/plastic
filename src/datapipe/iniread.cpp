@@ -44,7 +44,7 @@ bool DataPipe::LoadIni(const std::string name)
 
 	//loading
 	while (!feof(f)) {
-		r = fscanf(f,"%s = %[^\n]",key,fld);
+		r = fscanf(f,FMTINISTRING,key,fld);
 		if (r == 2)
 			cur.insert(make_pair(std::string(key),std::string(fld)));
 	}

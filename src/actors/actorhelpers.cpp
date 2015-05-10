@@ -24,14 +24,13 @@
 using namespace std;
 
 
-bool FillActorBasicStats(SPAStats* stats, DataPipe* pipe)
+bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe)
 {
+	string dat,fld;
+
 	if (!pipe) return false;
 
-	//TODO
-
-//	return false;
-	return true;
+	return false;
 }
 
 void GetActorClassDescr(EPAClass c, char* str, unsigned len, DataPipe* pipe)

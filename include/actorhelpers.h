@@ -24,7 +24,7 @@
 #include "actortypes.h"
 
 
-bool FillActorBasicStats(SPAStats* stats, DataPipe* pipe);
+bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe);
 
 void GetActorClassDescr(EPAClass c, char* str, unsigned len, DataPipe* pipe);
 
