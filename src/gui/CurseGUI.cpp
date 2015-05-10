@@ -204,9 +204,16 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 	backmask = NULL;
 	PumpEvents(&e);
 
+	/* Set up some aux vars */
+	c_x = c_y = 0;
+	activew.bg.r = 0; activew.bg.g = 0; activew.bg.b = 0;
+	activew.fg.r = 1000; activew.fg.g = 1000; activew.fg.b = 1000;
+	activew.sym = '-';
+	backgrw = activew;
+	backgrw.fg.r = 500; backgrw.fg.g = 500; backgrw.fg.b = 500;
+
 	/* Ready to rock! */
 	refresh();
-	c_x = c_y = 0;
 	result = 0;
 }
 
@@ -545,6 +552,7 @@ CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 	focused = false;
 	boxed = true;
 	stayontop = false;
+	showname = false;
 	ctrls = new CurseGUICtrlHolder(this);
 	name = "Unnamed";
 
@@ -595,9 +603,29 @@ void CurseGUIWnd::Update(bool refr)
 	werase(wnd);				//make a room for window
 	UpdateBack();				//draw background image
 	ctrls->Update();			//update controls
-	wcolor_set(wnd,0,NULL);		//set default color pair
-	if (boxed) box(wnd,0,0);	//draw border
+	DrawDecoration();		 	//draw border, title etc
+	wcolor_set(wnd,0,NULL);		//set default color pair (just in case)
 	if (refr) wrefresh(wnd);	//and refresh if necessary
+}
+
+void CurseGUIWnd::DrawDecoration()
+{
+	short p;
+
+	if (!boxed) return;
+
+	//draw colorful box
+	if (focused)
+		p = cmanager->CheckPair(parent->GetActiveWndBorder());
+	else
+		p = cmanager->CheckPair(parent->GetBackgrWndBorder());
+	wcolor_set(wnd,p,NULL);
+	box(wnd,0,0);
+
+	//draw title (name)
+	if (showname) {
+		//TODO: title
+	}
 }
 
 void CurseGUIWnd::Move(int x, int y)

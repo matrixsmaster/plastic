@@ -35,6 +35,8 @@ CurseGUIInventoryWnd::~CurseGUIInventoryWnd()
 void CurseGUIInventoryWnd::Update(bool refr)
 {
 	//TODO
+	DrawDecoration();
+	if (refr) wrefresh(wnd);
 }
 
 bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)

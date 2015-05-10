@@ -272,6 +272,8 @@ public:
  * 							|      |nger te|  |
  * 							|      |xt     |  |
  * 							+------+-------+--+
+ * 	 CurseGUILabel - just a label, nothing more :)
+ *
  */
 
 #endif /* CGUICONTROLS_H_ */

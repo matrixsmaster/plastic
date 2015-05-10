@@ -94,6 +94,7 @@ static void* plastic_eventhread(void* ptr)
 				//testing window
 				wnd = g_gui->MkWindow(curso.X,curso.Y,55,40,"SomeWin");
 				g_gui->SetFocus(wnd);
+				wnd->ShowName(true);
 				wnd->SetAutoAlloc(true);
 				pct = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
 				pct->SetAutoAlloc(true);

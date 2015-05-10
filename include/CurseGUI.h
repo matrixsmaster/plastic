@@ -106,6 +106,8 @@ private:
 	char* backmask;						//background mask (used to estimate space occupied by windows)
 	mmask_t oldmouse;					//original terminal mouse driver state
 	int c_x,c_y;						//cursor position
+	SGUIPixel activew;					//active window border style
+	SGUIPixel backgrw;					//inactive (background) window border style
 
 	void Reorder(int by);
 
@@ -171,6 +173,18 @@ public:
 
 	///Moves cursor to position at the end of each frame.
 	void SetCursorPos(const int x, const int y) { c_x = x; c_y = y; }
+
+	///Set the active window border style.
+	void SetActiveWndBorder(const SGUIPixel p)	{ activew = p; }
+
+	///Returns the active window border style.
+	const SGUIPixel* GetActiveWndBorder()		{ return &activew; }
+
+	///Set the inactive (background) window border style.
+	void SetBackgrWndBorder(const SGUIPixel p)	{ backgrw = p; }
+
+	///Returns the inactive (background) window border style.
+	const SGUIPixel* GetBackgrWndBorder()		{ return &backgrw; }
 };
 
 /* ********************************** GUI WINDOWS ********************************** */
@@ -194,8 +208,11 @@ protected:
 	bool focused;
 	bool boxed;
 	bool stayontop;
+	bool showname;
 	int g_x, g_y;
 	CurseGUICtrlHolder* ctrls;
+
+	void DrawDecoration();
 
 public:
 	CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h);
@@ -221,6 +238,12 @@ public:
 
 	///Returns if this window wants to stay on top.
 	bool IsStayOnTop()					{ return stayontop; }
+
+	///Lets a window to show its name if border is enabled.
+	void ShowName(bool s)				{ showname = s; }
+
+	///Returns if this window is showing its name.
+	bool IsShowName()					{ return showname; }
 
 	///Sets a name for a window.
 	virtual void SetName(const char* nm);

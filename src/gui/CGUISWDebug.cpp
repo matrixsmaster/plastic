@@ -88,7 +88,7 @@ void CurseGUIDebugWnd::Update(bool refr)
 		}
 	}
 
-	if (boxed) box(wnd,0,0);
+	DrawDecoration();
 	if (refr) wrefresh(wnd);
 }
 
