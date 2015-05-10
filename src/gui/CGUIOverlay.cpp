@@ -121,6 +121,7 @@ void CurseGUIOverlay::PutLog()
 				for(size_t i = 0; i < it->size(); ++i) {
 					ch = mvinch(y, m_x+i);
 					chclr = ch & A_COLOR;
+					//TODO use color manager to make opaccue
 					ch = it->at(i);
 					ch ^= chclr;
 					mvwaddch(wnd, h, i, ch);

@@ -93,7 +93,7 @@ static void* plastic_eventhread(void* ptr)
 			case KEY_F(1): g_gui->MkWindow(curso.X,curso.Y,10,5,"Test"); break;
 			case '0':
 				//testing window
-				wnd = g_gui->MkWindow(curso.X,curso.Y,35,10,"SomeWin");
+				wnd = g_gui->MkWindow(curso.X,curso.Y,55,40,"SomeWin");
 //				wnd = g_gui->GetWindowN("SomeWin");
 				g_gui->SetFocus(wnd);
 //				wnd->SetBoxed(false);
@@ -110,7 +110,7 @@ static void* plastic_eventhread(void* ptr)
 				chk->SetDisabled(true);
 				prb = new CurseGUIProgrBar(wnd->GetControls(),12,8,16,0,100);
 				prb->SetShowPercent(true);
-				tbl = new CurseGUITable(wnd->GetControls(), 1, 1, 7, 2, 2, 7);
+				tbl = new CurseGUITable(wnd->GetControls(), 1, 9, 7, 3, 5, 7);
 
 				break;
 			case '9':
@@ -120,11 +120,11 @@ static void* plastic_eventhread(void* ptr)
 				pct->ColorFill(test);
 				prb->Step();
 				break;
-			case '7':
-				tbl->Show(true);
-				break;
 			case '8':
-				tbl->SetData("item", 0, 0);
+				tbl->SetData("item set selected", 0, 0);
+				tbl->SetData("Lazy cunt! Bla bla bla bla Bla ", 0, 1);
+				tbl->SetData("Fuck you bitch!", 1, 0);
+				tbl->SetData("Zwei kleine Jagermeister. Ein kleine Wassershprot.", 2, 3);
 				break;
 			}
 			break;

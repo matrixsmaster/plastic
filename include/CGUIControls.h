@@ -234,9 +234,10 @@ private:
 	int auto_height;
 	int g_wdth;
 	int g_hght;
-	bool show;
+	int cur_x, cur_y;
 
 	void DrawCell(WINDOW* wd, int x, int y);
+	int GetHeightRow(int r);
 
 public:
 	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int w, int col, int rows, int wdth);
@@ -249,8 +250,6 @@ public:
 	void Update();
 	bool PutEvent(SGUIEvent* e);
 
-	//FIXME: why are you need hidden table?
-	void Show(bool s) 				{ show = s; }
 };
 
 /* ******************************************************************** */
