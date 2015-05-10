@@ -424,24 +424,18 @@ bool CurseGUI::PumpEvents(SGUIEvent* e)
 		}
 	}
 
-	if (!windows.empty()) {
-
-		/* Pump down the events (in order of drawing) */
-		for (it = windows.begin(); it != windows.end(); ++it) {
-			if ((e->t == GUIEV_KEYPRESS) || (e->t == GUIEV_MOUSE)) {
-				//user input events will only be passed into focused windows
-				if (!(*it)->IsFocused()) continue;
-			}
-			//pass the event
-			if ((*it)->PutEvent(e)) {
-				consumed = true; //that's a 'private' event, stop pumping
-				if ((*it)->WillClose()) RmWindow(*it); //destroy closing window
-				break;
-			}
+	/* Pump down the events (in order of drawing) */
+	for (it = windows.begin(); it != windows.end(); ++it) {
+		if ((e->t == GUIEV_KEYPRESS) || (e->t == GUIEV_MOUSE)) {
+			//user input events will only be passed into focused windows
+			if (!(*it)->IsFocused()) continue;
 		}
-
-		Reorder(0); //Windows reordering by focus value
-		Reorder(1); //Windows reordering by stayontop property
+		//pass the event
+		if ((*it)->PutEvent(e)) {
+			consumed = true; //that's a 'private' event, stop pumping
+			if ((*it)->WillClose()) RmWindow(*it); //destroy closing window
+			break;
+		}
 	}
 
 	/* No one has consumed the event. Need to be processed in global GUI scope. */
@@ -474,6 +468,12 @@ bool CurseGUI::PumpEvents(SGUIEvent* e)
 
 		default: break; //just to make compiler happy
 		}
+	}
+
+	/* Reorder windows */
+	if (!windows.empty()) {
+		Reorder(0); //Windows reordering by focus value
+		Reorder(1); //Windows reordering by stayontop property
 	}
 
 	/* Update the background masking */
@@ -534,9 +534,41 @@ void CurseGUI::UpdateBackmask()
 
 CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 {
+	int pw,ph;
+
+	//init variables
+	g_x = g_y = 0;
+	g_w = g_h = 0;
 	type = GUIWT_BASIC;
 	parent = scrn;
 	cmanager = scrn->GetColorManager();
+	focused = false;
+	boxed = true;
+	stayontop = false;
+	ctrls = new CurseGUICtrlHolder(this);
+	name = "Unnamed";
+
+	pw = parent->GetWidth();
+	ph = parent->GetHeight();
+
+	//check width and X position
+	if (x + w > pw) {
+		if (w < pw) x = pw - w - 1;
+		else {
+			w = pw;
+			x = 0;
+		}
+	}
+	//check height and Y position
+	if (y + h > ph) {
+		if (h< ph) y = ph - h - 1;
+		else {
+			h = ph;
+			y = 0;
+		}
+	}
+
+	//create a window
 	wnd = subwin(scrn->GetWindow(),h,w,y,x);
 	if (wnd) {
 		g_w = w;
@@ -544,11 +576,6 @@ CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 		g_x = x;
 		g_y = y;
 	}
-	focused = false;
-	boxed = true;
-	stayontop = false;
-	ctrls = new CurseGUICtrlHolder(this);
-	name = "Unnamed";
 }
 
 CurseGUIWnd::~CurseGUIWnd()

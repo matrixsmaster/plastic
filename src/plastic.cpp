@@ -56,7 +56,6 @@ static void* plastic_eventhread(void* ptr)
 	bool d;
 	//other debug
 	CurseGUIWnd* wnd;
-//	CurseGUIControl* ctl;
 	CurseGUIPicture* pct;
 	CurseGUIButton* btn;
 	CurseGUIEditBox* edb;
@@ -94,9 +93,7 @@ static void* plastic_eventhread(void* ptr)
 			case '0':
 				//testing window
 				wnd = g_gui->MkWindow(curso.X,curso.Y,55,40,"SomeWin");
-//				wnd = g_gui->GetWindowN("SomeWin");
 				g_gui->SetFocus(wnd);
-//				wnd->SetBoxed(false);
 				wnd->SetAutoAlloc(true);
 				pct = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
 				pct->SetAutoAlloc(true);
@@ -106,7 +103,6 @@ static void* plastic_eventhread(void* ptr)
 				edb = new CurseGUIEditBox(wnd->GetControls(),12,3,10,"");
 				chk = new CurseGUICheckBox(wnd->GetControls(),12,5,10,"Test A HIDDEN");
 				chk = new CurseGUICheckBox(wnd->GetControls(),12,6,10,"Test B");
-//				chk->SetChecked(true);
 				chk->SetDisabled(true);
 				prb = new CurseGUIProgrBar(wnd->GetControls(),12,8,16,0,100);
 				prb->SetShowPercent(true);
