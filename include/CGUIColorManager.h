@@ -54,6 +54,7 @@ public:
 	virtual ~CGUIColorManager();
 
 	short CheckPair(const SGUIPixel* px);
+	bool GetPairColors(SGUIPixel* dest, short pair);
 
 	void Flush();
 	void Apply();

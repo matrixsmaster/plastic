@@ -118,6 +118,16 @@ short CGUIColorManager::CheckPair(const SGUIPixel* px)
 	return 0; //default
 }
 
+bool CGUIColorManager::GetPairColors(SGUIPixel* dest, short pair)
+{
+	if ((!dest) || (pair < 1) || (pair > (short)pairs.size()))
+		return false;
+	pair--;
+	dest->bg = pairs.at(pair).tb;
+	dest->fg = pairs.at(pair).tf;
+	return true;
+}
+
 void CGUIColorManager::Apply()
 {
 	vector<SCTriple>::iterator ic;
