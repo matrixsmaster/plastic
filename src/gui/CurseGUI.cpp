@@ -569,7 +569,7 @@ CurseGUIWnd::CurseGUIWnd(CurseGUI* scrn, int x, int y, int w, int h)
 	}
 	//check height and Y position
 	if (y + h > ph) {
-		if (h< ph) y = ph - h - 1;
+		if (h < ph) y = ph - h - 1;
 		else {
 			h = ph;
 			y = 0;
@@ -624,7 +624,14 @@ void CurseGUIWnd::DrawDecoration()
 
 	//draw title (name)
 	if (showname) {
-		//TODO: title
+		//using this method to bypass the string operations
+		p = g_w / 2 - (name.size() + 4) / 2;
+		if (p < 0) p = 0;
+		mvwaddstr(wnd,0,p,"[ ");
+		p += 2;
+		mvwaddnstr(wnd,0,p,name.c_str(),g_w-4);
+		p += ((short)name.size() > g_w-4)? (g_w-4):((short)name.size());
+		mvwaddstr(wnd,0,p," ]");
 	}
 }
 

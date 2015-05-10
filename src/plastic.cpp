@@ -99,7 +99,6 @@ static void* plastic_eventhread(void* ptr)
 				pct = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
 				pct->SetAutoAlloc(true);
 				btn = new CurseGUIButton(wnd->GetControls(),2,7,10,"Test 1");
-
 				btn = new CurseGUIButton(wnd->GetControls(),12,2,10,"Test 2");
 				edb = new CurseGUIEditBox(wnd->GetControls(),12,3,10,"");
 				chk = new CurseGUICheckBox(wnd->GetControls(),12,5,10,"Test A HIDDEN");
@@ -116,6 +115,7 @@ static void* plastic_eventhread(void* ptr)
 				test.b = 500;
 				pct->ColorFill(test);
 				prb->Step();
+				wnd->ShowName(!wnd->IsShowName());
 				break;
 			case '8':
 				tbl->SetData("item set selected", 0, 0);
