@@ -27,6 +27,15 @@
 
 //#define WGCHUNKSZ (CHUNKBOX / VOXGRAIN)
 
+//pi const converted to integer to get rid of rounding errors
+#define WG_PI 3
+
+//3x3 chunks (or map cells) is a minimum for correct behavior
+#define WGMINPLANESD 3
+
+//number of chunks above the surface
+#define WGAIRCHUNKS 2
+
 #define WGRIVERQ 0.02
 #define WGPLANTQ 0.06
 #define WGPLANTSZ 0.01
@@ -67,6 +76,7 @@ struct SWGCell {
 struct SWGMapHeader {
 	int sx,sy,sz;
 	uli radius;
+	uli planeside;
 	long seed;
 };
 
@@ -80,6 +90,9 @@ private:
 	long org_seed;
 	vector3di wrldsz;
 	ulli plane;
+	ulli volume;
+	int planeside;
+	int planeX, planeY;		//to make it easy to work with non-spherical worlds
 	SWGCell* map;
 	uli cover[WGNUMKINDS];
 	int cities;
@@ -95,9 +108,11 @@ public:
 	void NewMap(long seed);
 
 	/* Statistics functions */
-	vector3di GetVolume()				{ return wrldsz; }
+	vector3di GetSizeVector()			{ return wrldsz; }
 	ulli GetAllocatedRAM()				{ return allocated; }
 	ulli GetPlaneArea()					{ return plane; }
+	int GetPlaneSide()					{ return planeside; }
+	ulli GetWorldVolume()				{ return volume; }
 	int GetNumCities()					{ return cities; }
 	int GetNumFactories()				{ return factories; }
 	uli GetNumCellsOf(EWGCellContent c)	{ return cover[c]; }

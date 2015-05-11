@@ -94,9 +94,14 @@ opts_begin:
 
 		//generate world to get area values
 		wgen = new WorldGen(s->world_r,NULL,0);
-		dim = wgen->GetVolume();
+		if (wgen->GetPlaneSide() < WGMINPLANESD) {
+			printf("Impossibly small world defined. Try bigger numbers!\n");
+			delete wgen;
+			break;
+		}
+		dim = wgen->GetSizeVector();
 		printf("Calculating values...\n");
-		printf("World volume dimensions = [%d, %d, %d]\n",dim.X,dim.Y,dim.Z);
+		printf("World bounding box dimensions = [%d, %d, %d]\n",dim.X,dim.Y,dim.Z);
 		printf("World surface area = %llu chunk^2\n",wgen->GetPlaneArea());
 
 		//get RAM weight of world map
@@ -107,7 +112,7 @@ opts_begin:
 		delete wgen;
 
 		//calculate estimate HDD consumption
-		cov = (float)(sizeof(VChunk)) * (float)dim.X * (float)dim.Y * (float)dim.Z;
+		cov = (float)(sizeof(VChunk)) * (float)wgen->GetWorldVolume();
 		cov = cov / 1024.f / 1024.f / 1024.f;
 		tb = cov / 1024.f;
 		pb = tb / 1024.f;
@@ -143,23 +148,23 @@ opts_begin:
 
 		//print covering values
 		cov = (float)wgen->GetNumCellsOf(WGCC_SPECBUILD) + (float)wgen->GetNumCellsOf(WGCC_CONCRETEB);
-		cov = cov / wgen->GetPlaneArea() * 100.f;
+		cov = cov / (float)wgen->GetPlaneArea() * 100.f;
 		printf("Industrial-related cells: %.2f%%\n",cov);
-		cov = (float)wgen->GetNumCellsOf(WGCC_HUGEBUILD) / wgen->GetPlaneArea() * 100.f;
+		cov = (float)wgen->GetNumCellsOf(WGCC_HUGEBUILD) / (float)wgen->GetPlaneArea() * 100.f;
 		printf("Downtown cells: %.2f%%\n",cov);
-		cov = (float)wgen->GetNumCellsOf(WGCC_MIDDLBLDS) / wgen->GetPlaneArea() * 100.f;
+		cov = (float)wgen->GetNumCellsOf(WGCC_MIDDLBLDS) / (float)wgen->GetPlaneArea() * 100.f;
 		printf("City end cells: %.2f%%\n",cov);
-		cov = (float)wgen->GetNumCellsOf(WGCC_SMALLBLDS) / wgen->GetPlaneArea() * 100.f;
+		cov = (float)wgen->GetNumCellsOf(WGCC_SMALLBLDS) / (float)wgen->GetPlaneArea() * 100.f;
 		printf("Suburb cells: %.2f%%\n",cov);
 		cov = (float)wgen->GetNumCellsOf(WGCC_HUGEBUILD) + (float)wgen->GetNumCellsOf(WGCC_MIDDLBLDS);
 		cov += (float)wgen->GetNumCellsOf(WGCC_SMALLBLDS);
-		cov = cov / wgen->GetPlaneArea() * 100.f;
+		cov = cov / (float)wgen->GetPlaneArea() * 100.f;
 		printf("Total city cells: %.2f%%\n",cov);
-		cov = (float)wgen->GetNumCellsOf(WGCC_TREEGRASS) / wgen->GetPlaneArea() * 100.f;
+		cov = (float)wgen->GetNumCellsOf(WGCC_TREEGRASS) / (float)wgen->GetPlaneArea() * 100.f;
 		printf("Park cells: %.2f%%\n",cov);
-		cov = (float)wgen->GetNumCellsOf(WGCC_WATERONLY) / wgen->GetPlaneArea() * 100.f;
+		cov = (float)wgen->GetNumCellsOf(WGCC_WATERONLY) / (float)wgen->GetPlaneArea() * 100.f;
 		printf("Water cells: %.2f%%\n",cov);
-		cov = (float)wgen->GetNumCellsOf(WGCC_WASTELAND) / wgen->GetPlaneArea() * 100.f;
+		cov = (float)wgen->GetNumCellsOf(WGCC_WASTELAND) / (float)wgen->GetPlaneArea() * 100.f;
 		printf("Pure wasteland cells: %.2f%%\n",cov);
 
 		//discard testing world

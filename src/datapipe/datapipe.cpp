@@ -87,6 +87,10 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 
 	/* Create and init the world generator */
 	wgen = new WorldGen(sets->world_r,voxeltab,voxtablen);
+	if (wgen->GetPlaneSide() < WGMINPLANESD) {
+		errout("Impossibly small world radius.\n");
+		return false;
+	}
 	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
 	if (!wgen->LoadMap(tmp)) {
 		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
@@ -95,8 +99,11 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 	allocated += wgen->GetAllocatedRAM();
 
 	/* Load external files */
-	if (!LoadVoxTab()) return false;	//Voxel table
-	ScanFiles();						//map known chunks
+	if (!LoadVoxTab()) {		//Voxel table
+		errout("Invalid root path or voxel table file is corrupted.\n");
+		return false;
+	}
+	ScanFiles();				//map known chunks
 
 	/* Allocate chunks buffers memory */
 	sz = sizeof(VChunk);

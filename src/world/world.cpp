@@ -40,7 +40,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
 	if (data->GetStatus() == DPIPE_ERROR) {
-		errout("Unable to initialize data pipe. Possibly invalid root directory.\n");
+		errout("Unable to initialize data pipe.\n");
 		result = 1;
 		return;
 	}
