@@ -40,9 +40,15 @@ bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe)
 
 	if (!pipe) return false;
 
+	//get class and body type string representation
 	cls = paclass_to_str[attr->cls].s;
-	bod = pabody_to_str[attr->body].s;
+	for (i = 0; i < NUMBODTYPE; i++)
+		if (pabody_to_str[i].b == attr->body) {
+			bod = pabody_to_str[i].s;
+			break;
+		}
 
+	//get applicable body types mask
 	GETSTATFIELD(Body,"_BMask");
 
 	//get body-related data

@@ -59,6 +59,8 @@ static void ishell_options(SGameSettings* s)
 	vector3di dim;
 
 opts_begin:
+
+	//display menu
 	puts("\nGame options:");
 	for (i = 0; i < GAMEARGTYPES; i++)
 		if (argp_table[i].edit) {
@@ -66,7 +68,8 @@ opts_begin:
 		}
 	puts("*) Exit to main menu");
 
-	while (!isprint(in = getchar())) ; //trash non-printable chars (NL,LF,EOF etc)
+	//process user input
+	MGETCHAR(in);
 	det = GAT_NOTHING;
 	for (i = 0; i < GAMEARGTYPES; i++)
 		if (argp_table[i].sw == in) {
@@ -174,7 +177,9 @@ static void ishell_player(SGameSettings* s)
 	DataPipeDummy* pdum;
 	SPAAttrib catr;
 	SPABase cbas;
+	const char* btstr;
 
+	//create lightweight data pipe for stats preview
 	pdum = new DataPipeDummy(s);
 	if (pdum->GetStatus() != DPIPE_IDLE) {
 		delete pdum;
@@ -183,15 +188,25 @@ static void ishell_player(SGameSettings* s)
 	}
 
 chargen_begin:
+
+	//get current body type string
+	for (i = 0; i < NUMBODTYPE; i++)
+		if (pabody_to_str[i].b == s->PCData.body) {
+			btstr = pabody_to_str[i].s;
+			break;
+		}
+
+	//display menu
 	puts("\nCharacter options:");
 	printf("1) Name\t\t(%s)\n",s->PCData.name);
 	printf("2) Gender\t(%c)\n",((s->PCData.female)? 'F':'M'));
 	printf("3) Class\t(%s)\n",paclass_to_str[s->PCData.cls].s);
-	printf("4) Body type\t(%s)\n",pabody_to_str[s->PCData.body].s);
+	printf("4) Body type\t(%s)\n",btstr);
 	puts("5) Review information about selected class and body");
 	puts("0) Exit ot main menu");
 
-	while (!isprint(in = getchar())) ; //trash non-printable chars (NL,LF,EOF etc)
+	//process input
+	MGETCHAR(in);
 	switch (in) {
 	case '0':
 		delete pdum;
@@ -205,7 +220,7 @@ chargen_begin:
 
 	case '2':
 		puts("New gender> Enter F or M");
-		while (!isprint(in = getchar())) ; //trash non-printable chars (NL,LF,EOF etc)
+		MGETCHAR(in);
 		s->PCData.female = ((in == 'f') || (in == 'F'));
 		break;
 
@@ -213,25 +228,43 @@ chargen_begin:
 		puts("Pick new class:");
 		for (i = 0; i < NUMCLASSES; i++)
 			printf("%1X: %s\n",(i+1),paclass_to_str[i].s);
-		while (!isprint(in = getchar())) ; //trash non-printable chars (NL,LF,EOF etc)
+
+		MGETCHAR(in);
 		i = (in < '9')? (in - '1'):(in - 'A' + 9); //convert hex character to value
 		if ((i < 0) || (i >= NUMCLASSES)) break; //and check the result
 		memcpy(&(s->PCData.cls),&i,sizeof(EPAClass));
 		break;
 
 	case '4':
+		puts("Pick new body type:");
+		for (i = 0; i < NUMBODTYPE; i++)
+			printf("%1X: %s\n",(i+1),pabody_to_str[i].s);
+
+		MGETCHAR(in);
+		in -= '1';
+		if ((in < 0) || (in >= NUMBODTYPE)) break;
+		i = 1 << in;
+		memcpy(&(s->PCData.body),&i,sizeof(EPABodyType));
 		break;
 
 	case '5':
 		catr = s->PCData;
+		//get the stats preview
 		if (!FillActorBasicStats(&catr,&cbas,pdum)) {
 			errout("Unable to download data from pipe!\n");
 			delete pdum;
 			return;
 		}
+
+		//get and display class description
 		GetActorClassDescr(s->PCData.cls,descr,sizeof(descr),pdum);
 		printf("\n\nClass: %s\n\n",paclass_to_str[s->PCData.cls].s);
 		printf("%s\n\n",descr);
+
+		//TODO: get and display body type description
+		printf("Body type: %s\n\n",btstr);
+		printf("%s\n\n",descr);
+
 		//print out class default stats
 		puts("Basic stats:");
 		printf("Charge capacity\t%d\tEngineering\t%d\n",cbas.CC,cbas.Eng);
@@ -244,6 +277,7 @@ chargen_begin:
 		printf("Reaction speed\t%d\tTrade\t\t%d\n",cbas.RS,cbas.Trd);
 		printf("Accuracy\t%d\n",cbas.Acc);
 		printf("AP\t%d\tDT\t%d\tDM\t%d\n\n",cbas.AP,cbas.DT,cbas.DM);
+
 		if (!(cbas.Body & s->PCData.body))
 			printf("Current body type is not applicable for this class.\n");
 		break;
@@ -266,7 +300,7 @@ shell_begin:
 	puts("0) Close shell and run the game");
 	puts("Q) Quit game");
 
-	while (!isprint(in = getchar())) ; //trash non-printable chars (NL,LF,EOF etc)
+	MGETCHAR(in);
 	switch (in) {
 	case '0':
 		return true;

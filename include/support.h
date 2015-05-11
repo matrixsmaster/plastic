@@ -26,6 +26,7 @@
 #include "visual.h"
 
 #define BOOLSTR(X) ((X)? "ON":"OFF")
+#define MGETCHAR(X) while (!isprint(X = getchar())) /*trash non-printable chars (NL,LF,EOF etc)*/
 
 /// Prints a simple formatted message to stderr.
 void errout(char const* fmt, ...);
