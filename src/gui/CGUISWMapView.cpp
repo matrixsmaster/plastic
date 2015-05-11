@@ -19,50 +19,70 @@
 
 #include "CGUISpecWnd.h"
 #include "CGUIControls.h"
-#include "inventory.h"
+#include "datapipe.h"
 
 
-CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
-	CurseGUIWnd(scrn,0,0,2,2)
+CurseGUIMapViewWnd::CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat) :
+		CurseGUIWnd(scrn,0,0,2,2)
 {
-	type = GUIWT_INVENTORY;
-	invent = iptr;
+	pipe = pdat;
+	name = "Map View";
+	showname = true;
 	ResizeWnd();
 }
 
-CurseGUIInventoryWnd::~CurseGUIInventoryWnd()
+CurseGUIMapViewWnd::~CurseGUIMapViewWnd()
 {
 	//TODO
 }
 
-void CurseGUIInventoryWnd::Update(bool refr)
+void CurseGUIMapViewWnd::ResizeWnd()
 {
-	//TODO
-	DrawDecoration();
-	if (refr) wrefresh(wnd);
+	int w,h,x,y;
+
+	w = MAPVIEWSIZEX * parent->GetWidth() / 100;
+	h = MAPVIEWSIZEY * parent->GetHeight() / 100;
+	x = parent->GetWidth() / 2 - w / 2;
+	y = parent->GetHeight() / 2 - h / 2;
+
+	Move(x,y);
+	Resize(w,h);
 }
 
-bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
+void CurseGUIMapViewWnd::Update(bool refr)
+{
+	//A template of GUI Window update process.
+	werase(wnd);				//make a room for window
+	UpdateBack();				//draw background image
+	ctrls->Update();			//update controls
+	DrawDecoration();		 	//draw border, title etc
+	wcolor_set(wnd,0,NULL);		//set default color pair (just in case)
+	if (refr) wrefresh(wnd);	//and refresh if necessary
+}
+
+bool CurseGUIMapViewWnd::PutEvent(SGUIEvent* e)
 {
 	if (will_close) return false;
 
+	/* Put the event to controls first */
+	if (ctrls->PutEvent(e)) return true;
+
+	/* Window-wide event */
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
 		switch (e->k) {
 		case GUI_DEFCLOSE: will_close = true; return true;
+		case '\t': ctrls->Rotate(); return true;
 		}
 		return false;
 
 	case GUIEV_RESIZE:
-		UpdateSize();
+		ResizeWnd();
 		return false; //don't consume resize event!
 
 	default: break;
 	}
-	return false;
-}
 
-void CurseGUIInventoryWnd::ResizeWnd()
-{
-	//TODO
+	/* That's not our event, pass thru */
+	return false;
 }

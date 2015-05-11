@@ -48,6 +48,9 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
 	printf("Core allocated memory: %llu bytes (%.3f GiB)\n",data->GetAllocatedRAM(),alloc_gb);
 
+	/* Bind keyboard */
+	BindKeys();
+
 	/* Create LVR */
 	lvr = new LVR(data);
 
@@ -149,8 +152,18 @@ void PlasticWorld::RemoveAllActors()
 	actors.clear();
 }
 
+void PlasticWorld::BindKeys()
+{
+	if (binder) delete binder;
+	binder = new KeyBinder(data);
+
+	binder->RegKeyByName("CONSOLE");
+	binder->RegKeyByName("MAP_VIEW");
+}
+
 void PlasticWorld::ProcessEvents(SGUIEvent* e)
 {
+	CurseGUIWnd* wptr;
 	//DEBUG:
 	vector3d tr = test->GetRot();
 	CurseGUIButton* btn;
@@ -160,45 +173,60 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
 		/* User pressed a key */
-		switch (e->k) { //FIXME: use binder
-		/* DEBUGging stuff */
-		case '`': dbg_toggle(); break;
-		case '[': scale -= 0.01; break;
-		case ']': scale += 0.01; break;
-		case ',': fov.X -= 0.1; break;
-		case '.': fov.X += 0.1; break;
-		case 'n': fov.Y -= 0.1; break;
-		case 'm': fov.Y += 0.1; break;
-		case '<': fov.X -= 1; break;
-		case '>': fov.X += 1; break;
-		case 'N': fov.Y -= 1; break;
-		case 'M': fov.Y += 1; break;
-		case ';': far--; break;
-		case '\'': far++; break;
-		case 't': fog--; break;
-		case 'y': fog++; break;
-		case '1': tr.X -= 2; break;
-		case '2': tr.X += 2; break;
-		case '3': tr.Y += 2; break;
-		case '4': tr.Y -= 2; break;
-		case '5': tr.Z -= 2; break;
-		case '6': tr.Z += 2; break;
-		case KEY_F(5):
-				if (CreateActor()) dbg_print("CA Success");
-				else dbg_print("CA FAILED");
-				return;
-		case KEY_F(4):
-				gui->GetColorManager()->Flush();
-				printf("TESTING: YOU SHOULDN'T SEE THIS!!!");
-				redrawwin(gui->GetWindow());
-				return;
-		case 'z': //KEY_F(2): //tmp
-			if(hud) {
-				if(hud->GetTransparent()) {
-					hud->SetTransparent(false);
-				} else hud->SetTransparent(true);
-			}
+		switch (binder->DecodeKey(e->k)) {
+		case 0: /*console*/
+			dbg_toggle();
 			break;
+
+		case 1: /*map view*/
+			wptr = gui->GetWindowN("Map View");
+			if (!wptr) {
+				wptr = new CurseGUIMapViewWnd(gui,data);
+				gui->AddWindow(wptr);
+			}
+			gui->SetFocus(wptr);
+			break;
+
+		default:
+			/* DEBUGging stuff */
+			switch (e->k) {
+			case '[': scale -= 0.01; break;
+			case ']': scale += 0.01; break;
+			case ',': fov.X -= 0.1; break;
+			case '.': fov.X += 0.1; break;
+			case 'n': fov.Y -= 0.1; break;
+			case 'm': fov.Y += 0.1; break;
+			case '<': fov.X -= 1; break;
+			case '>': fov.X += 1; break;
+			case 'N': fov.Y -= 1; break;
+			case 'M': fov.Y += 1; break;
+			case ';': far--; break;
+			case '\'': far++; break;
+			case 't': fog--; break;
+			case 'y': fog++; break;
+			case '1': tr.X -= 2; break;
+			case '2': tr.X += 2; break;
+			case '3': tr.Y += 2; break;
+			case '4': tr.Y -= 2; break;
+			case '5': tr.Z -= 2; break;
+			case '6': tr.Z += 2; break;
+			case KEY_F(5):
+					if (CreateActor()) dbg_print("CA Success");
+					else dbg_print("CA FAILED");
+					return;
+			case KEY_F(4):
+					gui->GetColorManager()->Flush();
+					printf("TESTING: YOU SHOULDN'T SEE THIS!!!");
+					redrawwin(gui->GetWindow());
+					return;
+			case 'z': //KEY_F(2): //tmp
+				if(hud) {
+					if(hud->GetTransparent()) {
+						hud->SetTransparent(false);
+					} else hud->SetTransparent(true);
+				}
+				break;
+			}
 		}
 
 		lvr->SetScale(scale);

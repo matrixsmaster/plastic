@@ -26,8 +26,6 @@
 #include <vector>
 #include "CurseGUI.h"
 
-#include "inventory.h"
-
 
 /* ********************************** Debug Console ********************************** */
 
@@ -61,6 +59,8 @@ public:
 
 /* ********************************** Inventory window ********************************** */
 
+class Inventory;
+
 class CurseGUIInventoryWnd : public CurseGUIWnd {
 private:
 	Inventory* invent;
@@ -70,6 +70,28 @@ private:
 public:
 	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);
 	virtual ~CurseGUIInventoryWnd();
+
+	void Update(bool refr);
+	bool PutEvent(SGUIEvent* e);
+};
+
+/* ********************************** Map View window ********************************** */
+
+//percent of coverage:
+#define MAPVIEWSIZEX 80
+#define MAPVIEWSIZEY 75
+
+class DataPipe;
+
+class CurseGUIMapViewWnd : public CurseGUIWnd {
+private:
+	DataPipe* pipe;
+
+	void ResizeWnd();
+
+public:
+	CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat);
+	virtual ~CurseGUIMapViewWnd();
 
 	void Update(bool refr);
 	bool PutEvent(SGUIEvent* e);

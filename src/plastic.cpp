@@ -30,6 +30,8 @@
 #include "CurseGUI.h"
 #include "world.h"
 #include "LVR.h"
+
+//DEBUG stuff:
 #include "CGUIControls.h"
 
 
@@ -38,7 +40,7 @@ static PlasticWorld*	g_wrld = NULL;
 static CurseGUI*		g_gui = NULL;
 static pthread_t		t_event = 0;
 static pthread_t		t_render = 0;
-static pthread_mutex_t	m_render;
+static pthread_mutex_t	m_render,m_resize;
 static bool				g_quit = false;
 static uli				g_fps = 0;
 
@@ -48,6 +50,7 @@ static uli				g_fps = 0;
 static void* plastic_eventhread(void* ptr)
 {
 	SGUIEvent my_e;
+	bool resz;
 
 	//projection testing:
 	vector2di curso;
@@ -66,12 +69,20 @@ static void* plastic_eventhread(void* ptr)
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 
+		/* Stop rendering any screen data while processing event */
 		pthread_mutex_lock(&m_render);
 
 		/* Events pump */
 		if (!g_gui->PumpEvents(&my_e)) {
+			/* Resize event will interfere with LVR frame processing, so lock it */
+			resz = (my_e.t == GUIEV_RESIZE);
+			if (resz) pthread_mutex_lock(&m_resize);
+
 			/* No one consumed event, need to be processed inside the core */
 			g_wrld->ProcessEvents(&my_e);
+
+			/* Unlock resize mutex if needed */
+			if (resz) pthread_mutex_unlock(&m_resize);
 		}
 
 		g_wrld->GetHUD()->UpdateFPS(g_fps);
@@ -89,7 +100,6 @@ static void* plastic_eventhread(void* ptr)
 
 		case GUIEV_KEYPRESS:
 			switch (my_e.k) {
-			case KEY_F(1): g_gui->MkWindow(curso.X,curso.Y,10,5,"Test"); break;
 			case '0':
 				//testing window
 				wnd = g_gui->MkWindow(curso.X,curso.Y,55,40,"SomeWin");
@@ -107,15 +117,10 @@ static void* plastic_eventhread(void* ptr)
 				prb = new CurseGUIProgrBar(wnd->GetControls(),12,8,16,0,100);
 				prb->SetShowPercent(true);
 				tbl = new CurseGUITable(wnd->GetControls(), 1, 9, 7, 3, 5, 7);
-
 				break;
 			case '9':
-				test.r = 1000;
-				test.g = 0;
-				test.b = 500;
-				pct->ColorFill(test);
-				prb->Step();
-				wnd->ShowName(!wnd->IsShowName());
+				my_e.t = GUIEV_RESIZE;
+				g_gui->AddEvent(&my_e);
 				break;
 			case '8':
 				tbl->SetData("item set selected", 0, 0);
@@ -156,7 +161,10 @@ static void* plastic_renderthread(void* ptr)
 	beg = clock();
 
 	while (!g_quit) {
+		pthread_mutex_lock(&m_resize);
 		lvr->Frame();
+		pthread_mutex_unlock(&m_resize);
+
 		fps++;
 		if ((clock() - beg) >= CLOCKS_PER_SEC) {
 			g_fps = fps;
@@ -204,8 +212,9 @@ static void plastic_start()
 	/* Init debug UI */
 	dbg_init(g_gui);
 
-	/* Create mutex */
+	/* Create mutexes */
 	pthread_mutex_init(&m_render,NULL);
+	pthread_mutex_init(&m_resize,NULL);
 
 	/* Start events processing thread */
 	pthread_create(&t_event,NULL,plastic_eventhread,NULL);
@@ -228,8 +237,9 @@ static void plastic_cleanup()
 		errout("OK\n");
 	}
 
-	/* Destroy mutex */
+	/* Destroy mutexes */
 	pthread_mutex_destroy(&m_render);
+	pthread_mutex_destroy(&m_resize);
 
 	/* Destroy debugging UI */
 	dbg_finalize();

@@ -106,6 +106,7 @@ public:
 	bool LoadMap(const char* fname);
 	void SaveMap(const char* fname);
 	void NewMap(long seed);
+	const SWGCell* GetMap()				{ return map; }
 
 	/* Statistics functions */
 	vector3di GetSizeVector()			{ return wrldsz; }

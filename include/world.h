@@ -58,6 +58,7 @@ private:
 	VModel* test;
 
 	//internal facilities
+	void BindKeys();
 	bool CreateActor();
 	void RemoveAllActors();
 
