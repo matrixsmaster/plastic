@@ -81,6 +81,11 @@ public:
 #define MAPVIEWSIZEX 80
 #define MAPVIEWSIZEY 75
 //#define MAPVIEWBORD 4
+#define MAPVIEWHIGHM 1.25
+#define MAPVIEWLOWM 0.75
+#define MAPVIEWRULX 5
+#define MAPVIEWRULY 3
+#define MAPVIEWRULSTR 16
 
 class DataPipe;
 
@@ -89,6 +94,7 @@ private:
 	DataPipe* pipe;
 	int scale;
 	int basex, basey;
+	bool showelev;
 
 	void ResizeWnd();
 	void DrawMap();

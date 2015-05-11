@@ -107,7 +107,9 @@ static void* plastic_eventhread(void* ptr)
 				wnd->ShowName(true);
 				wnd->SetAutoAlloc(true);
 				pct = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
+				test.r = 300; test.g = 0; test.b = 100;
 				pct->SetAutoAlloc(true);
+				pct->ColorFill(test);
 				btn = new CurseGUIButton(wnd->GetControls(),2,7,10,"Test 1");
 				btn = new CurseGUIButton(wnd->GetControls(),12,2,10,"Test 2");
 				edb = new CurseGUIEditBox(wnd->GetControls(),12,3,10,"");

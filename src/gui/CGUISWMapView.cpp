@@ -20,6 +20,7 @@
 #include "CGUISpecWnd.h"
 #include "CGUIControls.h"
 #include "datapipe.h"
+#include "support.h"
 
 
 static const SGUIPixel empty_tile = {
@@ -32,6 +33,7 @@ CurseGUIMapViewWnd::CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat) :
 	pipe = pdat;
 	basex = basey = 0;
 	scale = 1;
+	showelev = false;
 
 	name = "Map View";
 	showname = true;
@@ -61,25 +63,64 @@ void CurseGUIMapViewWnd::ResizeWnd()
 
 void CurseGUIMapViewWnd::DrawMap()
 {
-	int x,y,l,mx,my,ml;
+	int x,y,l,mx,my,ml,rt,rl;
+	unsigned k,u;
+	char vert[MAPVIEWRULSTR],horz[MAPVIEWRULSTR];
 	const SWGCell* map = pipe->GetGlobalSurfaceMap();
 	vector2di msz = pipe->GetGlobalSurfaceSize();
+	vector3d col;
+
+	//prepare rulers
+	rt = (g_w-3) / MAPVIEWRULX;
+	rl = (g_h-3) / MAPVIEWRULY;
+	vert[0] = 0;
 
 	/* Draw the map */
 	for (y = 0; y < g_h-3; y++) {
 		l = (y + 2) * g_w + 2; //make a room for a window border and a ruler
+		if (l >= backgr_size) break; //just in case, check buffer bounds
+
 		//apply scale
 		if (scale > 0) //magnification
 			my = (y + basey) / scale;
 		else //shrinking
 			my = (y + basey) * -scale;
 
+		//draw the vertical ruler
+		if (y % rl == 0) {
+			snprintf(vert,sizeof(vert),"-%d",my);
+			u = 0;
+		}
+		if (u < strlen(vert)) {
+			backgr[l-1] = empty_tile;
+			backgr[l-1].sym = vert[u++];
+		} else
+			backgr[l-1].sym = ' ';
+
+		//reset horizontal ruler string
+		horz[0] = 0;
+
 		for (x = 0; x < g_w-3; x++, l++) {
+			if (l >= backgr_size) break; //just in case, check buffer bounds
+
 			//apply scale
 			if (scale > 0) //magnification
 				mx = (x + basex) / scale;
 			else //shrinking
 				mx = (x + basex) * -scale;
+
+			//draw the horizontal ruler
+			if (y == 0) {
+				if (x % rt == 0) {
+					snprintf(horz,sizeof(horz),"|%d",mx);
+					k = 0;
+				}
+				if (k < strlen(horz)) {
+					backgr[l-g_w] = empty_tile;
+					backgr[l-g_w].sym = horz[k++];
+				} else
+					backgr[l-g_w].sym = ' ';
+			}
 
 			//calculate map cell linear address
 			ml = (msz.Y - my - 1) * msz.X + mx; //invert Y axis
@@ -91,12 +132,22 @@ void CurseGUIMapViewWnd::DrawMap()
 				backgr[l] = empty_tile;
 			else {
 				backgr[l] = wrld_tiles[map[ml].t];
-				//TODO: elev
+
+				//Elevation
+				if (!showelev) continue;
+				col = tripletovecf(backgr[l].bg);
+				switch (map[ml].elev) {
+				case 0: col *= MAPVIEWLOWM; break;
+				case 1: break;
+				case 2: col *= MAPVIEWHIGHM; break;
+				}
+				if (col.X > 1000) col.X = 1000;
+				if (col.Y > 1000) col.Y = 1000;
+				if (col.Z > 1000) col.Z = 1000;
+				backgr[l].bg = vecftotriple(col);
 			}
 		}
 	}
-
-	/* Draw the rulers */
 }
 
 bool CurseGUIMapViewWnd::PutEvent(SGUIEvent* e)
@@ -112,12 +163,26 @@ bool CurseGUIMapViewWnd::PutEvent(SGUIEvent* e)
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
 		switch (e->k) {
+
+		//standard controls
 		case GUI_DEFCLOSE: will_close = true; return true;
 		case '\t': ctrls->Rotate(); return true;
+		default: return true; //consume ALL keyboard events
+
+		//elevation showing
+		case 'e':
+		case 'E':
+			showelev ^= true;
+			DrawMap();
+			break;
+
+		//navigation
 		case KEY_UP: basey--; d = true; break;
 		case KEY_DOWN: basey++; d = true; break;
 		case KEY_LEFT: basex--; d = true; break;
 		case KEY_RIGHT: basex++; d = true; break;
+
+		//scale
 		case '-':
 			scale--;
 			if (scale == 0) scale = -1;
