@@ -49,13 +49,11 @@ bool CurseGUIBase::UpdateSize()
 
 	getmaxyx(wnd,h,w);
 
-	if ((h != g_h) || (w != g_w)) {
-		//size was changed
-		ResizeBack();
-		r = true;
-	}
+	r = ((h != g_h) || (w != g_w));
 	g_h = h;
 	g_w = w;
+
+	if (r) ResizeBack();
 
 	return r;
 }

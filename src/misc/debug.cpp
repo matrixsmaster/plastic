@@ -38,7 +38,7 @@ void dbg_toggle()
 	if (debug_ui) debug_ui->ToggleShow();
 }
 
-void dbg_logstr(char* str)
+void dbg_logstr(const char* str)
 {
 	if (debug_ui) debug_ui->PutString(str);
 }
