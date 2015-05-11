@@ -22,13 +22,23 @@
 #include "datapipe.h"
 
 
+static const SGUIPixel empty_tile = {
+		' ', { 1000, 1000, 1000 }, { 0, 0, 0 }
+};
+
 CurseGUIMapViewWnd::CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat) :
 		CurseGUIWnd(scrn,0,0,2,2)
 {
 	pipe = pdat;
+	basex = basey = 0;
+	scale = 1;
+
 	name = "Map View";
 	showname = true;
+
 	ResizeWnd();
+	SetAutoAlloc(true);
+	DrawMap();
 }
 
 CurseGUIMapViewWnd::~CurseGUIMapViewWnd()
@@ -49,19 +59,50 @@ void CurseGUIMapViewWnd::ResizeWnd()
 	Resize(w,h);
 }
 
-void CurseGUIMapViewWnd::Update(bool refr)
+void CurseGUIMapViewWnd::DrawMap()
 {
-	//A template of GUI Window update process.
-	werase(wnd);				//make a room for window
-	UpdateBack();				//draw background image
-	ctrls->Update();			//update controls
-	DrawDecoration();		 	//draw border, title etc
-	wcolor_set(wnd,0,NULL);		//set default color pair (just in case)
-	if (refr) wrefresh(wnd);	//and refresh if necessary
+	int x,y,l,mx,my,ml;
+	const SWGCell* map = pipe->GetGlobalSurfaceMap();
+	vector2di msz = pipe->GetGlobalSurfaceSize();
+
+	/* Draw the map */
+	for (y = 0; y < g_h-3; y++) {
+		l = (y + 2) * g_w + 2; //make a room for a window border and a ruler
+		//apply scale
+		if (scale > 0) //magnification
+			my = (y + basey) / scale;
+		else //shrinking
+			my = (y + basey) * -scale;
+
+		for (x = 0; x < g_w-3; x++, l++) {
+			//apply scale
+			if (scale > 0) //magnification
+				mx = (x + basex) / scale;
+			else //shrinking
+				mx = (x + basex) * -scale;
+
+			//calculate map cell linear address
+			ml = (msz.Y - my - 1) * msz.X + mx; //invert Y axis
+
+			if (	(mx < 0) || (mx >= msz.X) ||
+					(my < 0) || (my >= msz.Y) ||
+					(ml >= (msz.X*msz.Y)) )
+
+				backgr[l] = empty_tile;
+			else {
+				backgr[l] = wrld_tiles[map[ml].t];
+				//TODO: elev
+			}
+		}
+	}
+
+	/* Draw the rulers */
 }
 
 bool CurseGUIMapViewWnd::PutEvent(SGUIEvent* e)
 {
+	bool d = false;
+
 	if (will_close) return false;
 
 	/* Put the event to controls first */
@@ -73,14 +114,35 @@ bool CurseGUIMapViewWnd::PutEvent(SGUIEvent* e)
 		switch (e->k) {
 		case GUI_DEFCLOSE: will_close = true; return true;
 		case '\t': ctrls->Rotate(); return true;
+		case KEY_UP: basey--; d = true; break;
+		case KEY_DOWN: basey++; d = true; break;
+		case KEY_LEFT: basex--; d = true; break;
+		case KEY_RIGHT: basex++; d = true; break;
+		case '-':
+			scale--;
+			if (scale == 0) scale = -1;
+			d = true;
+			break;
+		case '=':
+			scale++;
+			if (scale == 0) scale = 1;
+			d = true;
+			break;
 		}
-		return false;
+		break;
 
 	case GUIEV_RESIZE:
 		ResizeWnd();
+		DrawMap();
 		return false; //don't consume resize event!
 
 	default: break;
+	}
+
+	if (d) {
+		//update map and consume event
+		DrawMap();
+		return true;
 	}
 
 	/* That's not our event, pass thru */

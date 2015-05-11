@@ -80,20 +80,23 @@ public:
 //percent of coverage:
 #define MAPVIEWSIZEX 80
 #define MAPVIEWSIZEY 75
+//#define MAPVIEWBORD 4
 
 class DataPipe;
 
 class CurseGUIMapViewWnd : public CurseGUIWnd {
 private:
 	DataPipe* pipe;
+	int scale;
+	int basex, basey;
 
 	void ResizeWnd();
+	void DrawMap();
 
 public:
 	CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat);
 	virtual ~CurseGUIMapViewWnd();
 
-	void Update(bool refr);
 	bool PutEvent(SGUIEvent* e);
 };
 

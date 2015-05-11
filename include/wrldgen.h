@@ -25,15 +25,13 @@
 #include "vecmath.h"
 #include "prngen.h"
 
-//#define WGCHUNKSZ (CHUNKBOX / VOXGRAIN)
-
-//pi const converted to integer to get rid of rounding errors
+/* PI const converted to integer to get rid of rounding errors */
 #define WG_PI 3
 
-//3x3 chunks (or map cells) is a minimum for correct behavior
+/* 3x3 chunks (or map cells) is a minimum for correct behavior */
 #define WGMINPLANESD 3
 
-//number of chunks above the surface
+/* Number of chunks above the surface */
 #define WGAIRCHUNKS 2
 
 #define WGRIVERQ 0.02
@@ -64,7 +62,24 @@ enum EWGCellContent {
 	WGCC_CITYCENTR,	//city or small town center marker
 };
 
+/* Text representation of map cells */
 static const char wrld_code[WGNUMKINDS+1] = ".#^%~$=SMHPC";
+
+/* Pseudographic tile representation of map cells */
+static const SGUIPixel wrld_tiles[WGNUMKINDS] = {
+		{ '.', { 1000, 1000, 1000 }, {    0,    0,    0 } },
+		{ '#', { 1000, 1000, 1000 }, {    0,    0,    0 } },
+		{ '^', { 1000, 1000, 1000 }, {    0,    0,    0 } },
+		{ '%', { 1000, 1000, 1000 }, {    0,    0,    0 } },
+		{ '~', { 1000, 1000, 1000 }, {    0,    0,    0 } },
+		{ '$', { 1000, 1000, 1000 }, {    0,    0,    0 } },
+		{ '=', { 1000, 1000, 1000 }, {    0,    0,    0 } },
+		{ 'S', { 1000, 1000, 1000 }, {    0,    0,    0 } },
+		{ 'M', { 1000, 1000, 1000 }, {    0,    0,    0 } },
+		{ 'H', { 1000, 1000, 1000 }, {    0,    0,    0 } },
+		{ 'P', { 1000, 1000, 1000 }, {    0,    0,    0 } },
+		{ 'C', { 1000,    0,    0 }, {    0,    0,    0 } },
+};
 
 /* Map cell data */
 struct SWGCell {
@@ -73,6 +88,7 @@ struct SWGCell {
 	long seed;
 };
 
+/* Map save file header data */
 struct SWGMapHeader {
 	int sx,sy,sz;
 	uli radius;
