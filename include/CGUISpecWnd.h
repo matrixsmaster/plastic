@@ -61,6 +61,10 @@ public:
 
 /* ********************************** Inventory window ********************************** */
 
+//percent of coverage:
+#define INVENTSIZEX 70
+#define INVENTSIZEY 70
+
 class Inventory;
 
 class CurseGUIInventoryWnd : public CurseGUIWnd {

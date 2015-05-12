@@ -155,6 +155,7 @@ void PlasticWorld::BindKeys()
 	binder->RegKeyByName("CONSOLE");
 	binder->RegKeyByName("CHAR_TAB");
 	binder->RegKeyByName("MAP_VIEW");
+	binder->RegKeyByName("INVENTORY");
 	binder->RegKeyByName("RENDER_CFG");
 }
 
@@ -191,7 +192,11 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			(reinterpret_cast<CurseGUIMapViewWnd*>(wptr))->SetPos(PC->GetGPos());
 			break;
 
-		case 3: /*LVR config*/
+		case 3: /*inventory*/
+			SPAWNWNDMACRO("Inventory",new CurseGUIInventoryWnd(gui,PC->GetInventory()));
+			break;
+
+		case 4: /*LVR config*/
 			SPAWNWNDMACRO("LVR config",new CurseGUIRenderConfWnd(gui,lvr));
 			break;
 

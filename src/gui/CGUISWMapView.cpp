@@ -30,13 +30,14 @@ static const SGUIPixel empty_tile = {
 CurseGUIMapViewWnd::CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat) :
 		CurseGUIWnd(scrn,0,0,2,2)
 {
+	type = GUIWT_OTHER;
+	name = "Map View";
+	showname = true;
+
 	pipe = pdat;
 	scale = 1;
 	showelev = false;
 	m_w = m_h = 0;
-
-	name = "Map View";
-	showname = true;
 
 	ResizeWnd();
 	SetAutoAlloc(true);
