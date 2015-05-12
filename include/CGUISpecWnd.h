@@ -80,7 +80,6 @@ public:
 //percent of coverage:
 #define MAPVIEWSIZEX 80
 #define MAPVIEWSIZEY 75
-//#define MAPVIEWBORD 4
 #define MAPVIEWHIGHM 1.25
 #define MAPVIEWLOWM 0.75
 #define MAPVIEWRULX 5
@@ -94,7 +93,6 @@ private:
 	DataPipe* pipe;
 	int scale;
 	vector2di base;
-//	vector2di shft;
 	vector3di pos;
 	bool showelev;
 	int m_w, m_h;
@@ -107,6 +105,21 @@ public:
 	virtual ~CurseGUIMapViewWnd()		{}
 
 	void SetPos(const vector3di p)		{ pos = p; }
+
+	bool PutEvent(SGUIEvent* e);
+};
+
+/* ********************************** Renderer Config window ********************************** */
+
+class LVR;
+
+class CurseGUIRenderConfWnd : public CurseGUIWnd {
+private:
+	LVR* lvr;
+
+public:
+	CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr);
+	virtual ~CurseGUIRenderConfWnd()	{}
 
 	bool PutEvent(SGUIEvent* e);
 };

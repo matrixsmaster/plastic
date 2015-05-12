@@ -49,8 +49,8 @@ WorldGen::WorldGen(uli r, SVoxelInf* tab, int tablen)
 	for (l = 1; l <= radius; l++)
 		volume += (2ULL * WG_PI * l) * (2ULL * WG_PI * l);
 
-	//allocate map memory
-	if (planeside >= WGMINPLANESD) {
+	//allocate map memory (only if radius is correct)
+	if (r >= WGMINRADIUS) {
 		l = plane * sizeof(SWGCell);
 		map = (SWGCell*)malloc(l);
 		memset(map,0,l);

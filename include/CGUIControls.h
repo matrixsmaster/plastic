@@ -254,6 +254,23 @@ public:
 
 /* ******************************************************************** */
 
+class CurseGUILabel : public CurseGUIControl
+{
+public:
+	CurseGUILabel(CurseGUICtrlHolder* p, int x, int y, int w, std::string capt);
+	virtual ~CurseGUILabel()				{}
+
+	void SetCaption(std::string capt)		{ text = capt; }
+
+	//Label is a static element, cannot be selected.
+	bool Select(bool s)						{ return false; }
+	bool IsSelected()						{ return false; }
+
+	void Update();
+	bool PutEvent(SGUIEvent* e)				{ return false; }
+};
+
+/* ******************************************************************** */
 
 /*
  * TODO:

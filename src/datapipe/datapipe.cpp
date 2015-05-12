@@ -86,11 +86,11 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 	allocated += sz;
 
 	/* Create and init the world generator */
-	wgen = new WorldGen(sets->world_r,voxeltab,voxtablen);
-	if (wgen->GetPlaneSide() < WGMINPLANESD) {
+	if (sets->world_r < WGMINRADIUS) {
 		errout("Impossibly small world radius.\n");
 		return false;
 	}
+	wgen = new WorldGen(sets->world_r,voxeltab,voxtablen);
 	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
 	if (!wgen->LoadMap(tmp)) {
 		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());

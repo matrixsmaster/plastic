@@ -91,14 +91,13 @@ opts_begin:
 		printf("Current radius = %lu\n",s->world_r);
 		printf("New radius> ");
 		scanf("%lu",&(s->world_r));
+		if (s->world_r < WGMINRADIUS) {
+			printf("Impossibly small world defined. Try bigger numbers!\n");
+			break;
+		}
 
 		//generate world to get area values
 		wgen = new WorldGen(s->world_r,NULL,0);
-		if (wgen->GetPlaneSide() < WGMINPLANESD) {
-			printf("Impossibly small world defined. Try bigger numbers!\n");
-			delete wgen;
-			break;
-		}
 		dim = wgen->GetSizeVector();
 		printf("Calculating values...\n");
 		printf("World bounding box dimensions = [%d, %d, %d]\n",dim.X,dim.Y,dim.Z);
