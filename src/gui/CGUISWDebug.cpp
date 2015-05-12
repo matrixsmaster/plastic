@@ -37,11 +37,6 @@ CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn) :
 	PutEvent(&e);
 }
 
-CurseGUIDebugWnd::~CurseGUIDebugWnd()
-{
-	//TODO
-}
-
 void CurseGUIDebugWnd::ToggleShow()
 {
 	hidden ^= true;
@@ -103,13 +98,11 @@ bool CurseGUIDebugWnd::PutEvent(SGUIEvent* e)
 		switch (e->k) {
 		case KEY_ENTER:
 		case 10: /* in case enter isn't enter */
-//			if(!hidden) { //FIXME: there's no need to do such a things :)
-				//TODO parse command
-				if(edit_line.size() > 1) {
-					PutString(edit_line.c_str()+1);
-					edit_line = ">";
-				}
-//			}
+			//TODO parse command
+			if(edit_line.size() > 1) {
+				PutString(edit_line.c_str()+1);
+				edit_line = ">";
+			}
 			break;
 		case KEY_BACKSPACE:
 		case 127: /* in case backspace isn't delete */

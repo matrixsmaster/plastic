@@ -130,7 +130,7 @@ bool DataPipe::ScanFiles()
 	return true;
 }
 
-bool DataPipe::FindChunk(vector3dulli pos, SDataPlacement* res)
+bool DataPipe::FindChunk(vector3di pos, SDataPlacement* res)
 {
 	if (!res) return false;
 
@@ -183,7 +183,7 @@ void DataPipe::PurgeChunks()
 	Unlock();
 }
 
-void DataPipe::SetGP(vector3dulli pos)
+void DataPipe::SetGP(vector3di pos)
 {
 	SDataPlacement plc;
 	GP = pos;

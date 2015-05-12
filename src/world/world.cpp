@@ -63,11 +63,12 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	far = DEFFARPLANE;
 	fog = DEFFOGPLANE;
 	fov = vector3d(DEFFOVX,DEFFOVY,1);
-	data->SetGP(vector3dulli(0));
+	data->SetGP(vector3di(0));
 	test = data->LoadModel("testmodel.dat",vector3di(128,100,135));
 	if (!test) abort();
 	lvr->SetPosition(vector3d(128,90,135));
 	PC->SetPos(vector3di(128,90,135));
+	PC->SetGPos(vector3di(0));
 	lvr->SetFogStart(fog);
 	lvr->SetFogColor(vector3di(100));
 }
@@ -185,6 +186,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				gui->AddWindow(wptr);
 			}
 			gui->SetFocus(wptr);
+			(reinterpret_cast<CurseGUIMapViewWnd*>(wptr))->SetPos(PC->GetGPos());
 			break;
 
 		default:

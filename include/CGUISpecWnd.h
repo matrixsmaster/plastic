@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include "CurseGUI.h"
+#include "vecmath.h"
 
 
 /* ********************************** Debug Console ********************************** */
@@ -41,7 +42,7 @@ private:
 
 public:
 	CurseGUIDebugWnd(CurseGUI* scrn);
-	virtual ~CurseGUIDebugWnd();
+	virtual ~CurseGUIDebugWnd()			{}
 
 	//Debug console is always focused if shown.
 	bool GainFocus()					{ return focused; }
@@ -69,9 +70,8 @@ private:
 
 public:
 	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);
-	virtual ~CurseGUIInventoryWnd();
+	virtual ~CurseGUIInventoryWnd()		{}
 
-	void Update(bool refr);
 	bool PutEvent(SGUIEvent* e);
 };
 
@@ -93,15 +93,20 @@ class CurseGUIMapViewWnd : public CurseGUIWnd {
 private:
 	DataPipe* pipe;
 	int scale;
-	int basex, basey;
+	vector2di base;
+//	vector2di shft;
+	vector3di pos;
 	bool showelev;
+	int m_w, m_h;
 
 	void ResizeWnd();
 	void DrawMap();
 
 public:
 	CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat);
-	virtual ~CurseGUIMapViewWnd();
+	virtual ~CurseGUIMapViewWnd()		{}
+
+	void SetPos(const vector3di p)		{ pos = p; }
 
 	bool PutEvent(SGUIEvent* e);
 };

@@ -30,16 +30,9 @@ CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
 	ResizeWnd();
 }
 
-CurseGUIInventoryWnd::~CurseGUIInventoryWnd()
+void CurseGUIInventoryWnd::ResizeWnd()
 {
 	//TODO
-}
-
-void CurseGUIInventoryWnd::Update(bool refr)
-{
-	//TODO
-	DrawDecoration();
-	if (refr) wrefresh(wnd);
 }
 
 bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
@@ -60,9 +53,4 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 	default: break;
 	}
 	return false;
-}
-
-void CurseGUIInventoryWnd::ResizeWnd()
-{
-	//TODO
 }

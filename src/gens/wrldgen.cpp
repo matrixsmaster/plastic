@@ -312,8 +312,9 @@ void WorldGen::NewMap(long seed)
 					//suburbs
 					ptr->t = WGCC_SMALLBLDS;
 				} else if (rng->FloatNum() > 0.5) {
-					//parks
-					ptr->t = WGCC_TREEGRASS;
+					//parks; don't touch industrial sites
+					if ((ptr->t != WGCC_CONCRETEB) && (ptr->t != WGCC_SPECBUILD))
+						ptr->t = WGCC_TREEGRASS;
 				} else
 					continue; //or just doesn't touch anything
 				ptr->elev = elv;
