@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include "CurseGUI.h"
+#include "CGUIControls.h"
 #include "vecmath.h"
 
 
@@ -116,6 +117,21 @@ class LVR;
 class CurseGUIRenderConfWnd : public CurseGUIWnd {
 private:
 	LVR* lvr;
+	float scale;
+	vector3d fov;
+	int far,fog;
+	vector3di fogcol;
+	CurseGUIEditBox* e_scale;
+	CurseGUIEditBox* e_fovx,*e_fovy;
+	CurseGUIEditBox* e_far;
+	CurseGUIEditBox* e_fog;
+	CurseGUIEditBox* e_fogr,*e_fogg,*e_fogb;
+	CurseGUIButton* b_apply,*b_reset;
+
+	void Fill();
+	void Scan();
+	void Apply();
+	void Reset();
 
 public:
 	CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr);

@@ -40,13 +40,13 @@ LVR::LVR(DataPipe* pipe)
 
 	g_w = g_h = 0;
 	rot = GenOMatrix();
-	scale = vector3d(1);
+	scale = vector3d(DEFSCALE);
 
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
 	far = DEFFARPLANE;
 	fog = DEFFOGPLANE;
-	dfog = 0; //no fog
+	SetFogColor(vector3di(DEFFOGGRAY));
 
 	skies = (pipe)? (new AtmoSky(pipe)):NULL;
 }

@@ -95,6 +95,7 @@ bool CurseGUIButton::PutEvent(SGUIEvent* e)
 
 		//Do some action with button
 		if (e->m.bstate & BUTTON1_CLICKED) {
+			holder->Select(this);
 			Click();
 			return true;
 		}

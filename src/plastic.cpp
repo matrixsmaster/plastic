@@ -99,6 +99,7 @@ static void* plastic_eventhread(void* ptr)
 			break;
 
 		case GUIEV_KEYPRESS:
+#if 0
 			switch (my_e.k) {
 			case '0':
 				//testing window
@@ -131,6 +132,7 @@ static void* plastic_eventhread(void* ptr)
 				tbl->SetData("Zwei kleine Jagermeister. Ein kleine Wassershprot.", 2, 3);
 				break;
 			}
+#endif
 			break;
 
 		default: break;
