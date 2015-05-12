@@ -100,7 +100,7 @@ bool CurseGUICheckBox::PutEvent(SGUIEvent* e)
 		if ((y < 0) || (y >= 1)) return false;
 
 		//Do some action with button
-		if (e->m.bstate & BUTTON1_CLICKED) {
+		if (e->m.bstate & CGMOUSE_LEFT) {
 			Check();
 			return true;
 		}

@@ -22,6 +22,8 @@
 #include <string.h>
 #include <math.h>
 #include "wrldgen.h"
+#include "vecmath.h"
+#include "vecmisc.h"
 
 
 WorldGen::WorldGen(uli r, SVoxelInf* tab, int tablen)
@@ -75,6 +77,7 @@ void WorldGen::GenerateChunk(PChunk buf)
 	voxel v;
 	if (!buf) return;
 	//FIXME: for debug only
+#if 1
 	for (z = 0; z < CHUNKBOX; z++) {
 		for (y = 0; y < CHUNKBOX; y++) {
 			for (x = 0; x < CHUNKBOX; x++) {
@@ -89,6 +92,48 @@ void WorldGen::GenerateChunk(PChunk buf)
 			}
 		}
 	}
+
+#else
+
+	vector3d crn[4];
+	SWGCell* ptr = map + (planeY / 2 * planeX + planeX / 2);
+//	z = (CHUNKBOX / WGELEVATIONS) * ptr->elev;
+
+	crn[1].X = 0;
+	crn[1].Y = CHUNKBOX;
+	crn[1].Z = (CHUNKBOX / WGELEVATIONS) * 0;//ptr->elev;
+
+	ptr++;
+	crn[2].X = CHUNKBOX;
+	crn[2].Y = CHUNKBOX;
+	crn[2].Z = (CHUNKBOX / WGELEVATIONS) * 1;//ptr->elev;
+
+	ptr += planeX;
+	crn[3].X = CHUNKBOX;
+	crn[3].Y = 0;
+	crn[3].Z = (CHUNKBOX / WGELEVATIONS) * 1;//ptr->elev;
+
+	ptr--;
+	crn[0].X = 0;
+	crn[0].Y = 0;
+	crn[0].Z = (CHUNKBOX / WGELEVATIONS) * 1;//ptr->elev;
+
+//	int zi;
+
+	for (y = 0; y < CHUNKBOX; y++) {
+		for (x = 0; x < CHUNKBOX; x++) {
+			t = InterpolateZQ(crn,x,y);
+//			for (zi = 0; zi < CHUNKBOX; zi++) {
+//				v = (z+zi < t)? 1:0;
+//				(*buf)[zi][y][x] = v;
+//			}
+			for (z = 0; z < CHUNKBOX; z++) {
+				v = (z < t)? 1:0;
+				(*buf)[z][y][x] = v;
+			}
+		}
+	}
+#endif
 }
 
 bool WorldGen::LoadMap(const char* fname)

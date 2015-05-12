@@ -43,6 +43,8 @@
 #define WGCITYSUBS 0.6
 #define WGCITYNOISE 0.2
 
+#define WGELEVATIONS 3
+
 /* Map cell content type (surface cells) */
 #define WGNUMKINDS 12
 

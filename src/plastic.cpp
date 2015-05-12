@@ -91,7 +91,7 @@ static void* plastic_eventhread(void* ptr)
 		d = false;
 		switch (my_e.t) {
 		case GUIEV_MOUSE:
-			if (my_e.m.bstate & BUTTON1_CLICKED) {
+			if (my_e.m.bstate & CGMOUSE_LEFT) {
 				curso.X = my_e.m.x;
 				curso.Y = my_e.m.y;
 				d = true;

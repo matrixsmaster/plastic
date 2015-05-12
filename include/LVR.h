@@ -32,15 +32,15 @@
 #include "sky.h"
 
 
-#define LVRDEBUG 1
+//#define LVRDEBUG 1
 //#define LVRDOUBLEBUFFERED 1
 
-#define DEFSCALE 0.33
-#define DEFFOVX 28
-#define DEFFOVY 14
-#define DEFFARPLANE 32
+#define DEFSCALE 1.f
+#define DEFFOVX 115
+#define DEFFOVY 62
+#define DEFFARPLANE 61
 #define DEFFOGPLANE 21
-#define DEFFOGGRAY 100
+#define DEFFOGGRAY 40
 
 
 class LVR {

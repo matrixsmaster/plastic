@@ -28,7 +28,10 @@ using namespace std;
 CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
 		CurseGUIWnd(scrn,8,8,26,8)
 {
+	type = GUIWT_OTHER;
 	name = "LVR config";
+	showname = true;
+
 	lvr = plvr;
 	scale = lvr->GetScale();
 	fov = lvr->GetFOV();
