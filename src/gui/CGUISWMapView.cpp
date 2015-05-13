@@ -59,7 +59,7 @@ void CurseGUIMapViewWnd::ResizeWnd()
 
 void CurseGUIMapViewWnd::DrawMap()
 {
-	int x,y,l,mx,my,ml,rt,rl;
+	int x,y,l,mx,my,myi,ml,rt,rl;
 	unsigned k,u;
 	char vert[MAPVIEWRULSTR],horz[MAPVIEWRULSTR];
 	const SWGCell* map = pipe->GetGlobalSurfaceMap();
@@ -71,8 +71,8 @@ void CurseGUIMapViewWnd::DrawMap()
 	m_h = g_h - 3;
 
 	//calculate shift
-	mbs.X = pos.X + msz.X / 2;
-	mbs.Y = pos.Y + msz.Y / 2;
+	mbs.X = pos.X;
+	mbs.Y = pos.Y;
 	mbs += base;
 	if (scale > 0) mbs *= scale;
 	else mbs /= scale * -1;
@@ -94,9 +94,11 @@ void CurseGUIMapViewWnd::DrawMap()
 		else //shrinking
 			my = (y + mbs.Y) * -scale;
 
+		myi = msz.Y - my - 1; //invert Y axis
+
 		//draw the vertical ruler
 		if (y % rl == 0) {
-			snprintf(vert,sizeof(vert),">%d",(my-msz.Y/2));
+			snprintf(vert,sizeof(vert),">%d",myi);
 			u = 0;
 		}
 		if (u < strlen(vert)) {
@@ -120,7 +122,7 @@ void CurseGUIMapViewWnd::DrawMap()
 			//draw the horizontal ruler
 			if (y == 0) {
 				if (x % rt == 0) {
-					snprintf(horz,sizeof(horz),"|%d",(mx-msz.X/2));
+					snprintf(horz,sizeof(horz),"|%d",mx);
 					k = 0;
 				}
 				if (k < strlen(horz)) {
@@ -131,7 +133,7 @@ void CurseGUIMapViewWnd::DrawMap()
 			}
 
 			//calculate map cell linear address
-			ml = (msz.Y - my - 1) * msz.X + mx; //invert Y axis
+			ml = myi * msz.X + mx;
 
 			if (	(mx < 0) || (mx >= msz.X) ||
 					(my < 0) || (my >= msz.Y) ||

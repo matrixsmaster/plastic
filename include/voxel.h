@@ -38,18 +38,33 @@
 typedef unsigned short int voxel; //must be a 16-bit wide
 
 ///Voxel physical type.
-enum EVoxelPType {
+#define NUMVOXTYPES 10
+enum EVoxelType {
 	VOXT_EMPTY = 0,
-	VOXT_SOLID,
+	VOXT_SAND,
+	VOXT_STONE,
+	VOXT_DIRT,
+	VOXT_GRASS,
 	VOXT_WATER,
-	VOXT_BODY
+	VOXT_METAL,
+	VOXT_GLASS,
+	VOXT_PLAST,
+	VOXT_WOOD,
+	//append here
 };
 
 ///Voxel index info structure.
 struct SVoxelInf {
-	EVoxelPType type;
+	EVoxelType type;
 	SGUIPixel pix;
 	char sides[6];
+};
+
+///Unified voxel table structure.
+struct SVoxelTab {
+	SVoxelInf* tab;
+	unsigned len;
+	int stat[NUMVOXTYPES];
 };
 
 ///Chunk data type {[z][y][x]}

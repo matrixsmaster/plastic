@@ -36,8 +36,7 @@ DataPipe::DataPipe(const SGameSettings* sets, bool allocate)
 	allocated = 0;
 	memset(root,0,MAXPATHLEN);
 	wgen = NULL;
-	voxeltab = NULL;
-	voxtablen = 0;
+	memset(&voxeltab,0,sizeof(voxeltab));
 	rammax = sets->rammax;
 
 	/* Copy root path */
@@ -59,8 +58,7 @@ DataPipe::~DataPipe()
 	status = DPIPE_NOTREADY;
 
 	if (wgen) delete wgen;
-	voxtablen = 0;
-	if (voxeltab) free(voxeltab);
+	if (voxeltab.tab) free(voxeltab.tab);
 
 	PurgeModels();
 	PurgeChunks();
@@ -76,13 +74,13 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 
 	/* Allocate voxel info table */
 	sz = DEFVOXTYPES * sizeof(SVoxelInf);
-	voxtablen = DEFVOXTYPES;
-	voxeltab = (SVoxelInf*)malloc(sz);
-	if (!voxeltab) {
+	voxeltab.len = DEFVOXTYPES;
+	voxeltab.tab = (SVoxelInf*)malloc(sz);
+	if (!voxeltab.tab) {
 		errout("Unable to allocate RAM for voxel table.\n");
 		return false;
 	}
-	memset(voxeltab,0,sz);
+	memset(voxeltab.tab,0,sz);
 	allocated += sz;
 
 	/* Create and init the world generator */
@@ -90,7 +88,7 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 		errout("Impossibly small world radius.\n");
 		return false;
 	}
-	wgen = new WorldGen(sets->world_r,voxeltab,voxtablen);
+	wgen = new WorldGen(sets->world_r,&voxeltab);
 	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
 	if (!wgen->LoadMap(tmp)) {
 		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
@@ -145,7 +143,8 @@ bool DataPipe::LoadVoxTab()
 	char pth[MAXPATHLEN];
 	char fx;
 	SVoxelInf cvf;
-	int r,n = 0;
+	int r;
+	unsigned n = 0;
 
 	//combine a file path
 	snprintf(pth,MAXPATHLEN,"%s/%s",root,VOXTABFILENAME);
@@ -160,9 +159,19 @@ bool DataPipe::LoadVoxTab()
 				&(cvf.pix.bg.r),&(cvf.pix.bg.g),&(cvf.pix.bg.b),
 				cvf.sides);
 
-		if (r < 9) continue;
-		if (fx == 'V') voxeltab[n++] = cvf;
-		if (n >= voxtablen) break;
+		if (r < 9) continue; //check number of successfully parsed params
+
+		if (fx == 'V') {
+			if ((cvf.type >= 0) && (cvf.type < NUMVOXTYPES))
+				voxeltab.stat[cvf.type]++;
+			else {
+				errout("Unknown voxel type %d\n",(int)cvf.type);
+				fclose(vtf);
+				return false;
+			}
+			voxeltab.tab[n++] = cvf;
+		}
+		if (n >= voxeltab.len) break;
 	}
 
 	fclose(vtf);
@@ -297,13 +306,13 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
 {
 	voxel v = GetVoxel(p);
-	if (v < voxtablen) return &voxeltab[v];
+	if (v < voxeltab.len) return &(voxeltab.tab[v]);
 	else return NULL;
 }
 
 SVoxelInf* DataPipe::GetVInfo(const voxel v)
 {
-	if (v < voxtablen) return &voxeltab[v];
+	if (v < voxeltab.len) return &(voxeltab.tab[v]);
 	else return NULL;
 }
 

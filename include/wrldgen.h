@@ -82,9 +82,17 @@ static const SGUIPixel wrld_tiles[WGNUMKINDS] = {
 		{ 'C', { 1000,    0,    0 }, {    0,    0,    0 } },
 };
 
+enum EWGChunkType {
+	WGCT_AIR,
+	WGCT_SURFACE,
+	WGCT_WATER,
+	WGCT_UNDERGR
+};
+
 /* Map cell data */
 struct SWGCell {
 	EWGCellContent t;
+	EWGChunkType chunkt;
 	char elev;
 	long seed;
 };
@@ -100,8 +108,7 @@ struct SWGMapHeader {
 class WorldGen {
 private:
 	uli radius;
-	SVoxelInf* vtab;
-	int vtablen;
+	SVoxelTab* vtab;
 	PRNGen* rng;
 	ulli allocated;
 	long org_seed;
@@ -109,14 +116,14 @@ private:
 	ulli plane;
 	ulli volume;
 	int planeside;
-	int planeX, planeY;		//to make it easy to work with non-spherical worlds
+	vector2di planev;
 	SWGCell* map;
 	uli cover[WGNUMKINDS];
 	int cities;
 	int factories;
 
 public:
-	WorldGen(uli r, SVoxelInf* tab, int tablen);
+	WorldGen(uli r, SVoxelTab* tab);
 	virtual ~WorldGen();
 
 	/* Map management */
@@ -124,6 +131,7 @@ public:
 	void SaveMap(const char* fname);
 	void NewMap(long seed);
 	const SWGCell* GetMap()				{ return map; }
+	SWGCell GetCell(vector3di crd);
 
 	/* Statistics functions */
 	vector3di GetSizeVector()			{ return wrldsz; }
@@ -134,6 +142,10 @@ public:
 	int GetNumCities()					{ return cities; }
 	int GetNumFactories()				{ return factories; }
 	uli GetNumCellsOf(EWGCellContent c)	{ return cover[c]; }
+
+	void WrapCoords(vector3di* pnt);
+
+	voxel GetVoxelOfType(EVoxelType t);
 
 	/* Main chunk generation facility */
 	void GenerateChunk(PChunk buf);

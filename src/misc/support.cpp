@@ -97,7 +97,7 @@ opts_begin:
 		}
 
 		//generate world to get area values
-		wgen = new WorldGen(s->world_r,NULL,0);
+		wgen = new WorldGen(s->world_r,NULL);
 		dim = wgen->GetSizeVector();
 		printf("Calculating values...\n");
 		printf("World bounding box dimensions = [%d, %d, %d]\n",dim.X,dim.Y,dim.Z);
@@ -140,7 +140,7 @@ opts_begin:
 
 		//generate test world
 		puts("Generating test world...");
-		wgen = new WorldGen(s->world_r,NULL,0);
+		wgen = new WorldGen(s->world_r,NULL);
 		wgen->NewMap(s->wg_seed);
 		printf("Cities generated: %d\n",wgen->GetNumCities());
 		printf("Factories generated: %d\n",wgen->GetNumFactories());

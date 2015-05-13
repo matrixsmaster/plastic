@@ -55,9 +55,9 @@ struct SGameSettings {
 #define DEFAULT_SETTINGS { 							\
 	"./data",										\
 	false, 											\
-	64,												\
+	32,												\
 	(4ULL*1024*1024*1024),							\
-	0,												\
+	24141595,										\
 	{ "Mary", true, PCLS_INQUISITOR, PBOD_PNEUMO, },\
 }
 
@@ -83,7 +83,7 @@ static const SGameArg argp_table[GAMEARGTYPES] = {
 	{ GAT_USESHELL,	's', false,	"Show interactive shell after startup to "\
 								"adjust game settings and/or generate "\
 								"player character." },
-	{ GAT_WORLDRAD,	'R', true,	"Set the radius of the world spheroid." },
+	{ GAT_WORLDRAD,	'R', true,	"Set the radius of the world hypertorus." },
 	{ GAT_RAMMAX,	'm', true,	"Set the memory threshold for the main "\
 								"data holding facilities. This amount is "\
 								"only the rough approximation. "\

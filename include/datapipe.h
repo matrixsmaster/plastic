@@ -77,8 +77,7 @@ protected:
 	char root[MAXPATHLEN];			//root path
 	PlaceMap placetab;				//chunk displacement map
 	WorldGen* wgen;					//world generator instance
-	SVoxelInf* voxeltab;			//voxel types table
-	int voxtablen;					//...its length
+	SVoxelTab voxeltab;				//voxel types table
 	IniMap ini;						//map of known (and loaded) ini files
 	VModVec objs;					//objects in scene
 	ulli rammax;					//max amount of memory allowed to be allocated
@@ -108,10 +107,7 @@ public:
 	ulli GetMaxRAM()					{ return rammax; }
 
 	///Returns a pointer to voxel info table.
-	SVoxelInf* GetVoxTable()			{ return voxeltab; }
-
-	///Returns voxel info table length.
-	int GetVoxTableLen()				{ return voxtablen; }
+	SVoxelTab* GetVoxTable()			{ return &voxeltab; }
 
 	///Discards all chunks buffers and release memory.
 	virtual void PurgeChunks();
@@ -160,7 +156,7 @@ class DataPipeDummy : public DataPipe
 public:
 	DataPipeDummy(const SGameSettings* sets);
 
-	void SetVoxTab(SVoxelInf* p, int l)	{ voxtablen = l; voxeltab = p; }
+	void SetVoxTab(SVoxelTab* p)		{ voxeltab = *p; }
 
 	void SetGP(vector3di pos)			{}
 	bool Move(EGMoveDir dir)			{ return false; }
