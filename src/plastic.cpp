@@ -103,7 +103,7 @@ static void* plastic_eventhread(void* ptr)
 			switch (my_e.k) {
 			case '0':
 				//testing window
-				wnd = g_gui->MkWindow(curso.X,curso.Y,55,25,"SomeWin");
+				wnd = g_gui->MkWindow(curso.X,curso.Y,50,25,"SomeWin");
 				g_gui->SetFocus(wnd);
 				wnd->ShowName(true);
 				wnd->SetAutoAlloc(true);
@@ -119,17 +119,36 @@ static void* plastic_eventhread(void* ptr)
 				chk->SetDisabled(true);
 				prb = new CurseGUIProgrBar(wnd->GetControls(),12,8,16,0,100);
 				prb->SetShowPercent(true);
-				tbl = new CurseGUITable(wnd->GetControls(), 1, 9, 3, 5, 7, 7);
+				tbl = new CurseGUITable(wnd->GetControls(), 1, 9, 3, 3, 7, 5, 7);
 				break;
 			case '9':
 				my_e.t = GUIEV_RESIZE;
 				g_gui->AddEvent(&my_e);
 				break;
 			case '8':
-				tbl->SetData("item set selected and gta V", 0, 0);
-				tbl->SetData("Lazy cunt! Bla bla bla bla Bla ", 0, 1);
-				tbl->SetData("Fuck you bitch!", 1, 0);
-				tbl->SetData("Zwei kleine Jagermeister. Ein kleine Wassershprot.", 2, 3);
+				tbl->SetData("item", 0, 0);// set selected and gta V", 0, 0);
+				tbl->SetData("Lazy", 0, 1); // cunt! Bla bla bla bla Bla ", 0, 1);
+				tbl->SetData("Fuck", 1, 0);// you bitch!", 1, 0);
+				tbl->SetData("Zwei", 2, 3);// kleine Jagermeister. Ein kleine Wassershprot.", 2, 3);
+				tbl->SetData("kleine", 4, 0);// Jagermeister.", 0, 5);
+				break;
+			case '1':
+				tbl->AddRow();
+				break;
+			case '2':
+				tbl->DelRow();
+				break;
+			case '3':
+				tbl->AddColumn();
+				break;
+			case '4':
+				tbl->DelColumn();
+				break;
+			case '6':
+				tbl->SetData("Zwei kleine Jagermeister.", 5, 0);
+				break;
+			case '5':
+				tbl->SetWidth(5);
 				break;
 			}
 #endif

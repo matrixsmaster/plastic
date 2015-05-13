@@ -226,9 +226,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				}
 				break;
 			case 'x':
-				if(hud) {
-					//TODO
-				}
 				break;
 			}
 		}
