@@ -91,7 +91,7 @@ static void* plastic_eventhread(void* ptr)
 		d = false;
 		switch (my_e.t) {
 		case GUIEV_MOUSE:
-			if (my_e.m.bstate & BUTTON1_CLICKED) {
+			if (my_e.m.bstate & CGMOUSE_LEFT) {
 				curso.X = my_e.m.x;
 				curso.Y = my_e.m.y;
 				d = true;
@@ -99,6 +99,7 @@ static void* plastic_eventhread(void* ptr)
 			break;
 
 		case GUIEV_KEYPRESS:
+#if 0
 			switch (my_e.k) {
 			case '0':
 				//testing window
@@ -131,6 +132,7 @@ static void* plastic_eventhread(void* ptr)
 				tbl->SetData("Zwei kleine Jagermeister. Ein kleine Wassershprot.", 2, 3);
 				break;
 			}
+#endif
 			break;
 
 		default: break;

@@ -32,39 +32,41 @@
 #include "sky.h"
 
 
-#define LVRDEBUG 1
+//#define LVRDEBUG 1
 //#define LVRDOUBLEBUFFERED 1
 
-#define DEFFARPLANE 32
+#define DEFSCALE 1.f
+#define DEFFOVX 115
+#define DEFFOVY 62
+#define DEFFARPLANE 61
 #define DEFFOGPLANE 21
-#define DEFFOVX 28
-#define DEFFOVY 14
+#define DEFFOGGRAY 40
 
 
-//TODO: comment it
 class LVR {
 private:
-	int g_w,g_h;
-	uli rendsize;
-	int far,fog;
-	double dfog;
-	vector2di mid;
-	vector3d fov;
-	SMatrix3d rot;
-	vector3d offset,eulerot,scale;
-	vector3di fogcol;
-	DataPipe* pipeptr;
-	SGUIPixel* render;
-	int activebuf;
-	int* zbuf;
-	vector3di* pbuf;
-	AtmoSky* skies;
-	char* mask;
+	int g_w,g_h;					//Graphics width and height
+	uli rendsize;					//Linear size of the frame
+	int far,fog;					//Far plane distance and Fog start plane distance
+	double dfog;					//Fog differential
+	vector2di mid;					//Center point of the screen
+	vector3d fov;					//Field Of View
+	SMatrix3d rot;					//Camera rotation matrix
+	vector3d offset,eulerot,scale;	//Camera transformations
+	vector3di fogcol;				//Fog color
+	DataPipe* pipeptr;				//DataPipe instance
+	SGUIPixel* render;				//Rendered frame data pointer
+	int activebuf;					//Active (drawing) buffer number
+	int* zbuf;						//Depth buffer
+	vector3di* pbuf;				//Point (voxel) buffer
+	AtmoSky* skies;					//Atmospherics
+	char* mask;						//Renderer mask (which places will not be rendered)
 
 public:
 	LVR(DataPipe* pipe);
 	virtual ~LVR();
 
+	//TODO: comment it
 	SGUIPixel* GetRender();
 	uli GetRenderLen()				{ return rendsize; }
 

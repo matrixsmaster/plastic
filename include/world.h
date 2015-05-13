@@ -51,10 +51,7 @@ private:
 	//holders
 	std::vector<PlasticActor*> actors;
 
-	//FIXME: delete them
-	float scale;
-	vector3d fov;
-	int far,fog;
+	//FIXME: DEBUG
 	VModel* test;
 
 	//internal facilities

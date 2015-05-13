@@ -54,7 +54,7 @@ enum EDPipeStatus {
 
 struct SDataPlacement {
 	unsigned filenum;
-	vector3dulli pos;
+	vector3di pos;
 	long offset;
 };
 
@@ -73,7 +73,7 @@ protected:
 	EDPipeStatus status;
 	pthread_mutex_t vmutex;
 	ulli allocated;					//amount of allocated RAM
-	vector3dulli GP;				//global position of central chunk
+	vector3di GP;					//global position of central chunk
 	char root[MAXPATHLEN];			//root path
 	PlaceMap placetab;				//chunk displacement map
 	WorldGen* wgen;					//world generator instance
@@ -85,7 +85,7 @@ protected:
 
 	bool Allocator(const SGameSettings* sets);
 	bool ScanFiles();
-	bool FindChunk(vector3dulli pos, SDataPlacement* res);
+	bool FindChunk(vector3di pos, SDataPlacement* res);
 	bool LoadVoxTab();
 	bool LoadIni(const std::string name);
 
@@ -117,7 +117,10 @@ public:
 	virtual void PurgeChunks();
 
 	///Set up the global position of central chunk.
-	virtual void SetGP(vector3dulli pos);
+	virtual void SetGP(vector3di pos);
+
+	///Returns the global position of central chunk.
+	virtual vector3di GetGP()			{ return GP; }
 
 	///Move the world to next chunk.
 	///Update chunks buffers either by loading or by generating.
@@ -159,7 +162,7 @@ public:
 
 	void SetVoxTab(SVoxelInf* p, int l)	{ voxtablen = l; voxeltab = p; }
 
-	void SetGP(vector3dulli pos)		{}
+	void SetGP(vector3di pos)			{}
 	bool Move(EGMoveDir dir)			{ return false; }
 
 	voxel GetVoxel(const vector3di* p);

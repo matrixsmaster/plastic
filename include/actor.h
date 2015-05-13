@@ -63,6 +63,8 @@ public:
 	void SetGPos(const vector3di p)		{ gpos = p; }
 	vector3di GetGPos()					{ return gpos; }
 
+	Inventory* GetInventory()			{ return &invent; }
+
 	void Move(ELMoveDir d, float step);
 
 	bool Spawn();

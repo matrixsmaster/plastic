@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 #include "CurseGUI.h"
+#include "CGUIControls.h"
+#include "vecmath.h"
 
 
 /* ********************************** Debug Console ********************************** */
@@ -41,7 +43,7 @@ private:
 
 public:
 	CurseGUIDebugWnd(CurseGUI* scrn);
-	virtual ~CurseGUIDebugWnd();
+	virtual ~CurseGUIDebugWnd()			{}
 
 	//Debug console is always focused if shown.
 	bool GainFocus()					{ return focused; }
@@ -59,6 +61,10 @@ public:
 
 /* ********************************** Inventory window ********************************** */
 
+//percent of coverage:
+#define INVENTSIZEX 70
+#define INVENTSIZEY 70
+
 class Inventory;
 
 class CurseGUIInventoryWnd : public CurseGUIWnd {
@@ -69,9 +75,8 @@ private:
 
 public:
 	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);
-	virtual ~CurseGUIInventoryWnd();
+	virtual ~CurseGUIInventoryWnd()		{}
 
-	void Update(bool refr);
 	bool PutEvent(SGUIEvent* e);
 };
 
@@ -80,7 +85,6 @@ public:
 //percent of coverage:
 #define MAPVIEWSIZEX 80
 #define MAPVIEWSIZEY 75
-//#define MAPVIEWBORD 4
 #define MAPVIEWHIGHM 1.25
 #define MAPVIEWLOWM 0.75
 #define MAPVIEWRULX 5
@@ -93,15 +97,49 @@ class CurseGUIMapViewWnd : public CurseGUIWnd {
 private:
 	DataPipe* pipe;
 	int scale;
-	int basex, basey;
+	vector2di base;
+	vector3di pos;
 	bool showelev;
+	int m_w, m_h;
 
 	void ResizeWnd();
 	void DrawMap();
 
 public:
 	CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat);
-	virtual ~CurseGUIMapViewWnd();
+	virtual ~CurseGUIMapViewWnd()		{}
+
+	void SetPos(const vector3di p)		{ pos = p; }
+
+	bool PutEvent(SGUIEvent* e);
+};
+
+/* ********************************** Renderer Config window ********************************** */
+
+class LVR;
+
+class CurseGUIRenderConfWnd : public CurseGUIWnd {
+private:
+	LVR* lvr;
+	float scale;
+	vector3d fov;
+	int far,fog;
+	vector3di fogcol;
+	CurseGUIEditBox* e_scale;
+	CurseGUIEditBox* e_fovx,*e_fovy;
+	CurseGUIEditBox* e_far;
+	CurseGUIEditBox* e_fog;
+	CurseGUIEditBox* e_fogr,*e_fogg,*e_fogb;
+	CurseGUIButton* b_apply,*b_reset;
+
+	void Fill();
+	void Scan();
+	void Apply();
+	void Reset();
+
+public:
+	CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr);
+	virtual ~CurseGUIRenderConfWnd()	{}
 
 	bool PutEvent(SGUIEvent* e);
 };

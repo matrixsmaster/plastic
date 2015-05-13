@@ -53,23 +53,18 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 	/* Create LVR */
 	lvr = new LVR(data);
+//	lvr->SetFogColor(vector3di(100));
 
 	/* Create Player */
 	PC = new Player(sets->PCData,data);
 
 	//FIXME: debugging stuff
-	scale = 0.33;
-	lvr->SetScale(0.33);
-	far = DEFFARPLANE;
-	fog = DEFFOGPLANE;
-	fov = vector3d(DEFFOVX,DEFFOVY,1);
-	data->SetGP(vector3dulli(0));
+	data->SetGP(vector3di(0));
 	test = data->LoadModel("testmodel.dat",vector3di(128,100,135));
 	if (!test) abort();
 	lvr->SetPosition(vector3d(128,90,135));
 	PC->SetPos(vector3di(128,90,135));
-	lvr->SetFogStart(fog);
-	lvr->SetFogColor(vector3di(100));
+	PC->SetGPos(vector3di(0));
 }
 
 PlasticWorld::~PlasticWorld()
@@ -158,8 +153,18 @@ void PlasticWorld::BindKeys()
 	binder = new KeyBinder(data);
 
 	binder->RegKeyByName("CONSOLE");
+	binder->RegKeyByName("CHAR_TAB");
 	binder->RegKeyByName("MAP_VIEW");
+	binder->RegKeyByName("INVENTORY");
+	binder->RegKeyByName("RENDER_CFG");
 }
+
+#define SPAWNWNDMACRO(Name,Create) \
+							wptr = gui->GetWindowN(Name); \
+							if (!wptr) { \
+								wptr = Create; \
+								gui->AddWindow(wptr); } \
+							gui->SetFocus(wptr);
 
 void PlasticWorld::ProcessEvents(SGUIEvent* e)
 {
@@ -178,32 +183,26 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			dbg_toggle();
 			break;
 
-		case 1: /*map view*/
-			wptr = gui->GetWindowN("Map View");
-			if (!wptr) {
-				wptr = new CurseGUIMapViewWnd(gui,data);
-				gui->AddWindow(wptr);
-			}
-			gui->SetFocus(wptr);
+		case 1: /*PC stats tab*/
+			//TODO
+			break;
+
+		case 2: /*map view*/
+			SPAWNWNDMACRO("Map View",new CurseGUIMapViewWnd(gui,data));
+			(reinterpret_cast<CurseGUIMapViewWnd*>(wptr))->SetPos(PC->GetGPos());
+			break;
+
+		case 3: /*inventory*/
+			SPAWNWNDMACRO("Inventory",new CurseGUIInventoryWnd(gui,PC->GetInventory()));
+			break;
+
+		case 4: /*LVR config*/
+			SPAWNWNDMACRO("LVR config",new CurseGUIRenderConfWnd(gui,lvr));
 			break;
 
 		default:
 			/* DEBUGging stuff */
 			switch (e->k) {
-			case '[': scale -= 0.01; break;
-			case ']': scale += 0.01; break;
-			case ',': fov.X -= 0.1; break;
-			case '.': fov.X += 0.1; break;
-			case 'n': fov.Y -= 0.1; break;
-			case 'm': fov.Y += 0.1; break;
-			case '<': fov.X -= 1; break;
-			case '>': fov.X += 1; break;
-			case 'N': fov.Y -= 1; break;
-			case 'M': fov.Y += 1; break;
-			case ';': far--; break;
-			case '\'': far++; break;
-			case 't': fog--; break;
-			case 'y': fog++; break;
 			case '1': tr.X -= 2; break;
 			case '2': tr.X += 2; break;
 			case '3': tr.Y += 2; break;
@@ -233,12 +232,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				break;
 			}
 		}
-
-		lvr->SetScale(scale);
-		lvr->SetFOV(fov);
-		lvr->SetFarDist(far);
-		lvr->SetFogStart(fog);
-
 		test->SetRot(tr);
 
 		PC->ProcessEvent(e);
@@ -256,20 +249,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 		break;
 
 	case GUIEV_CTLBACK:
-		//DEBUG:
-		switch (e->b.t) {
-		case GUIFB_SWITCHED:
-			btn = (CurseGUIButton*)e->b.ctl;
-			if (btn) {
-				btn->SetCaption("OK");
-			}
-			break;
-		case GUIFB_EDITOK:
-			edb = (CurseGUIEditBox*)e->b.ctl;
-			if (edb) {
-				edb->SetText(edb->GetText()+"!");
-			}
-		}
+		/* Nothing to do now */
 		break;
 
 	default:

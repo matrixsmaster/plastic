@@ -28,11 +28,10 @@
 /* PI const converted to integer to get rid of rounding errors */
 #define WG_PI 3
 
-/* 3x3 chunks (or map cells) is a minimum for correct behavior */
-#define WGMINPLANESD 3
-
 /* Number of chunks above the surface */
 #define WGAIRCHUNKS 2
+
+#define WGMINRADIUS (WGAIRCHUNKS + 3 + 1)
 
 #define WGRIVERQ 0.02
 #define WGPLANTQ 0.06
@@ -43,6 +42,8 @@
 #define WGCITYENDS 0.35
 #define WGCITYSUBS 0.6
 #define WGCITYNOISE 0.2
+
+#define WGELEVATIONS 3
 
 /* Map cell content type (surface cells) */
 #define WGNUMKINDS 12

@@ -188,6 +188,7 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 	/* Make the mouse alive */
 	if (mousemask(ALL_MOUSE_EVENTS,&oldmouse) == 0) CGABRT(5);
 	if (has_mouse() == FALSE) CGABRT(6);
+	oldmouseint = mouseinterval(0);
 
 	/* Spawn the color manager */
 	cmanager = new CGUIColorManager();
@@ -217,6 +218,7 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 
 CurseGUI::~CurseGUI()
 {
+	mouseinterval(oldmouseint);
 	mousemask(oldmouse,NULL);
 
 	RmAllWindows();
@@ -456,7 +458,7 @@ bool CurseGUI::PumpEvents(SGUIEvent* e)
 			break;
 
 		case GUIEV_MOUSE:
-			if ((windows.empty()) || (e->m.bstate != BUTTON1_CLICKED)) break;
+			if ((windows.empty()) || (e->m.bstate != CGMOUSE_LEFT)) break;
 			for (rt = windows.rbegin(); rt != windows.rend(); ++rt) {
 				//check mouse pointer is inside window
 				if (((*rt)->GetPosX() > e->m.x) || (((*rt)->GetPosY() > e->m.y))) continue;

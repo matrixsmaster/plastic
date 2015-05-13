@@ -86,11 +86,11 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 	allocated += sz;
 
 	/* Create and init the world generator */
-	wgen = new WorldGen(sets->world_r,voxeltab,voxtablen);
-	if (wgen->GetPlaneSide() < WGMINPLANESD) {
+	if (sets->world_r < WGMINRADIUS) {
 		errout("Impossibly small world radius.\n");
 		return false;
 	}
+	wgen = new WorldGen(sets->world_r,voxeltab,voxtablen);
 	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
 	if (!wgen->LoadMap(tmp)) {
 		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
@@ -130,7 +130,7 @@ bool DataPipe::ScanFiles()
 	return true;
 }
 
-bool DataPipe::FindChunk(vector3dulli pos, SDataPlacement* res)
+bool DataPipe::FindChunk(vector3di pos, SDataPlacement* res)
 {
 	if (!res) return false;
 
@@ -183,7 +183,7 @@ void DataPipe::PurgeChunks()
 	Unlock();
 }
 
-void DataPipe::SetGP(vector3dulli pos)
+void DataPipe::SetGP(vector3di pos)
 {
 	SDataPlacement plc;
 	GP = pos;

@@ -30,22 +30,18 @@ static const SGUIPixel empty_tile = {
 CurseGUIMapViewWnd::CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat) :
 		CurseGUIWnd(scrn,0,0,2,2)
 {
-	pipe = pdat;
-	basex = basey = 0;
-	scale = 1;
-	showelev = false;
-
+	type = GUIWT_OTHER;
 	name = "Map View";
 	showname = true;
+
+	pipe = pdat;
+	scale = 1;
+	showelev = false;
+	m_w = m_h = 0;
 
 	ResizeWnd();
 	SetAutoAlloc(true);
 	DrawMap();
-}
-
-CurseGUIMapViewWnd::~CurseGUIMapViewWnd()
-{
-	//TODO
 }
 
 void CurseGUIMapViewWnd::ResizeWnd()
@@ -67,8 +63,20 @@ void CurseGUIMapViewWnd::DrawMap()
 	unsigned k,u;
 	char vert[MAPVIEWRULSTR],horz[MAPVIEWRULSTR];
 	const SWGCell* map = pipe->GetGlobalSurfaceMap();
-	vector2di msz = pipe->GetGlobalSurfaceSize();
+	vector2di mbs,msz = pipe->GetGlobalSurfaceSize();
 	vector3d col;
+
+	//store dimensions
+	m_w = g_w - 3; //reserve space for a border and a ruler
+	m_h = g_h - 3;
+
+	//calculate shift
+	mbs.X = pos.X + msz.X / 2;
+	mbs.Y = pos.Y + msz.Y / 2;
+	mbs += base;
+	if (scale > 0) mbs *= scale;
+	else mbs /= scale * -1;
+	mbs -= vector2di(m_w/2,m_h/2);
 
 	//prepare rulers
 	rt = (g_w-3) / MAPVIEWRULX;
@@ -76,19 +84,19 @@ void CurseGUIMapViewWnd::DrawMap()
 	vert[0] = 0;
 
 	/* Draw the map */
-	for (y = 0; y < g_h-3; y++) {
+	for (y = 0; y < m_h; y++) {
 		l = (y + 2) * g_w + 2; //make a room for a window border and a ruler
 		if (l >= backgr_size) break; //just in case, check buffer bounds
 
 		//apply scale
 		if (scale > 0) //magnification
-			my = (y + basey) / scale;
+			my = (y + mbs.Y) / scale;
 		else //shrinking
-			my = (y + basey) * -scale;
+			my = (y + mbs.Y) * -scale;
 
 		//draw the vertical ruler
 		if (y % rl == 0) {
-			snprintf(vert,sizeof(vert),"-%d",my);
+			snprintf(vert,sizeof(vert),">%d",(my-msz.Y/2));
 			u = 0;
 		}
 		if (u < strlen(vert)) {
@@ -100,19 +108,19 @@ void CurseGUIMapViewWnd::DrawMap()
 		//reset horizontal ruler string
 		horz[0] = 0;
 
-		for (x = 0; x < g_w-3; x++, l++) {
+		for (x = 0; x < m_w; x++, l++) {
 			if (l >= backgr_size) break; //just in case, check buffer bounds
 
 			//apply scale
 			if (scale > 0) //magnification
-				mx = (x + basex) / scale;
+				mx = (x + mbs.X) / scale;
 			else //shrinking
-				mx = (x + basex) * -scale;
+				mx = (x + mbs.X) * -scale;
 
 			//draw the horizontal ruler
 			if (y == 0) {
 				if (x % rt == 0) {
-					snprintf(horz,sizeof(horz),"|%d",mx);
+					snprintf(horz,sizeof(horz),"|%d",(mx-msz.X/2));
 					k = 0;
 				}
 				if (k < strlen(horz)) {
@@ -177,20 +185,20 @@ bool CurseGUIMapViewWnd::PutEvent(SGUIEvent* e)
 			break;
 
 		//navigation
-		case KEY_UP: basey--; d = true; break;
-		case KEY_DOWN: basey++; d = true; break;
-		case KEY_LEFT: basex--; d = true; break;
-		case KEY_RIGHT: basex++; d = true; break;
+		case KEY_UP: base.Y--; d = true; break;
+		case KEY_DOWN: base.Y++; d = true; break;
+		case KEY_LEFT: base.X--; d = true; break;
+		case KEY_RIGHT: base.X++; d = true; break;
 
 		//scale
 		case '-':
 			scale--;
-			if (scale == 0) scale = -1;
+			if (scale == 0) scale = -2;
 			d = true;
 			break;
 		case '=':
 			scale++;
-			if (scale == 0) scale = 1;
+			if (scale == 0) scale = 2;
 			d = true;
 			break;
 		}

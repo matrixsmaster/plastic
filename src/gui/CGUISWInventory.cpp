@@ -25,21 +25,26 @@
 CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
 	CurseGUIWnd(scrn,0,0,2,2)
 {
-	type = GUIWT_INVENTORY;
+	type = GUIWT_OTHER;
+	name = "Inventory";
+	showname = true;
+
 	invent = iptr;
+
 	ResizeWnd();
 }
 
-CurseGUIInventoryWnd::~CurseGUIInventoryWnd()
+void CurseGUIInventoryWnd::ResizeWnd()
 {
-	//TODO
-}
+	int w,h,x,y;
 
-void CurseGUIInventoryWnd::Update(bool refr)
-{
-	//TODO
-	DrawDecoration();
-	if (refr) wrefresh(wnd);
+	w = MAPVIEWSIZEX * parent->GetWidth() / 100;
+	h = MAPVIEWSIZEY * parent->GetHeight() / 100;
+	x = parent->GetWidth() / 2 - w / 2;
+	y = parent->GetHeight() / 2 - h / 2;
+
+	Move(x,y);
+	Resize(w,h);
 }
 
 bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
@@ -60,9 +65,4 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 	default: break;
 	}
 	return false;
-}
-
-void CurseGUIInventoryWnd::ResizeWnd()
-{
-	//TODO
 }

@@ -34,6 +34,10 @@
 #include "CGUIColorManager.h"
 
 
+#define CGMOUSE_LEFT (BUTTON1_PRESSED | BUTTON1_RELEASED)
+#define CGMOUSE_RGHT (BUTTON2_PRESSED | BUTTON2_RELEASED)
+
+
 /* ********************************** GUI BASE ********************************** */
 
 class CurseGUIBase {
@@ -105,6 +109,7 @@ private:
 	std::vector<SGUIEvent> eventFIFO;	//internal events buffer
 	char* backmask;						//background mask (used to estimate space occupied by windows)
 	mmask_t oldmouse;					//original terminal mouse driver state
+	int oldmouseint;					//original mouse click interval
 	int c_x,c_y;						//cursor position
 	SGUIPixel activew;					//active window border style
 	SGUIPixel backgrw;					//inactive (background) window border style
@@ -194,7 +199,7 @@ enum ECGUIWindowType {
 	GUIWT_BASIC,
 	GUIWT_OVERLAY,
 	GUIWT_DEBUGUI,
-	GUIWT_INVENTORY
+	GUIWT_OTHER
 };
 
 class CurseGUICtrlHolder;

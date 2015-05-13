@@ -27,6 +27,7 @@
 
 #define BOOLSTR(X) ((X)? "ON":"OFF")
 #define MGETCHAR(X) while (!isprint(X = getchar())) /*trash non-printable chars (NL,LF,EOF etc)*/
+#define SIGN(X) ((X < 0)? -1:1)
 
 /// Prints a simple formatted message to stderr.
 void errout(char const* fmt, ...);
