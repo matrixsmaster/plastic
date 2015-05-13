@@ -101,7 +101,6 @@ struct SWGCell {
 struct SWGMapHeader {
 	int sx,sy,sz;
 	uli radius;
-	uli planeside;
 	long seed;
 };
 
@@ -122,6 +121,8 @@ private:
 	int cities;
 	int factories;
 
+	void ResetVolume();
+
 public:
 	WorldGen(uli r, SVoxelTab* tab);
 	virtual ~WorldGen();
@@ -134,6 +135,7 @@ public:
 	SWGCell GetCell(vector3di crd);
 
 	/* Statistics functions */
+	uli GetRadius()						{ return radius; }
 	vector3di GetSizeVector()			{ return wrldsz; }
 	ulli GetAllocatedRAM()				{ return allocated; }
 	ulli GetPlaneArea()					{ return plane; }
@@ -148,7 +150,7 @@ public:
 	voxel GetVoxelOfType(EVoxelType t);
 
 	/* Main chunk generation facility */
-	void GenerateChunk(PChunk buf);
+	void GenerateChunk(PChunk buf, vector3di pos);
 };
 
 #endif /* WRLDGEN_H_ */

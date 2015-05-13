@@ -82,14 +82,14 @@ protected:
 	VModVec objs;					//objects in scene
 	ulli rammax;					//max amount of memory allowed to be allocated
 
-	bool Allocator(const SGameSettings* sets);
+	bool Allocator(SGameSettings* sets);
 	bool ScanFiles();
 	bool FindChunk(vector3di pos, SDataPlacement* res);
 	bool LoadVoxTab();
 	bool LoadIni(const std::string name);
 
 public:
-	DataPipe(const SGameSettings* sets, bool allocate = true);
+	DataPipe(SGameSettings* sets, bool allocate = true);
 	virtual ~DataPipe();
 
 	///Returns a status of the pipe.
@@ -154,7 +154,7 @@ public:
 class DataPipeDummy : public DataPipe
 {
 public:
-	DataPipeDummy(const SGameSettings* sets);
+	DataPipeDummy(SGameSettings* sets);
 
 	void SetVoxTab(SVoxelTab* p)		{ voxeltab = *p; }
 

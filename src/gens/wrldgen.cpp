@@ -28,20 +28,35 @@
 
 WorldGen::WorldGen(uli r, SVoxelTab* tab)
 {
-	ulli l;
-
+	//init variables
 	radius = r;
 	vtab = tab;
 	rng = new PRNGen(false);
 	map = NULL;
 	allocated = 0;
 	org_seed = 0;
+	plane = 0;
+	planeside = 0;
+	volume = 0;
+	factories = 0;
+	cities = 0;
 
 	//calculate dimensions of the world
 	wrldsz.X = 2UL * WG_PI * radius;
 	wrldsz.Y = wrldsz.X;
 	wrldsz.Z = (int)radius;
 
+	ResetVolume();
+}
+
+WorldGen::~WorldGen()
+{
+	delete rng;
+	if (map) free(map);
+}
+
+void WorldGen::ResetVolume()
+{
 	/* calculate areas and volume
 	 * this set of variables is capable of working
 	 * with the other geometry forms of the worlds
@@ -50,25 +65,6 @@ WorldGen::WorldGen(uli r, SVoxelTab* tab)
 	plane = planeside * planeside;
 	planev = vector2di(planeside);  //rectangular area
 	volume = wrldsz.X * wrldsz.Y * wrldsz.Z;
-
-	//allocate map memory (only if radius is correct)
-	if (r >= WGMINRADIUS) {
-		l = plane * sizeof(SWGCell);
-		map = (SWGCell*)malloc(l);
-		memset(map,0,l);
-		if (map) allocated = l;
-	}
-
-	//reset covering stats
-	memset(cover,0,sizeof(cover));
-	cities = 0;
-	factories = 0;
-}
-
-WorldGen::~WorldGen()
-{
-	delete rng;
-	if (map) free(map);
 }
 
 SWGCell WorldGen::GetCell(vector3di crd)
@@ -134,7 +130,7 @@ voxel WorldGen::GetVoxelOfType(EVoxelType t)
 	return 0;
 }
 
-void WorldGen::GenerateChunk(PChunk buf)
+void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 {
 	int x,y,z,t;
 	voxel v,vgr;
@@ -215,15 +211,23 @@ bool WorldGen::LoadMap(const char* fname)
 	FILE* mf;
 	SWGMapHeader hdr;
 
-	if ((!fname) || (!map)) return false;
+	if (!fname) return false;
 
 	mf = fopen(fname,"rb");
 	if (!mf) return false;
 
-	//TODO
+	fread(&hdr,sizeof(hdr),1,mf);
 
 	fclose(mf);
-	return false;
+
+	//apply loaded data
+	radius = hdr.radius;
+	wrldsz = vector3di(hdr.sx,hdr.sy,hdr.sz);
+
+	ResetVolume();
+	NewMap(hdr.seed);
+
+	return true;
 }
 
 void WorldGen::SaveMap(const char* fname)
@@ -274,20 +278,17 @@ void WorldGen::SaveMap(const char* fname)
 
 	/* Store the actual usable binary map information */
 	hdr.radius = radius;
-	hdr.planeside = planeside;
 	hdr.sx = wrldsz.X;
 	hdr.sy = wrldsz.Y;
 	hdr.sz = wrldsz.Z;
 	hdr.seed = org_seed;
 
-/*
 	mf = fopen(fname,"wb");
 	if (!mf) return;
 
-	//TODO
+	fwrite(&hdr,sizeof(hdr),1,mf);
 
 	fclose(mf);
-	*/
 }
 
 void WorldGen::NewMap(long seed)
@@ -297,9 +298,23 @@ void WorldGen::NewMap(long seed)
 	bool flg;
 	float df,pr,mm;
 	vector2di cnt;
+	ulli l;
 
+	/* Allocate map memory */
+	if (radius < WGMINRADIUS) return;
+	l = plane * sizeof(SWGCell);
+	map = (SWGCell*)realloc(map,l);
 	if (!map) return;
 
+	allocated = l;
+	memset(map,0,l);
+
+	/* Reset covering stats */
+	memset(cover,0,sizeof(cover));
+	cities = 0;
+	factories = 0;
+
+	/* Prepare RNG */
 	org_seed = seed;
 	rng->SetSeed(seed);
 

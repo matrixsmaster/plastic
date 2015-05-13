@@ -23,7 +23,7 @@
 #include "datapipe.h"
 
 
-DataPipeDummy::DataPipeDummy(const SGameSettings* sets) :
+DataPipeDummy::DataPipeDummy(SGameSettings* sets) :
 		DataPipe(sets,false)
 {
 	if (status == DPIPE_NOTREADY) status = DPIPE_IDLE;

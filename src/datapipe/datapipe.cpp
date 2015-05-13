@@ -25,7 +25,7 @@
 #include "vecmisc.h"
 
 
-DataPipe::DataPipe(const SGameSettings* sets, bool allocate)
+DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 {
 	int i;
 
@@ -66,7 +66,7 @@ DataPipe::~DataPipe()
 	pthread_mutex_destroy(&vmutex);
 }
 
-bool DataPipe::Allocator(const SGameSettings* sets)
+bool DataPipe::Allocator(SGameSettings* sets)
 {
 	int i;
 	size_t sz;
@@ -93,7 +93,8 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 	if (!wgen->LoadMap(tmp)) {
 		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
 		wgen->SaveMap(tmp);
-	}
+	} else
+		sets->world_r = wgen->GetRadius(); //override current radius with a saved one
 	allocated += wgen->GetAllocatedRAM();
 
 	/* Load external files */
@@ -117,6 +118,8 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 			return false;
 		}
 	}
+
+	//TODO: load Player data
 
 	/* All clear. */
 	return true;
@@ -201,7 +204,7 @@ void DataPipe::SetGP(vector3di pos)
 #if HOLDCHUNKS == 1
 	/* One chunk right there, simplest scenario */
 	if (!FindChunk(pos,&plc))
-		wgen->GenerateChunk(chunks[0]);
+		wgen->GenerateChunk(chunks[0],GP);
 
 #elif HOLDCHUNKS == 9
 	/* One 3x3 plane of chunks, most widely used scenario */
