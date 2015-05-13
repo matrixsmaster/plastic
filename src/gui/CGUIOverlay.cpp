@@ -41,8 +41,10 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, boo
 
 	transparent = true;
 
-	pxl.bg.r = 0; pxl.bg.g = 0; pxl.bg.b = 0;
-	pxl.fg.r = 1000; pxl.fg.g = 500; pxl.fg.b = 1000;
+	pixl.bg.r = 0; pixl.bg.g = 0; pixl.bg.b = 0;
+	pixl.fg.r = 1000; pixl.fg.g = 500; pixl.fg.b = 1000;
+
+	transp = 0;
 }
 
 CurseGUIOverlay::~CurseGUIOverlay()
@@ -85,6 +87,12 @@ void CurseGUIOverlay::PutString(string str)
 void CurseGUIOverlay::SetBckgrMask(SGUIPixel* pxl)
 {
 	//TODO
+	pixl.bg.r = pxl->bg.r;
+	pixl.bg.g = pxl->bg.g;
+	pixl.bg.b = pxl->bg.b;
+	pixl.fg.r = pxl->fg.r;
+	pixl.fg.g = pxl->fg.g;
+	pixl.fg.b = pxl->fg.b;
 }
 
 void CurseGUIOverlay::ClearLog()
@@ -109,7 +117,7 @@ void CurseGUIOverlay::PutLog()
 
 	if(!log.empty()) {
 		if (!transparent)
-			wcolor_set(wnd, cmanager->CheckPair(&pxl), NULL);
+			wcolor_set(wnd, cmanager->CheckPair(&pixl), NULL);
 
 		if(nl - log.size() >= 0)
 			nl = log.size() + 1;
@@ -120,7 +128,9 @@ void CurseGUIOverlay::PutLog()
 
 				for(size_t i = 0; i < it->size(); ++i) {
 					ch = mvinch(y, m_x+i);
+
 					chclr = ch & A_COLOR;
+
 					//TODO use color manager to make it opaque
 					ch = it->at(i);
 					ch ^= chclr;
@@ -133,4 +143,14 @@ void CurseGUIOverlay::PutLog()
 			h--; y--;
 		}
 	}
+}
+
+void CurseGUIOverlay::SetTransparentUp()
+{
+
+}
+
+void CurseGUIOverlay::SetTransparentDown()
+{
+
 }
