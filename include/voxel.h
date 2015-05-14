@@ -29,7 +29,7 @@
 #define VOXGRAIN 8
 
 ///Number of chunks in current active buffers.
-#define HOLDCHUNKS 9
+#define HOLDCHUNKS 18
 
 ///Number of intial voxel types.
 #define DEFVOXTYPES 1024
@@ -41,11 +41,11 @@ typedef unsigned short int voxel; //must be a 16-bit wide
 #define NUMVOXTYPES 10
 enum EVoxelType {
 	VOXT_EMPTY = 0,
+	VOXT_WATER,
 	VOXT_SAND,
 	VOXT_STONE,
 	VOXT_DIRT,
 	VOXT_GRASS,
-	VOXT_WATER,
 	VOXT_METAL,
 	VOXT_GLASS,
 	VOXT_PLAST,

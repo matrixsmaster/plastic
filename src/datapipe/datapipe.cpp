@@ -227,6 +227,19 @@ void DataPipe::SetGP(vector3di pos)
 	//FIXME: all directions
 #elif HOLDCHUNKS == 18
 	/* Two 3x3 planes (one right there, and one underneath) */
+	int i,j,k,l;
+	vector3di cur(pos);
+	for (i = -1, l = 0; i <= 0; i++) {
+		cur.Z = pos.Z + i;
+		for (j = -1; j < 2; j++) {
+			cur.Y = pos.Y + j;
+			for (k = -1; k < 2; k++, l++) {
+				cur.X = pos.X + k;
+				if (!FindChunk(cur,&plc))
+					wgen->GenerateChunk(chunks[l],cur);
+			}
+		}
+	}
 
 #elif HOLDCHUNKS == 27
 	/* Full set of 3x3x3 (the most memory hungry scenario) */
@@ -249,7 +262,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 {
 	PChunk ch;
 	VModVec::iterator mi;
-	voxel tmp;
+	voxel tmp = 0;
 
 	if (status != DPIPE_IDLE) return 0;
 	Lock();
@@ -287,9 +300,12 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	x = p->X / CHUNKBOX - ((p->X < 0)? 1:0);
 	y = p->Y / CHUNKBOX - ((p->Y < 0)? 1:0);
 	z = p->Z / CHUNKBOX - ((p->Z < 0)? 1:0);
-	px = abs(p->X) % CHUNKBOX;
-	py = abs(p->Y) % CHUNKBOX;
-	pz = abs(p->Z) % CHUNKBOX;
+	px = p->X % CHUNKBOX;
+	py = p->Y % CHUNKBOX;
+	pz = p->Z % CHUNKBOX;
+	if (px < 0) px = CHUNKBOX + px;
+	if (py < 0) py = CHUNKBOX + py;
+	if (pz < 0) pz = CHUNKBOX + pz;
 
 #if HOLDCHUNKS == 9
 	if (	(x < -1) || (y < -1) || (z < 0) ||
@@ -302,6 +318,14 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 
 	//FIXME: use other chunks
 #elif HOLDCHUNKS == 18
+	if (	(x < -1) || (y < -1) || (z < -1) ||
+			(x >  1) || (y >  1) || (z > 0) ) {
+		Unlock();
+		return 0;
+	}
+	++z; ++y; ++x; //centerize
+	ch = chunks[z*9+y*3+x];
+
 #else
 #endif
 

@@ -150,14 +150,24 @@ bool CurseGUIRenderConfWnd::PutEvent(SGUIEvent* e)
 		return false; //don't consume resize event!
 
 	case GUIEV_CTLBACK:
-		if (e->b.t != GUIFB_SWITCHED) break;
-		//check button
-		if (e->b.ctl == b_apply) {
+		switch (e->b.t) {
+		case GUIFB_SWITCHED:
+			//check button
+			if (e->b.ctl == b_apply) {
+				Scan();
+				Apply();
+			} else if (e->b.ctl == b_reset) {
+				Reset();
+				Apply();
+			}
+			break;
+
+		case GUIFB_EDITOK:
 			Scan();
 			Apply();
-		} else if (e->b.ctl == b_reset) {
-			Reset();
-			Apply();
+			break;
+
+		default: break;
 		}
 		break;
 

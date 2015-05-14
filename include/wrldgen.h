@@ -134,6 +134,7 @@ public:
 	void NewMap(long seed);
 	const SWGCell* GetMap()				{ return map; }
 	SWGCell GetCell(vector3di crd);
+	SWGCell GetSurfaceCell(vector3di crd);
 
 	/* Statistics functions and helpers */
 	uli GetRadius()						{ return radius; }
