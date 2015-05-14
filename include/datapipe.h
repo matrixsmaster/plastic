@@ -77,20 +77,19 @@ protected:
 	char root[MAXPATHLEN];			//root path
 	PlaceMap placetab;				//chunk displacement map
 	WorldGen* wgen;					//world generator instance
-	SVoxelInf* voxeltab;			//voxel types table
-	int voxtablen;					//...its length
+	SVoxelTab voxeltab;				//voxel types table
 	IniMap ini;						//map of known (and loaded) ini files
 	VModVec objs;					//objects in scene
 	ulli rammax;					//max amount of memory allowed to be allocated
 
-	bool Allocator(const SGameSettings* sets);
+	bool Allocator(SGameSettings* sets);
 	bool ScanFiles();
 	bool FindChunk(vector3di pos, SDataPlacement* res);
 	bool LoadVoxTab();
 	bool LoadIni(const std::string name);
 
 public:
-	DataPipe(const SGameSettings* sets, bool allocate = true);
+	DataPipe(SGameSettings* sets, bool allocate = true);
 	virtual ~DataPipe();
 
 	///Returns a status of the pipe.
@@ -108,10 +107,7 @@ public:
 	ulli GetMaxRAM()					{ return rammax; }
 
 	///Returns a pointer to voxel info table.
-	SVoxelInf* GetVoxTable()			{ return voxeltab; }
-
-	///Returns voxel info table length.
-	int GetVoxTableLen()				{ return voxtablen; }
+	SVoxelTab* GetVoxTable()			{ return &voxeltab; }
 
 	///Discards all chunks buffers and release memory.
 	virtual void PurgeChunks();
@@ -147,8 +143,9 @@ public:
 	///Purge all loaded models.
 	virtual void PurgeModels();
 
-	const SWGCell* GetGlobalSurfaceMap()	{ return wgen->GetMap(); }
+	const SWGCell* GetGlobalSurfaceMap()	{ return wgen->GetMap(); } //FIXME
 	vector2di GetGlobalSurfaceSize()		{ return (vector2di(wgen->GetPlaneSide())); }
+	vector3di GetInitialPCGPos()			{ return wgen->GetPCInitPos(); }
 };
 
 /* ********************************** DATA PIPE DUMMY ********************************** */
@@ -158,9 +155,9 @@ public:
 class DataPipeDummy : public DataPipe
 {
 public:
-	DataPipeDummy(const SGameSettings* sets);
+	DataPipeDummy(SGameSettings* sets);
 
-	void SetVoxTab(SVoxelInf* p, int l)	{ voxtablen = l; voxeltab = p; }
+	void SetVoxTab(SVoxelTab* p)		{ voxeltab = *p; }
 
 	void SetGP(vector3di pos)			{}
 	bool Move(EGMoveDir dir)			{ return false; }

@@ -25,7 +25,7 @@
 #include "vecmisc.h"
 
 
-DataPipe::DataPipe(const SGameSettings* sets, bool allocate)
+DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 {
 	int i;
 
@@ -36,8 +36,7 @@ DataPipe::DataPipe(const SGameSettings* sets, bool allocate)
 	allocated = 0;
 	memset(root,0,MAXPATHLEN);
 	wgen = NULL;
-	voxeltab = NULL;
-	voxtablen = 0;
+	memset(&voxeltab,0,sizeof(voxeltab));
 	rammax = sets->rammax;
 
 	/* Copy root path */
@@ -59,8 +58,7 @@ DataPipe::~DataPipe()
 	status = DPIPE_NOTREADY;
 
 	if (wgen) delete wgen;
-	voxtablen = 0;
-	if (voxeltab) free(voxeltab);
+	if (voxeltab.tab) free(voxeltab.tab);
 
 	PurgeModels();
 	PurgeChunks();
@@ -68,7 +66,7 @@ DataPipe::~DataPipe()
 	pthread_mutex_destroy(&vmutex);
 }
 
-bool DataPipe::Allocator(const SGameSettings* sets)
+bool DataPipe::Allocator(SGameSettings* sets)
 {
 	int i;
 	size_t sz;
@@ -76,13 +74,13 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 
 	/* Allocate voxel info table */
 	sz = DEFVOXTYPES * sizeof(SVoxelInf);
-	voxtablen = DEFVOXTYPES;
-	voxeltab = (SVoxelInf*)malloc(sz);
-	if (!voxeltab) {
+	voxeltab.len = DEFVOXTYPES;
+	voxeltab.tab = (SVoxelInf*)malloc(sz);
+	if (!voxeltab.tab) {
 		errout("Unable to allocate RAM for voxel table.\n");
 		return false;
 	}
-	memset(voxeltab,0,sz);
+	memset(voxeltab.tab,0,sz);
 	allocated += sz;
 
 	/* Create and init the world generator */
@@ -90,12 +88,14 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 		errout("Impossibly small world radius.\n");
 		return false;
 	}
-	wgen = new WorldGen(sets->world_r,voxeltab,voxtablen);
+	wgen = new WorldGen(sets->world_r,&voxeltab);
 	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
-	if (!wgen->LoadMap(tmp)) {
+
+	if ((sets->new_game) || (!wgen->LoadMap(tmp))) {
 		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
 		wgen->SaveMap(tmp);
-	}
+	} else
+		sets->world_r = wgen->GetRadius(); //override current radius with a saved one
 	allocated += wgen->GetAllocatedRAM();
 
 	/* Load external files */
@@ -120,6 +120,11 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 		}
 	}
 
+	//TODO: load Player data
+	if (!sets->new_game) {
+		//...
+	}
+
 	/* All clear. */
 	return true;
 }
@@ -127,6 +132,7 @@ bool DataPipe::Allocator(const SGameSettings* sets)
 bool DataPipe::ScanFiles()
 {
 	//TODO: scan world files to map known chunks
+	//TODO: if new game, delete these files
 	return true;
 }
 
@@ -145,7 +151,8 @@ bool DataPipe::LoadVoxTab()
 	char pth[MAXPATHLEN];
 	char fx;
 	SVoxelInf cvf;
-	int r,n = 0;
+	int r;
+	unsigned n = 0;
 
 	//combine a file path
 	snprintf(pth,MAXPATHLEN,"%s/%s",root,VOXTABFILENAME);
@@ -160,9 +167,19 @@ bool DataPipe::LoadVoxTab()
 				&(cvf.pix.bg.r),&(cvf.pix.bg.g),&(cvf.pix.bg.b),
 				cvf.sides);
 
-		if (r < 9) continue;
-		if (fx == 'V') voxeltab[n++] = cvf;
-		if (n >= voxtablen) break;
+		if (r < 9) continue; //check number of successfully parsed params
+
+		if (fx == 'V') {
+			if ((cvf.type >= 0) && (cvf.type < NUMVOXTYPES))
+				voxeltab.stat[cvf.type]++;
+			else {
+				errout("Unknown voxel type %d\n",(int)cvf.type);
+				fclose(vtf);
+				return false;
+			}
+			voxeltab.tab[n++] = cvf;
+		}
+		if (n >= voxeltab.len) break;
 	}
 
 	fclose(vtf);
@@ -192,24 +209,24 @@ void DataPipe::SetGP(vector3di pos)
 #if HOLDCHUNKS == 1
 	/* One chunk right there, simplest scenario */
 	if (!FindChunk(pos,&plc))
-		wgen->GenerateChunk(chunks[0]);
+		wgen->GenerateChunk(chunks[0],GP);
 
 #elif HOLDCHUNKS == 9
 	/* One 3x3 plane of chunks, most widely used scenario */
 	int i,j,l;
-	vector3dulli cur(pos);
+	vector3di cur(pos);
 	for (i = -1, l = 0; i < 2; i++) {
 		cur.Y = pos.Y + i;
 		for (j = -1; j < 2; j++, l++) {
 			cur.X = pos.X + j;
 			if (!FindChunk(cur,&plc))
-				wgen->GenerateChunk(chunks[l]);
+				wgen->GenerateChunk(chunks[l],cur);
 		}
 	}
 
 	//FIXME: all directions
 #elif HOLDCHUNKS == 18
-	/* Two 3x3 planes (one right there, and one upper) */
+	/* Two 3x3 planes (one right there, and one underneath) */
 
 #elif HOLDCHUNKS == 27
 	/* Full set of 3x3x3 (the most memory hungry scenario) */
@@ -297,13 +314,13 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
 {
 	voxel v = GetVoxel(p);
-	if (v < voxtablen) return &voxeltab[v];
+	if (v < voxeltab.len) return &(voxeltab.tab[v]);
 	else return NULL;
 }
 
 SVoxelInf* DataPipe::GetVInfo(const voxel v)
 {
-	if (v < voxtablen) return &voxeltab[v];
+	if (v < voxeltab.len) return &(voxeltab.tab[v]);
 	else return NULL;
 }
 

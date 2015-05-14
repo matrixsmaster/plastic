@@ -40,6 +40,7 @@ void printsettings(SGameSettings* s)
 	printf("\n%s settings:\n",			PRODNAME);
 	printf("Root dir:\t\t%s\n",			s->root);
 	printf("Use startup shell:\t%s\n",	BOOLSTR(s->use_shell));
+	printf("Start new game:\t\t%s\n",	BOOLSTR(s->new_game));
 	printf("World radius:\t\t%lu\n",	s->world_r);
 	printf("World seed value:\t%ld\n",	s->wg_seed);
 	printf("Max RAM amount:\t\t%llu\n",	s->rammax);
@@ -87,6 +88,12 @@ opts_begin:
 		scanf(sfmt,s->root);
 		break;
 
+	case GAT_NEWGAME:
+		puts("Start new game> Enter either (T)rue or (F)alse");
+		MGETCHAR(in);
+		s->new_game = ((in == 't') || (in == 'T'));
+		break;
+
 	case GAT_WORLDRAD:
 		printf("Current radius = %lu\n",s->world_r);
 		printf("New radius> ");
@@ -97,7 +104,7 @@ opts_begin:
 		}
 
 		//generate world to get area values
-		wgen = new WorldGen(s->world_r,NULL,0);
+		wgen = new WorldGen(s->world_r,NULL);
 		dim = wgen->GetSizeVector();
 		printf("Calculating values...\n");
 		printf("World bounding box dimensions = [%d, %d, %d]\n",dim.X,dim.Y,dim.Z);
@@ -140,7 +147,7 @@ opts_begin:
 
 		//generate test world
 		puts("Generating test world...");
-		wgen = new WorldGen(s->world_r,NULL,0);
+		wgen = new WorldGen(s->world_r,NULL);
 		wgen->NewMap(s->wg_seed);
 		printf("Cities generated: %d\n",wgen->GetNumCities());
 		printf("Factories generated: %d\n",wgen->GetNumFactories());
@@ -223,7 +230,7 @@ chargen_begin:
 		break;
 
 	case '2':
-		puts("New gender> Enter F or M");
+		puts("New gender> Enter either (F)emale or (M)ale");
 		MGETCHAR(in);
 		s->PCData.female = ((in == 'f') || (in == 'F'));
 		break;

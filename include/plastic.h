@@ -40,12 +40,13 @@ This is free software, and you are welcome to redistribute it\n\
 under conditions of GNU GPL v2\n\n"
 
 
-#define GAMEARGTYPES 6
+#define GAMEARGTYPES 7
 #define GAMEARGHELPLEN 360
 
 struct SGameSettings {
 	char root[MAXPATHLEN];	//VFS root dir
 	bool use_shell;			//launch interactive shell
+	bool new_game;			//discard old data
 	uli world_r;			//world radius
 	ulli rammax;			//amount of memory that positively allowed to be used
 	long wg_seed;			//seed for world map generation (zero for random seed)
@@ -55,16 +56,19 @@ struct SGameSettings {
 #define DEFAULT_SETTINGS { 							\
 	"./data",										\
 	false, 											\
-	64,												\
+	true,											\
+	32,												\
 	(4ULL*1024*1024*1024),							\
-	0,												\
+	110864270,										\
 	{ "Mary", true, PCLS_INQUISITOR, PBOD_PNEUMO, },\
 }
+//24141595
 
 enum EGameArgType {
 	GAT_NOTHING,
 	GAT_ROOTDIR,
 	GAT_USESHELL,
+	GAT_NEWGAME,
 	GAT_WORLDRAD,
 	GAT_RAMMAX,
 	GAT_SEED,
@@ -83,7 +87,8 @@ static const SGameArg argp_table[GAMEARGTYPES] = {
 	{ GAT_USESHELL,	's', false,	"Show interactive shell after startup to "\
 								"adjust game settings and/or generate "\
 								"player character." },
-	{ GAT_WORLDRAD,	'R', true,	"Set the radius of the world spheroid." },
+	{ GAT_NEWGAME,	'N', true,	"Start new game (discard old world)." },
+	{ GAT_WORLDRAD,	'R', true,	"Set the radius of the world hypertorus." },
 	{ GAT_RAMMAX,	'm', true,	"Set the memory threshold for the main "\
 								"data holding facilities. This amount is "\
 								"only the rough approximation. "\

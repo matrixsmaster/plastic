@@ -90,6 +90,7 @@ public:
 #define MAPVIEWRULX 5
 #define MAPVIEWRULY 3
 #define MAPVIEWRULSTR 16
+#define MAPVIEWBOTLINSTR 129
 
 class DataPipe;
 
@@ -98,7 +99,7 @@ private:
 	DataPipe* pipe;
 	int scale;
 	vector2di base;
-	vector3di pos;
+	vector3di gpos,lpos;
 	bool showelev;
 	int m_w, m_h;
 
@@ -109,7 +110,7 @@ public:
 	CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat);
 	virtual ~CurseGUIMapViewWnd()		{}
 
-	void SetPos(const vector3di p)		{ pos = p; }
+	void SetPos(const vector3di glob, const vector3di loc);
 
 	bool PutEvent(SGUIEvent* e);
 };

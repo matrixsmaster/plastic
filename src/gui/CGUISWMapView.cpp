@@ -27,6 +27,14 @@ static const SGUIPixel empty_tile = {
 		' ', { 1000, 1000, 1000 }, { 0, 0, 0 }
 };
 
+static const SGUIPixel curpos_tile = {
+		'X', { 1000, 1000, 1000 }, { 900, 0, 0 }
+};
+
+static const SGUIPixel bottom_line = {
+		' ', { 0, 900, 0 }, { 0, 0, 0 }
+};
+
 CurseGUIMapViewWnd::CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat) :
 		CurseGUIWnd(scrn,0,0,2,2)
 {
@@ -59,20 +67,20 @@ void CurseGUIMapViewWnd::ResizeWnd()
 
 void CurseGUIMapViewWnd::DrawMap()
 {
-	int x,y,l,mx,my,ml,rt,rl;
+	int x,y,l,mx,my,myi,ml,rt,rl;
 	unsigned k,u;
-	char vert[MAPVIEWRULSTR],horz[MAPVIEWRULSTR];
+	char vert[MAPVIEWRULSTR],horz[MAPVIEWRULSTR],botl[MAPVIEWBOTLINSTR];
 	const SWGCell* map = pipe->GetGlobalSurfaceMap();
 	vector2di mbs,msz = pipe->GetGlobalSurfaceSize();
 	vector3d col;
 
 	//store dimensions
 	m_w = g_w - 3; //reserve space for a border and a ruler
-	m_h = g_h - 3;
+	m_h = g_h - 4; //reserve space for: border, ruler, bottom line
 
 	//calculate shift
-	mbs.X = pos.X + msz.X / 2;
-	mbs.Y = pos.Y + msz.Y / 2;
+	mbs.X = gpos.X;
+	mbs.Y = msz.Y - gpos.Y - 1;
 	mbs += base;
 	if (scale > 0) mbs *= scale;
 	else mbs /= scale * -1;
@@ -94,9 +102,11 @@ void CurseGUIMapViewWnd::DrawMap()
 		else //shrinking
 			my = (y + mbs.Y) * -scale;
 
+		myi = msz.Y - my - 1; //invert Y axis
+
 		//draw the vertical ruler
 		if (y % rl == 0) {
-			snprintf(vert,sizeof(vert),">%d",(my-msz.Y/2));
+			snprintf(vert,sizeof(vert),">%d",myi);
 			u = 0;
 		}
 		if (u < strlen(vert)) {
@@ -120,7 +130,7 @@ void CurseGUIMapViewWnd::DrawMap()
 			//draw the horizontal ruler
 			if (y == 0) {
 				if (x % rt == 0) {
-					snprintf(horz,sizeof(horz),"|%d",(mx-msz.X/2));
+					snprintf(horz,sizeof(horz),"|%d",mx);
 					k = 0;
 				}
 				if (k < strlen(horz)) {
@@ -131,13 +141,15 @@ void CurseGUIMapViewWnd::DrawMap()
 			}
 
 			//calculate map cell linear address
-			ml = (msz.Y - my - 1) * msz.X + mx; //invert Y axis
+			ml = myi * msz.X + mx;
 
 			if (	(mx < 0) || (mx >= msz.X) ||
 					(my < 0) || (my >= msz.Y) ||
 					(ml >= (msz.X*msz.Y)) )
 
 				backgr[l] = empty_tile;
+			else if ((mx == gpos.X) && (my == (msz.Y - gpos.Y - 1)))
+				backgr[l] = curpos_tile;
 			else {
 				backgr[l] = wrld_tiles[map[ml].t];
 
@@ -156,6 +168,25 @@ void CurseGUIMapViewWnd::DrawMap()
 			}
 		}
 	}
+
+	/* Draw bottom line */
+	snprintf(botl,sizeof(botl),"GPos = [%d %d %d];  LPos = [%d %d %d]",
+			gpos.X,gpos.Y,gpos.Z,lpos.X,lpos.Y,lpos.Z);
+
+	for (k = 2; k < (unsigned)m_w; k++) {
+		l = (g_h-2) * g_w + k;
+		u = k - 2;
+		backgr[l] = bottom_line;
+		if ((u >= strlen(botl)) || (u >= sizeof(botl))) break;
+		backgr[l].sym = botl[u];
+	}
+}
+
+void CurseGUIMapViewWnd::SetPos(const vector3di glob, const vector3di loc)
+{
+	gpos = glob;
+	lpos = loc;
+	DrawMap();
 }
 
 bool CurseGUIMapViewWnd::PutEvent(SGUIEvent* e)
@@ -185,10 +216,10 @@ bool CurseGUIMapViewWnd::PutEvent(SGUIEvent* e)
 			break;
 
 		//navigation
-		case KEY_UP: base.Y--; d = true; break;
-		case KEY_DOWN: base.Y++; d = true; break;
-		case KEY_LEFT: base.X--; d = true; break;
-		case KEY_RIGHT: base.X++; d = true; break;
+		case KEY_UP:	base.Y -= (scale < 0)? -scale:1; d = true; break;
+		case KEY_DOWN:	base.Y += (scale < 0)? -scale:1; d = true; break;
+		case KEY_LEFT:	base.X -= (scale < 0)? -scale:1; d = true; break;
+		case KEY_RIGHT:	base.X += (scale < 0)? -scale:1; d = true; break;
 
 		//scale
 		case '-':

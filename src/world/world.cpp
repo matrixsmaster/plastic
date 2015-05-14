@@ -53,18 +53,20 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 	/* Create LVR */
 	lvr = new LVR(data);
-//	lvr->SetFogColor(vector3di(100));
 
 	/* Create Player */
 	PC = new Player(sets->PCData,data);
 
 	//FIXME: debugging stuff
-	data->SetGP(vector3di(0));
+//	PC->SetGPos(vector3di(data->GetGlobalSurfaceSize().X/2,
+//			data->GetGlobalSurfaceSize().Y/2,
+//			sets->world_r - WGAIRCHUNKS - 1));
+	PC->SetGPos(data->GetInitialPCGPos());
+	PC->SetPos(vector3di(128,90,135));
+	data->SetGP(PC->GetGPos());
 	test = data->LoadModel("testmodel.dat",vector3di(128,100,135));
 	if (!test) abort();
 	lvr->SetPosition(vector3d(128,90,135));
-	PC->SetPos(vector3di(128,90,135));
-	PC->SetGPos(vector3di(0));
 }
 
 PlasticWorld::~PlasticWorld()
@@ -189,7 +191,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 		case 2: /*map view*/
 			SPAWNWNDMACRO("Map View",new CurseGUIMapViewWnd(gui,data));
-			(reinterpret_cast<CurseGUIMapViewWnd*>(wptr))->SetPos(PC->GetGPos());
+			(reinterpret_cast<CurseGUIMapViewWnd*>(wptr))->SetPos(PC->GetGPos(),PC->GetPos());
 			break;
 
 		case 3: /*inventory*/

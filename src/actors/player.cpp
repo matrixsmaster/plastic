@@ -62,10 +62,10 @@ void Player::ProcessEvent(const SGUIEvent* e)
 	case 6: Move(LMOVE_LEFT,2.2f); break;
 	case 7: Move(LMOVE_RGHT,2.2f); break;
 
-	case  8: rot.Z += 2; rc = true; break;
-	case  9: rot.Z -= 2; rc = true; break;
-	case 10: rot.X += 2; rc = true; break;
-	case 11: rot.X -= 2; rc = true; break;
+	case  8: rot.Z += 4; rc = true; break;
+	case  9: rot.Z -= 4; rc = true; break;
+	case 10: rot.X += 4; rc = true; break;
+	case 11: rot.X -= 4; rc = true; break;
 
 //	case : Move(LMOVE_UP,1.2f); break;
 //	case : Move(LMOVE_DW,1.2f); break;
