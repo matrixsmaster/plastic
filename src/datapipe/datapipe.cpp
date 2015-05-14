@@ -33,6 +33,7 @@ DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 	status = DPIPE_ERROR;
 	pthread_mutex_init(&vmutex,NULL);
 	memset(chunks,0,sizeof(chunks));
+	memset(chstat,0,sizeof(chstat));
 	allocated = 0;
 	memset(root,0,MAXPATHLEN);
 	wgen = NULL;
@@ -197,62 +198,140 @@ void DataPipe::PurgeChunks()
 			chunks[i] = NULL;
 			allocated -= sizeof(VChunk);
 		}
+
+	status = DPIPE_NOTREADY;
 	Unlock();
 }
 
 void DataPipe::SetGP(vector3di pos)
 {
-	SDataPlacement plc;
+	unsigned l;
+
 	GP = pos;
+
 	Lock();
+	status = DPIPE_BUSY;
+
+	for (l = 0; l < HOLDCHUNKS; l++)
+		chstat[l] = DPCHK_QUEUE;
 
 #if HOLDCHUNKS == 1
-	/* One chunk right there, simplest scenario */
-	if (!FindChunk(pos,&plc))
-		wgen->GenerateChunk(chunks[0],GP);
+	l = 0;
 
 #elif HOLDCHUNKS == 9
+	l = 1 * 3 + 1;
+
+#else
+	l = 1 * 9 + 1 * 3 + 1;
+
+#endif
+
+	MakeChunk(l,GP);
+
+	status = DPIPE_IDLE;
+	Unlock();
+}
+
+bool DataPipe::Move(EGMoveDir dir)
+{
+	Lock();
+	status = DPIPE_BUSY;
+	//TODO
+	status = DPIPE_IDLE;
+	Unlock();
+	return false;
+}
+
+void DataPipe::ChunkQueue()
+{
+	vector3di cur;
+	bool fnd = false;
+	unsigned l;
+
+	if (status != DPIPE_IDLE) return;
+
+#if HOLDCHUNKS == 1
+	/* One chunk right there, simplest scenario. Do nothing. */
+	return;
+#endif
+
+//	Lock();
+//	status = DPIPE_BUSY;
+
+#if HOLDCHUNKS == 9
 	/* One 3x3 plane of chunks, most widely used scenario */
-	int i,j,l;
-	vector3di cur(pos);
+	int i,j;
+	cur.Z = GP.Z:
 	for (i = -1, l = 0; i < 2; i++) {
-		cur.Y = pos.Y + i;
+		cur.Y = GP.Y + i;
 		for (j = -1; j < 2; j++, l++) {
-			cur.X = pos.X + j;
-			if (!FindChunk(cur,&plc))
-				wgen->GenerateChunk(chunks[l],cur);
+			cur.X = GP.X + j;
+			if (chstat[l] == DPCHK_QUEUE) {
+				fnd = true;
+				goto chunk_found;
+			}
 		}
 	}
 
-	//FIXME: all directions
 #elif HOLDCHUNKS == 18
 	/* Two 3x3 planes (one right there, and one underneath) */
-	int i,j,k,l;
-	vector3di cur(pos);
+	int i,j,k;
 	for (i = -1, l = 0; i <= 0; i++) {
-		cur.Z = pos.Z + i;
+		cur.Z = GP.Z + i;
 		for (j = -1; j < 2; j++) {
-			cur.Y = pos.Y + j;
+			cur.Y = GP.Y + j;
 			for (k = -1; k < 2; k++, l++) {
-				cur.X = pos.X + k;
-				if (!FindChunk(cur,&plc))
-					wgen->GenerateChunk(chunks[l],cur);
+				cur.X = GP.X + k;
+				if (chstat[l] == DPCHK_QUEUE) {
+					fnd = true;
+					goto chunk_found;
+				}
 			}
 		}
 	}
 
 #elif HOLDCHUNKS == 27
 	/* Full set of 3x3x3 (the most memory hungry scenario) */
-
-#else
-#error "Invalid value of HOLDCHUNKS!"
+	int i,j,k;
+	for (i = -1, l = 0; i < 2; i++) {
+		cur.Z = GP.Z + i;
+		for (j = -1; j < 2; j++) {
+			cur.Y = GP.Y + j;
+			for (k = -1; k < 2; k++, l++) {
+				cur.X = GP.X + k;
+				if (chstat[l] == DPCHK_QUEUE) {
+					fnd = true;
+					goto chunk_found;
+				}
+			}
+		}
+	}
 #endif
 
-	Unlock();
-	status = DPIPE_IDLE;
+chunk_found:
+	if (fnd) {
+		chstat[l] = DPCHK_LOADING;
+		MakeChunk(l,cur);
+	}
+
+//	status = DPIPE_IDLE;
+//	Unlock();
 }
 
-bool DataPipe::Move(EGMoveDir dir)
+void DataPipe::MakeChunk(unsigned l, vector3di pos)
+{
+	SDataPlacement plc;
+
+	if (!FindChunk(pos,&plc)) {
+		wgen->GenerateChunk(chunks[l],pos);
+		chstat[l] = DPCHK_READY;
+	} else if (!LoadChunk(&plc,chunks[l]))
+		chstat[l] = DPCHK_ERROR;
+	else
+		chstat[l] = DPCHK_READY;
+}
+
+bool DataPipe::LoadChunk(SDataPlacement* res, PChunk buf)
 {
 	//TODO
 	return false;
@@ -263,6 +342,11 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	PChunk ch;
 	VModVec::iterator mi;
 	voxel tmp = 0;
+
+#if HOLDCHUNKS > 1
+	int x,y,z,px,py,pz;
+	unsigned l;
+#endif
 
 	if (status != DPIPE_IDLE) return 0;
 	Lock();
@@ -283,20 +367,20 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 #if HOLDCHUNKS == 1
 	/* Simplest case */
 
-	if (	(p->X < 0) || (p->Y < 0) || (p->Z < 0) ||
-			(p->X >= CHUNKBOX) || (p->Y >= CHUNKBOX) || (p->Z >= CHUNKBOX) ) {
+	px = p->X;
+	py = p->Y;
+	pz = p->Z;
+
+	if (	(px < 0) || (py < 0) || (pz < 0) ||
+			(px >= CHUNKBOX) || (py >= CHUNKBOX) || (pz >= CHUNKBOX) ) {
 		Unlock();
 		return 0;
 	}
-	ch = chunks[0];
-	tmp = (*ch)[p->Z][p->Y][p->X];
-	Unlock();
-	return tmp;
+	l = 0;
 
 #else
 
 	/* Other cases */
-	int x,y,z,px,py,pz;
 	x = p->X / CHUNKBOX - ((p->X < 0)? 1:0);
 	y = p->Y / CHUNKBOX - ((p->Y < 0)? 1:0);
 	z = p->Z / CHUNKBOX - ((p->Z < 0)? 1:0);
@@ -314,9 +398,8 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 		return 0;
 	}
 	++y; ++x; //centerize
-	ch = chunks[y*3+x];
+	l = y * 3 + x;
 
-	//FIXME: use other chunks
 #elif HOLDCHUNKS == 18
 	if (	(x < -1) || (y < -1) || (z < -1) ||
 			(x >  1) || (y >  1) || (z > 0) ) {
@@ -324,12 +407,27 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 		return 0;
 	}
 	++z; ++y; ++x; //centerize
-	ch = chunks[z*9+y*3+x];
+	l = z * 9 + y * 3 + x;
+
+#elif HOLDCHUNKS == 27
+	if (	(x < -1) || (y < -1) || (z < -1) ||
+			(x >  1) || (y >  1) || (z >  1) ) {
+		Unlock();
+		return 0;
+	}
+	++z; ++y; ++x; //centerize
+	l = z * 9 + y * 3 + x;
 
 #else
+#error "Invalid value of HOLDCHUNKS!"
+
 #endif
 
-	tmp = (*ch)[pz][py][px];
+	if (chstat[l] == DPCHK_READY) {
+		ch = chunks[l];
+		tmp = (*ch)[pz][py][px];
+	}
+
 	Unlock();
 	return tmp;
 #endif

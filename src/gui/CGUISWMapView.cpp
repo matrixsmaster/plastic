@@ -150,22 +150,23 @@ void CurseGUIMapViewWnd::DrawMap()
 				backgr[l] = empty_tile;
 			else if ((mx == gpos.X) && (my == (msz.Y - gpos.Y - 1)))
 				backgr[l] = curpos_tile;
-			else {
+			else
 				backgr[l] = wrld_tiles[map[ml].t];
 
-				//Elevation
-				if (!showelev) continue;
-				col = tripletovecf(backgr[l].bg);
-				switch (map[ml].elev) {
-				case 0: col *= MAPVIEWLOWM; break;
-				case 1: break;
-				case 2: col *= MAPVIEWHIGHM; break;
-				}
-				if (col.X > 1000) col.X = 1000;
-				if (col.Y > 1000) col.Y = 1000;
-				if (col.Z > 1000) col.Z = 1000;
-				backgr[l].bg = vecftotriple(col);
+			//Elevation
+			if ((!showelev) || (backgr[l].sym == ' ')) continue;
+
+			col = tripletovecf(backgr[l].bg);
+			switch (map[ml].elev) {
+			case 0: col *= MAPVIEWLOWM; break;
+			case 1: break;
+			case 2: col *= MAPVIEWHIGHM; break;
 			}
+			if (col.X > 1000) col.X = 1000;
+			if (col.Y > 1000) col.Y = 1000;
+			if (col.Z > 1000) col.Z = 1000;
+			backgr[l].bg = vecftotriple(col);
+			backgr[l].sym = map[ml].elev + '1';
 		}
 	}
 

@@ -278,25 +278,4 @@ public:
 
 /* ******************************************************************** */
 
-/*
- * TODO:
- * V CurseGUIPicture - blit picture to window backbuffer
- * V CurseGUIButton - renders a simple button like [BUTTON]
- * V CurseGUIEditBox - an underline (_) fillable with some text or user input.
- * 					Example: EditBox(6 chars):	(______)
- * 							after some input:	(Test__)
- * V CurseGUICheckBox - (V) or (X) with switchable state. Use (O) for disabled.
- * V CurseGUIProgrBar - basic progress bar like {#### 25%     }
- *   CurseGUITable - table utilizes ncurses' line drawings. Should be possible to navigate with keys.
- * 					Ex.:	+------+-------*--+ (see curs_addch (3X) section Line graphics)
- * 							|item  |  text | 1|
- * 							+------+-------+--+
- * 							|item 2|some lo| 2|
- * 							|      |nger te|  |
- * 							|      |xt     |  |
- * 							+------+-------+--+
- * 	 CurseGUILabel - just a label, nothing more :)
- *
- */
-
 #endif /* CGUICONTROLS_H_ */

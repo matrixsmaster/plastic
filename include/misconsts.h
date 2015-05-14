@@ -27,6 +27,7 @@
 
 #define EVENTUSLEEP 50000
 #define WORLDUSLEEP 90000
+#define CHUNKUSLEEP 100000
 
 
 //Global Movement Directions
