@@ -120,6 +120,7 @@ private:
 	uli cover[WGNUMKINDS];
 	int cities;
 	int factories;
+	vector3di pcpos;
 
 	void ResetVolume();
 
@@ -134,7 +135,7 @@ public:
 	const SWGCell* GetMap()				{ return map; }
 	SWGCell GetCell(vector3di crd);
 
-	/* Statistics functions */
+	/* Statistics functions and helpers */
 	uli GetRadius()						{ return radius; }
 	vector3di GetSizeVector()			{ return wrldsz; }
 	ulli GetAllocatedRAM()				{ return allocated; }
@@ -144,6 +145,7 @@ public:
 	int GetNumCities()					{ return cities; }
 	int GetNumFactories()				{ return factories; }
 	uli GetNumCellsOf(EWGCellContent c)	{ return cover[c]; }
+	vector3di GetPCInitPos()			{ return pcpos; }
 
 	void WrapCoords(vector3di* pnt);
 

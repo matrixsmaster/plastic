@@ -143,8 +143,9 @@ public:
 	///Purge all loaded models.
 	virtual void PurgeModels();
 
-	const SWGCell* GetGlobalSurfaceMap()	{ return wgen->GetMap(); }
+	const SWGCell* GetGlobalSurfaceMap()	{ return wgen->GetMap(); } //FIXME
 	vector2di GetGlobalSurfaceSize()		{ return (vector2di(wgen->GetPlaneSide())); }
+	vector3di GetInitialPCGPos()			{ return wgen->GetPCInitPos(); }
 };
 
 /* ********************************** DATA PIPE DUMMY ********************************** */

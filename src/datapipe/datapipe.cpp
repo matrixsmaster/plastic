@@ -90,7 +90,8 @@ bool DataPipe::Allocator(SGameSettings* sets)
 	}
 	wgen = new WorldGen(sets->world_r,&voxeltab);
 	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
-	if (!wgen->LoadMap(tmp)) {
+
+	if ((sets->new_game) || (!wgen->LoadMap(tmp))) {
 		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
 		wgen->SaveMap(tmp);
 	} else
@@ -120,6 +121,9 @@ bool DataPipe::Allocator(SGameSettings* sets)
 	}
 
 	//TODO: load Player data
+	if (!sets->new_game) {
+		//...
+	}
 
 	/* All clear. */
 	return true;
@@ -128,6 +132,7 @@ bool DataPipe::Allocator(SGameSettings* sets)
 bool DataPipe::ScanFiles()
 {
 	//TODO: scan world files to map known chunks
+	//TODO: if new game, delete these files
 	return true;
 }
 
@@ -209,19 +214,19 @@ void DataPipe::SetGP(vector3di pos)
 #elif HOLDCHUNKS == 9
 	/* One 3x3 plane of chunks, most widely used scenario */
 	int i,j,l;
-	vector3dulli cur(pos);
+	vector3di cur(pos);
 	for (i = -1, l = 0; i < 2; i++) {
 		cur.Y = pos.Y + i;
 		for (j = -1; j < 2; j++, l++) {
 			cur.X = pos.X + j;
 			if (!FindChunk(cur,&plc))
-				wgen->GenerateChunk(chunks[l]);
+				wgen->GenerateChunk(chunks[l],cur);
 		}
 	}
 
 	//FIXME: all directions
 #elif HOLDCHUNKS == 18
-	/* Two 3x3 planes (one right there, and one upper) */
+	/* Two 3x3 planes (one right there, and one underneath) */
 
 #elif HOLDCHUNKS == 27
 	/* Full set of 3x3x3 (the most memory hungry scenario) */

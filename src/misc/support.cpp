@@ -40,6 +40,7 @@ void printsettings(SGameSettings* s)
 	printf("\n%s settings:\n",			PRODNAME);
 	printf("Root dir:\t\t%s\n",			s->root);
 	printf("Use startup shell:\t%s\n",	BOOLSTR(s->use_shell));
+	printf("Start new game:\t\t%s\n",	BOOLSTR(s->new_game));
 	printf("World radius:\t\t%lu\n",	s->world_r);
 	printf("World seed value:\t%ld\n",	s->wg_seed);
 	printf("Max RAM amount:\t\t%llu\n",	s->rammax);
@@ -85,6 +86,12 @@ opts_begin:
 		printf("New root dir> ");
 		snprintf(sfmt,sizeof(sfmt),"%%%ds\\n",MAXPATHLEN);
 		scanf(sfmt,s->root);
+		break;
+
+	case GAT_NEWGAME:
+		puts("Start new game> Enter either (T)rue or (F)alse");
+		MGETCHAR(in);
+		s->new_game = ((in == 't') || (in == 'T'));
 		break;
 
 	case GAT_WORLDRAD:
@@ -223,7 +230,7 @@ chargen_begin:
 		break;
 
 	case '2':
-		puts("New gender> Enter F or M");
+		puts("New gender> Enter either (F)emale or (M)ale");
 		MGETCHAR(in);
 		s->PCData.female = ((in == 'f') || (in == 'F'));
 		break;

@@ -80,7 +80,7 @@ SWGCell WorldGen::GetCell(vector3di crd)
 		//core air pocket or air above the surface
 		cl.chunkt = WGCT_AIR;
 	} else {
-		l = crd.Y * plane + crd.X;
+		l = crd.Y * planev.X + crd.X;
 		//get surface level at point
 		z = map[l].elev;
 		z = radius - WGAIRCHUNKS - (WGELEVATIONS - z - 1);
@@ -134,58 +134,35 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 {
 	int x,y,z,t;
 	voxel v,vgr;
-	if (!buf) return;
-	//FIXME: for debug only
-#if 0
-	for (z = 0; z < CHUNKBOX; z++) {
-		for (y = 0; y < CHUNKBOX; y++) {
-			for (x = 0; x < CHUNKBOX; x++) {
-				if (z < 128) {
-//					t = (rand() & 3) + 1;
-					t = (((y % 2)? x:(x+1)) % 2) + 1 + (z % 2);
-					v = (voxel)t;
-					if (rand() < RAND_MAX / 10) v = 0;
-				} else v = 0;
-				if ((x > 108) && (x < 148) && (y > 108) && (y < 148) && (z > 126) && (z < 135)) v = 4;
-				(*buf)[z][y][x] = v;
-			}
-		}
-	}
-
-#else
-
+	SWGCell cell;
 	vector3d crn[4];
 	voxel grains[CHUNKBOX/VOXGRAIN][CHUNKBOX/VOXGRAIN][CHUNKBOX/VOXGRAIN];
 
-	SWGCell* ptr = map + (planev.Y / 2 * planev.X + planev.X / 2);
+	if (!buf) return;
 
-	rng->SetSeed(ptr->seed);
 	memset(grains,0,sizeof(grains));
+	cell = GetCell(pos);
+	rng->SetSeed(cell.seed);
 
 	crn[1].X = 0;
 	crn[1].Y = CHUNKBOX;
-	crn[1].Z = CHUNKBOX * ptr->elev;
+	crn[1].Z = CHUNKBOX * cell.elev;
 
-	ptr++;
 	crn[2].X = CHUNKBOX;
 	crn[2].Y = CHUNKBOX;
-	crn[2].Z = CHUNKBOX * ptr->elev;
+	crn[2].Z = CHUNKBOX * GetCell(pos+vector3di(1,0,0)).elev;
 
-	ptr += planev.X;
 	crn[3].X = CHUNKBOX;
 	crn[3].Y = 0;
-	crn[3].Z = CHUNKBOX * ptr->elev;
+	crn[3].Z = CHUNKBOX * GetCell(pos+vector3di(1,-1,0)).elev;
 
-	ptr--;
 	crn[0].X = 0;
 	crn[0].Y = 0;
-	crn[0].Z = CHUNKBOX * ptr->elev;
-
-	for (x = 0; x < 4; x++) crn[x].Z -= CHUNKBOX / 2;
+	crn[0].Z = CHUNKBOX * GetCell(pos+vector3di(0,-1,0)).elev;
 
 	for (y = 0; y < CHUNKBOX; y++) {
 		for (x = 0; x < CHUNKBOX; x++) {
-			t = InterpolateZQ(crn,x,y);
+			t = InterpolateZQ(crn,x,y) - CHUNKBOX / 2;
 			for (z = 0; z < CHUNKBOX; z++) {
 
 				if (grains[z/VOXGRAIN][y/VOXGRAIN][x/VOXGRAIN] == 0) {
@@ -202,8 +179,7 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 		}
 	}
 
-	rng->TimeSeed();
-#endif
+	rng->TimeSeed(); //reset seed
 }
 
 bool WorldGen::LoadMap(const char* fname)
@@ -314,6 +290,9 @@ void WorldGen::NewMap(long seed)
 	cities = 0;
 	factories = 0;
 
+	/* Reset initial Player position */
+	pcpos = vector3di(0);
+
 	/* Prepare RNG */
 	org_seed = seed;
 	rng->SetSeed(seed);
@@ -361,7 +340,7 @@ void WorldGen::NewMap(long seed)
 			if (!flg) {
 				ptr = map + (i * planev.X + j);
 				ptr->t = WGCC_WATERONLY;
-				ptr->elev = 1; //to flatten the river :)
+				ptr->elev = 0; //to flatten the river :)
 
 				/* Create realistic waterside (full eight directions) */
 				for (v = 0; v < 8; v++) {
@@ -412,6 +391,13 @@ void WorldGen::NewMap(long seed)
 
 				ptr->t = (rng->FloatNum() < 0.5)? WGCC_CONCRETEB:WGCC_SPECBUILD;
 				ptr->elev = 1;
+
+				//store initial player position helper
+				if (pcpos == vector3di(0)) {
+					pcpos.X = t;
+					pcpos.Y = q;
+					pcpos.Z = radius - WGAIRCHUNKS - ptr->elev;
+				}
 			}
 		}
 	}
