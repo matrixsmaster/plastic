@@ -28,17 +28,18 @@ using namespace std;
 #define BORDER_HEIGHT 2
 
 
-CurseGUITable::CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int w, int rows, int col, int wdth) :
+CurseGUITable::CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int col, int wcell, int htable, int wtable) :
 		CurseGUIControl(p,x,y)
 {
-	showt = false;
 	g_col = col;
 	g_rows = rows;
-	auto_height = 1;
-	g_wdth = wdth;
-	g_hght = 1;
+	g_wcell = wcell;
+	g_hcell = 1;
+	g_htable = htable;
+	g_wtable = wtable;
+	g_tw = (g_wcell + BORDER_WIDTH/2) * g_col + 2;
 	cur_x = cur_y = 0;
-
+	scrolly = scrollx = 0;
 
 	tbl.resize(g_rows);
 	for(size_t i = 0; i < tbl.size(); ++i) {
@@ -50,59 +51,110 @@ CurseGUITable::CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int w, int row
 
 void CurseGUITable::SetData(string data, int r, int c)
 {
-	//TODO: check bounds of 'r' and 'c' !
-//	if((r > 0) && (r < g_rows) && (c > 0) && (c < g_col))
-	tbl[r][c] = data;
+	if((r >= 0) && (r < g_rows) && (c >= 0) && (c < g_col))
+		tbl[r][c] = data;
 }
 
 void CurseGUITable::SetWidth(int width)
 {
 	//TODO
+	g_wcell = width;
 }
 
-int CurseGUITable::GetHeightRow(int r)
+void CurseGUITable::AddRow()
 {
-	//TODO
-	size_t h,tmp;
+	vector<string> row;
+	for(int i = 0; i < g_col; ++i) {
+		row.push_back("");
+	}
+	tbl.push_back(row);
+	g_rows++;
+
+}
+
+void CurseGUITable::DelRow()
+{
+	if (!tbl.empty())
+		tbl.pop_back();
+	g_rows--;
+}
+
+void CurseGUITable::AddColumn()
+{
+	for(size_t i = 0; i < tbl.size(); ++i)
+		tbl.at(i).push_back("");
+	g_col++;
+}
+
+void CurseGUITable::DelColumn()
+{
+	if(!tbl.empty())
+		for(size_t i = 0; i < tbl.size(); ++i)
+			if(!tbl.at(i).empty())
+				tbl.at(i).pop_back();
+	g_col--;
+}
+
+int CurseGUITable::GetTableHeight()
+{
+	int tmp,i;
+
+	tmp = 0;
+	for(i = 0; i < g_rows; ++i) {
+		tmp += GetRowHeight(i);
+	}
+	return tmp;
+}
+
+int CurseGUITable::GetRowHeight(int r)
+{
+	size_t h,tmp,i;
 	h = 0;
-	for(size_t i = 0; i < tbl.at(r).size(); ++i) {
-		tmp = (int)ceil((float)(tbl.at(r).at(i).size()) / (float)g_wdth);
-//		printf("%u  ",tmp);
+	for(i = 0; i < tbl.at(r).size(); ++i) {
+		tmp = (int)ceil((float)(tbl.at(r).at(i).size()) / (float)g_wcell);
 		if (h < tmp) h = tmp;
 	}
 
 	return (int)h;
 }
 
-void CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
+int CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 {
 	char ch = ' ';
 	bool borderx,bordery;
 	int w, h, x, y;
+	int lx;
 
 	string str = tbl.at(r).at(c);
-	//Calculate height cell
-	g_hght = GetHeightRow(r);
+	//Calculate cell height
+	g_hcell = GetRowHeight(r); //FIXME set local g_hcell
 
-	w = g_wdth + BORDER_WIDTH;
-	h = g_hght + BORDER_HEIGHT;
-	x = g_x + cur_x;
-	y = g_y + cur_y;
+	w = g_wcell + BORDER_WIDTH;
+	h = g_hcell + BORDER_HEIGHT;
+	x = g_x + cur_x - scrollx;
+	y = g_y + cur_y - scrolly;
 
-	int lx = 0;
+	lx = 0;
 
-	for(int i = y; i < y+h; ++i) {
-		bordery = ((i == y) || (i == y+h-1));
+	for(int i = y; i < (y + h); ++i) {
+		bordery = ((i == y) || (i == y + h - 1));
 
-		for(int j = x; j < x+w; ++j) {
-			borderx = (j == x || j == x+w-1);
+		//cut off invisible parts
+		if(i < g_y) {
+			if(!bordery)
+				lx += g_wcell;
+			continue;
+		}
+		if(i > (g_y + g_htable)) continue;
+
+		for(int j = x; j < (x + w); ++j) {
+			borderx = ((j == x) || (j == x + w - 1));
 
 			if(bordery) {
 				ch = (borderx)? '+':'-';
 			} else {
 				if (borderx) ch = '|';
 				else {
-					//TODO print text
 					ch = ' ';
 					if(!str.empty()) {
 						if(lx < (int)str.size())
@@ -121,21 +173,54 @@ void CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 			wattrset(wd,A_NORMAL);
 		}
 	}
+	return 0;
 }
+
 
 void CurseGUITable::Update()
 {
-	int i,j;
+	int i,j,th,tw,stepy;
+	int h;
 	WINDOW* wd = wnd->GetWindow();
 
-	//draw rows and columns
+	th = GetTableHeight();
+	if (th < g_htable) {
+		scrolly = 0;
+		h = g_htable + 3;
+	}
+	else h = th - g_htable + 3;
+	printf("[%d %d %d]", g_htable, scrolly, h);
+	if (scrolly < 0) scrolly = 0;
+	if (scrolly > h) scrolly = h;
+
+//TODO
+	//	tmpw = wnd->GetWidth();
+
+//	if (scrollx < 0) scrollx = 0;
+//	if (g_tw < g_wtable) { //tmpw
+//		scrollx = 0;
+//		tw = g_tw + 1;
+//	} else tw = g_tw - g_wtable + 1; //tmpw
+//	if (scrollx > tw) scrollx = tw;
+
+
+
+	//draw table
 	for(i = 0, cur_y = 0; i < g_rows; ++i) {
 		for(j = 0, cur_x = 0; j < g_col; ++j) {
 			DrawCell(wd, i, j);
-			cur_x += g_wdth + BORDER_WIDTH / 2;
+			cur_x += g_wcell + BORDER_WIDTH / 2;
 		}
-		cur_y += GetHeightRow(i) + BORDER_HEIGHT / 2;
+		cur_y += GetRowHeight(i) + BORDER_HEIGHT / 2;
 	}
+
+	//rows scrollbar
+//	if(g_wtable < tmpw) {
+//		stepy = th / g_htable;
+//		if(stepy > 0)
+//			mvwaddch(wd, (g_y+(scrolly/stepy)), g_wtable, '|');
+//	}
+
 }
 
 bool CurseGUITable::PutEvent(SGUIEvent* e)
@@ -146,10 +231,16 @@ bool CurseGUITable::PutEvent(SGUIEvent* e)
 
 		switch (e->k) {
 		case KEY_UP:
+			scrolly--;
+			return true;
 		case KEY_DOWN:
+			scrolly++;
+			return true;
 		case KEY_LEFT:
+			scrollx--;
+			return true;
 		case KEY_RIGHT:
-			//TODO
+			scrollx++;
 			return true;
 		default: break;
 		}

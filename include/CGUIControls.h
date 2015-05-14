@@ -228,21 +228,23 @@ class CurseGUITable : public CurseGUIControl
 private:
 	std::vector<std::vector<std::string> > tbl;
 
-	bool showt;
-	int g_col;
-	int g_rows;
-	int auto_height;
-	int g_wdth;
-	int g_hght;
+	int g_col;			//quantity columns
+	int g_rows;			//quantity rows
+	int g_wcell;		//cell width
+	int g_hcell;		//cell height
+	int g_htable;		//the visible height of the table
+	int g_wtable;		//the visible width of the table
+	int g_tw;			//table width
 	int cur_x, cur_y;
+	int scrolly, scrollx;
 
-	void DrawCell(WINDOW* wd, int x, int y);
-	int GetHeightRow(int r);
+	int DrawCell(WINDOW* wd, int x, int y);
+	int GetRowHeight(int r);
+	int GetTableHeight();
 
 public:
-	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int w, int col, int rows, int wdth);
+	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int col, int rows, int wcell, int htable, int wtable);
 	virtual ~CurseGUITable()	{}
-
 
 	void SetData(std::string data, int r, int c);
 	void SetWidth(int width);
@@ -250,6 +252,10 @@ public:
 	void Update();
 	bool PutEvent(SGUIEvent* e);
 
+	void AddRow();
+	void DelRow();
+	void AddColumn();
+	void DelColumn();
 };
 
 /* ******************************************************************** */

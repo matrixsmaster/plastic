@@ -42,8 +42,9 @@ private:
 	int m_w, m_h;		//width and height
 	bool transparent;	//window transparency
 	bool logging;		//window logging
+	int transp;
 
-	SGUIPixel pxl;
+	SGUIPixel pixl;
 
 
 	void ResizeWnd();
@@ -69,6 +70,10 @@ public:
 	void PutString(std::string str);
 
 	void ClearLog();
+
+	void SetTransparentUp();
+	void SetTransparentDown();
+
 };
 
 

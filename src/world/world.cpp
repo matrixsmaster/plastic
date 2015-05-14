@@ -225,6 +225,8 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 					} else hud->SetTransparent(true);
 				}
 				break;
+			case 'x':
+				break;
 			}
 		}
 		test->SetRot(tr);
