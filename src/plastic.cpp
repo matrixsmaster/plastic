@@ -119,18 +119,22 @@ static void* plastic_eventhread(void* ptr)
 				chk->SetDisabled(true);
 				prb = new CurseGUIProgrBar(wnd->GetControls(),12,8,16,0,100);
 				prb->SetShowPercent(true);
-				tbl = new CurseGUITable(wnd->GetControls(), 1, 9, 3, 3, 7, 5, 7);
+				tbl = new CurseGUITable(wnd->GetControls(), 1, 9, 3, 3, 7, 10, 15);
 				break;
 			case '9':
 				my_e.t = GUIEV_RESIZE;
 				g_gui->AddEvent(&my_e);
 				break;
 			case '8':
-				tbl->SetData("item", 0, 0);// set selected and gta V", 0, 0);
-				tbl->SetData("Lazy", 0, 1); // cunt! Bla bla bla bla Bla ", 0, 1);
-				tbl->SetData("Fuck", 1, 0);// you bitch!", 1, 0);
-				tbl->SetData("Zwei", 2, 3);// kleine Jagermeister. Ein kleine Wassershprot.", 2, 3);
-				tbl->SetData("kleine", 4, 0);// Jagermeister.", 0, 5);
+				tbl->SetData("item set selected and gta V", 0, 0);
+				tbl->SetData("Lazy cunt! Bla bla bla bla Bla ", 0, 1);
+				tbl->SetData("Fuck you bitch!", 1, 1);
+				tbl->SetData("Fuck you bitch!", 1, 2);
+				tbl->SetData("Fuck you bitch!", 1, 3);
+				tbl->SetData("Fuck you bitch!", 2, 0);
+				tbl->SetData("Fuck you bitch!", 2, 1);
+				tbl->SetData("Zwei kleine Jagermeister. Ein kleine Wassershprot.", 2, 3);
+				tbl->SetData("kleine Jagermeister.", 0, 5);
 				break;
 			case '1':
 				tbl->AddRow();

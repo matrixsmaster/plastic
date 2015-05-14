@@ -231,16 +231,16 @@ private:
 	int g_col;			//quantity columns
 	int g_rows;			//quantity rows
 	int g_wcell;		//cell width
-	int g_hcell;		//cell height
+//	int g_hcell;		//cell height
 	int g_htable;		//the visible height of the table
 	int g_wtable;		//the visible width of the table
-	int g_tw;			//table width
 	int cur_x, cur_y;
 	int scrolly, scrollx;
 
 	int DrawCell(WINDOW* wd, int x, int y);
 	int GetRowHeight(int r);
 	int GetTableHeight();
+	int GetTableWidth();
 
 public:
 	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int col, int rows, int wcell, int htable, int wtable);
