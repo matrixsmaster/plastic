@@ -119,7 +119,7 @@ static void* plastic_eventhread(void* ptr)
 				chk->SetDisabled(true);
 				prb = new CurseGUIProgrBar(wnd->GetControls(),12,8,16,0,100);
 				prb->SetShowPercent(true);
-				tbl = new CurseGUITable(wnd->GetControls(), 1, 9, 3, 3, 7, 10, 15);
+				tbl = new CurseGUITable(wnd->GetControls(), 1, 9, 3, 3, 7, 10, 10);
 				break;
 			case '9':
 				my_e.t = GUIEV_RESIZE;

@@ -74,6 +74,8 @@ public:
 	void SetTransparentUp();
 	void SetTransparentDown();
 
+	//TODO Add coords
+
 };
 
 

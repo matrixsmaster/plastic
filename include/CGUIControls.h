@@ -231,9 +231,8 @@ private:
 	int g_col;			//quantity columns
 	int g_rows;			//quantity rows
 	int g_wcell;		//cell width
-//	int g_hcell;		//cell height
-	int g_htable;		//the visible height of the table
-	int g_wtable;		//the visible width of the table
+	int g_vhtable;		//the visible height of the table
+	int g_vwtable;		//the visible width of the table
 	int cur_x, cur_y;
 	int scrolly, scrollx;
 
@@ -287,7 +286,7 @@ public:
  * 							after some input:	(Test__)
  * V CurseGUICheckBox - (V) or (X) with switchable state. Use (O) for disabled.
  * V CurseGUIProgrBar - basic progress bar like {#### 25%     }
- *   CurseGUITable - table utilizes ncurses' line drawings. Should be possible to navigate with keys.
+ * V CurseGUITable - table utilizes ncurses' line drawings. Should be possible to navigate with keys.
  * 					Ex.:	+------+-------*--+ (see curs_addch (3X) section Line graphics)
  * 							|item  |  text | 1|
  * 							+------+-------+--+
@@ -295,7 +294,7 @@ public:
  * 							|      |nger te|  |
  * 							|      |xt     |  |
  * 							+------+-------+--+
- * 	 CurseGUILabel - just a label, nothing more :)
+ * V CurseGUILabel - just a label, nothing more :)
  *
  */
 
