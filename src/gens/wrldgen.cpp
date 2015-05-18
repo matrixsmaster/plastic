@@ -103,6 +103,16 @@ SWGCell WorldGen::GetCell(vector3di crd)
 	return cl;
 }
 
+SWGCell WorldGen::GetSurfaceCell(vector3di crd)
+{
+	SWGCell cl;
+
+	WrapCoords(&crd);
+	cl = map[crd.Y * planev.X + crd.X];
+
+	return cl;
+}
+
 void WorldGen::WrapCoords(vector3di* pnt)
 {
 	pnt->X = pnt->X % plane;
@@ -142,41 +152,65 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 
 	memset(grains,0,sizeof(grains));
 	cell = GetCell(pos);
-	rng->SetSeed(cell.seed);
 
-	crn[1].X = 0;
-	crn[1].Y = CHUNKBOX;
-	crn[1].Z = CHUNKBOX * cell.elev;
+	for (z = 0; z < (CHUNKBOX/VOXGRAIN); z++)
+		for (y = 0; y < (CHUNKBOX/VOXGRAIN); y++)
+			for (x = 0; x < (CHUNKBOX/VOXGRAIN); x++)
+				grains[z][y][x] = GetVoxelOfType(VOXT_SAND);
 
-	crn[2].X = CHUNKBOX;
-	crn[2].Y = CHUNKBOX;
-	crn[2].Z = CHUNKBOX * GetCell(pos+vector3di(1,0,0)).elev;
+	switch (cell.chunkt) {
+	case WGCT_SURFACE:
 
-	crn[3].X = CHUNKBOX;
-	crn[3].Y = 0;
-	crn[3].Z = CHUNKBOX * GetCell(pos+vector3di(1,-1,0)).elev;
+		rng->SetSeed(cell.seed);
 
-	crn[0].X = 0;
-	crn[0].Y = 0;
-	crn[0].Z = CHUNKBOX * GetCell(pos+vector3di(0,-1,0)).elev;
+		crn[1].X = 0;
+		crn[1].Y = CHUNKBOX;
+		crn[1].Z = CHUNKBOX;// * cell.elev;
 
-	for (y = 0; y < CHUNKBOX; y++) {
-		for (x = 0; x < CHUNKBOX; x++) {
-			t = InterpolateZQ(crn,x,y) - CHUNKBOX / 2;
-			for (z = 0; z < CHUNKBOX; z++) {
+		crn[2].X = CHUNKBOX;
+		crn[2].Y = CHUNKBOX;
+		crn[2].Z = CHUNKBOX * GetSurfaceCell(pos+vector3di(1,0,0)).elev;
 
-				if (grains[z/VOXGRAIN][y/VOXGRAIN][x/VOXGRAIN] == 0) {
-					vgr = GetVoxelOfType(VOXT_SAND);
-					grains[z/VOXGRAIN][y/VOXGRAIN][x/VOXGRAIN] = vgr;
-				} else
+		crn[3].X = CHUNKBOX;
+		crn[3].Y = 0;
+		crn[3].Z = CHUNKBOX * GetSurfaceCell(pos+vector3di(1,-1,0)).elev;
+
+		crn[0].X = 0;
+		crn[0].Y = 0;
+		crn[0].Z = CHUNKBOX * GetSurfaceCell(pos+vector3di(0,-1,0)).elev;
+
+		for (y = 0; y < CHUNKBOX; y++) {
+			for (x = 0; x < CHUNKBOX; x++) {
+//				t = InterpolateZQ(crn,x,y) - CHUNKBOX / 2;
+				t = 128;
+				for (z = 0; z < CHUNKBOX; z++) {
+
 					vgr = grains[z/VOXGRAIN][y/VOXGRAIN][x/VOXGRAIN];
+					if (rng->RangedNumber(100) < 5) vgr = GetVoxelOfType(VOXT_SAND);
 
-				if (rng->RangedNumber(100) < 5) vgr = GetVoxelOfType(VOXT_SAND);
-
-				v = (z < t)? vgr:0;
-				(*buf)[z][y][x] = v;
+					v = (z < t)? vgr:0;
+					(*buf)[z][y][x] = v;
+				}
 			}
 		}
+		break;
+
+	case WGCT_UNDERGR:
+		for (z = 0; z < CHUNKBOX; z++)
+			for (y = 0; y < CHUNKBOX; y++)
+				for (x = 0; x < CHUNKBOX; x++)
+					(*buf)[z][y][x] = grains[z/VOXGRAIN][y/VOXGRAIN][x/VOXGRAIN];
+		break;
+
+	case WGCT_WATER:
+		v = GetVoxelOfType(VOXT_WATER);
+		for (z = 0; z < CHUNKBOX; z++)
+			for (y = 0; y < CHUNKBOX; y++)
+				for (x = 0; x < CHUNKBOX; x++)
+					(*buf)[z][y][x] = v;
+		break;
+
+	default: break;
 	}
 
 	rng->TimeSeed(); //reset seed

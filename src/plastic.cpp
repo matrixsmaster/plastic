@@ -18,6 +18,7 @@
  */
 
 /* Defines the entry point of the application. Please keep this file as clean as possible. */
+/* Note: all threads are gathered here to maintain them simultaneously. */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,9 +31,7 @@
 #include "CurseGUI.h"
 #include "world.h"
 #include "LVR.h"
-
-//DEBUG stuff:
-#include "CGUIControls.h"
+#include "datapipe.h"
 
 
 static SGameSettings	g_set = DEFAULT_SETTINGS;
@@ -40,6 +39,7 @@ static PlasticWorld*	g_wrld = NULL;
 static CurseGUI*		g_gui = NULL;
 static pthread_t		t_event = 0;
 static pthread_t		t_render = 0;
+static pthread_t		t_loader = 0;
 static pthread_mutex_t	m_render,m_resize;
 static bool				g_quit = false;
 static uli				g_fps = 0;
@@ -57,15 +57,6 @@ static void* plastic_eventhread(void* ptr)
 	char s[128];
 	vector3di x;
 	bool d;
-	//other debug
-	CurseGUIWnd* wnd;
-	CurseGUIPicture* pct;
-	CurseGUIButton* btn;
-	CurseGUIEditBox* edb;
-	CurseGUICheckBox* chk;
-	CurseGUIProgrBar* prb;
-	CurseGUITable* tbl;
-	SCTriple test;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 
@@ -96,66 +87,6 @@ static void* plastic_eventhread(void* ptr)
 				curso.Y = my_e.m.y;
 				d = true;
 			}
-			break;
-
-		case GUIEV_KEYPRESS:
-#if 0
-			switch (my_e.k) {
-			case '0':
-				//testing window
-				wnd = g_gui->MkWindow(curso.X,curso.Y,50,25,"SomeWin");
-				g_gui->SetFocus(wnd);
-				wnd->ShowName(true);
-				wnd->SetAutoAlloc(true);
-				pct = new CurseGUIPicture(wnd->GetControls(),1,1,10,5); //auto-registering
-				test.r = 300; test.g = 0; test.b = 100;
-				pct->SetAutoAlloc(true);
-				pct->ColorFill(test);
-				btn = new CurseGUIButton(wnd->GetControls(),2,7,10,"Test 1");
-				btn = new CurseGUIButton(wnd->GetControls(),12,2,10,"Test 2");
-				edb = new CurseGUIEditBox(wnd->GetControls(),12,3,10,"");
-				chk = new CurseGUICheckBox(wnd->GetControls(),12,5,10,"Test A HIDDEN");
-				chk = new CurseGUICheckBox(wnd->GetControls(),12,6,10,"Test B");
-				chk->SetDisabled(true);
-				prb = new CurseGUIProgrBar(wnd->GetControls(),12,8,16,0,100);
-				prb->SetShowPercent(true);
-				tbl = new CurseGUITable(wnd->GetControls(), 1, 9, 3, 3, 7, 10, 10);
-				break;
-			case '9':
-				my_e.t = GUIEV_RESIZE;
-				g_gui->AddEvent(&my_e);
-				break;
-			case '8':
-				tbl->SetData("item set selected and gta V", 0, 0);
-				tbl->SetData("Lazy cunt! Bla bla bla bla Bla ", 0, 1);
-				tbl->SetData("Fuck you bitch!", 1, 1);
-				tbl->SetData("Fuck you bitch!", 1, 2);
-				tbl->SetData("Fuck you bitch!", 1, 3);
-				tbl->SetData("Fuck you bitch!", 2, 0);
-				tbl->SetData("Fuck you bitch!", 2, 1);
-				tbl->SetData("Zwei kleine Jagermeister. Ein kleine Wassershprot.", 2, 3);
-				tbl->SetData("kleine Jagermeister.", 0, 5);
-				break;
-			case '1':
-				tbl->AddRow();
-				break;
-			case '2':
-				tbl->DelRow();
-				break;
-			case '3':
-				tbl->AddColumn();
-				break;
-			case '4':
-				tbl->DelColumn();
-				break;
-			case '6':
-				tbl->SetData("Zwei kleine Jagermeister.", 5, 0);
-				break;
-			case '5':
-				tbl->SetWidth(5);
-				break;
-			}
-#endif
 			break;
 
 		default: break;
@@ -207,6 +138,20 @@ static void* plastic_renderthread(void* ptr)
 	return NULL;
 }
 
+static void* plastic_chunksthread(void* ptr)
+{
+	DataPipe* pipe = reinterpret_cast<DataPipe*> (ptr);
+
+	while (!g_quit) {
+
+		pipe->ChunkQueue();
+
+		usleep(CHUNKUSLEEP);
+	}
+
+	return NULL;
+}
+
 /* *********************************************************** */
 
 static void plastic_start()
@@ -243,6 +188,9 @@ static void plastic_start()
 	pthread_mutex_init(&m_render,NULL);
 	pthread_mutex_init(&m_resize,NULL);
 
+	/* Start chunks loading queue */
+	pthread_create(&t_loader,NULL,plastic_chunksthread,g_wrld->GetDataPipe());
+
 	/* Start events processing thread */
 	pthread_create(&t_event,NULL,plastic_eventhread,NULL);
 
@@ -261,6 +209,11 @@ static void plastic_cleanup()
 	if (t_event) {
 		errout("Closing events thread... ");
 		pthread_join(t_event,NULL);
+		errout("OK\n");
+	}
+	if (t_loader) {
+		errout("Closing chunks queue... ");
+		pthread_join(t_loader,NULL);
 		errout("OK\n");
 	}
 

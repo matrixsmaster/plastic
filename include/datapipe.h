@@ -49,7 +49,15 @@ enum EDPipeStatus {
 	DPIPE_NOTREADY,		//pipe is partially initialized
 	DPIPE_ERROR,		//error state, pipe cannot be used
 	DPIPE_IDLE,			//normal state, use Lock()/Unlock() to modify the contents
-	DPIPE_BUSY			//I/O operations in progress
+	DPIPE_BUSY			//central chunk is loading
+};
+
+enum EDChunkStatus {
+	DPCHK_EMPTY,
+	DPCHK_READY,
+	DPCHK_QUEUE,
+	DPCHK_LOADING,
+	DPCHK_ERROR
 };
 
 struct SDataPlacement {
@@ -69,9 +77,10 @@ typedef std::map<vector3dulli,SDataPlacement> PlaceMap;
 
 class DataPipe {
 protected:
-	PChunk chunks[HOLDCHUNKS];		//world chunk buffers
 	EDPipeStatus status;
-	pthread_mutex_t vmutex;
+	PChunk chunks[HOLDCHUNKS];			//world chunk buffers
+	EDChunkStatus chstat[HOLDCHUNKS];	//chunks status
+	pthread_mutex_t vmutex;				//main voxel mutex
 	ulli allocated;					//amount of allocated RAM
 	vector3di GP;					//global position of central chunk
 	char root[MAXPATHLEN];			//root path
@@ -87,6 +96,8 @@ protected:
 	bool FindChunk(vector3di pos, SDataPlacement* res);
 	bool LoadVoxTab();
 	bool LoadIni(const std::string name);
+	void MakeChunk(unsigned l, vector3di pos);
+	bool LoadChunk(SDataPlacement* res, PChunk buf);
 
 public:
 	DataPipe(SGameSettings* sets, bool allocate = true);
@@ -122,6 +133,9 @@ public:
 	///Update chunks buffers either by loading or by generating.
 	///Returns false if move is invalid.
 	virtual bool Move(EGMoveDir dir);
+
+	///Do NOT call this method in the outside code, unless you're know what you're doing!
+	virtual void ChunkQueue();
 
 	///Returns a specific voxel (or its data) in a loaded space.
 	virtual voxel GetVoxel(const vector3di* p);			//return voxel code

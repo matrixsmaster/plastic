@@ -81,6 +81,9 @@ public:
 	///Returns HUD pointer.
 	HUD* GetHUD()							{ return hud; }
 
+	///Returns DataPipe instance currently in use.
+	DataPipe* GetDataPipe()					{ return data; }
+
 	///Main events processing facility.
 	void ProcessEvents(SGUIEvent* e);
 };

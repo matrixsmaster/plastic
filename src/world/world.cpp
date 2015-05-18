@@ -63,7 +63,11 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 //			sets->world_r - WGAIRCHUNKS - 1));
 	PC->SetGPos(data->GetInitialPCGPos());
 	PC->SetPos(vector3di(128,90,135));
+
+	//TODO: move this to the first quantum of the world update cycle
+	puts("\nGenerating the first parts of the world...");
 	data->SetGP(PC->GetGPos());
+
 	test = data->LoadModel("testmodel.dat",vector3di(128,100,135));
 	if (!test) abort();
 	lvr->SetPosition(vector3d(128,90,135));
@@ -173,8 +177,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	CurseGUIWnd* wptr;
 	//DEBUG:
 	vector3d tr = test->GetRot();
-	CurseGUIButton* btn;
-	CurseGUIEditBox* edb;
 
 	result = 0;
 	switch (e->t) {
