@@ -235,6 +235,8 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 		}
 		test->SetRot(tr);
 
+
+
 		PC->ProcessEvent(e);
 		lvr->SetEulerRotation(PC->GetRot().ToReal());
 		lvr->SetPosition(PC->GetPos().ToReal());

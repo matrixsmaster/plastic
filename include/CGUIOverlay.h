@@ -27,28 +27,34 @@
 #include "CurseGUI.h"
 
 
+struct SPOS {
+	int x, y, z;
+};
+
 // structure to show in status overlay
 struct SOVRLStats {
 	int fps;
-	int w, h;
+	SPOS gp;
+	SPOS lp;
 };
 
-//
+
 class CurseGUIOverlay : public CurseGUIWnd {
 private:
 	std::vector<std::string> log;
 
 	int m_x, m_y;		//window position
 	int m_w, m_h;		//width and height
-	bool transparent;	//window transparency
+	float transparent;	//window transparency
 	bool logging;		//window logging
-	int transp;
+
 
 	SGUIPixel pixl;
 
 
 	void ResizeWnd();
 	void PutLog();
+	void SetBckgr();
 
 public:
 	CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, bool logg);
@@ -59,6 +65,8 @@ public:
 	bool LooseFocus()					{ return true; }
 
 	void SetTransparent(bool t)			{ transparent = t; }
+	void SetTransparent(float t);
+
 	bool GetTransparent() 				{ return transparent; }
 
 	void SetBckgrMask(SGUIPixel* pxl);
@@ -71,11 +79,11 @@ public:
 
 	void ClearLog();
 
+
 	void SetTransparentUp();
 	void SetTransparentDown();
 
-	//TODO Add coords
-
+	//TODO add transparent, use ColorManager
 };
 
 

@@ -27,11 +27,11 @@ HUD::HUD(CurseGUI* guiptr)
 	gui = guiptr;
 
 	stats.fps = 0;
-	stats.h = 0;
-	stats.w = 0;
+	stats.gp.x = 0; stats.gp.y = 0; stats.gp.z = 0;
+	stats.lp.x = 0; stats.lp.y = 0; stats.lp.z = 0;
 
 	//add some overlays
-	Spawn(0,0, gui->GetWidth()/4, 1, false, "fps = 0"); //top
+//	Spawn(0,0, gui->GetWidth()/4, 1, false, "fps = 0"); //top
 	Spawn(0,gui->GetHeight()-gui->GetHeight()/4, gui->GetWidth()/4, gui->GetHeight()/4, true, "Testing bottom overlay"); //bottom
 	Spawn(gui->GetWidth()/5, 0, gui->GetWidth()/5, STAT_OVRL_HEIGHT, false, "fps = 0");
 }
@@ -75,16 +75,26 @@ void HUD::UpdateStatusOvrl()
 	//TODO
 	string str;
 
-	if(overlays.size() > 2) {
+	if(overlays.size() > STAT_OVRL-1) {
 		overlays[STAT_OVRL]->ClearLog();
 		str = "fps = ";
 		str += intToString(stats.fps);
 		overlays[STAT_OVRL]->PutString(str);
-		str = "width: ";
-		str += intToString(stats.h);
+		str = "GPos [";
+		str += intToString(stats.gp.x);
+		str += " ";
+		str += intToString(stats.gp.y);
+		str += " ";
+		str += intToString(stats.gp.z);
+		str += "]";
 		overlays[STAT_OVRL]->PutString(str);
-		str = "height: ";
-		str += intToString(stats.h);
+		str = "LPos [";
+		str += intToString(stats.lp.x);
+		str += " ";
+		str += intToString(stats.lp.y);
+		str += " ";
+		str += intToString(stats.lp.z);
+		str += "]";
 		overlays[STAT_OVRL]->PutString(str);
 	}
 }

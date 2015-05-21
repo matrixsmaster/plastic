@@ -25,9 +25,8 @@
 #include "CurseGUI.h"
 #include "CGUIOverlay.h"
 
-#define FPS_OVRL 0
-#define BTM_OVRL 1
-#define STAT_OVRL 2
+#define BTM_OVRL 0
+#define STAT_OVRL 1
 
 #define STAT_OVRL_HEIGHT 3
 
@@ -56,6 +55,9 @@ public:
 	bool GetTransparent();
 	void SetTransparent(bool t);
 	void SetBckgrMask(SGUIPixel* pxl);
+
+	void SetGPos();
+	void SetLPos();
 };
 
 #endif /* HUD_H_ */

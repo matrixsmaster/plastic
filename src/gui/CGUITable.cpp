@@ -55,7 +55,6 @@ void CurseGUITable::SetData(string data, int r, int c)
 
 void CurseGUITable::SetWidth(int width)
 {
-	//TODO
 	g_wcell = width;
 }
 
