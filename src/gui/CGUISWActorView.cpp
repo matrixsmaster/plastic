@@ -19,29 +19,30 @@
 
 #include "CGUISpecWnd.h"
 #include "CGUIControls.h"
-#include "inventory.h"
+#include "actor.h"
 
 
-CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
-	CurseGUIWnd(scrn,0,0,2,2)
+CurseGUIActorViewWnd::CurseGUIActorViewWnd(CurseGUI* scrn, PlasticActor* actr) :
+		CurseGUIWnd(scrn,1,1,2,2)
 {
 	type = GUIWT_OTHER;
-	name = "Inventory";
+	name = "Actor View";
 	showname = true;
 
-	invent = iptr;
+	actor = actr;
 
+	SetAutoAlloc(true);
 	ResizeWnd();
 }
 
-void CurseGUIInventoryWnd::ResizeWnd()
+void CurseGUIActorViewWnd::ResizeWnd()
 {
 	int w,h,x,y;
 
-	w = INVENTSIZEX * parent->GetWidth() / 100;
-	h = INVENTSIZEY * parent->GetHeight() / 100;
-	x = parent->GetWidth() / 2 - w / 2;
-	y = parent->GetHeight() / 2 - h / 2;
+	w = parent->GetWidth() / 2;
+	h = parent->GetHeight() - 4;
+	x = w - 1;
+	y = 1;
 
 	Move(x,y);
 	Resize(w,h);
@@ -51,10 +52,15 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	ctrls = new CurseGUICtrlHolder(this);
 
 	//create controls
-	table = new CurseGUITable(ctrls,1,1,2,1,2,2,2);
+	portrait = new CurseGUIPicture(ctrls,1,1,ACTPORTRAITW,ACTPORTRAITH);
+	portrait->SetAutoAlloc(true);
+	portrait->SetPicture(actor->GetPortrait());
+//	SCTriple t;
+//	t.r = 500; t.g = 0; t.b = 300;
+//	portrait->ColorFill(t);
 }
 
-bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
+bool CurseGUIActorViewWnd::PutEvent(SGUIEvent* e)
 {
 	if (will_close) return false;
 

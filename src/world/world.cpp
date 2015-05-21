@@ -188,7 +188,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			break;
 
 		case 1: /*PC stats tab*/
-			//TODO
+			SPAWNWNDMACRO("Actor View",new CurseGUIActorViewWnd(gui,PC));
 			break;
 
 		case 2: /*map view*/

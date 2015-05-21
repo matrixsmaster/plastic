@@ -70,6 +70,7 @@ class Inventory;
 class CurseGUIInventoryWnd : public CurseGUIWnd {
 private:
 	Inventory* invent;
+	CurseGUITable* table;
 
 	void ResizeWnd();
 
@@ -141,6 +142,24 @@ private:
 public:
 	CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr);
 	virtual ~CurseGUIRenderConfWnd()	{}
+
+	bool PutEvent(SGUIEvent* e);
+};
+
+/* ********************************** Actor View window ********************************** */
+
+class PlasticActor;
+
+class CurseGUIActorViewWnd : public CurseGUIWnd {
+private:
+	PlasticActor* actor;
+	CurseGUIPicture* portrait;
+
+	void ResizeWnd();
+
+public:
+	CurseGUIActorViewWnd(CurseGUI* scrn, PlasticActor* actr);
+	virtual ~CurseGUIActorViewWnd()		{}
 
 	bool PutEvent(SGUIEvent* e);
 };
