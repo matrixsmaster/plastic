@@ -228,11 +228,11 @@ class CurseGUITable : public CurseGUIControl
 private:
 	std::vector<std::vector<std::string> > tbl;
 
-	int g_col;			//quantity columns
-	int g_rows;			//quantity rows
+	int g_col;			//quantity of columns
+	int g_rows;			//quantity of rows
 	int g_wcell;		//cell width
-	int g_vhtable;		//the visible height of the table
-	int g_vwtable;		//the visible width of the table
+	int g_vhtable;		//visible height of the table
+	int g_vwtable;		//visible width of the table
 	int cur_x, cur_y;
 	int scrolly, scrollx;
 

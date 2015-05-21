@@ -61,6 +61,7 @@ DataPipe::~DataPipe()
 	if (wgen) delete wgen;
 	if (voxeltab.tab) free(voxeltab.tab);
 
+	PurgeSprites();
 	PurgeModels();
 	PurgeChunks();
 
@@ -500,4 +501,38 @@ void DataPipe::PurgeModels()
 
 	objs.clear();
 	Unlock();
+}
+
+VSprite* DataPipe::LoadSprite(const char* fname)
+{
+	char fn[MAXPATHLEN];
+	VSprite* spr = new VSprite();
+
+	snprintf(fn,MAXPATHLEN,"%s/%s",root,fname);
+	if (!spr->LoadFromFile(fn)) {
+		delete spr;
+		return NULL;
+	}
+
+	allocated += spr->GetAllocatedRAM();
+
+//	Lock();
+	sprs.push_back(spr);
+//	Unlock();
+
+	return spr;
+}
+
+void DataPipe::PurgeSprites()
+{
+	VSprVec::iterator mi;
+
+//	Lock();
+	for (mi = sprs.begin(); mi != sprs.end(); ++mi) {
+		allocated -= (*mi)->GetAllocatedRAM();
+		delete (*mi);
+	}
+
+	sprs.clear();
+//	Unlock();
 }

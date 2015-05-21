@@ -86,6 +86,10 @@ bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe)
 			break;
 		}
 
+	//determine body model file name
+	//FIXME
+	strcpy(attr->model,"mod/actors/alice.dat");
+
 	return true;
 }
 

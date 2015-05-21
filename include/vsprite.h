@@ -20,6 +20,23 @@
 #ifndef SPRITE_H_
 #define SPRITE_H_
 
+#include "visual.h"
 
+class VSprite {
+private:
+	int g_w, g_h, allocram;
+	SGUIPixel* img;
+
+public:
+	VSprite();
+	virtual ~VSprite();
+
+	bool LoadFromFile(const char* fn);
+
+	SGUIPixel* GetImage()				{ return img; }
+	int GetWidth()						{ return g_w; }
+	int GetHeight()						{ return g_h; }
+	int GetAllocatedRAM()				{ return allocram; }
+};
 
 #endif /* SPRITE_H_ */

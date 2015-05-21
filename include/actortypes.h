@@ -120,4 +120,7 @@ static const SEPABRecord pabody_to_str[NUMBODTYPE] = {
 		{ PBOD_HYDROL,	"Hydraulic" },
 };
 
+#define ACTPORTRAITW 30
+#define ACTPORTRAITH 20
+
 #endif /* ACTORTYPES_H_ */

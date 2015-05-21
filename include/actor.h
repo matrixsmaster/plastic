@@ -46,6 +46,7 @@ protected:
 	DataPipe* pipe;			//DataPipe instance
 	VModel* model;			//Actor's model
 	Inventory invent;		//Actor's inventory
+	SGUIPixel* portrait;	//Actor's portrait
 
 	void InitVars();
 
@@ -64,6 +65,8 @@ public:
 	vector3di GetGPos()					{ return gpos; }
 
 	Inventory* GetInventory()			{ return &invent; }
+
+	SGUIPixel* GetPortrait()			{ return portrait; }
 
 	void Move(ELMoveDir d, float step);
 

@@ -31,6 +31,7 @@
 #include "vecmath.h"
 #include "wrldgen.h"
 #include "vmodel.h"
+#include "vsprite.h"
 #include "plastic.h"
 
 
@@ -70,6 +71,7 @@ struct SDataPlacement {
 typedef std::map<std::string,std::string> IniData;
 typedef std::map<std::string,IniData> IniMap;
 typedef std::vector<VModel*> VModVec;
+typedef std::vector<VSprite*> VSprVec;
 typedef std::map<vector3dulli,SDataPlacement> PlaceMap;
 
 
@@ -88,8 +90,9 @@ protected:
 	WorldGen* wgen;					//world generator instance
 	SVoxelTab voxeltab;				//voxel types table
 	IniMap ini;						//map of known (and loaded) ini files
-	VModVec objs;					//objects in scene
 	ulli rammax;					//max amount of memory allowed to be allocated
+	VModVec objs;					//objects in scene
+	VSprVec sprs;					//sprites in scene
 
 	bool Allocator(SGameSettings* sets);
 	bool ScanFiles();
@@ -157,6 +160,11 @@ public:
 	///Purge all loaded models.
 	virtual void PurgeModels();
 
+	//FIXME: comment
+	virtual VSprite* LoadSprite(const char* fname);
+	virtual void PurgeSprites();
+
+	//FIXME: comment
 	const SWGCell* GetGlobalSurfaceMap()	{ return wgen->GetMap(); } //FIXME
 	vector2di GetGlobalSurfaceSize()		{ return (vector2di(wgen->GetPlaneSide())); }
 	vector3di GetInitialPCGPos()			{ return wgen->GetPCInitPos(); }

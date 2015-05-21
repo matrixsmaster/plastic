@@ -66,6 +66,12 @@ void PlasticActor::AutoInitStats()
 		base = ns;
 		curr = ns;
 	}
+
+	//FIXME: debug only!
+	portrait = (SGUIPixel*)malloc(ACTPORTRAITH*ACTPORTRAITW*sizeof(SGUIPixel));
+	VSprite* s = pipe->LoadSprite("spr/testspr.dat");
+	memcpy(portrait,s->GetImage(),ACTPORTRAITH*ACTPORTRAITW*sizeof(SGUIPixel));
+//	pipe->PurgeSprites()
 }
 
 void PlasticActor::SetRot(const vector3di r)
@@ -102,6 +108,8 @@ bool PlasticActor::Spawn()
 
 void PlasticActor::Delete()
 {
-	pipe->UnloadModel(model);
+	if (model) pipe->UnloadModel(model);
 	model = NULL;
+	if (portrait) free(portrait);
+	portrait = NULL;
 }

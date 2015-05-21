@@ -120,7 +120,7 @@ short CGUIColorManager::CheckPair(const SGUIPixel* px)
 
 bool CGUIColorManager::GetPairColors(SGUIPixel* dest, short pair)
 {
-	if ((!dest) || (pair < 1) || (pair > (short)pairs.size()))
+	if ((!dest) || (pair < 1) || (pair >= (short)pairs.size()))
 		return false;
 	pair--;
 	dest->bg = pairs.at(pair).tb;
