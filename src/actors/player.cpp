@@ -22,6 +22,8 @@
 Player::Player(SPAAttrib s, DataPipe* pptr) :
 		PlasticActor(s,pptr)
 {
+	isnpc = false;
+
 	binder = new KeyBinder(pptr);
 
 	binder->RegKeyByName("WALK_FORW");

@@ -33,6 +33,15 @@ using namespace std;
 							if (fld.empty()) return false; \
 							stat->X = atoi(fld.c_str());
 
+const char* BodyTypeToStr(EPABodyType t)
+{
+	int i;
+	for (i = 0; i < NUMBODTYPE; i++)
+		if (pabody_to_str[i].b == t)
+			return (pabody_to_str[i].s);
+	return NULL;
+}
+
 bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe)
 {
 	int i;
@@ -42,11 +51,7 @@ bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe)
 
 	//get class and body type string representation
 	cls = paclass_to_str[attr->cls].s;
-	for (i = 0; i < NUMBODTYPE; i++)
-		if (pabody_to_str[i].b == attr->body) {
-			bod = pabody_to_str[i].s;
-			break;
-		}
+	bod = string(BodyTypeToStr(attr->body));
 
 	//get applicable body types mask
 	GETSTATFIELD(Body,"_BMask");

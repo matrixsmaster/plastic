@@ -28,7 +28,7 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, boo
 		m_y(y),
 		m_w(w),
 		m_h(h),
-		logging(logg)
+		logging(logg) //FIXME: mixed-style initialization, use either one or another!
 {
 	type = GUIWT_OVERLAY;
 

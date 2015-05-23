@@ -40,8 +40,10 @@ void CurseGUIInventoryWnd::ResizeWnd()
 
 	w = INVENTSIZEX * parent->GetWidth() / 100;
 	h = INVENTSIZEY * parent->GetHeight() / 100;
-	x = parent->GetWidth() / 2 - w / 2;
-	y = parent->GetHeight() / 2 - h / 2;
+
+	//lower-right corner
+	x = parent->GetWidth() - w;
+	y = parent->GetHeight() - h;
 
 	Move(x,y);
 	Resize(w,h);

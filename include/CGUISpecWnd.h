@@ -148,6 +148,8 @@ public:
 
 /* ********************************** Actor View window ********************************** */
 
+#define ACTRVIEWMINW 60
+
 class PlasticActor;
 
 class CurseGUIActorViewWnd : public CurseGUIWnd {
