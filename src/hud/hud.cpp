@@ -110,7 +110,7 @@ bool HUD::GetTransparent()
 {
 	//TODO check focus
 	if(overlays.size() >  0)
-		return overlays[BTM_OVRL]->GetTransparent();
+		return overlays[BTM_OVRL]->IsTransparent();
 	return false;
 }
 
