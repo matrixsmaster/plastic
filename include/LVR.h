@@ -33,7 +33,7 @@
 
 
 //#define LVRDEBUG 1
-//#define LVRDOUBLEBUFFERED 1
+#define LVRDOUBLEBUFFERED 1
 
 #define DEFSCALE 1.f
 #define DEFFOVX 115
@@ -44,7 +44,7 @@
 
 
 class LVR {
-private:
+protected:
 	int g_w,g_h;					//Graphics width and height
 	uli rendsize;					//Linear size of the frame
 	int far,fog;					//Far plane distance and Fog start plane distance
@@ -59,40 +59,43 @@ private:
 	int activebuf;					//Active (drawing) buffer number
 	int* zbuf;						//Depth buffer
 	vector3di* pbuf;				//Point (voxel) buffer
-	AtmoSky* skies;					//Atmospherics
 	char* mask;						//Renderer mask (which places will not be rendered)
+
+	void ReallocBuffers();
 
 public:
 	LVR(DataPipe* pipe);
 	virtual ~LVR();
 
 	//TODO: comment it
-	SGUIPixel* GetRender();
-	uli GetRenderLen()				{ return rendsize; }
+	virtual SGUIPixel* GetRender();
+	uli GetRenderLen()						{ return rendsize; }
 
-	bool Resize(int w, int h);
-	void SetMask(char* m, int w, int h);
-	void RemoveSkies();
+	virtual bool Resize(int w, int h);
+	virtual void SetMask(char* m, int w, int h);
+	virtual void SetMid(const vector2di m)	{ mid = m; }
 
-	void SetEulerRotation(const vector3d r);
-	void SetPosition(const vector3d pos);
+	virtual void SetEulerRotation(const vector3d r);
+	virtual void SetPosition(const vector3d pos);
 
-	void SetScale(const double s);
-	double GetScale()				{ return scale.Z; }
-	void SetFOV(const vector3d f);
-	vector3d GetFOV()				{ return fov; }
-	void SetFarDist(const int d);
-	int GetFarDist()				{ return far; }
-	void SetFogStart(const int d);
-	int GetFogStart()				{ return fog; }
-	void SetFogColor(const vector3di nfc);
-	vector3di GetFogColor()			{ return fogcol; }
+	virtual void SetScale(const double s);
+	double GetScale()						{ return scale.Z; }
+	virtual void SetFOV(const vector3d f);
+	vector3d GetFOV()						{ return fov; }
+	virtual void SetFarDist(const int d);
+	int GetFarDist()						{ return far; }
+	virtual void SetFogStart(const int d);
+	int GetFogStart()						{ return fog; }
+	virtual void SetFogColor(const vector3di nfc);
+	vector3di GetFogColor()					{ return fogcol; }
 
-	vector3di GetProjection(const vector2di pnt);
+	virtual const int* GetZBuf()			{ return zbuf; }
+	virtual const vector3di* GetPBuf()		{ return pbuf; }
+	virtual vector3di GetProjection(const vector2di pnt);
 
-	void Frame();
-	void Postprocess();
-	void SwapBuffers();
+	virtual void Frame();
+	virtual void Postprocess();
+	virtual void SwapBuffers();
 };
 
 #endif /* LVR_H_ */

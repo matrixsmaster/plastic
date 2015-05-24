@@ -20,24 +20,24 @@
 #include <stdlib.h>
 #include <string>
 #include "CGUISpecWnd.h"
-#include "LVR.h"
+#include "renderpool.h"
 
 using namespace std;
 
 
-CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
+CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, RenderPool* ppool) :
 		CurseGUIWnd(scrn,8,8,26,8)
 {
 	type = GUIWT_OTHER;
 	name = "LVR config";
 	showname = true;
 
-	lvr = plvr;
-	scale = lvr->GetScale();
-	fov = lvr->GetFOV();
-	far = lvr->GetFarDist();
-	fog = lvr->GetFogStart();
-	fogcol = lvr->GetFogColor();
+	pool = ppool;
+	scale = pool->GetScale();
+	fov = pool->GetFOV();
+	far = pool->GetFarDist();
+	fog = pool->GetFogStart();
+	fogcol = pool->GetFogColor();
 
 	//Create labels
 	new CurseGUILabel(ctrls,1,1,5,"Scale");
@@ -112,11 +112,11 @@ void CurseGUIRenderConfWnd::Scan()
 
 void CurseGUIRenderConfWnd::Apply()
 {
-	lvr->SetScale(scale);
-	lvr->SetFOV(fov);
-	lvr->SetFarDist(far);
-	lvr->SetFogStart(fog);
-	lvr->SetFogColor(fogcol);
+	pool->SetScale(scale);
+	pool->SetFOV(fov);
+	pool->SetFarDist(far);
+	pool->SetFogStart(fog);
+	pool->SetFogColor(fogcol);
 }
 
 void CurseGUIRenderConfWnd::Reset()

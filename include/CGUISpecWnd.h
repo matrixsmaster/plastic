@@ -118,11 +118,11 @@ public:
 
 /* ********************************** Renderer Config window ********************************** */
 
-class LVR;
+class RenderPool;
 
 class CurseGUIRenderConfWnd : public CurseGUIWnd {
 private:
-	LVR* lvr;
+	RenderPool* pool;
 	float scale;
 	vector3d fov;
 	int far,fog;
@@ -140,7 +140,7 @@ private:
 	void Reset();
 
 public:
-	CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr);
+	CurseGUIRenderConfWnd(CurseGUI* scrn, RenderPool* ppool);
 	virtual ~CurseGUIRenderConfWnd()	{}
 
 	bool PutEvent(SGUIEvent* e);

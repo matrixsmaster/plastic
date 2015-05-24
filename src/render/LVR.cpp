@@ -47,32 +47,17 @@ LVR::LVR(DataPipe* pipe)
 	far = DEFFARPLANE;
 	fog = DEFFOGPLANE;
 	SetFogColor(vector3di(DEFFOGGRAY));
-
-	skies = (pipe)? (new AtmoSky(pipe)):NULL;
 }
 
 LVR::~LVR()
 {
-	if (skies) delete skies;
 	if (render) free(render);
 	if (zbuf) free(zbuf);
 	if (pbuf) delete[] pbuf;
 }
 
-bool LVR::Resize(int w, int h)
+void LVR::ReallocBuffers()
 {
-	if (w < 1) w = 0;
-	if (h < 1) h = 0;
-
-	//apply setting
-	g_w = w;
-	g_h = h;
-	rendsize = w * h;
-
-	//get a screen middle point
-	mid.X = w / 2;
-	mid.Y = h / 2;
-
 	if (pbuf) delete[] pbuf;
 
 #ifdef LVRDOUBLEBUFFERED
@@ -95,6 +80,23 @@ bool LVR::Resize(int w, int h)
 	pbuf = new vector3di[rendsize];
 
 #endif
+}
+
+bool LVR::Resize(int w, int h)
+{
+	if (w < 1) w = 0;
+	if (h < 1) h = 0;
+
+	//apply setting
+	g_w = w;
+	g_h = h;
+	rendsize = w * h;
+
+	//get a screen middle point
+	mid.X = w / 2;
+	mid.Y = h / 2;
+
+	ReallocBuffers();
 
 	return ((render != NULL) && (zbuf != NULL) && (pbuf != NULL));
 }
@@ -115,12 +117,6 @@ void LVR::SetMask(char* m, int w, int h)
 	if ((w != g_w) || (h != g_h)) mask = NULL;
 }
 
-void LVR::RemoveSkies()
-{
-	if (skies) delete skies;
-	skies = NULL;
-}
-
 void LVR::SetEulerRotation(const vector3d r)
 {
 	SMatrix3d rx,ry,rz,xy;
@@ -130,9 +126,6 @@ void LVR::SetEulerRotation(const vector3d r)
 	eulerot.Y = r.Z; //swap Y-Z axes
 	eulerot.Z = r.Y;
 	RotNormDegF(&eulerot); //norm it to form [0;360)
-
-	//update skies rotation
-	if (skies) skies->SetEulerAngles(eulerot);
 
 	//generate rotation matrices
 	rx = GenMtxRotX(eulerot.X * M_PI / 180.f);
@@ -249,9 +242,6 @@ void LVR::Frame()
 #endif
 
 	memset(curzbuf,0,rendsize*sizeof(int));
-
-	if (skies)
-		skies->RenderTo(frame,g_w,g_h);
 
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {

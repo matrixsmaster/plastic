@@ -31,12 +31,13 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	result = 0;
 	sets = settings;
 	data = NULL;
-	lvr = NULL;
+	render = NULL;
 	gui = NULL;
 	PC = NULL;
 	hud = NULL;
 	binder = NULL;
 	once = false;
+	g_w = g_h = 0;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
@@ -52,8 +53,8 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	/* Bind keyboard */
 	BindKeys();
 
-	/* Create LVR */
-	lvr = new LVR(data);
+	/* Create render pool */
+	render = new RenderPool(data);
 
 	/* Create Player */
 	PC = new Player(sets->PCData,data);
@@ -70,7 +71,7 @@ PlasticWorld::~PlasticWorld()
 	//UI parts
 	if (binder) delete binder;
 	if (hud) delete hud;
-	if (lvr) delete lvr;
+	if (render) delete render;
 
 	//The last one: DataPipe
 	if (data) delete data;
@@ -83,7 +84,7 @@ void PlasticWorld::Quantum()
 		once = true;
 
 		data->SetGP(PC->GetGPos());
-		lvr->SetPosition(PC->GetPos().ToReal());
+		render->SetPos(PC->GetPos());
 
 		//FIXME: debugging stuff
 		test = data->LoadModel("testmodel.dat",vector3di(128,100,135));
@@ -91,12 +92,20 @@ void PlasticWorld::Quantum()
 	}
 
 	//DEBUG:
-	data->Lock();
-	if (test->GetState() == 0)
-		test->SetState(test->GetNumStates()-1);
-	else
-		test->SetState(test->GetState()-1);
-	data->Unlock();
+//	data->Lock();
+//	if (test->GetState() == 0)
+//		test->SetState(test->GetNumStates()-1);
+//	else
+//		test->SetState(test->GetState()-1);
+//	data->Unlock();
+}
+
+void PlasticWorld::Frame()
+{
+	if ((!gui) || (!render)) return;
+
+	gui->SetBackgroundData(render->GetRender(),render->GetRenderLen());
+	render->SetMask(gui->GetBackmask(),g_w,g_h);
 }
 
 void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
@@ -107,25 +116,19 @@ void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
 
 void PlasticWorld::ConnectGUI()
 {
-	int nw,nh;
-
-	if ((!gui) || (!lvr)) {
+	if ((!gui) || (!render)) {
 		result = 1;
 		return;
 	}
 
-	//resize LVR frame
-	nw = gui->GetWidth();
-	nh = gui->GetHeight();
-	if (!lvr->Resize(nw,nh)) {
+	//resize frame
+	g_w = gui->GetWidth();
+	g_h = gui->GetHeight();
+	if (!render->Resize(g_w,g_h)) {
 		errout("Unable to resize LVR frame!\n");
 		result = 2;
 		return;
 	}
-
-	//Connect lvr output to CurseGUI main background
-	gui->SetBackgroundData(lvr->GetRender(),lvr->GetRenderLen());
-	lvr->SetMask(gui->GetBackmask(),nw,nh);
 
 	//Update HUD sizes, positions etc (reset)
 	if (hud) delete hud;
@@ -201,7 +204,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			break;
 
 		case 4: /*LVR config*/
-			SPAWNWNDMACRO("LVR config",new CurseGUIRenderConfWnd(gui,lvr));
+			SPAWNWNDMACRO("LVR config",new CurseGUIRenderConfWnd(gui,render));
 			break;
 
 		default:
@@ -234,8 +237,9 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 		test->SetRot(tr); //FIXME: debug only
 
 		PC->ProcessEvent(e);
-		lvr->SetEulerRotation(PC->GetRot().ToReal());
-		lvr->SetPosition(PC->GetPos().ToReal());
+		dbg_print("PC Pos [%d %d %d] Rot [%d %d %d]",PC->GetPos().X,PC->GetPos().Y,PC->GetPos().Z,PC->GetRot().X,PC->GetRot().Y,PC->GetRot().Z);
+		render->SetRot(PC->GetRot());
+		render->SetPos(PC->GetPos());
 		break;
 
 	case GUIEV_RESIZE:
@@ -249,7 +253,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			curso.X = e->m.x;
 			curso.Y = e->m.y;
 
-			x = lvr->GetProjection(curso);
+			x = render->GetProjection(curso);
 			snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
 			hud->PutStrBottom(s);
 			gui->SetCursorPos(curso.X,curso.Y);

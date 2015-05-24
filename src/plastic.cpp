@@ -30,8 +30,8 @@
 #include "debug.h"
 #include "CurseGUI.h"
 #include "world.h"
-#include "LVR.h"
 #include "datapipe.h"
+#include "renderpool.h"
 
 
 static SGameSettings	g_set = DEFAULT_SETTINGS;
@@ -84,17 +84,18 @@ static void* plastic_eventhread(void* ptr)
 
 static void* plastic_renderthread(void* ptr)
 {
-	LVR* lvr;
+//	LVR* lvr;
 	time_t beg;
 	uli fps = 0;
 
-	lvr = g_wrld->GetRenderer();
+//	lvr = g_wrld->GetRenderer();
 	beg = clock();
 
 	while (!g_quit) {
-		pthread_mutex_lock(&m_resize);
-		lvr->Frame();
-		pthread_mutex_unlock(&m_resize);
+//		pthread_mutex_lock(&m_resize);
+//		lvr->Frame();
+		g_wrld->Frame();
+//		pthread_mutex_unlock(&m_resize);
 
 		fps++;
 		if ((clock() - beg) >= CLOCKS_PER_SEC) {
@@ -104,6 +105,7 @@ static void* plastic_renderthread(void* ptr)
 		}
 
 		pthread_mutex_lock(&m_render);
+//		g_wrld->Frame();
 		g_gui->Update(true);
 		pthread_mutex_unlock(&m_render);
 	}

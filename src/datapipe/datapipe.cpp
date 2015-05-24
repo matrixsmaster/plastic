@@ -245,16 +245,16 @@ bool DataPipe::Move(EGMoveDir dir)
 
 void DataPipe::ChunkQueue()
 {
-	vector3di cur;
-	bool fnd = false;
-	unsigned l;
-
 	if (status != DPIPE_IDLE) return;
 
 #if HOLDCHUNKS == 1
 	/* One chunk right there, simplest scenario. Do nothing. */
 	return;
-#endif
+#else
+
+	vector3di cur;
+	bool fnd = false;
+	unsigned l;
 
 //	Lock();
 //	status = DPIPE_BUSY;
@@ -317,6 +317,7 @@ chunk_found:
 
 //	status = DPIPE_IDLE;
 //	Unlock();
+#endif
 }
 
 void DataPipe::MakeChunk(unsigned l, vector3di pos)
@@ -341,16 +342,17 @@ bool DataPipe::LoadChunk(SDataPlacement* res, PChunk buf)
 voxel DataPipe::GetVoxel(const vector3di* p)
 {
 	PChunk ch;
+	int px,py,pz;
+	unsigned l;
 	VModVec::iterator mi;
 	voxel tmp = 0;
 
 #if HOLDCHUNKS > 1
-	int x,y,z,px,py,pz;
-	unsigned l;
+	int x,y,z;
 #endif
 
 	if (status != DPIPE_IDLE) return 0;
-	Lock();
+//	Lock();
 
 	/* Check for dynamic objects */
 	if (!objs.empty()) {
@@ -358,7 +360,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
 				tmp = (*mi)->GetVoxelAt(p);
 				if (tmp) {
-					Unlock();
+					//Unlock();
 					return tmp;
 				}
 			}
@@ -374,7 +376,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 
 	if (	(px < 0) || (py < 0) || (pz < 0) ||
 			(px >= CHUNKBOX) || (py >= CHUNKBOX) || (pz >= CHUNKBOX) ) {
-		Unlock();
+		//Unlock();
 		return 0;
 	}
 	l = 0;
@@ -395,7 +397,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 #if HOLDCHUNKS == 9
 	if (	(x < -1) || (y < -1) || (z < 0) ||
 			(x >  1) || (y >  1) || (z > 0) ) {
-		Unlock();
+		//Unlock();
 		return 0;
 	}
 	++y; ++x; //centerize
@@ -404,7 +406,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 #elif HOLDCHUNKS == 18
 	if (	(x < -1) || (y < -1) || (z < -1) ||
 			(x >  1) || (y >  1) || (z > 0) ) {
-		Unlock();
+		//Unlock();
 		return 0;
 	}
 	++z; ++y; ++x; //centerize
@@ -413,7 +415,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 #elif HOLDCHUNKS == 27
 	if (	(x < -1) || (y < -1) || (z < -1) ||
 			(x >  1) || (y >  1) || (z >  1) ) {
-		Unlock();
+		//Unlock();
 		return 0;
 	}
 	++z; ++y; ++x; //centerize
@@ -423,15 +425,15 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 #error "Invalid value of HOLDCHUNKS!"
 
 #endif
+#endif
 
 	if (chstat[l] == DPCHK_READY) {
 		ch = chunks[l];
 		tmp = (*ch)[pz][py][px];
 	}
 
-	Unlock();
+	//Unlock();
 	return tmp;
-#endif
 }
 
 SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
