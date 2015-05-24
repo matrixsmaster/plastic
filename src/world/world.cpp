@@ -92,20 +92,22 @@ void PlasticWorld::Quantum()
 	}
 
 	//DEBUG:
-//	data->Lock();
-//	if (test->GetState() == 0)
-//		test->SetState(test->GetNumStates()-1);
-//	else
-//		test->SetState(test->GetState()-1);
-//	data->Unlock();
+	data->Lock();
+	if (test->GetState() == 0)
+		test->SetState(test->GetNumStates()-1);
+	else
+		test->SetState(test->GetState()-1);
+	data->Unlock();
 }
 
 void PlasticWorld::Frame()
 {
 	if ((!gui) || (!render)) return;
 
+//	render->Lock();
 	gui->SetBackgroundData(render->GetRender(),render->GetRenderLen());
 	render->SetMask(gui->GetBackmask(),g_w,g_h);
+//	render->Unlock();
 }
 
 void PlasticWorld::ConnectGUI(CurseGUI* guiptr)

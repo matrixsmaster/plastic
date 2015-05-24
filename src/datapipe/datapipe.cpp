@@ -339,6 +339,15 @@ bool DataPipe::LoadChunk(SDataPlacement* res, PChunk buf)
 	return false;
 }
 
+/* GetVoxel() Interlocking macro for multithreaded access */
+#ifdef DPLOCKEACHVOX
+#define DP_GETVOX_LOCK Lock()
+#define DP_GETVOX_UNLOCK Unlock()
+#else
+#define DP_GETVOX_LOCK
+#define DP_GETVOX_UNLOCK
+#endif
+
 voxel DataPipe::GetVoxel(const vector3di* p)
 {
 	PChunk ch;
@@ -352,7 +361,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 #endif
 
 	if (status != DPIPE_IDLE) return 0;
-//	Lock();
+	DP_GETVOX_LOCK;
 
 	/* Check for dynamic objects */
 	if (!objs.empty()) {
@@ -360,7 +369,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
 				tmp = (*mi)->GetVoxelAt(p);
 				if (tmp) {
-					//Unlock();
+					DP_GETVOX_UNLOCK;
 					return tmp;
 				}
 			}
@@ -376,7 +385,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 
 	if (	(px < 0) || (py < 0) || (pz < 0) ||
 			(px >= CHUNKBOX) || (py >= CHUNKBOX) || (pz >= CHUNKBOX) ) {
-		//Unlock();
+		DP_GETVOX_UNLOCK;
 		return 0;
 	}
 	l = 0;
@@ -397,7 +406,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 #if HOLDCHUNKS == 9
 	if (	(x < -1) || (y < -1) || (z < 0) ||
 			(x >  1) || (y >  1) || (z > 0) ) {
-		//Unlock();
+		DP_GETVOX_UNLOCK;
 		return 0;
 	}
 	++y; ++x; //centerize
@@ -406,7 +415,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 #elif HOLDCHUNKS == 18
 	if (	(x < -1) || (y < -1) || (z < -1) ||
 			(x >  1) || (y >  1) || (z > 0) ) {
-		//Unlock();
+		DP_GETVOX_UNLOCK;
 		return 0;
 	}
 	++z; ++y; ++x; //centerize
@@ -415,7 +424,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 #elif HOLDCHUNKS == 27
 	if (	(x < -1) || (y < -1) || (z < -1) ||
 			(x >  1) || (y >  1) || (z >  1) ) {
-		//Unlock();
+		DP_GETVOX_UNLOCK;
 		return 0;
 	}
 	++z; ++y; ++x; //centerize
@@ -432,7 +441,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 		tmp = (*ch)[pz][py][px];
 	}
 
-	//Unlock();
+	DP_GETVOX_UNLOCK;
 	return tmp;
 }
 

@@ -56,6 +56,7 @@ static void* plastic_eventhread(void* ptr)
 
 		/* Stop rendering any screen data while processing event */
 		pthread_mutex_lock(&m_render);
+//		g_wrld->GetRenderer()->Lock();
 
 		/* Events pump */
 		if (!g_gui->PumpEvents(&my_e)) {
@@ -72,6 +73,7 @@ static void* plastic_eventhread(void* ptr)
 
 		g_wrld->GetHUD()->UpdateFPS(g_fps); //FIXME
 
+//		g_wrld->GetRenderer()->Unlock();
 		pthread_mutex_unlock(&m_render);
 
 		/* To keep CPU load low(er) */
@@ -108,6 +110,8 @@ static void* plastic_renderthread(void* ptr)
 //		g_wrld->Frame();
 		g_gui->Update(true);
 		pthread_mutex_unlock(&m_render);
+
+		usleep(100);
 	}
 
 	return NULL;

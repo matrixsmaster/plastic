@@ -130,12 +130,13 @@ bool RenderPool::Quantum()
 
 	skies->RenderTo(render+shf,g_w,g_h);
 
-	pipeptr->Lock();
+//	pipeptr->Lock();
 
 	for (i = 0; i < RENDERPOOLN; i++) {
 		cur = pool + i;
 //		if ((!cur->done) || (!cur->good)) continue;
 		if (!cur->good) continue;
+//		while (!cur->done) ;
 		lvr = cur->lvr;
 
 		pthread_mutex_lock(&(cur->mtx));
@@ -154,7 +155,14 @@ bool RenderPool::Quantum()
 //		memcpy(render+shf+cur->start,lvr->GetRender(),l * sizeof(SGUIPixel));
 	}
 
-	pipeptr->Unlock();
+//	for (i = 0; i < RENDERPOOLN; i++) {
+//		cur = pool + i;
+//		if (!cur->good) continue;
+//		while (!cur->done) ;
+//		cur->done = false;
+//	}
+
+//	pipeptr->Unlock();
 
 	pthread_mutex_unlock(&m_rend);
 
@@ -214,8 +222,8 @@ SGUIPixel* RenderPool::GetRender()
 {
 	SGUIPixel* ptr;
 
-//	pthread_mutex_lock(&m_rend);
-	Lock();
+	pthread_mutex_lock(&m_rend);
+//	Lock();
 	SwapBuffers();
 #ifdef LVRDOUBLEBUFFERED
 	//return NOT active buffer data
@@ -224,8 +232,8 @@ SGUIPixel* RenderPool::GetRender()
 	ptr = render;
 #endif
 
-	Unlock();
-//	pthread_mutex_unlock(&m_rend);
+//	Unlock();
+	pthread_mutex_unlock(&m_rend);
 
 	return ptr;
 }
