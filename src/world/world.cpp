@@ -105,10 +105,10 @@ void PlasticWorld::Frame()
 {
 	if ((!gui) || (!render)) return;
 
-//	render->Lock();
 	gui->SetBackgroundData(render->GetRender(),render->GetRenderLen());
 	render->SetMask(gui->GetBackmask(),g_w,g_h);
-//	render->Unlock();
+
+	//TODO: make precision clock inside PlasticWorld (for atmo and physics). Move FPS calc here.
 }
 
 void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
@@ -143,6 +143,7 @@ void PlasticWorld::ConnectGUI()
 
 bool PlasticWorld::CreateActor()
 {
+	//FIXME: debug only
 	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,data);
 	npc->SetPos(PC->GetPos());
 	return (npc->Spawn());

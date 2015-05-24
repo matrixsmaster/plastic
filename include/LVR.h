@@ -32,9 +32,13 @@
 #include "sky.h"
 
 
+///Define this to use debugging output.
 //#define LVRDEBUG 1
+
+///Define this to use double-buffering in LVR.
 #define LVRDOUBLEBUFFERED 1
 
+///Set of default settings.
 #define DEFSCALE 1.f
 #define DEFFOVX 115
 #define DEFFOVY 62

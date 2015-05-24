@@ -31,9 +31,13 @@
 #include "visual.h"
 
 
+///Size of render pool (max number of threads).
 #define RENDERPOOLN 3
+
+///Desync time for render threads (us).
 #define RENDERPOOLDESW 100
 
+/* Pool runtime data structure */
 struct SRendPoolDat {
 	pthread_t thr;
 	pthread_mutex_t mtx;
@@ -41,11 +45,10 @@ struct SRendPoolDat {
 	bool done;
 	bool quit;
 	int start;
-//	uli size;
 	bool good;
-//	SGUIPixel* buf;
 };
 
+/* RenderPool: multi-thread LVR */
 class RenderPool : public LVR {
 private:
 	SRendPoolDat pool[RENDERPOOLN];
@@ -63,6 +66,7 @@ public:
 	RenderPool(DataPipe* pipe);
 	virtual ~RenderPool();
 
+	//FIXME: comment it
 	bool Quantum();
 
 	void Lock();

@@ -35,19 +35,31 @@
 #include "plastic.h"
 
 
+///Default amount of available RAM.
 #define DEFRAMMAX (2ULL * 1024*1024*1024)
 
+///Block DataPipe on each voxel access operation.
 //#define DPLOCKEACHVOX 1
 
+///Maximum length of argument string in INI file.
 #define MAXINISTRLEN 256
+///INI file string format.
 #define FMTINISTRING "%s = %255[^\n]"
 
+///Voxel table file name.
 #define VOXTABFILENAME "voxtab.dat"
+
+///Atmospherics settings file name.
 #define ATMOININAME "atmosphere"
+
+///Control bindings file name.
 #define KEYBINDNAME "controls"
+
+///Actors classes data file name.
 #define CLASNFONAME "classes"
 
 
+/* States of DataPipe */
 enum EDPipeStatus {
 	DPIPE_NOTREADY,		//pipe is partially initialized
 	DPIPE_ERROR,		//error state, pipe cannot be used
@@ -55,6 +67,7 @@ enum EDPipeStatus {
 	DPIPE_BUSY			//central chunk is loading
 };
 
+/* States of voxel chunk inside DataPipe */
 enum EDChunkStatus {
 	DPCHK_EMPTY,
 	DPCHK_READY,
@@ -63,6 +76,7 @@ enum EDChunkStatus {
 	DPCHK_ERROR
 };
 
+/* File data placement map record */
 struct SDataPlacement {
 	unsigned filenum;
 	vector3di pos;
@@ -172,6 +186,7 @@ public:
 	vector3di GetInitialPCGPos()			{ return wgen->GetPCInitPos(); }
 	vector3di GetInitialPCLPos()			{ return vector3di(128,90,135); } //FIXME
 };
+
 
 /* ********************************** DATA PIPE DUMMY ********************************** */
 /* This class can be used as a lightweight version of DataPipe.

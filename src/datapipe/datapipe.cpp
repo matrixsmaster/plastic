@@ -262,7 +262,7 @@ void DataPipe::ChunkQueue()
 #if HOLDCHUNKS == 9
 	/* One 3x3 plane of chunks, most widely used scenario */
 	int i,j;
-	cur.Z = GP.Z:
+	cur.Z = GP.Z;
 	for (i = -1, l = 0; i < 2; i++) {
 		cur.Y = GP.Y + i;
 		for (j = -1; j < 2; j++, l++) {

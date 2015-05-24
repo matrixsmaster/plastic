@@ -33,3 +33,5 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Implement navigation by mouse (wheel for X and drag for Y)
 
 -> Discard awaiting keypresses after each keypress event
+
+-> Fix a bug with event system halt after multiple resizes
