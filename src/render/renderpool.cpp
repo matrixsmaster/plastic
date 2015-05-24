@@ -34,8 +34,6 @@ static void* rendpool_lvrthread(void* ptr)
 
 			pthread_mutex_lock(&(me->mtx));
 
-//			memset(lvr->GetRender(),0,lvr->GetRenderLen()*sizeof(SGUIPixel));
-
 			lvr->SwapBuffers();
 
 			pthread_mutex_unlock(&(me->mtx));
@@ -68,35 +66,45 @@ static void* rendpool_mainthread(void* ptr)
 RenderPool::RenderPool(DataPipe* pipe) :
 		LVR(pipe)
 {
-	int i;
-
 	skies = new AtmoSky(pipe);
 	quit = false;
 	fps = 0;
 
 	pthread_mutex_init(&m_rend,NULL);
 
-	for (i = 0; i < RENDERPOOLN; i++) {
-		memset(&pool[i],0,sizeof(SRendPoolDat));
-
-		pool[i].lvr = new LVR(pipe);
-
-		pthread_mutex_init(&(pool[i].mtx),NULL);
-		pthread_create(&(pool[i].thr),NULL,rendpool_lvrthread,&(pool[i]));
-	}
+	SpawnThreads();
 
 	pthread_create(&t_rend,NULL,rendpool_mainthread,this);
 }
 
 RenderPool::~RenderPool()
 {
-	int i;
-
 	quit = true;
 
 	pthread_join(t_rend,NULL);
 
-	for (i = 0; i < RENDERPOOLN; i++) {
+	KillThreads();
+
+	pthread_mutex_destroy(&m_rend);
+
+	delete skies;
+}
+
+void RenderPool::SpawnThreads()
+{
+	for (int i = 0; i < RENDERPOOLN; i++) {
+		memset(&pool[i],0,sizeof(SRendPoolDat));
+
+		pool[i].lvr = new LVR(pipeptr);
+
+		pthread_mutex_init(&(pool[i].mtx),NULL);
+		pthread_create(&(pool[i].thr),NULL,rendpool_lvrthread,&(pool[i]));
+	}
+}
+
+void RenderPool::KillThreads()
+{
+	for (int i = 0; i < RENDERPOOLN; i++) {
 		pool[i].quit = true;
 
 		pthread_join(pool[i].thr,NULL);
@@ -104,10 +112,6 @@ RenderPool::~RenderPool()
 
 		delete (pool[i].lvr);
 	}
-
-	pthread_mutex_destroy(&m_rend);
-
-	delete skies;
 }
 
 bool RenderPool::Quantum()
@@ -193,6 +197,7 @@ void RenderPool::SetPos(vector3di p)
 {
 	int i;
 	vector3d ps = p.ToReal();
+	ipos = p;
 
 	for (i = 0; i < RENDERPOOLN; i++)
 		pool[i].lvr->SetPosition(ps);
@@ -203,6 +208,7 @@ void RenderPool::SetRot(vector3di r)
 	int i;
 	float tmp;
 	vector3d rt = r.ToReal();
+	irot = r;
 
 	for (i = 0; i < RENDERPOOLN; i++)
 		pool[i].lvr->SetEulerRotation(rt);
@@ -224,7 +230,9 @@ SGUIPixel* RenderPool::GetRender()
 
 	pthread_mutex_lock(&m_rend);
 //	Lock();
+
 	SwapBuffers();
+
 #ifdef LVRDOUBLEBUFFERED
 	//return NOT active buffer data
 	ptr = (render + ((activebuf)? 0:rendsize));
@@ -259,7 +267,15 @@ bool RenderPool::Resize(int w, int h)
 
 	dbg_logstr("Awaiting resize...");
 
-	Lock();
+//	for (i = 0; i < RENDERPOOLN; i++) {
+//		while ((pool[i].good) && (!pool[i].done)) ;
+//	}
+//	for (i = 0; i < RENDERPOOLN; i++)
+//		pool[i].good = false;
+//	Lock();
+
+	pthread_mutex_lock(&m_rend);
+	KillThreads();
 
 	g_w = w;
 	g_h = h;
@@ -268,6 +284,8 @@ bool RenderPool::Resize(int w, int h)
 	dbg_print("Resized to %d x %d = %u",w,h,rendsize);
 
 	ReallocBuffers();
+
+	SpawnThreads();
 
 	for (i = 0, s = 0; i < RENDERPOOLN; i++, s+=n) {
 		pool[i].start = s * g_w;
@@ -282,15 +300,17 @@ bool RenderPool::Resize(int w, int h)
 		pool[i].done = false;
 	}
 
-	Unlock();
+//	Unlock();
+
+	pthread_mutex_unlock(&m_rend);
 
 	return true;
 }
 
 void RenderPool::SetMask(char* m, int w, int h)
 {
-	Lock();
-	Unlock();
+//	Lock();
+//	Unlock();
 }
 
 void RenderPool::SetScale(const double s)

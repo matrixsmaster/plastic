@@ -37,7 +37,7 @@
 
 #define DEFRAMMAX (2ULL * 1024*1024*1024)
 
-#define DPLOCKEACHVOX 1
+//#define DPLOCKEACHVOX 1
 
 #define MAXINISTRLEN 256
 #define FMTINISTRING "%s = %255[^\n]"

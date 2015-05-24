@@ -244,6 +244,8 @@ void LVR::Frame()
 	memset(curzbuf,0,rendsize*sizeof(int));
 	memset(frame,0,rendsize*sizeof(SGUIPixel));
 
+	pipeptr->Lock();
+
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
 		for (x = 0; x < g_w; x++,l++) {
@@ -332,6 +334,8 @@ void LVR::Frame()
 			} //by Z
 		} //by X
 	} //by Y
+
+	pipeptr->Unlock();
 }
 
 void LVR::Postprocess()

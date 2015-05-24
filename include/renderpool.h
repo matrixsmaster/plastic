@@ -49,13 +49,15 @@ struct SRendPoolDat {
 class RenderPool : public LVR {
 private:
 	SRendPoolDat pool[RENDERPOOLN];
-//	SGUIPixel* buffer;
 	AtmoSky* skies;
 	vector3di ipos,irot;
 	bool quit;
 	pthread_t t_rend;
 	pthread_mutex_t m_rend;
 	ulli fps;
+
+	void SpawnThreads();
+	void KillThreads();
 
 public:
 	RenderPool(DataPipe* pipe);
