@@ -134,18 +134,12 @@ bool RenderPool::Quantum()
 
 	skies->RenderTo(render+shf,g_w,g_h);
 
-//	pipeptr->Lock();
-
 	for (i = 0; i < RENDERPOOLN; i++) {
 		cur = pool + i;
-//		if ((!cur->done) || (!cur->good)) continue;
 		if (!cur->good) continue;
-//		while (!cur->done) ;
 		lvr = cur->lvr;
 
 		pthread_mutex_lock(&(cur->mtx));
-
-//		lvr->SwapBuffers();
 
 		l = lvr->GetRenderLen();
 		tmp = lvr->GetRender();
@@ -156,17 +150,7 @@ bool RenderPool::Quantum()
 		}
 		cur->done = false;
 		pthread_mutex_unlock(&(cur->mtx));
-//		memcpy(render+shf+cur->start,lvr->GetRender(),l * sizeof(SGUIPixel));
 	}
-
-//	for (i = 0; i < RENDERPOOLN; i++) {
-//		cur = pool + i;
-//		if (!cur->good) continue;
-//		while (!cur->done) ;
-//		cur->done = false;
-//	}
-
-//	pipeptr->Unlock();
 
 	pthread_mutex_unlock(&m_rend);
 
@@ -267,13 +251,6 @@ bool RenderPool::Resize(int w, int h)
 
 	dbg_logstr("Awaiting resize...");
 
-//	for (i = 0; i < RENDERPOOLN; i++) {
-//		while ((pool[i].good) && (!pool[i].done)) ;
-//	}
-//	for (i = 0; i < RENDERPOOLN; i++)
-//		pool[i].good = false;
-//	Lock();
-
 	pthread_mutex_lock(&m_rend);
 	KillThreads();
 
@@ -284,23 +261,16 @@ bool RenderPool::Resize(int w, int h)
 	dbg_print("Resized to %d x %d = %u",w,h,rendsize);
 
 	ReallocBuffers();
-
 	SpawnThreads();
 
 	for (i = 0, s = 0; i < RENDERPOOLN; i++, s+=n) {
 		pool[i].start = s * g_w;
 		if (s+n >= h) n = h - s;
 		pool[i].good = pool[i].lvr->Resize(w,n);
-//		if (!pool[i].good) {
-//			errout("Resize %d %d\n",w,n);
-//			abort();
-//		}
 		pool[i].lvr->SetMid(mid);
 		mid.Y -= n;
 		pool[i].done = false;
 	}
-
-//	Unlock();
 
 	pthread_mutex_unlock(&m_rend);
 

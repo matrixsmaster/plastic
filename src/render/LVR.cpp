@@ -323,11 +323,12 @@ void LVR::Frame()
 							frame[l].fg = vecftotriple(fo);
 						}
 					} else {
-						//something went wrong
+						//something went wrong, we're inside the object
 						frame[l].bg.r = 0;
 						frame[l].bg.g = 0;
 						frame[l].bg.b = 0;
 						frame[l].fg = frame[l].bg;
+						frame[l].sym = ' ';
 					}
 					break;
 				} //voxel frame
