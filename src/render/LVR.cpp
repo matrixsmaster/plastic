@@ -242,6 +242,7 @@ void LVR::Frame()
 #endif
 
 	memset(curzbuf,0,rendsize*sizeof(int));
+	memset(frame,0,rendsize*sizeof(SGUIPixel));
 
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {

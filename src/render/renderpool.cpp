@@ -30,13 +30,17 @@ static void* rendpool_lvrthread(void* ptr)
 
 	for (;;) {
 		if (me->good) {
-			pthread_mutex_lock(&(me->mtx));
-			memset(lvr->GetRender(),0,lvr->GetRenderLen()*sizeof(SGUIPixel));
 			lvr->Frame();
+
+			pthread_mutex_lock(&(me->mtx));
+
+//			memset(lvr->GetRender(),0,lvr->GetRenderLen()*sizeof(SGUIPixel));
+
+			lvr->SwapBuffers();
+
 			pthread_mutex_unlock(&(me->mtx));
 		}
 
-		lvr->SwapBuffers();
 		me->done = true;
 
 		while (me->done) {
@@ -112,8 +116,11 @@ bool RenderPool::Quantum()
 	uli l,shf;
 	SRendPoolDat* cur;
 	LVR* lvr;
+	SGUIPixel* tmp;
 
 	if ((!render) || (!zbuf) || (!pbuf)) return quit;
+
+	pthread_mutex_lock(&m_rend);
 
 #ifdef LVRDOUBLEBUFFERED
 	shf = (activebuf)? rendsize:0;
@@ -121,41 +128,30 @@ bool RenderPool::Quantum()
 	shf = 0;
 #endif
 
-	pthread_mutex_lock(&m_rend);
-
 	skies->RenderTo(render+shf,g_w,g_h);
 
 	pipeptr->Lock();
 
 	for (i = 0; i < RENDERPOOLN; i++) {
 		cur = pool + i;
-		if ((!cur->done) || (!cur->good)) continue;
+//		if ((!cur->done) || (!cur->good)) continue;
+		if (!cur->good) continue;
 		lvr = cur->lvr;
 
-//		pthread_mutex_lock(&(cur->mtx));
+		pthread_mutex_lock(&(cur->mtx));
 
 //		lvr->SwapBuffers();
-		cur->done = false;
-
-//		pthread_mutex_unlock(&(cur->mtx));
 
 		l = lvr->GetRenderLen();
+		tmp = lvr->GetRender();
 
 		while (l--) {
-			if (lvr->GetRender()[l].sym)
-				render[shf+cur->start+l] = lvr->GetRender()[l];
+			if (tmp[l].sym)
+				render[shf+cur->start+l] = tmp[l];
 		}
+		cur->done = false;
+		pthread_mutex_unlock(&(cur->mtx));
 //		memcpy(render+shf+cur->start,lvr->GetRender(),l * sizeof(SGUIPixel));
-
-#ifdef LVRDOUBLEBUFFERED
-
-//		memcpy(pbuf,lvr->GetPBuf(),l * sizeof(vector3di));
-
-
-#else
-#endif
-
-
 	}
 
 	pipeptr->Unlock();
@@ -218,8 +214,9 @@ SGUIPixel* RenderPool::GetRender()
 {
 	SGUIPixel* ptr;
 
-	pthread_mutex_lock(&m_rend);
-
+//	pthread_mutex_lock(&m_rend);
+	Lock();
+	SwapBuffers();
 #ifdef LVRDOUBLEBUFFERED
 	//return NOT active buffer data
 	ptr = (render + ((activebuf)? 0:rendsize));
@@ -227,8 +224,8 @@ SGUIPixel* RenderPool::GetRender()
 	ptr = render;
 #endif
 
-	SwapBuffers();
-	pthread_mutex_unlock(&m_rend);
+	Unlock();
+//	pthread_mutex_unlock(&m_rend);
 
 	return ptr;
 }
