@@ -47,6 +47,8 @@ private:
 	Player* PC;
 	HUD* hud;
 	KeyBinder* binder;
+	bool once;
+	vector2di curso;
 
 	//holders
 	std::vector<PlasticActor*> actors;

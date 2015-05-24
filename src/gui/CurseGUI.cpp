@@ -122,9 +122,8 @@ void CurseGUIBase::UpdateBack()
 	l = 0;
 	wcolor_set(wnd,1,NULL);
 	lc = -1;
-	for (i = 0; i < g_h; i++) {
-		lin = i * g_w;
-		for (j = 0; j < g_w; j++,lin++) {
+	for (i = 0, lin = 0; i < g_h; i++) {
+		for (j = 0; j < g_w; j++, lin++) {
 			clc = cmanager->CheckPair(&backgr[lin]);
 			if (lc != clc) {
 				if (l > 0) {
