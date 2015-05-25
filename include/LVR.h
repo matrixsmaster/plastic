@@ -22,7 +22,7 @@
 #ifndef LVR_H_
 #define LVR_H_
 
-#include "voxel.h"
+#include "LVRconsts.h"
 #include "datapipe.h"
 #include "misconsts.h"
 #include "CurseGUI.h"
@@ -32,40 +32,25 @@
 #include "sky.h"
 
 
-///Define this to use debugging output.
-//#define LVRDEBUG 1
-
-///Define this to use double-buffering in LVR.
-#define LVRDOUBLEBUFFERED 1
-
-///Set of default settings.
-#define DEFSCALE 1.f
-#define DEFFOVX 115
-#define DEFFOVY 62
-#define DEFFARPLANE 61
-#define DEFFOGPLANE 21
-#define DEFFOGGRAY 40
-
-
 class LVR {
 protected:
 	int g_w,g_h;					//Graphics width and height
 	uli rendsize;					//Linear size of the frame
-	int far,fog;					//Far plane distance and Fog start plane distance
-	double dfog;					//Fog differential
+	int far;						//Far plane distance
 	vector2di mid;					//Center point of the screen
 	vector3d fov;					//Field Of View
 	SMatrix3d rot;					//Camera rotation matrix
 	vector3d offset,eulerot,scale;	//Camera transformations
-	vector3di fogcol;				//Fog color
 	DataPipe* pipeptr;				//DataPipe instance
 	SGUIPixel* render;				//Rendered frame data pointer
 	int activebuf;					//Active (drawing) buffer number
 	int* zbuf;						//Depth buffer
 	vector3di* pbuf;				//Point (voxel) buffer
 	char* mask;						//Renderer mask (which places will not be rendered)
+	SLVRPostProcess pproc;			//Post-processing settings.
 
 	void ReallocBuffers();
+	void ApplyFog();
 
 public:
 	LVR(DataPipe* pipe);
@@ -90,10 +75,14 @@ public:
 	vector3d GetFOV()						{ return fov; }
 	virtual void SetFarDist(const int d);
 	int GetFarDist()						{ return far; }
-	virtual void SetFogStart(const int d);
-	int GetFogStart()						{ return fog; }
-	virtual void SetFogColor(const vector3di nfc);
-	vector3di GetFogColor()					{ return fogcol; }
+//	virtual void SetFogStart(const int d);
+//	int GetFogStart()						{ return fog; }
+//	virtual void SetFogColor(const vector3di nfc);
+//	vector3di GetFogColor()					{ return fogcol; }
+
+	virtual void SetPostprocess(const SLVRPostProcess p);
+//	virtual void SetPostprocess();
+	virtual SLVRPostProcess GetPostprocess() { return pproc; }
 
 	virtual const int* GetZBuf()			{ return zbuf; }
 	virtual const vector3di* GetPBuf()		{ return pbuf; }

@@ -291,30 +291,42 @@ void RenderPool::SetMask(char* m, int w, int h)
 
 void RenderPool::SetScale(const double s)
 {
+	scale = vector3d(s);
 	for (int i = 0; i < RENDERPOOLN; i++)
 		pool[i].lvr->SetScale(s);
 }
 
 void RenderPool::SetFOV(const vector3d f)
 {
+	fov = f;
 	for (int i = 0; i < RENDERPOOLN; i++)
 		pool[i].lvr->SetFOV(f);
 }
 
 void RenderPool::SetFarDist(const int d)
 {
+	far = d;
 	for (int i = 0; i < RENDERPOOLN; i++)
 		pool[i].lvr->SetFarDist(d);
 }
 
-void RenderPool::SetFogStart(const int d)
-{
-	for (int i = 0; i < RENDERPOOLN; i++)
-		pool[i].lvr->SetFogStart(d);
-}
+//void RenderPool::SetFogStart(const int d)
+//{
+//	fog = d;
+//	for (int i = 0; i < RENDERPOOLN; i++)
+//		pool[i].lvr->SetFogStart(d);
+//}
+//
+//void RenderPool::SetFogColor(const vector3di nfc)
+//{
+//	fogcol = nfc;
+//	for (int i = 0; i < RENDERPOOLN; i++)
+//		pool[i].lvr->SetFogColor(nfc);
+//}
 
-void RenderPool::SetFogColor(const vector3di nfc)
+void RenderPool::SetPostprocess(const SLVRPostProcess p)
 {
+	pproc = p;
 	for (int i = 0; i < RENDERPOOLN; i++)
-		pool[i].lvr->SetFogColor(nfc);
+		pool[i].lvr->SetPostprocess(p);
 }

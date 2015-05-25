@@ -36,8 +36,7 @@ CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, RenderPool* ppool) 
 	scale = pool->GetScale();
 	fov = pool->GetFOV();
 	far = pool->GetFarDist();
-	fog = pool->GetFogStart();
-	fogcol = pool->GetFogColor();
+	ppset = pool->GetPostprocess();
 
 	//Create labels
 	new CurseGUILabel(ctrls,1,1,5,"Scale");
@@ -81,14 +80,14 @@ void CurseGUIRenderConfWnd::Fill()
 	snprintf(buf,sizeof(buf),"%d",far);
 	e_far->SetText(string(buf));
 
-	snprintf(buf,sizeof(buf),"%d",fog);
+	snprintf(buf,sizeof(buf),"%d",ppset.fog_dist);
 	e_fog->SetText(string(buf));
 
-	snprintf(buf,sizeof(buf),"%d",fogcol.X);
+	snprintf(buf,sizeof(buf),"%hd",ppset.fog_col.r);
 	e_fogr->SetText(string(buf));
-	snprintf(buf,sizeof(buf),"%d",fogcol.Y);
+	snprintf(buf,sizeof(buf),"%hd",ppset.fog_col.g);
 	e_fogg->SetText(string(buf));
-	snprintf(buf,sizeof(buf),"%d",fogcol.Z);
+	snprintf(buf,sizeof(buf),"%hd",ppset.fog_col.b);
 	e_fogb->SetText(string(buf));
 }
 
@@ -104,10 +103,10 @@ void CurseGUIRenderConfWnd::Scan()
 	fov.Y = tmp;
 
 	sscanf((e_far->GetText().c_str()),"%d",&far);
-	sscanf((e_fog->GetText().c_str()),"%d",&fog);
-	sscanf((e_fogr->GetText().c_str()),"%d",&(fogcol.X));
-	sscanf((e_fogg->GetText().c_str()),"%d",&(fogcol.Y));
-	sscanf((e_fogb->GetText().c_str()),"%d",&(fogcol.Z));
+	sscanf((e_fog->GetText().c_str()),"%d",&ppset.fog_dist);
+	sscanf((e_fogr->GetText().c_str()),"%hd",&(ppset.fog_col.r));
+	sscanf((e_fogg->GetText().c_str()),"%hd",&(ppset.fog_col.g));
+	sscanf((e_fogb->GetText().c_str()),"%hd",&(ppset.fog_col.b));
 }
 
 void CurseGUIRenderConfWnd::Apply()
@@ -115,18 +114,18 @@ void CurseGUIRenderConfWnd::Apply()
 	pool->SetScale(scale);
 	pool->SetFOV(fov);
 	pool->SetFarDist(far);
-	pool->SetFogStart(fog);
-	pool->SetFogColor(fogcol);
+	pool->SetPostprocess(ppset);
 }
 
 void CurseGUIRenderConfWnd::Reset()
 {
+	SLVRPostProcess temp = DEFPOSTPROC;
+
 	scale = DEFSCALE;
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
 	far = DEFFARPLANE;
-	fog = DEFFOGPLANE;
-	fogcol = vector3di(DEFFOGGRAY);
+	ppset = temp;
 }
 
 bool CurseGUIRenderConfWnd::PutEvent(SGUIEvent* e)
