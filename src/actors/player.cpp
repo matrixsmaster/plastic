@@ -47,10 +47,22 @@ Player::~Player()
 	delete binder;
 }
 
-void Player::ProcessEvent(const SGUIEvent* e)
+bool Player::ProcessEvent(const SGUIEvent* e)
 {
 	bool rc = false; //rotation change flag
-	if (e->t != GUIEV_KEYPRESS) return;
+
+	if (e->t == GUIEV_MOUSE) {
+		if (e->m.bstate & GUISCRL_UP) {
+			rot.X += 4;
+			rc = true;
+		} else if (e->m.bstate & GUISCRL_DW) {
+			rot.X -= 4;
+			rc = true;
+		}
+		goto PC_ProcEvEnd;
+
+	} else if (e->t != GUIEV_KEYPRESS)
+		return false;
 
 	switch (binder->DecodeKey(e->k)) {
 
@@ -73,5 +85,8 @@ void Player::ProcessEvent(const SGUIEvent* e)
 //	case : Move(LMOVE_DW,1.2f); break;
 	}
 
+PC_ProcEvEnd:
 	if (rc) SetRot(rot); //Update rotation
+
+	return true;
 }

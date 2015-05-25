@@ -18,9 +18,6 @@
  */
 
 #include "renderpool.h"
-//debug:
-#include "debug.h"
-#include "support.h"
 
 
 static void* rendpool_lvrthread(void* ptr)
@@ -257,16 +254,12 @@ bool RenderPool::Resize(int w, int h)
 	mid.X = w / 2;
 	mid.Y = h / 2;
 
-	dbg_logstr("Awaiting resize...");
-
 	pthread_mutex_lock(&m_rend);
 	KillThreads();
 
 	g_w = w;
 	g_h = h;
 	rendsize = w * h;
-
-	dbg_print("Resized to %d x %d = %u",w,h,rendsize);
 
 	ReallocBuffers();
 	SpawnThreads();
@@ -317,20 +310,6 @@ void RenderPool::SetFarDist(const int d)
 	for (int i = 0; i < RENDERPOOLN; i++)
 		pool[i].lvr->SetFarDist(d);
 }
-
-//void RenderPool::SetFogStart(const int d)
-//{
-//	fog = d;
-//	for (int i = 0; i < RENDERPOOLN; i++)
-//		pool[i].lvr->SetFogStart(d);
-//}
-//
-//void RenderPool::SetFogColor(const vector3di nfc)
-//{
-//	fogcol = nfc;
-//	for (int i = 0; i < RENDERPOOLN; i++)
-//		pool[i].lvr->SetFogColor(nfc);
-//}
 
 void RenderPool::SetPostprocess(const SLVRPostProcess p)
 {

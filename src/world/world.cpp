@@ -186,6 +186,13 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	char s[128];
 
 	result = 0;
+
+	if (PC->ProcessEvent(e)) {
+		render->SetRot(PC->GetRot());
+		render->SetPos(PC->GetPos());
+		return;
+	}
+
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
 		/* User pressed a key */
@@ -239,11 +246,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			}
 		}
 		test->SetRot(tr); //FIXME: debug only
-
-		PC->ProcessEvent(e);
-		dbg_print("PC Pos [%d %d %d] Rot [%d %d %d]",PC->GetPos().X,PC->GetPos().Y,PC->GetPos().Z,PC->GetRot().X,PC->GetRot().Y,PC->GetRot().Z);
-		render->SetRot(PC->GetRot());
-		render->SetPos(PC->GetPos());
 		break;
 
 	case GUIEV_RESIZE:
