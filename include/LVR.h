@@ -75,13 +75,8 @@ public:
 	vector3d GetFOV()						{ return fov; }
 	virtual void SetFarDist(const int d);
 	int GetFarDist()						{ return far; }
-//	virtual void SetFogStart(const int d);
-//	int GetFogStart()						{ return fog; }
-//	virtual void SetFogColor(const vector3di nfc);
-//	vector3di GetFogColor()					{ return fogcol; }
 
 	virtual void SetPostprocess(const SLVRPostProcess p);
-//	virtual void SetPostprocess();
 	virtual SLVRPostProcess GetPostprocess() { return pproc; }
 
 	virtual const int* GetZBuf()			{ return zbuf; }

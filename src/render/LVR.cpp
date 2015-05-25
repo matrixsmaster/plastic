@@ -49,7 +49,6 @@ LVR::LVR(DataPipe* pipe)
 	fov.Y = DEFFOVY;
 	far = DEFFARPLANE;
 
-//	SetPostprocess(temp);
 	pproc = temp;
 }
 
@@ -176,43 +175,20 @@ void LVR::SetFOV(const vector3d f)
 void LVR::SetFarDist(const int d)
 {
 	far = d;
-//	SetPostprocess();
 
 #ifdef LVRDEBUG
 	dbg_print("LVR Far plane = %d",d);
 #endif
 }
 
-//void LVR::SetFogStart(const int d)
-//{
-//	pproc.fog_dist = d;
-//	pproc.fog_diff = 1.f / (double)(far - pproc.fog_dist);
-//
-//#ifdef LVRDEBUG
-//	dbg_print("LVR Fog dist. = %d",d);
-//#endif
-//}
-//
-//void LVR::SetFogColor(const vector3di nfc)
-//{
-//	fogcol = nfc;
-//	pproc.fog_diff = 1.f / (double)(far - pproc.fog_dist);
-//
-//#ifdef LVRDEBUG
-//	dbg_print("LVR Fog color: [%d, %d, %d]",nfc.X,nfc.Y,nfc.Z);
-//#endif
-//}
-
 void LVR::SetPostprocess(const SLVRPostProcess p)
 {
 	pproc = p;
-//	SetPostprocess();
-}
 
-//void LVR::SetPostprocess()
-//{
-//	pproc.fog_diff = 1.f / (double)(far - pproc.fog_dist);
-//}
+#ifdef LVRDEBUG
+	dbg_print("LVR post-processing settings changed");
+#endif
+}
 
 vector3di LVR::GetProjection(const vector2di pnt)
 {
@@ -234,8 +210,7 @@ vector3di LVR::GetProjection(const vector2di pnt)
 
 void LVR::Frame()
 {
-	int x,y,z,l,fl,s,i,m;
-	double fg;
+	int x,y,z,l,s,i,m;
 	vector3d v,fo,fn;
 	vector3di iv,av;
 	SVoxelInf* vox;
@@ -313,36 +288,11 @@ void LVR::Frame()
 					if ((s >= 0) && (s < 6)) {
 						//draw it!
 						frame[l].sym = vox->sides[s];
-
 						//apply voxel' color information
 						frame[l].bg = vox->pix.bg;
 						frame[l].fg = vox->pix.fg;
-
-						//apply simple pproc.fog_dist effect
-						//FIXME: maybe put this code somewhere outside? To Postprocess
-						fl = z - pproc.fog_dist;
-						if (fl > 0) {
-							fg = (1.f / (double)(far - pproc.fog_dist)) * fl;
-							fo = tripletovecf(frame[l].bg);
-							fo *= (1.f - fg);
-							fn.X = pproc.fog_col.r;
-							fn.Y = pproc.fog_col.g;
-							fn.Z = pproc.fog_col.b;
-							fn *= fg;
-							fo += fn;
-							frame[l].bg = vecftotriple(fo);
-
-							fo = tripletovecf(frame[l].fg);
-							fo *= (1.f - fg);
-							fo += fn;
-							frame[l].fg = vecftotriple(fo);
-						}
 					} else {
 						//something went wrong, we're inside the object
-						frame[l].bg.r = 0;
-						frame[l].bg.g = 0;
-						frame[l].bg.b = 0;
-						frame[l].fg = frame[l].bg;
 						frame[l].sym = ' ';
 					}
 					break;
@@ -356,7 +306,26 @@ void LVR::Frame()
 
 void LVR::Postprocess()
 {
-	//TODO: move pproc.fog_dist here
+#if 0
+	//apply simple pproc.fog_dist effect
+	fl = z - pproc.fog_dist;
+	if (fl > 0) {
+		fg = (1.f / (double)(far - pproc.fog_dist)) * fl;
+		fo = tripletovecf(frame[l].bg);
+		fo *= (1.f - fg);
+		fn.X = pproc.fog_col.r;
+		fn.Y = pproc.fog_col.g;
+		fn.Z = pproc.fog_col.b;
+		fn *= fg;
+		fo += fn;
+		frame[l].bg = vecftotriple(fo);
+
+		fo = tripletovecf(frame[l].fg);
+		fo *= (1.f - fg);
+		fo += fn;
+		frame[l].fg = vecftotriple(fo);
+	}
+#endif
 }
 
 void LVR::SwapBuffers()

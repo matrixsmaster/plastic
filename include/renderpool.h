@@ -85,11 +85,10 @@ public:
 	void SetScale(const double s);
 	void SetFOV(const vector3d f);
 	void SetFarDist(const int d);
-//	void SetFogStart(const int d);
-//	void SetFogColor(const vector3di nfc);
 	void SetPostprocess(const SLVRPostProcess p);
 
 	void Frame()					{}
+	void Postprocess()				{}
 
 	ulli GetFPS()					{ return fps; }
 };

@@ -31,6 +31,7 @@ static void* rendpool_lvrthread(void* ptr)
 	for (;;) {
 		if (me->good) {
 			lvr->Frame();
+			lvr->Postprocess();
 
 			pthread_mutex_lock(&(me->mtx));
 
@@ -117,10 +118,12 @@ void RenderPool::KillThreads()
 bool RenderPool::Quantum()
 {
 	int i;
-	uli l,shf;
+	uli l,shf,csh;
 	SRendPoolDat* cur;
 	LVR* lvr;
-	SGUIPixel* tmp;
+	SGUIPixel* vbf;
+	const int* zbf;
+	const vector3di* pbf;
 
 	if ((!render) || (!zbuf) || (!pbuf)) return quit;
 
@@ -142,11 +145,16 @@ bool RenderPool::Quantum()
 		pthread_mutex_lock(&(cur->mtx));
 
 		l = lvr->GetRenderLen();
-		tmp = lvr->GetRender();
+		vbf = lvr->GetRender();
+		zbf = lvr->GetZBuf();
+		pbf = lvr->GetPBuf();
 
+		csh = shf + cur->start;
 		while (l--) {
-			if (tmp[l].sym)
-				render[shf+cur->start+l] = tmp[l];
+			if (vbf[l].sym)
+				render[csh+l] = vbf[l];
+			zbuf[csh+l] = zbf[l];
+			pbuf[csh+l] = pbf[l];
 		}
 		cur->done = false;
 		pthread_mutex_unlock(&(cur->mtx));
