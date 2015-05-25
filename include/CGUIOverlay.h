@@ -54,7 +54,6 @@ private:
 
 	void ResizeWnd();
 	void PutLog();
-	void SetBckgr();
 
 public:
 	CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, bool logg);
@@ -79,11 +78,6 @@ public:
 
 	void ClearLog();
 
-
-	void SetTransparentUp();
-	void SetTransparentDown();
-
-	//TODO add transparent, use ColorManager
 };
 
 

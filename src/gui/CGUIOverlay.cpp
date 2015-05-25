@@ -109,7 +109,7 @@ void CurseGUIOverlay::PutLog()
 	vector<string>::iterator it;
 	int h;
 	h = g_h - 1;
-	chtype ch = 0, chclr;
+	chtype ch = 0;
 	int nl = g_h;
 	int y = m_y+h;
 	SGUIPixel pxl;
@@ -119,40 +119,33 @@ void CurseGUIOverlay::PutLog()
 	pxl.fg.r = 0; pxl.fg.g = 0; pxl.fg.b = 0;
 
 	if(!log.empty()) {
-//		if (!transparent)
-//			wcolor_set(wnd, cmanager->CheckPair(&pixl), NULL);
 
 		if(nl - log.size() >= 0)
 			nl = log.size() + 1;
 
 		for(it = log.end() - 1; it != log.end() - nl; it--) {
 
-//			if (transparent) {
-
 				for(size_t i = 0; i < it->size(); ++i) {
 					ch = mvinch(y, m_x+i);
 					pair = (ch & A_COLOR) >> NCURSES_ATTR_SHIFT;
 
 					pxl.sym = it->at(i);
-					if(!cmanager->GetPairColors(&pxl, pair)) abort();
+					if(cmanager->GetPairColors(&pxl, pair)) {
 
-					//Set transparency
-					pxl.bg.r = float(pxl.bg.r)*transparent;
-					pxl.bg.g = float(pxl.bg.g)*transparent;
-					pxl.bg.b = float(pxl.bg.b)*transparent;
+						//Set transparency
+						pxl.bg.r = float(pxl.bg.r)*transparent;
+						pxl.bg.g = float(pxl.bg.g)*transparent;
+						pxl.bg.b = float(pxl.bg.b)*transparent;
 
-					pxl.fg.r = 1000;
-					pxl.fg.g = 1000;
-					pxl.fg.b = 1000;
+						pxl.fg.r = 1000;
+						pxl.fg.g = 1000;
+						pxl.fg.b = 1000;
+					}
 
 					lc = cmanager->CheckPair(&pxl);
 					wcolor_set(wnd, lc, NULL);
 					mvwaddch(wnd, h, i, pxl.sym);
-//				}
-
-//			} else {
-//				mvwaddnstr(wnd,h,m_x,it->c_str(),g_w);
-			}
+				}
 			h--; y--;
 		}
 	}
@@ -161,19 +154,4 @@ void CurseGUIOverlay::PutLog()
 void CurseGUIOverlay::SetTransparent(float t)
 {
 	transparent = t;
-}
-
-void CurseGUIOverlay::SetTransparentUp()
-{
-
-}
-
-void CurseGUIOverlay::SetTransparentDown()
-{
-
-}
-
-void CurseGUIOverlay::SetBckgr()
-{
-
 }
