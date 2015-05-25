@@ -34,10 +34,6 @@
 #include "CGUIColorManager.h"
 
 
-#define CGMOUSE_LEFT (BUTTON1_PRESSED | BUTTON1_RELEASED)
-#define CGMOUSE_RGHT (BUTTON2_PRESSED | BUTTON2_RELEASED)
-
-
 /* ********************************** GUI BASE ********************************** */
 
 class CurseGUIBase {

@@ -83,6 +83,7 @@ public:
 class Player : public PlasticActor {
 private:
 	KeyBinder* binder;
+	vector2di oldmp;
 
 public:
 	Player(SPAAttrib s, DataPipe* pptr);

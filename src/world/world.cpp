@@ -20,6 +20,7 @@
 #include "world.h"
 #include "support.h"
 #include "debug.h"
+#include "CGUIEvents.h"
 #include "CGUIControls.h"
 
 
@@ -255,7 +256,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 	case GUIEV_MOUSE:
 		/* Mouse */
-		if (e->m.bstate & CGMOUSE_LEFT) {
+		if (e->m.bstate & GUIMOUS_LEFT) {
 			curso.X = e->m.x;
 			curso.Y = e->m.y;
 

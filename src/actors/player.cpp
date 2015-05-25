@@ -53,40 +53,51 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 
 	if (e->t == GUIEV_MOUSE) {
 		if (e->m.bstate & GUISCRL_UP) {
-			rot.X += 4;
+			rot.X += 4; //FIXME: use rotation speed
 			rc = true;
 		} else if (e->m.bstate & GUISCRL_DW) {
-			rot.X -= 4;
+			rot.X -= 4; //FIXME: use rotation speed
 			rc = true;
-		}
-		goto PC_ProcEvEnd;
+//		} else if (e->m.bstate & GUIMOUS_RGHT) {
+//			rot.Z += 2 * (e->m.x - oldmp.X);
+//			rot.X -= 2 * (e->m.y - oldmp.Y);
+//			oldmp.X = e->m.x;
+//			oldmp.Y = e->m.y;
+//			rc = true;
+//		} else if (e->m.bstate & BUTTON1_PRESSED) {
+//			rot.Z -= 4;
+//			rc = true;
+//		} else if (e->m.bstate & BUTTON3_PRESSED) {
+//			rot.Z += 4;
+//			rc = true;
+		} else
+			return false;
 
-	} else if (e->t != GUIEV_KEYPRESS)
+	} else if (e->t == GUIEV_KEYPRESS) {
+		switch (binder->DecodeKey(e->k)) {
+		default: return false;
+
+		case 0: Move(LMOVE_FORW,1.2f); break; //FIXME: use speed value
+		case 1: Move(LMOVE_BACK,1.2f); break;
+		case 2: Move(LMOVE_LEFT,1.2f); break;
+		case 3: Move(LMOVE_RGHT,1.2f); break;
+
+		case 4: Move(LMOVE_FORW,2.2f); break; //FIXME: use speed value
+		case 5: Move(LMOVE_BACK,2.2f); break;
+		case 6: Move(LMOVE_LEFT,2.2f); break;
+		case 7: Move(LMOVE_RGHT,2.2f); break;
+
+		case  8: rot.Z += 4; rc = true; break; //FIXME: use rotation speed
+		case  9: rot.Z -= 4; rc = true; break;
+		case 10: rot.X += 4; rc = true; break;
+		case 11: rot.X -= 4; rc = true; break;
+
+	//	case : Move(LMOVE_UP,1.2f); break;
+	//	case : Move(LMOVE_DW,1.2f); break;
+		}
+	} else
 		return false;
 
-	switch (binder->DecodeKey(e->k)) {
-	default: return false;
-
-	case 0: Move(LMOVE_FORW,1.2f); break; //FIXME: use speed value
-	case 1: Move(LMOVE_BACK,1.2f); break;
-	case 2: Move(LMOVE_LEFT,1.2f); break;
-	case 3: Move(LMOVE_RGHT,1.2f); break;
-
-	case 4: Move(LMOVE_FORW,2.2f); break; //FIXME: use speed value
-	case 5: Move(LMOVE_BACK,2.2f); break;
-	case 6: Move(LMOVE_LEFT,2.2f); break;
-	case 7: Move(LMOVE_RGHT,2.2f); break;
-
-	case  8: rot.Z += 4; rc = true; break;
-	case  9: rot.Z -= 4; rc = true; break;
-	case 10: rot.X += 4; rc = true; break;
-	case 11: rot.X -= 4; rc = true; break;
-
-//	case : Move(LMOVE_UP,1.2f); break;
-//	case : Move(LMOVE_DW,1.2f); break;
-	}
-
-PC_ProcEvEnd:
 	if (rc) SetRot(rot); //Update rotation
 
 	return true;
