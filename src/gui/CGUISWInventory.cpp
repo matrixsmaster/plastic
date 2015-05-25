@@ -53,17 +53,38 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	ctrls = new CurseGUICtrlHolder(this);
 
 	//create controls
-	table = new CurseGUITable(ctrls,1,1,2,1,2,2,2);
+	table = new CurseGUITable(ctrls,1,1,7,5,5,10,25+6);
+	table->SetData("N", 0, 0);
+	table->SetData("Name", 0, 1);
+	table->SetData("Weight", 0, 2);
+	table->SetData("Condition", 0, 3);
+	table->SetData("Cost", 0, 4);
+
+	description = new CurseGUITable(ctrls,1,12,2,1,20,3,42);
+	description->SetData("Description", 0, 0);
+
+//	new CurseGUILabel(ctrls, 11, );
+	/*CurseGUIButton* destroy_btn;
+	CurseGUIButton* drop_btn;
+	CurseGUIButton* wear_btn;
+	CurseGUIButton* use_btn;
+	CurseGUIButton* repair_btn;
+
+	CurseGUIEditBox* search_edit;*/
 }
 
 bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 {
 	if (will_close) return false;
 
+	/* Put the event to controls first */
+	if (ctrls->PutEvent(e)) return true;
+
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
 		switch (e->k) {
 		case GUI_DEFCLOSE: will_close = true; return true;
+		case '\t': ctrls->Rotate(); break;
 		}
 		return false;
 

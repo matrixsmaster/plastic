@@ -53,6 +53,12 @@ void CurseGUITable::SetData(string data, int r, int c)
 		tbl[r][c] = data;
 }
 
+void CurseGUITable::ClearData(int r, int c)
+{
+	if((r >= 0) && (r < g_rows) && (c >= 0) && (c < g_col))
+		tbl[r][c] = "";
+}
+
 void CurseGUITable::SetWidth(int width)
 {
 	g_wcell = width;
@@ -124,7 +130,7 @@ int CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 {
 	char ch = ' ';
 	bool borderx,bordery;
-	int w, h, x, y, sx;
+	int w,h,x,y,sx;
 	int lx;
 	borderx = true;
 
@@ -137,7 +143,7 @@ int CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 
 	lx = 0;
 
-	sx = scrollx-(g_wcell+1)*c;
+	sx = scrollx - (g_wcell + 1) * c;
 
 	for (int i = y; i < (y + h); ++i) {
 		bordery = ((i == y) || (i == y + h - 1));
@@ -225,7 +231,7 @@ bool CurseGUITable::PutEvent(SGUIEvent* e)
 {
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
-//		if (!selected) return false;
+		if (!selected) return false;
 
 		switch (e->k) {
 		case KEY_UP:
@@ -240,12 +246,6 @@ bool CurseGUITable::PutEvent(SGUIEvent* e)
 		case KEY_RIGHT:
 			scrollx++;
 			return true;
-		case 'z':
-			scrollx--;
-			break;
-		case 'x':
-			scrollx++;
-			break;
 		default: break;
 		}
 		break;

@@ -23,15 +23,15 @@
 using namespace std;
 
 CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, bool logg) :
-		CurseGUIWnd(scrn,x,y,0,0),
-		m_x(x),
-		m_y(y),
-		m_w(w),
-		m_h(h),
-		logging(logg) //FIXME: mixed-style initialization, use either one or another!
+		CurseGUIWnd(scrn,x,y,0,0)
 {
 	type = GUIWT_OVERLAY;
 
+	m_x = x;
+	m_y = y;
+	m_w = w;
+	m_h = h;
+	logging = logg;
 	name = "Overlay";
 
 	SGUIEvent e;
@@ -61,7 +61,7 @@ bool CurseGUIOverlay::PutEvent(SGUIEvent* e)
 	//OverlayUI events processing
 	switch (e->t) {
 	case GUIEV_RESIZE:
-		ResizeWnd();
+		Resize(m_w, m_h);
 		break;
 	default: break;
 	}
@@ -95,12 +95,6 @@ void CurseGUIOverlay::SetBckgrMask(SGUIPixel* pxl)
 void CurseGUIOverlay::ClearLog()
 {
 	log.clear();
-}
-
-void CurseGUIOverlay::ResizeWnd()
-{
-	//FIXME: are you really need a method to wrap one function call o_O ?
-	Resize(m_w, m_h);
 }
 
 void CurseGUIOverlay::PutLog()

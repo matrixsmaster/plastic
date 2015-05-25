@@ -242,10 +242,23 @@ private:
 	int GetTableWidth();
 
 public:
-	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int col, int rows, int wcell, int htable, int wtable);
+	/* CurseGUITable
+	 *
+	 * x      - x position
+	 * y      - y position
+	 * rows	  - quantity of rows
+	 * col    - quantity of columns
+	 * wcell  - cell width
+	 * htable - visible width of the table
+	 * wtable - visible height of the table
+	 */
+	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int col, int wcell, int htable, int wtable);
 	virtual ~CurseGUITable()	{}
 
 	void SetData(std::string data, int r, int c);
+	void ClearData(int r, int c);
+
+	//Set  width rows
 	void SetWidth(int width);
 
 	void Update();

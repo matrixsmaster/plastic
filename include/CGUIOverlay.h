@@ -53,7 +53,6 @@ private:
 
 	SGUIPixel pixl;
 
-	void ResizeWnd();
 	void PutLog();
 
 public:
