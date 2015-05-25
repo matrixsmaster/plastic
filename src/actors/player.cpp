@@ -65,6 +65,7 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 		return false;
 
 	switch (binder->DecodeKey(e->k)) {
+	default: return false;
 
 	case 0: Move(LMOVE_FORW,1.2f); break; //FIXME: use speed value
 	case 1: Move(LMOVE_BACK,1.2f); break;
