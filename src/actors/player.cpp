@@ -17,11 +17,16 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <stdlib.h>
 #include "actor.h"
+#include "support.h"
+
 
 Player::Player(SPAAttrib s, DataPipe* pptr) :
 		PlasticActor(s,pptr)
 {
+	char tmp[MAXINISTRLEN];
+
 	isnpc = false;
 
 	binder = new KeyBinder(pptr);
@@ -40,6 +45,14 @@ Player::Player(SPAAttrib s, DataPipe* pptr) :
 	binder->RegKeyByName("TURN_RGHT");
 	binder->RegKeyByName("TURN_UP");
 	binder->RegKeyByName("TURN_DW");
+
+	maxrspd = atoi(pptr->GetIniDataS(KEYBINDNAME,"TURN_MAX").c_str());
+	pptr->GetIniDataC(KEYBINDNAME,"WHEEL_HORZ",tmp,sizeof(tmp));
+	rot_hor = mmask_by_str(tmp);
+	pptr->GetIniDataC(KEYBINDNAME,"WHEEL_VERT",tmp,sizeof(tmp));
+	rot_ver = mmask_by_str(tmp);
+
+	rspd = 4; //FIXME: debug
 }
 
 Player::~Player()
@@ -50,30 +63,27 @@ Player::~Player()
 bool Player::ProcessEvent(const SGUIEvent* e)
 {
 	bool rc = false; //rotation change flag
+	mmask_t modb = BUTTON_CTRL | BUTTON_SHIFT | BUTTON_ALT;
 
 	if (e->t == GUIEV_MOUSE) {
-		if (e->m.bstate & GUISCRL_UP) {
-			rot.X += 4; //FIXME: use rotation speed
+		//Check mouse wheel event
+		if (e->m.bstate & (GUISCRL_UP | GUISCRL_DW)) {
+
+			if ((e->m.bstate & modb) == rot_ver)
+				rot.X += (e->m.bstate & GUISCRL_UP)? rspd:-rspd;
+
+			else if ((e->m.bstate & modb) == rot_hor)
+				rot.Z -= (e->m.bstate & GUISCRL_UP)? rspd:-rspd;
+
+			else return false;
+
 			rc = true;
-		} else if (e->m.bstate & GUISCRL_DW) {
-			rot.X -= 4; //FIXME: use rotation speed
-			rc = true;
-//		} else if (e->m.bstate & GUIMOUS_RGHT) {
-//			rot.Z += 2 * (e->m.x - oldmp.X);
-//			rot.X -= 2 * (e->m.y - oldmp.Y);
-//			oldmp.X = e->m.x;
-//			oldmp.Y = e->m.y;
-//			rc = true;
-//		} else if (e->m.bstate & BUTTON1_PRESSED) {
-//			rot.Z -= 4;
-//			rc = true;
-//		} else if (e->m.bstate & BUTTON3_PRESSED) {
-//			rot.Z += 4;
-//			rc = true;
+
 		} else
 			return false;
 
 	} else if (e->t == GUIEV_KEYPRESS) {
+
 		switch (binder->DecodeKey(e->k)) {
 		default: return false;
 
@@ -87,14 +97,15 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 		case 6: Move(LMOVE_LEFT,2.2f); break;
 		case 7: Move(LMOVE_RGHT,2.2f); break;
 
-		case  8: rot.Z += 4; rc = true; break; //FIXME: use rotation speed
-		case  9: rot.Z -= 4; rc = true; break;
-		case 10: rot.X += 4; rc = true; break;
-		case 11: rot.X -= 4; rc = true; break;
+		case  8: rot.Z += rspd; rc = true; break;
+		case  9: rot.Z -= rspd; rc = true; break;
+		case 10: rot.X += rspd; rc = true; break;
+		case 11: rot.X -= rspd; rc = true; break;
 
 	//	case : Move(LMOVE_UP,1.2f); break;
 	//	case : Move(LMOVE_DW,1.2f); break;
 		}
+
 	} else
 		return false;
 

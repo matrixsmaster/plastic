@@ -21,6 +21,7 @@
 #define SUPPORT_H_
 
 #include <stdarg.h>
+#include <ncurses.h>
 #include "vecmath.h"
 #include "plastic.h"
 #include "visual.h"
@@ -49,5 +50,8 @@ vector3d tripletovecf(const SCTriple s);
 
 ///Convert CPoint3D to SCTriple.
 SCTriple vecftotriple(const vector3d s);
+
+///Get mouse event mask by string representation.
+mmask_t mmask_by_str(const char* s);
 
 #endif /* SUPPORT_H_ */

@@ -439,3 +439,13 @@ SCTriple vecftotriple(const vector3d s)
 	r.b = s.Z;
 	return r;
 }
+
+mmask_t mmask_by_str(const char* s)
+{
+	if (s) {
+		if (!strcmp(s,"CTRL")) return BUTTON_CTRL;
+		if (!strcmp(s,"SHIFT")) return BUTTON_SHIFT;
+		if (!strcmp(s,"ALT")) return BUTTON_ALT;
+	}
+	return 0;
+}

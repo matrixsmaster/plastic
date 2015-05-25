@@ -29,7 +29,3 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Add auto register function of GUI controls to GUI windows (?)
 
 -> Add Message Box Window
-
--> Implement navigation by mouse (wheel for X and drag for Y)
-
--> Fix a bug with event system halt after multiple resizes
