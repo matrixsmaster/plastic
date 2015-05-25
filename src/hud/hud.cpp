@@ -26,14 +26,14 @@ HUD::HUD(CurseGUI* guiptr)
 {
 	gui = guiptr;
 
-	stats.fps = 0;
-	stats.gp.x = 0; stats.gp.y = 0; stats.gp.z = 0;
-	stats.lp.x = 0; stats.lp.y = 0; stats.lp.z = 0;
+	st_gp.X = 0; st_gp.Y = 0; st_gp.Z = 0;
+	st_lp.X = 0; st_lp.Y = 0; st_lp.Z = 0;
+
 
 	//add some overlays
-//	Spawn(0,0, gui->GetWidth()/4, 1, false, "fps = 0"); //top
+	Spawn(0,0, gui->GetWidth()/4, 1, false, "fps = 0"); //top
 	Spawn(0,gui->GetHeight()-gui->GetHeight()/4, gui->GetWidth()/4, gui->GetHeight()/4, true, "Testing bottom overlay"); //bottom
-	Spawn(gui->GetWidth()/5, 0, gui->GetWidth()/5, STAT_OVRL_HEIGHT, false, "fps = 0");
+	Spawn(gui->GetWidth()/5, 0, gui->GetWidth()/5, STAT_OVRL_HEIGHT, false, "");
 }
 
 HUD::~HUD()
@@ -64,39 +64,43 @@ string HUD::intToString(int n)
 
 void HUD::UpdateFPS(uli fps)
 {
+	string str;
+
 	if(overlays.empty()) return;
 
-	stats.fps = fps;
-	UpdateStatusOvrl();
+	overlays[FPS_OVRL]->ClearLog();
+
+	str = "fps = ";
+	str += intToString(fps);
+	overlays[FPS_OVRL]->PutString(str);
 }
 
-void HUD::UpdateStatusOvrl()
+void HUD::UpdateStatusOvrl() //vector3di gp
 {
 	//TODO
 	string str;
 
-	if(overlays.size() > STAT_OVRL-1) {
-		overlays[STAT_OVRL]->ClearLog();
-		str = "fps = ";
-		str += intToString(stats.fps);
-		overlays[STAT_OVRL]->PutString(str);
-		str = "GPos [";
-		str += intToString(stats.gp.x);
-		str += " ";
-		str += intToString(stats.gp.y);
-		str += " ";
-		str += intToString(stats.gp.z);
-		str += "]";
-		overlays[STAT_OVRL]->PutString(str);
-		str = "LPos [";
-		str += intToString(stats.lp.x);
-		str += " ";
-		str += intToString(stats.lp.y);
-		str += " ";
-		str += intToString(stats.lp.z);
-		str += "]";
-		overlays[STAT_OVRL]->PutString(str);
-	}
+	if(!(overlays.size() > STAT_OVRL-1)) return;
+
+	overlays[STAT_OVRL]->ClearLog();
+	str = "GPos [";
+	str += intToString(st_gp.X);
+	str += " ";
+	str += intToString(st_gp.Y);
+	str += " ";
+	str += intToString(st_gp.Z);
+	str += "]";
+	overlays[STAT_OVRL]->PutString(str);
+	str = "LPos [";
+	str += intToString(st_lp.X);
+	str += " ";
+	str += intToString(st_lp.Y);
+	str += " ";
+	str += intToString(st_lp.Z);
+	str += "]";
+	overlays[STAT_OVRL]->PutString(str);
+	str = "";
+	overlays[STAT_OVRL]->PutString(str);
 }
 
 void HUD::PutStrBottom(const char* str)
@@ -119,6 +123,11 @@ void HUD::SetTransparent(bool t)
 	//TODO check focus
 	if(!overlays.empty())
 		overlays[BTM_OVRL]->SetTransparent(t);
+}
+
+void HUD::SetAlpha(float a)
+{
+
 }
 
 void HUD::SetBckgrMask(SGUIPixel* pxl)

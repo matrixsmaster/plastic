@@ -24,11 +24,19 @@
 #include "misconsts.h"
 #include "CurseGUI.h"
 #include "CGUIOverlay.h"
+#include "vecmath.h"
 
-#define BTM_OVRL 0
-#define STAT_OVRL 1
+#define FPS_OVRL 	0
+#define BTM_OVRL 	1
+#define STAT_OVRL 	2
 
 #define STAT_OVRL_HEIGHT 3
+
+//enum HUDOverlayType {
+//	FPS_OVRL,
+//	BTM_OVRL,
+//	STATUS
+//};
 
 
 
@@ -37,6 +45,8 @@ private:
 	CurseGUI* gui;
 	std::vector<CurseGUIOverlay*> overlays;
 	SOVRLStats stats;
+	vector3di st_gp;
+	vector3di st_lp;
 
 	///Spawn an overlay window (for internal use only).
 	void Spawn(int x, int y, int w, int h, bool logging, const char* txt);
@@ -48,16 +58,19 @@ public:
 
 	///Updates FPS counter.
 	void UpdateFPS(uli fps);
-	//Update status message (fps etc)
+
+	//Update status message (gpos, lpos, etc)
 	void UpdateStatusOvrl();
 
 	void PutStrBottom(const char* str);
+
 	bool GetTransparent();
 	void SetTransparent(bool t);
+	void SetAlpha(float a);
 	void SetBckgrMask(SGUIPixel* pxl);
 
-	void SetGPos();
-	void SetLPos();
+	void SetGPos(vector3di gp) { st_gp = gp; }
+	void SetLPos(vector3di lp) { st_lp = lp; }
 };
 
 #endif /* HUD_H_ */

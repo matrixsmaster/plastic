@@ -53,15 +53,14 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	ctrls = new CurseGUICtrlHolder(this);
 
 	//create controls
-	table = new CurseGUITable(ctrls,1,1,7,5,5,10,25+6);
+	table = new CurseGUITable(ctrls,1,1,7,5,6,10,25+6);
 	table->SetData("N", 0, 0);
 	table->SetData("Name", 0, 1);
 	table->SetData("Weight", 0, 2);
 	table->SetData("Condition", 0, 3);
 	table->SetData("Cost", 0, 4);
 
-	description = new CurseGUITable(ctrls,1,12,2,1,20,3,42);
-	description->SetData("Description", 0, 0);
+	new CurseGUILabel(ctrls, 1, 11, 12, "Description:");
 
 //	new CurseGUILabel(ctrls, 11, );
 	/*CurseGUIButton* destroy_btn;

@@ -71,6 +71,7 @@ static void* plastic_eventhread(void* ptr)
 		}
 
 		g_wrld->GetHUD()->UpdateFPS(g_fps); //FIXME
+		g_wrld->GetHUD()->UpdateStatusOvrl();
 
 		pthread_mutex_unlock(&m_render);
 

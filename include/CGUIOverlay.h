@@ -36,7 +36,6 @@ struct SPOS {
 
 // structure to show in status overlay
 struct SOVRLStats {
-	int fps;
 	SPOS gp;
 	SPOS lp;
 };
