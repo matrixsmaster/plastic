@@ -279,31 +279,42 @@ bool RenderPool::Resize(int w, int h)
 
 void RenderPool::SetMask(char* m, int w, int h)
 {
-//	Lock();
-//	Unlock();
+	int i;
+
+	Lock();
+	for (i = 0; i < RENDERPOOLN; i++) {
+		if (pool[i].good)
+			pool[i].lvr->SetMask(m+pool[i].start,w,pool[i].lvr->GetHeight());
+	}
+	Unlock();
 }
 
 void RenderPool::SetScale(const double s)
 {
-	//TODO
+	for (int i = 0; i < RENDERPOOLN; i++)
+		pool[i].lvr->SetScale(s);
 }
 
 void RenderPool::SetFOV(const vector3d f)
 {
-	//TODO
+	for (int i = 0; i < RENDERPOOLN; i++)
+		pool[i].lvr->SetFOV(f);
 }
 
 void RenderPool::SetFarDist(const int d)
 {
-	//TODO
+	for (int i = 0; i < RENDERPOOLN; i++)
+		pool[i].lvr->SetFarDist(d);
 }
 
 void RenderPool::SetFogStart(const int d)
 {
-	//TODO
+	for (int i = 0; i < RENDERPOOLN; i++)
+		pool[i].lvr->SetFogStart(d);
 }
 
 void RenderPool::SetFogColor(const vector3di nfc)
 {
-	//TODO
+	for (int i = 0; i < RENDERPOOLN; i++)
+		pool[i].lvr->SetFogColor(nfc);
 }

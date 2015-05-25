@@ -78,6 +78,8 @@ public:
 	virtual bool Resize(int w, int h);
 	virtual void SetMask(char* m, int w, int h);
 	virtual void SetMid(const vector2di m)	{ mid = m; }
+	virtual int GetWidth()					{ return g_w; }
+	virtual int GetHeight()					{ return g_h; }
 
 	virtual void SetEulerRotation(const vector3d r);
 	virtual void SetPosition(const vector3d pos);
