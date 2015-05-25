@@ -201,11 +201,7 @@ static void ishell_player(SGameSettings* s)
 chargen_begin:
 
 	//get current body type string
-	for (i = 0; i < NUMBODTYPE; i++)
-		if (pabody_to_str[i].b == s->PCData.body) {
-			btstr = pabody_to_str[i].s;
-			break;
-		}
+	btstr = BodyTypeToStr(s->PCData.body);
 
 	//display menu
 	puts("\nCharacter options:");

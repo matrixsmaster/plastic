@@ -52,12 +52,6 @@ static void* plastic_eventhread(void* ptr)
 	SGUIEvent my_e;
 	bool resz;
 
-	//projection testing:
-	vector2di curso;
-	char s[128];
-	vector3di x;
-	bool d;
-
 	while ((g_gui) && (!g_gui->WillClose())) {
 
 		/* Stop rendering any screen data while processing event */
@@ -76,28 +70,7 @@ static void* plastic_eventhread(void* ptr)
 			if (resz) pthread_mutex_unlock(&m_resize);
 		}
 
-		g_wrld->GetHUD()->UpdateFPS(g_fps);
-
-		//debug:
-		d = false;
-		switch (my_e.t) {
-		case GUIEV_MOUSE:
-			if (my_e.m.bstate & CGMOUSE_LEFT) {
-				curso.X = my_e.m.x;
-				curso.Y = my_e.m.y;
-				d = true;
-			}
-			break;
-
-		default: break;
-		}
-
-		if (d) {
-			x = g_wrld->GetRenderer()->GetProjection(curso);
-			snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
-			g_wrld->GetHUD()->PutStrBottom(s);
-			g_gui->SetCursorPos(curso.X,curso.Y);
-		}
+		g_wrld->GetHUD()->UpdateFPS(g_fps); //FIXME
 
 		pthread_mutex_unlock(&m_render);
 

@@ -87,13 +87,16 @@ void CurseGUIPicture::ColorFill(SCTriple col)
 
 void CurseGUIPicture::Update()
 {
-	int i,wh;
+	int i,wh,pw,ph;
 	SGUIPixel* rcv = wnd->GetBackgroundData();
-	wh = wnd->GetWidth();
 
 	if ((!pict) || (!rcv)) return;
 
-	for (i = 0; i < g_h; i++)
-		memcpy(rcv+((i+g_y)*wh+g_x),pict+(i*g_w),g_w*sizeof(SGUIPixel));
+	wh = wnd->GetWidth();
+	pw = ((g_w + g_x) > wh)? (wh-g_x):g_w;
+	ph = ((g_h + g_y) > wnd->GetHeight())? (wnd->GetHeight()-g_y):g_h;
+
+	for (i = 0; i < ph; i++)
+		memcpy(rcv+((i+g_y)*wh+g_x),pict+(i*g_w),pw*sizeof(SGUIPixel));
 }
 

@@ -53,6 +53,7 @@ PlasticActor::~PlasticActor()
 
 void PlasticActor::InitVars()
 {
+	isnpc = true;
 	rotmat = GenOMatrix();
 	model = NULL;
 }
@@ -112,4 +113,10 @@ void PlasticActor::Delete()
 	model = NULL;
 	if (portrait) free(portrait);
 	portrait = NULL;
+}
+
+SPABase PlasticActor::GetStats(bool current)
+{
+	if (current) return curr;
+	else return base;
 }

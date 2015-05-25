@@ -122,9 +122,8 @@ void CurseGUIBase::UpdateBack()
 	l = 0;
 	wcolor_set(wnd,1,NULL);
 	lc = -1;
-	for (i = 0; i < g_h; i++) {
-		lin = i * g_w;
-		for (j = 0; j < g_w; j++,lin++) {
+	for (i = 0, lin = 0; i < g_h; i++) {
+		for (j = 0; j < g_w; j++, lin++) {
 			clc = cmanager->CheckPair(&backgr[lin]);
 			if (lc != clc) {
 				if (l > 0) {
@@ -210,6 +209,7 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 	activew.sym = '-';
 	backgrw = activew;
 	backgrw.fg.r = 500; backgrw.fg.g = 500; backgrw.fg.b = 500;
+	wndmove_flag = false;
 
 	/* Ready to rock! */
 	refresh();
@@ -264,6 +264,7 @@ void CurseGUI::SoftReset()
 {
 	/* Will look like CurseGUI was reset, but it wasn't */
 	RmAllWindows();
+	wndmove_flag = false;
 	cmanager->Flush();
 	cmanager->Apply();
 	clear();
@@ -458,18 +459,57 @@ bool CurseGUI::PumpEvents(SGUIEvent* e)
 			break;
 
 		case GUIEV_MOUSE:
-			if ((windows.empty()) || (e->m.bstate != CGMOUSE_LEFT)) break;
-			for (rt = windows.rbegin(); rt != windows.rend(); ++rt) {
-				//check mouse pointer is inside window
-				if (((*rt)->GetPosX() > e->m.x) || (((*rt)->GetPosY() > e->m.y))) continue;
-				x = (*rt)->GetPosX() + (*rt)->GetWidth();
-				y = (*rt)->GetPosY() + (*rt)->GetHeight();
-				if ((e->m.x >= x) || (e->m.y >= y)) continue;
-				//try to set focus. If it's impossible, move on.
-				if (!(*rt)->GainFocus()) continue;
-				SetFocus(*rt); //do this to send 'focus lost' message to others
+			if (windows.empty()) break;
+			if (e->m.bstate == BUTTON1_PRESSED) {
+				/* Select a window or move */
+
+				//doing it in reverse order
+				for (rt = windows.rbegin(); rt != windows.rend(); ++rt) {
+					switch ((*rt)->GetType()) {
+					case GUIWT_OVERLAY:
+					case GUIWT_DEBUGUI:
+						continue;
+					default: break;
+					}
+
+					//check mouse pointer is inside window
+					x = (*rt)->GetPosX();
+					y = (*rt)->GetPosY();
+					if ((x > e->m.x) || (y > e->m.y)) continue;
+					wndmove_flag = ((x == e->m.x) || (y == e->m.y)); //check mouse is on border
+					x += (*rt)->GetWidth();
+					y += (*rt)->GetHeight();
+					if ((e->m.x >= x) || (e->m.y >= y)) continue;
+					wndmove_flag |= ((--x == e->m.x) || (--y == e->m.y)); //check mouse is on border
+
+					//try to set focus. If it's impossible, move on.
+					if (!(*rt)->GainFocus()) continue;
+					SetFocus(*rt); //do this to send 'focus lost' message to others
+					consumed = true;
+
+					//remember mouse position and window pointer if window is moving
+					if (wndmove_flag) {
+						wndmove_ox = e->m.x;
+						wndmove_oy = e->m.y;
+						wndmove_wnd = (*rt);
+					}
+
+					break; //make sure only one window will gain focus
+				}
+
+			} else if ((e->m.bstate == BUTTON1_RELEASED) && wndmove_flag) {
+				/* Stop moving window */
+
+				wndmove_flag = false;
+				x = wndmove_wnd->GetPosX() + (e->m.x - wndmove_ox);
+				y = wndmove_wnd->GetPosY() + (e->m.y - wndmove_oy);
+				if (x < 0) x = 0;
+				if (y < 0) y = 0;
+				if ((x+wndmove_wnd->GetWidth()) >= g_w) x = g_w - wndmove_wnd->GetWidth();
+				if ((y+wndmove_wnd->GetHeight()) >= g_h) y = g_h - wndmove_wnd->GetHeight();
+				wndmove_wnd->Move(x,y);
+
 				consumed = true;
-				break; //make sure only one window will gain focus
 			}
 			break;
 
@@ -516,8 +556,7 @@ void CurseGUI::UpdateBackmask()
 		switch ((*it)->GetType()) {
 		case GUIWT_OVERLAY:
 			ovrl = reinterpret_cast<CurseGUIOverlay*> (*it);
-			if (ovrl->GetTransparent()) skip = true; //skip transparent overlays
-			skip = true;
+			if (ovrl->IsTransparent()) skip = true; //skip transparent overlays
 			break;
 
 		case GUIWT_DEBUGUI:

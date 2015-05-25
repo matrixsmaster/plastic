@@ -23,6 +23,7 @@
 #include "datapipe.h"
 #include "actortypes.h"
 
+const char* BodyTypeToStr(EPABodyType t);
 
 bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe);
 

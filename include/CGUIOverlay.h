@@ -27,6 +27,9 @@
 #include "CurseGUI.h"
 
 
+#define CGUIOVERLAYDEFALPHA 0.5
+
+
 struct SPOS {
 	int x, y, z;
 };
@@ -45,12 +48,10 @@ private:
 
 	int m_x, m_y;		//window position
 	int m_w, m_h;		//width and height
-	float transparent;	//window transparency
+	float alpha;		//window transparency
 	bool logging;		//window logging
 
-
 	SGUIPixel pixl;
-
 
 	void ResizeWnd();
 	void PutLog();
@@ -59,25 +60,38 @@ public:
 	CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, bool logg);
 	virtual ~CurseGUIOverlay();
 
+	void Update(bool refr);
+	bool PutEvent(SGUIEvent* e);
+
 	//Overlay willn't gain or loose the focus.
 	bool GainFocus()					{ return false; }
 	bool LooseFocus()					{ return true; }
 
-	void SetTransparent(bool t)			{ transparent = t; }
-	void SetTransparent(float t);
+	///Apply an alpha-value to overlay window.
+	void SetAlpha(float f)				{ alpha = f; }
 
-	bool GetTransparent() 				{ return transparent; }
+	///Shortcut method for quick transparency toggling.
+	void SetTransparent(bool t)			{ alpha = (t)? CGUIOVERLAYDEFALPHA:0; }
 
+	///Returns true if an overlay window is somewhat transparent.
+	bool IsTransparent() 				{ return (alpha > 0); }
+
+	///Returns precise alpha value for overlay window.
+	float GetAlpha()					{ return alpha; }
+
+	///Applies given format to be used in overlay window.
+	void SetFormat(const SGUIPixel fmt)	{ pixl = fmt; }
+
+	///Returns current format in use.
+	SGUIPixel GetFormat()				{ return pixl; }
+
+	//FIXME: comment it out!
 	void SetBckgrMask(SGUIPixel* pxl);
 
-	void Update(bool refr);
-	bool PutEvent(SGUIEvent* e);
-
-	void PutString(char* str);
+	void PutString(const char* str);
 	void PutString(std::string str);
 
 	void ClearLog();
-
 };
 
 

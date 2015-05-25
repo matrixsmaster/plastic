@@ -40,6 +40,9 @@ This is free software, and you are welcome to redistribute it\n\
 under conditions of GNU GPL v2\n\n"
 
 
+#define TERMW_MINWIDTH 80
+#define TERMW_MINHEIGHT 24
+
 #define GAMEARGTYPES 7
 #define GAMEARGHELPLEN 360
 

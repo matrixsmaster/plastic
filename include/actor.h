@@ -38,6 +38,7 @@
 //Basic Actor Class
 class PlasticActor {
 protected:
+	bool isnpc;				//NPC flag
 	vector3di gpos,pos;		//Global and local position
 	SPAAttrib attrib;		//Basic attribs
 	SPABase base,curr;		//Base and current stats
@@ -57,6 +58,8 @@ public:
 
 	virtual void AutoInitStats();
 
+	bool IsNPC()						{ return isnpc; }
+
 	void SetPos(const vector3di p)		{ pos = p; }
 	void SetRot(const vector3di r);
 	vector3di GetPos()					{ return pos; }
@@ -67,6 +70,8 @@ public:
 	Inventory* GetInventory()			{ return &invent; }
 
 	SGUIPixel* GetPortrait()			{ return portrait; }
+	SPAAttrib GetAttributes()			{ return attrib; }
+	SPABase GetStats(bool current);
 
 	void Move(ELMoveDir d, float step);
 

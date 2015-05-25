@@ -168,6 +168,7 @@ public:
 	const SWGCell* GetGlobalSurfaceMap()	{ return wgen->GetMap(); } //FIXME
 	vector2di GetGlobalSurfaceSize()		{ return (vector2di(wgen->GetPlaneSide())); }
 	vector3di GetInitialPCGPos()			{ return wgen->GetPCInitPos(); }
+	vector3di GetInitialPCLPos()			{ return vector3di(128,90,135); } //FIXME
 };
 
 /* ********************************** DATA PIPE DUMMY ********************************** */

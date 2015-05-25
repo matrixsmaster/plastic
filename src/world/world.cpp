@@ -36,6 +36,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	PC = NULL;
 	hud = NULL;
 	binder = NULL;
+	once = false;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
@@ -56,21 +57,8 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 	/* Create Player */
 	PC = new Player(sets->PCData,data);
-
-	//FIXME: debugging stuff
-//	PC->SetGPos(vector3di(data->GetGlobalSurfaceSize().X/2,
-//			data->GetGlobalSurfaceSize().Y/2,
-//			sets->world_r - WGAIRCHUNKS - 1));
 	PC->SetGPos(data->GetInitialPCGPos());
-	PC->SetPos(vector3di(128,90,135));
-
-	//TODO: move this to the first quantum of the world update cycle
-	puts("\nGenerating the first parts of the world...");
-	data->SetGP(PC->GetGPos());
-
-	test = data->LoadModel("testmodel.dat",vector3di(128,100,135));
-	if (!test) abort();
-	lvr->SetPosition(vector3d(128,90,135));
+	PC->SetPos(data->GetInitialPCLPos());
 }
 
 PlasticWorld::~PlasticWorld()
@@ -91,9 +79,18 @@ PlasticWorld::~PlasticWorld()
 void PlasticWorld::Quantum()
 {
 	//TODO: world update (!)
+	if (!once) {
+		once = true;
+
+		data->SetGP(PC->GetGPos());
+		lvr->SetPosition(PC->GetPos().ToReal());
+
+		//FIXME: debugging stuff
+		test = data->LoadModel("testmodel.dat",vector3di(128,100,135));
+		if (!test) abort();
+	}
 
 	//DEBUG:
-//	if (data->TryLock()) return;
 	data->Lock();
 	if (test->GetState() == 0)
 		test->SetState(test->GetNumStates()-1);
@@ -175,8 +172,11 @@ void PlasticWorld::BindKeys()
 void PlasticWorld::ProcessEvents(SGUIEvent* e)
 {
 	CurseGUIWnd* wptr;
+
 	//DEBUG:
 	vector3d tr = test->GetRot();
+	vector3di x;
+	char s[128];
 
 	result = 0;
 	switch (e->t) {
@@ -229,13 +229,9 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 					} else hud->SetTransparent(true);
 				}
 				break;
-			case 'x':
-				break;
 			}
 		}
-		test->SetRot(tr);
-
-
+		test->SetRot(tr); //FIXME: debug only
 
 		PC->ProcessEvent(e);
 		lvr->SetEulerRotation(PC->GetRot().ToReal());
@@ -248,7 +244,16 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 		break;
 
 	case GUIEV_MOUSE:
-		/* Nothing to do now */
+		/* Mouse */
+		if (e->m.bstate & CGMOUSE_LEFT) {
+			curso.X = e->m.x;
+			curso.Y = e->m.y;
+
+			x = lvr->GetProjection(curso);
+			snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
+			hud->PutStrBottom(s);
+			gui->SetCursorPos(curso.X,curso.Y);
+		}
 		break;
 
 	case GUIEV_CTLBACK:

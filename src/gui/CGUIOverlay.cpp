@@ -19,7 +19,6 @@
 
 #include <sstream>
 #include "CGUIOverlay.h"
-#include "debug.h" // tmp
 
 using namespace std;
 
@@ -29,7 +28,7 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, boo
 		m_y(y),
 		m_w(w),
 		m_h(h),
-		logging(logg)
+		logging(logg) //FIXME: mixed-style initialization, use either one or another!
 {
 	type = GUIWT_OVERLAY;
 
@@ -39,7 +38,7 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, boo
 	e.t = GUIEV_RESIZE;
 	PutEvent(&e);
 
-	transparent = 0.5;
+	alpha = CGUIOVERLAYDEFALPHA;
 
 	pixl.bg.r = 0; pixl.bg.g = 0; pixl.bg.b = 0;
 	pixl.fg.r = 1000; pixl.fg.g = 500; pixl.fg.b = 1000;
@@ -69,7 +68,7 @@ bool CurseGUIOverlay::PutEvent(SGUIEvent* e)
 	return false;
 }
 
-void CurseGUIOverlay::PutString(char* str)
+void CurseGUIOverlay::PutString(const char* str)
 {
 	//Put string to OverlayUI log
 	string log_str(str);
@@ -98,60 +97,69 @@ void CurseGUIOverlay::ClearLog()
 	log.clear();
 }
 
-
 void CurseGUIOverlay::ResizeWnd()
 {
+	//FIXME: are you really need a method to wrap one function call o_O ?
 	Resize(m_w, m_h);
 }
 
 void CurseGUIOverlay::PutLog()
 {
 	vector<string>::iterator it;
-	int h;
-	h = g_h - 1;
+	int h = g_h - 1;
 	chtype ch = 0;
 	int nl = g_h;
 	int y = m_y+h;
 	SGUIPixel pxl;
 	short lc = -1;
 	short pair;
-	pxl.bg.r = 500; pxl.bg.g = 500; pxl.bg.b = 0;
-	pxl.fg.r = 0; pxl.fg.g = 0; pxl.fg.b = 0;
+	int i;
 
-	if(!log.empty()) {
+	if (log.empty()) return;
 
-		if(nl - log.size() >= 0)
-			nl = log.size() + 1;
+	if (alpha <= 0)
+		wcolor_set(wnd, cmanager->CheckPair(&pixl), NULL);
 
-		for(it = log.end() - 1; it != log.end() - nl; it--) {
+	if(nl - log.size() >= 0)
+		nl = log.size() + 1;
 
-				for(size_t i = 0; i < it->size(); ++i) {
-					ch = mvinch(y, m_x+i);
-					pair = (ch & A_COLOR) >> NCURSES_ATTR_SHIFT;
+	for(it = log.end() - 1; it != log.end() - nl; --it, --h, --y) {
 
-					pxl.sym = it->at(i);
-					if(cmanager->GetPairColors(&pxl, pair)) {
 
-						//Set transparency
-						pxl.bg.r = float(pxl.bg.r)*transparent;
-						pxl.bg.g = float(pxl.bg.g)*transparent;
-						pxl.bg.b = float(pxl.bg.b)*transparent;
+		if (alpha > 0) {
+			//deal with each character separately in transparent mode
+			for (i = 0; i < (int)it->size(); ++i) {
+				//get underlying symbol information
+				ch = mvinch(y, m_x+i);
+				pair = (ch & A_COLOR) >> NCURSES_ATTR_SHIFT;
 
-						pxl.fg.r = 1000;
-						pxl.fg.g = 1000;
-						pxl.fg.b = 1000;
-					}
+				pxl.sym = it->at(i);
 
-					lc = cmanager->CheckPair(&pxl);
-					wcolor_set(wnd, lc, NULL);
-					mvwaddch(wnd, h, i, pxl.sym);
-				}
-			h--; y--;
+				//get the color information by pair code
+				if(!cmanager->GetPairColors(&pxl, pair)) continue;
+
+				//Set transparency
+				pxl.bg.r = float(pxl.bg.r)*alpha;
+				pxl.bg.g = float(pxl.bg.g)*alpha;
+				pxl.bg.b = float(pxl.bg.b)*alpha;
+
+				pxl.fg.r = 1000;
+				pxl.fg.g = 1000;
+				pxl.fg.b = 1000;
+
+				//Apply new symbol
+				lc = cmanager->CheckPair(&pxl);
+				wcolor_set(wnd, lc, NULL);
+				mvwaddch(wnd, h, i, pxl.sym);
+			}
+
+		} else {
+			//just print out the string
+			mvwaddnstr(wnd,h,m_x,it->c_str(),g_w);
+			//and fill the possible gap
+			i = it->size();
+			while (i < g_w)
+				mvwaddch(wnd,h,m_x + i++,' ');
 		}
 	}
-}
-
-void CurseGUIOverlay::SetTransparent(float t)
-{
-	transparent = t;
 }

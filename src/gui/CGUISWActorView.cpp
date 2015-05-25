@@ -20,6 +20,7 @@
 #include "CGUISpecWnd.h"
 #include "CGUIControls.h"
 #include "actor.h"
+#include "actorhelpers.h"
 
 
 CurseGUIActorViewWnd::CurseGUIActorViewWnd(CurseGUI* scrn, PlasticActor* actr) :
@@ -38,11 +39,18 @@ CurseGUIActorViewWnd::CurseGUIActorViewWnd(CurseGUI* scrn, PlasticActor* actr) :
 void CurseGUIActorViewWnd::ResizeWnd()
 {
 	int w,h,x,y;
+//	char buf[ACTRVIEWMINW+1];
+	SPAAttrib atrs = actor->GetAttributes();
+//	SPABase bs = actor->GetStats(false);
+//	SPABase cr = actor->GetStats(true);
 
 	w = parent->GetWidth() / 2;
-	h = parent->GetHeight() - 4;
-	x = w - 1;
-	y = 1;
+	if (w < ACTRVIEWMINW) w = ACTRVIEWMINW;
+	h = ACTPORTRAITH + 7;
+
+	//upper-right corner
+	x = parent->GetWidth() - w;
+	y = 0;
 
 	Move(x,y);
 	Resize(w,h);
@@ -55,9 +63,19 @@ void CurseGUIActorViewWnd::ResizeWnd()
 	portrait = new CurseGUIPicture(ctrls,1,1,ACTPORTRAITW,ACTPORTRAITH);
 	portrait->SetAutoAlloc(true);
 	portrait->SetPicture(actor->GetPortrait());
-//	SCTriple t;
-//	t.r = 500; t.g = 0; t.b = 300;
-//	portrait->ColorFill(t);
+
+	new CurseGUILabel(ctrls,3,ACTPORTRAITH+1,5,"Type:");
+	new CurseGUILabel(ctrls,9,ACTPORTRAITH+1,6,((actor->IsNPC())? "NPC":"Player"));
+	new CurseGUILabel(ctrls,3,ACTPORTRAITH+2,5,"Name:");
+	new CurseGUILabel(ctrls,9,ACTPORTRAITH+2,ACTPORTRAITW-9,atrs.name);
+	new CurseGUILabel(ctrls,1,ACTPORTRAITH+3,7,"Gender:");
+	new CurseGUILabel(ctrls,9,ACTPORTRAITH+3,7,((atrs.female)? "Female":"Male"));
+	new CurseGUILabel(ctrls,2,ACTPORTRAITH+4,6,"Class:");
+	new CurseGUILabel(ctrls,9,ACTPORTRAITH+4,ACTPORTRAITW-9,paclass_to_str[atrs.cls].s);
+	new CurseGUILabel(ctrls,3,ACTPORTRAITH+5,5,"Body:");
+	new CurseGUILabel(ctrls,9,ACTPORTRAITH+5,ACTPORTRAITW-9,BodyTypeToStr(atrs.body));
+
+	new CurseGUILabel(ctrls,ACTPORTRAITW+3,1,3,"HP:");
 }
 
 bool CurseGUIActorViewWnd::PutEvent(SGUIEvent* e)

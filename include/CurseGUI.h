@@ -113,6 +113,9 @@ private:
 	int c_x,c_y;						//cursor position
 	SGUIPixel activew;					//active window border style
 	SGUIPixel backgrw;					//inactive (background) window border style
+	bool wndmove_flag;					//window movement flag
+	int wndmove_ox,wndmove_oy;			//window movement original mouse position
+	CurseGUIWnd* wndmove_wnd;			//window movement pointer holder
 
 	void Reorder(int by);
 
