@@ -186,7 +186,7 @@ void LVR::SetPostprocess(const SLVRPostProcess p)
 	pproc = p;
 
 #ifdef LVRDEBUG
-	dbg_print("LVR post-processing settings changed");
+	dbg_print("LVR instance %p post-processing settings changed",this);
 #endif
 }
 

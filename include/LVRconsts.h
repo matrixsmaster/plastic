@@ -27,7 +27,7 @@
 
 
 ///Define this to use debugging output.
-//#define LVRDEBUG 1
+#define LVRDEBUG 1
 
 ///Define this to use double-buffering in LVR.
 #define LVRDOUBLEBUFFERED 1

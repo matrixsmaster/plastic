@@ -41,7 +41,7 @@ static CurseGUI*		g_gui = NULL;
 static pthread_t		t_event = 0;
 static pthread_t		t_render = 0;
 static pthread_t		t_loader = 0;
-static pthread_mutex_t	m_render;//,m_resize;
+static pthread_mutex_t	m_render;
 static bool				g_quit = false;
 static uli				g_fps = 0;
 
@@ -60,15 +60,8 @@ static void* plastic_eventhread(void* ptr)
 
 		/* Events pump */
 		if (!g_gui->PumpEvents(&my_e)) {
-			/* Resize event will interfere with LVR frame processing, so lock it */
-//			resz = (my_e.t == GUIEV_RESIZE);
-//			if (resz) pthread_mutex_lock(&m_resize);
-
 			/* No one consumed event, need to be processed inside the core */
 			g_wrld->ProcessEvents(&my_e);
-
-			/* Unlock resize mutex if needed */
-//			if (resz) pthread_mutex_unlock(&m_resize);
 		}
 
 		g_wrld->GetHUD()->UpdateFPS(g_fps); //FIXME
@@ -90,11 +83,6 @@ static void* plastic_renderthread(void* ptr)
 	beg = clock();
 
 	while (!g_quit) {
-
-//		pthread_mutex_lock(&m_resize);
-//		g_wrld->Frame();
-//		pthread_mutex_unlock(&m_resize);
-
 		fps++;
 		if ((clock() - beg) >= CLOCKS_PER_SEC) {
 			g_fps = fps;
@@ -162,7 +150,6 @@ static void plastic_start()
 
 	/* Create mutexes */
 	pthread_mutex_init(&m_render,NULL);
-//	pthread_mutex_init(&m_resize,NULL);
 
 	/* Start chunks loading queue */
 	pthread_create(&t_loader,NULL,plastic_chunksthread,g_wrld->GetDataPipe());
@@ -195,7 +182,6 @@ static void plastic_cleanup()
 
 	/* Destroy mutexes */
 	pthread_mutex_destroy(&m_render);
-//	pthread_mutex_destroy(&m_resize);
 
 	/* Destroy debugging UI */
 	dbg_finalize();
