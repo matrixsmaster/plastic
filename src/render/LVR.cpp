@@ -208,6 +208,20 @@ vector3di LVR::GetProjection(const vector2di pnt)
 	return r;
 }
 
+#ifdef LVRDOUBLEBUFFERED
+#define SETCURRENTBUFS { \
+		frame = render + ((activebuf)? rendsize:0); \
+		curzbuf = zbuf + ((activebuf)? rendsize:0); \
+		curpbuf = pbuf + ((activebuf)? rendsize:0); \
+}
+#else
+#define SETCURRENTBUFS { \
+		frame = render; \
+		curzbuf = zbuf; \
+		curpbuf = pbuf; \
+}
+#endif
+
 void LVR::Frame()
 {
 	int x,y,z,l,s,i,m;
@@ -219,27 +233,20 @@ void LVR::Frame()
 	vector3di* curpbuf;
 	voxel area[6];
 
-	frame = render;
-	curzbuf = zbuf;
-	curpbuf = pbuf;
+	/* Set buffers to active frame */
+	SETCURRENTBUFS;
 
-#ifdef LVRDOUBLEBUFFERED
-	if (activebuf) {
-		frame = &render[rendsize];
-		curzbuf = &zbuf[rendsize];
-		curpbuf = &pbuf[rendsize];
-	}
-#endif
-
+	/* Clear frame data */
 	memset(curzbuf,0,rendsize*sizeof(int));
 	memset(frame,0,rendsize*sizeof(SGUIPixel));
 
+	/* Lock datapipe until render is done */
 	pipeptr->Lock();
 
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
 		for (x = 0; x < g_w; x++,l++) {
-			curpbuf[l] = vector3di(-1);
+			curpbuf[l] = vector3di(-1); //clear pbuf data
 			if ((mask) && (mask[l])) continue;
 
 			//reverse painter's algorithm
@@ -301,31 +308,56 @@ void LVR::Frame()
 		} //by X
 	} //by Y
 
+	/* Release datapipe */
 	pipeptr->Unlock();
 }
 
 void LVR::Postprocess()
 {
-#if 0
-	//apply simple pproc.fog_dist effect
-	fl = z - pproc.fog_dist;
-	if (fl > 0) {
-		fg = (1.f / (double)(far - pproc.fog_dist)) * fl;
-		fo = tripletovecf(frame[l].bg);
-		fo *= (1.f - fg);
-		fn.X = pproc.fog_col.r;
-		fn.Y = pproc.fog_col.g;
-		fn.Z = pproc.fog_col.b;
-		fn *= fg;
-		fo += fn;
-		frame[l].bg = vecftotriple(fo);
+	int x,y,l;
+	SGUIPixel* frame;
+	int* curzbuf;
+	vector3di* curpbuf;
+	float fa,fb,fc;
+	vector3d vfa,vfb;
 
-		fo = tripletovecf(frame[l].fg);
-		fo *= (1.f - fg);
-		fo += fn;
-		frame[l].fg = vecftotriple(fo);
+	dbg_print("postprocessing %p",this);
+
+	/* Set buffers to active frame */
+	SETCURRENTBUFS;
+
+	for (y = 0, l = 0; y < g_h; y++) {
+		for (x = 0; x < g_w; x++, l++) {
+
+			/* Fog */
+			if (pproc.fog_dist > 0) {
+				fa = curzbuf[l] - pproc.fog_dist;
+				fc = 1.f / (float)(far - pproc.fog_dist);
+				if (fa > 0) {
+					fb = fc * fa;
+					vfa = tripletovecf(frame[l].bg);
+					vfa *= (1.f - fb);
+					vfb.X = pproc.fog_col.r;
+					vfb.Y = pproc.fog_col.g;
+					vfb.Z = pproc.fog_col.b;
+					vfb *= fb;
+					vfa += vfb;
+					frame[l].bg = vecftotriple(vfa);
+
+					vfa = tripletovecf(frame[l].fg);
+					vfa *= (1.f - fb);
+					vfa += vfb;
+					frame[l].fg = vecftotriple(vfa);
+				}
+			}
+
+			/* Noise */
+			if (pproc.noise > 0) {
+				//FIXME: debugging implementation
+				//
+			}
+		}
 	}
-#endif
 }
 
 void LVR::SwapBuffers()

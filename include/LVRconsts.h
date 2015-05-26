@@ -44,7 +44,7 @@
 struct SLVRPostProcess {
 	int fog_dist;
 	SCTriple fog_col;
-	float noise;
+	int noise;
 };
 
 ///Default post-processing.

@@ -134,6 +134,7 @@ private:
 	CurseGUIEditBox* e_far;
 	CurseGUIEditBox* e_fog;
 	CurseGUIEditBox* e_fogr,*e_fogg,*e_fogb;
+	CurseGUIEditBox* e_noise;
 	CurseGUIButton* b_apply,*b_reset;
 
 	void Fill();

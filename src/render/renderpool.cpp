@@ -18,7 +18,7 @@
  */
 
 #include "renderpool.h"
-
+#include "debug.h"
 
 static void* rendpool_lvrthread(void* ptr)
 {
@@ -28,7 +28,8 @@ static void* rendpool_lvrthread(void* ptr)
 	for (;;) {
 		if (me->good) {
 			lvr->Frame();
-			lvr->Postprocess();
+			if (me->dopproc)
+				lvr->Postprocess();
 
 			pthread_mutex_lock(&(me->mtx));
 
@@ -218,7 +219,6 @@ SGUIPixel* RenderPool::GetRender()
 	SGUIPixel* ptr;
 
 	pthread_mutex_lock(&m_rend);
-//	Lock();
 
 	SwapBuffers();
 
@@ -229,7 +229,6 @@ SGUIPixel* RenderPool::GetRender()
 	ptr = render;
 #endif
 
-//	Unlock();
 	pthread_mutex_unlock(&m_rend);
 
 	return ptr;
@@ -273,6 +272,8 @@ bool RenderPool::Resize(int w, int h)
 		pool[i].done = false;
 	}
 
+	SetPostprocess(pproc);
+
 	pthread_mutex_unlock(&m_rend);
 
 	return true;
@@ -313,7 +314,15 @@ void RenderPool::SetFarDist(const int d)
 
 void RenderPool::SetPostprocess(const SLVRPostProcess p)
 {
+	bool ppc = (	(p.fog_dist) ||
+					(p.noise) );
+
 	pproc = p;
-	for (int i = 0; i < RENDERPOOLN; i++)
+
+	for (int i = 0; i < RENDERPOOLN; i++) {
 		pool[i].lvr->SetPostprocess(p);
+		pool[i].dopproc = ppc;
+	}
+
+	dbg_print("Postprocess = %d",ppc);
 }

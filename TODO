@@ -31,3 +31,5 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Add Message Box Window
 
 -> Add water generation threshold to WorldGen
+
+-> Consider adding lens flare effect for post-processor

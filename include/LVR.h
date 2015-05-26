@@ -50,7 +50,6 @@ protected:
 	SLVRPostProcess pproc;			//Post-processing settings.
 
 	void ReallocBuffers();
-	void ApplyFog();
 
 public:
 	LVR(DataPipe* pipe);

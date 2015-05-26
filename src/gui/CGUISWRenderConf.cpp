@@ -26,7 +26,7 @@ using namespace std;
 
 
 CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, RenderPool* ppool) :
-		CurseGUIWnd(scrn,8,8,26,8)
+		CurseGUIWnd(scrn,8,8,26,9)
 {
 	type = GUIWT_OTHER;
 	name = "LVR config";
@@ -48,8 +48,9 @@ CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, RenderPool* ppool) 
 	new CurseGUILabel(ctrls,24,2,1,"R");
 	new CurseGUILabel(ctrls,24,3,1,"G");
 	new CurseGUILabel(ctrls,24,4,1,"B");
+	new CurseGUILabel(ctrls,14,5,5,"Noise");
 
-	//Create controls
+	//Create edits
 	e_scale = new CurseGUIEditBox(ctrls,6,1,6,"0");
 	e_fovx = new CurseGUIEditBox(ctrls,6,2,6,"0");
 	e_fovy = new CurseGUIEditBox(ctrls,6,3,6,"0");
@@ -58,8 +59,11 @@ CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, RenderPool* ppool) 
 	e_fogr = new CurseGUIEditBox(ctrls,19,2,5,"0");
 	e_fogg = new CurseGUIEditBox(ctrls,19,3,5,"0");
 	e_fogb = new CurseGUIEditBox(ctrls,19,4,5,"0");
-	b_apply = new CurseGUIButton(ctrls,1,6,9,"Apply");
-	b_reset = new CurseGUIButton(ctrls,13,6,9,"Reset");
+	e_noise = new CurseGUIEditBox(ctrls,19,5,6,"0");
+
+	//Create buttons
+	b_apply = new CurseGUIButton(ctrls,1,7,9,"Apply");
+	b_reset = new CurseGUIButton(ctrls,13,7,9,"Reset");
 
 	//Fill them
 	Fill();
@@ -89,6 +93,9 @@ void CurseGUIRenderConfWnd::Fill()
 	e_fogg->SetText(string(buf));
 	snprintf(buf,sizeof(buf),"%hd",ppset.fog_col.b);
 	e_fogb->SetText(string(buf));
+
+	snprintf(buf,sizeof(buf),"%d",ppset.noise);
+	e_noise->SetText(string(buf));
 }
 
 void CurseGUIRenderConfWnd::Scan()
@@ -107,6 +114,7 @@ void CurseGUIRenderConfWnd::Scan()
 	sscanf((e_fogr->GetText().c_str()),"%hd",&(ppset.fog_col.r));
 	sscanf((e_fogg->GetText().c_str()),"%hd",&(ppset.fog_col.g));
 	sscanf((e_fogb->GetText().c_str()),"%hd",&(ppset.fog_col.b));
+	sscanf((e_noise->GetText().c_str()),"%d",&(ppset.noise));
 }
 
 void CurseGUIRenderConfWnd::Apply()
