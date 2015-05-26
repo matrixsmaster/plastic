@@ -51,7 +51,6 @@ static uli				g_fps = 0;
 static void* plastic_eventhread(void* ptr)
 {
 	SGUIEvent my_e;
-//	bool resz;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 
@@ -73,7 +72,7 @@ static void* plastic_eventhread(void* ptr)
 	}
 	g_quit = true;
 
-	return NULL;
+	pthread_exit(NULL);
 }
 
 static void* plastic_renderthread(void* ptr)
@@ -99,7 +98,7 @@ static void* plastic_renderthread(void* ptr)
 		usleep(UPDATUSLEEP);
 	}
 
-	return NULL;
+	pthread_exit(NULL);
 }
 
 static void* plastic_chunksthread(void* ptr)
@@ -113,7 +112,7 @@ static void* plastic_chunksthread(void* ptr)
 		usleep(CHUNKUSLEEP);
 	}
 
-	return NULL;
+	pthread_exit(NULL);
 }
 
 /* *********************************************************** */

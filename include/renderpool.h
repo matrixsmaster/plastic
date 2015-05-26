@@ -53,45 +53,62 @@ struct SRendPoolDat {
 /* RenderPool: multi-thread LVR */
 class RenderPool : public LVR {
 private:
-	SRendPoolDat pool[RENDERPOOLN];
-	AtmoSky* skies;
-	vector3di ipos,irot;
-	bool quit;
-	pthread_t t_rend;
-	pthread_mutex_t m_rend;
-	ulli fps;
+	SRendPoolDat pool[RENDERPOOLN];	//Render pool data
+	AtmoSky* skies;					//Skies rendering instance
+	vector3di ipos,irot;			//Position and rotation of camera (integer)
+	bool quit;						//Quit event flag
+	pthread_t t_rend;				//Main thread
+	pthread_mutex_t m_rend;			//Main thread frame mutex
+	ulli fps;						//FPS counter
 
-	void SpawnThreads();
-	void KillThreads();
+	void SpawnThreads();			//Rendering threads spawner
+	void KillThreads();				//Rendering threads killer
 
 public:
 	RenderPool(DataPipe* pipe);
 	virtual ~RenderPool();
 
-	//FIXME: comment it
+	///Internal facility. Do Not Use in external code!
+	///Made public to be accessible from thread.
 	bool Quantum();
 
+	///Lock all RenderPool.
 	void Lock();
+	///Release RenderPool.
 	void Unlock();
+	///Return state of quit event flag.
 	bool IsClosing()				{ return quit; }
 
+	///Set camera position (integer).
 	void SetPos(vector3di p);
+	///Set camera rotation (integer, degrees).
 	void SetRot(vector3di r);
 
+	///Returns recently finished frame and moves on to make next one.
 	SGUIPixel* GetRender();
+
+	///Returns render pool internal data. Do Not Use in external code!
+	///Made public to be accessible from thread.
 	SRendPoolDat* GetPoolDatN(int n);
 
+	///LVR-compatible frame resizing.
 	bool Resize(int w, int h);
+	///LVR-compatible frame masking.
 	void SetMask(char* m, int w, int h);
 
+	///Set camera frustrum scaling.
 	void SetScale(const double s);
+	///Set camera Field of View.
 	void SetFOV(const vector3d f);
+	///Set far clipping plane distance.
 	void SetFarDist(const int d);
+	///Set new postprocessing settings.
 	void SetPostprocess(const SLVRPostProcess p);
 
 	void Frame()					{}
 	void Postprocess()				{}
 
+	///Returns current FPS value.
 	ulli GetFPS()					{ return fps; }
 };
 

@@ -18,7 +18,7 @@
  */
 
 #include "renderpool.h"
-#include "debug.h"
+
 
 static void* rendpool_lvrthread(void* ptr)
 {
@@ -26,27 +26,32 @@ static void* rendpool_lvrthread(void* ptr)
 	LVR* lvr = me->lvr;
 
 	for (;;) {
+		/* For every allocated renderer, do next sub-frame */
 		if (me->good) {
-			lvr->Frame();
+			lvr->Frame(); //meanwhile, main thread can copy previous sub-frame
+			/* Optionally, do post-processing */
 			if (me->dopproc)
 				lvr->Postprocess();
 
+			/* Lock and swap */
 			pthread_mutex_lock(&(me->mtx));
 
-			lvr->SwapBuffers();
+			lvr->SwapBuffers(); //select location for next sub-frame
 
 			pthread_mutex_unlock(&(me->mtx));
 		}
 
+		/* This renderer is ready to transfer its sub-frame */
 		me->done = true;
 
+		/* Wait for transfer or quit event */
 		while (me->done) {
 			if (me->quit) return NULL;
 			usleep(RENDERPOOLDESW);
 		}
 	}
 
-	return NULL;
+	pthread_exit(NULL);
 }
 
 static void* rendpool_mainthread(void* ptr)
@@ -54,12 +59,14 @@ static void* rendpool_mainthread(void* ptr)
 	int i;
 	RenderPool* ths = reinterpret_cast<RenderPool*> (ptr);
 
+	/* Continuously check all renderers with some time gap until quit event */
 	while (!ths->Quantum()) usleep(RENDERPOOLDESW);
 
+	/* We're quitting, push quit event down to all renderers */
 	for (i = 0; i < RENDERPOOLN; i++)
 		ths->GetPoolDatN(i)->quit = true;
 
-	return NULL;
+	pthread_exit(NULL);
 }
 
 RenderPool::RenderPool(DataPipe* pipe) :
@@ -69,33 +76,44 @@ RenderPool::RenderPool(DataPipe* pipe) :
 	quit = false;
 	fps = 0;
 
+	/* Create frame mutex */
 	pthread_mutex_init(&m_rend,NULL);
 
+	/* Spawn all rendering threads */
 	SpawnThreads();
 
+	/* Spawn main thread */
 	pthread_create(&t_rend,NULL,rendpool_mainthread,this);
 }
 
 RenderPool::~RenderPool()
 {
+	/* Quit event */
 	quit = true;
 
+	/* Wait for the end of the main thread */
 	pthread_join(t_rend,NULL);
 
+	/* Close all renderers */
 	KillThreads();
 
+	/* Destroy frame mutex */
 	pthread_mutex_destroy(&m_rend);
 
+	/* Free other facilities */
 	delete skies;
 }
 
 void RenderPool::SpawnThreads()
 {
 	for (int i = 0; i < RENDERPOOLN; i++) {
+		/* Reset renderer data */
 		memset(&pool[i],0,sizeof(SRendPoolDat));
 
+		/* Create LVR instance */
 		pool[i].lvr = new LVR(pipeptr);
 
+		/* Create renderer mutex and start rendering thread */
 		pthread_mutex_init(&(pool[i].mtx),NULL);
 		pthread_create(&(pool[i].thr),NULL,rendpool_lvrthread,&(pool[i]));
 	}
@@ -104,11 +122,14 @@ void RenderPool::SpawnThreads()
 void RenderPool::KillThreads()
 {
 	for (int i = 0; i < RENDERPOOLN; i++) {
+		/* Push quit event */
 		pool[i].quit = true;
 
+		/* Wait for ending and destroy mutex */
 		pthread_join(pool[i].thr,NULL);
 		pthread_mutex_destroy(&(pool[i].mtx));
 
+		/* Now just destroy LVR instance */
 		delete (pool[i].lvr);
 	}
 }
@@ -123,30 +144,37 @@ bool RenderPool::Quantum()
 	const int* zbf;
 	const vector3di* pbf;
 
+	/* Dry-run: buffer(s) not ready */
 	if ((!render) || (!zbuf) || (!pbuf)) return quit;
 
+	/* Lock frame mutex */
 	pthread_mutex_lock(&m_rend);
 
+	/* Hold frame offset value */
 #ifdef LVRDOUBLEBUFFERED
 	shf = (activebuf)? rendsize:0;
 #else
 	shf = 0;
 #endif
 
+	/* Draw skies background */
 	skies->RenderTo(render+shf,g_w,g_h);
 
 	for (i = 0; i < RENDERPOOLN; i++) {
 		cur = pool + i;
-		if (!cur->good) continue;
+		if (!cur->good) continue; //discard not used renderers
 		lvr = cur->lvr;
 
+		/* Lock renderer buffer swapping */
 		pthread_mutex_lock(&(cur->mtx));
 
+		/* Prepare addresses */
 		l = lvr->GetRenderLen();
 		vbf = lvr->GetRender();
 		zbf = lvr->GetZBuf();
 		pbf = lvr->GetPBuf();
 
+		/* Copy all data needed */
 		csh = shf + cur->start;
 		while (l--) {
 			if (vbf[l].sym)
@@ -154,10 +182,13 @@ bool RenderPool::Quantum()
 			zbuf[csh+l] = zbf[l];
 			pbuf[csh+l] = pbf[l];
 		}
+
+		/* Release renderer */
 		cur->done = false;
 		pthread_mutex_unlock(&(cur->mtx));
 	}
 
+	/* Release frame buffer */
 	pthread_mutex_unlock(&m_rend);
 
 	return quit;
@@ -218,8 +249,12 @@ SGUIPixel* RenderPool::GetRender()
 {
 	SGUIPixel* ptr;
 
+	/* Lock frame mutex */
 	pthread_mutex_lock(&m_rend);
 
+	/* We'll return the frame which just have been created,
+	 * so select new frame location.
+	 */
 	SwapBuffers();
 
 #ifdef LVRDOUBLEBUFFERED
@@ -229,6 +264,7 @@ SGUIPixel* RenderPool::GetRender()
 	ptr = render;
 #endif
 
+	/* Release frame mutex */
 	pthread_mutex_unlock(&m_rend);
 
 	return ptr;
@@ -249,31 +285,35 @@ bool RenderPool::Resize(int w, int h)
 #error "RENDERPOOL is too small"
 #endif
 
+	/* Prepare height of each sub-frame, and a central mid-point */
 	n = h / (RENDERPOOLN - 1);
 	mid.X = w / 2;
 	mid.Y = h / 2;
-
-	pthread_mutex_lock(&m_rend);
-	KillThreads();
-
 	g_w = w;
 	g_h = h;
 	rendsize = w * h;
 
+	/* Lock frame mutex and destroy all renderers (just to stop them completely) */
+	pthread_mutex_lock(&m_rend);
+	KillThreads();
+
+	/* Reallocate main buffers and start renderers */
 	ReallocBuffers();
 	SpawnThreads();
 
 	for (i = 0, s = 0; i < RENDERPOOLN; i++, s+=n) {
-		pool[i].start = s * g_w;
-		if (s+n >= h) n = h - s;
-		pool[i].good = pool[i].lvr->Resize(w,n);
-		pool[i].lvr->SetMid(mid);
-		mid.Y -= n;
-		pool[i].done = false;
+		pool[i].start = s * g_w; //sub-frame offset
+		if (s+n >= h) n = h - s; //sub-frame height check
+		pool[i].good = pool[i].lvr->Resize(w,n); //resize sub-frame
+		pool[i].lvr->SetMid(mid); //set sub-frame mid-point
+		mid.Y -= n; //and move mid-point up bu sub-frame height
+		pool[i].done = false; //sub-frame is dirty now and ready to process
 	}
 
+	/* Reset post-processing completely */
 	SetPostprocess(pproc);
 
+	/* Release frame mutex */
 	pthread_mutex_unlock(&m_rend);
 
 	return true;
@@ -285,7 +325,7 @@ void RenderPool::SetMask(char* m, int w, int h)
 
 	Lock();
 	for (i = 0; i < RENDERPOOLN; i++) {
-		if (pool[i].good)
+		if (pool[i].good) //set the mask for active renderers only
 			pool[i].lvr->SetMask(m+pool[i].start,w,pool[i].lvr->GetHeight());
 	}
 	Unlock();
@@ -323,6 +363,4 @@ void RenderPool::SetPostprocess(const SLVRPostProcess p)
 		pool[i].lvr->SetPostprocess(p);
 		pool[i].dopproc = ppc;
 	}
-
-	dbg_print("Postprocess = %d",ppc);
 }

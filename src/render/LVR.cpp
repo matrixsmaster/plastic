@@ -241,7 +241,7 @@ void LVR::Frame()
 	memset(frame,0,rendsize*sizeof(SGUIPixel));
 
 	/* Lock datapipe until render is done */
-	pipeptr->Lock();
+//	pipeptr->Lock();
 
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
@@ -309,7 +309,7 @@ void LVR::Frame()
 	} //by Y
 
 	/* Release datapipe */
-	pipeptr->Unlock();
+//	pipeptr->Unlock();
 }
 
 void LVR::Postprocess()
@@ -320,8 +320,6 @@ void LVR::Postprocess()
 	vector3di* curpbuf;
 	float fa,fb,fc;
 	vector3d vfa,vfb;
-
-	dbg_print("postprocessing %p",this);
 
 	/* Set buffers to active frame */
 	SETCURRENTBUFS;
