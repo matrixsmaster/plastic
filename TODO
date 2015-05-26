@@ -29,3 +29,5 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Add auto register function of GUI controls to GUI windows (?)
 
 -> Add Message Box Window
+
+-> Add water generation threshold to WorldGen

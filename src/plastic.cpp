@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include "plastic.h"
 #include "support.h"
+#include "utils.h"
 #include "debug.h"
 #include "CurseGUI.h"
 #include "world.h"

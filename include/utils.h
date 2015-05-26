@@ -17,28 +17,23 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef SUPPORT_H_
-#define SUPPORT_H_
+/* Plastic Inquisitor Utilities */
 
-#include <stdarg.h>
-#include <ncurses.h>
-#include "vecmath.h"
-#include "visual.h"
+#ifndef UTILS_H_
+#define UTILS_H_
 
-#define BOOLSTR(X) ((X)? "ON":"OFF")
-#define MGETCHAR(X) while (!isprint(X = getchar())) /*trash non-printable chars (NL,LF,EOF etc)*/
-#define SIGN(X) ((X < 0)? -1:1)
+#include "plastic.h"
 
-/// Prints a simple formatted message to stderr.
-void errout(char const* fmt, ...);
+/// Prints out SGameSettings data.
+void printsettings(SGameSettings* s);
 
-///Convert SCTriple to CPoint3D.
-vector3d tripletovecf(const SCTriple s);
+///Interactive shell for adjusting settings.
+bool interactive_shell(SGameSettings* s);
 
-///Convert CPoint3D to SCTriple.
-SCTriple vecftotriple(const vector3d s);
+/// Argument parser. Supposed to be used for analyze startup environment.
+bool argparser(int argc, char* argv[], SGameSettings* sets);
 
-///Get mouse event mask by string representation.
-mmask_t mmask_by_str(const char* s);
+///Help screen.
+void arghelp(char* pname);
 
-#endif /* SUPPORT_H_ */
+#endif /* UTILS_H_ */
