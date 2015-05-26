@@ -339,13 +339,17 @@ bool DataPipe::LoadChunk(SDataPlacement* res, PChunk buf)
 	return false;
 }
 
-/* GetVoxel() Interlocking macro for multithreaded access */
+/* GetVoxel() Interlocking macros variations for multithreaded access */
 #ifdef DPLOCKEACHVOX
 #define DP_GETVOX_LOCK Lock()
 #define DP_GETVOX_UNLOCK Unlock()
+#define DP_GETVOXDYN_TRLOCK
+#define DP_GETVOXDYN_UNLOCK
 #else
 #define DP_GETVOX_LOCK
 #define DP_GETVOX_UNLOCK
+#define DP_GETVOXDYN_TRLOCK if (!TryLock())
+#define DP_GETVOXDYN_UNLOCK Unlock()
 #endif
 
 voxel DataPipe::GetVoxel(const vector3di* p)
@@ -364,16 +368,20 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	DP_GETVOX_LOCK;
 
 	/* Check for dynamic objects */
-	if (!objs.empty()) {
-		for (mi = objs.begin(); mi != objs.end(); ++mi) {
-			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
-				tmp = (*mi)->GetVoxelAt(p);
-				if (tmp) {
-					DP_GETVOX_UNLOCK;
-					return tmp;
+	DP_GETVOXDYN_TRLOCK {
+		if (!objs.empty()) {
+			for (mi = objs.begin(); mi != objs.end(); ++mi) {
+				if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
+					tmp = (*mi)->GetVoxelAt(p);
+					if (tmp) {
+						DP_GETVOX_UNLOCK;
+						DP_GETVOXDYN_UNLOCK;
+						return tmp;
+					}
 				}
 			}
 		}
+		DP_GETVOXDYN_UNLOCK;
 	}
 
 #if HOLDCHUNKS == 1

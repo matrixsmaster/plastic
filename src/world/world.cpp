@@ -95,6 +95,7 @@ void PlasticWorld::Quantum()
 
 	//DEBUG:
 	data->Lock();
+//	if (data->TryLock()) return;
 	if (test->GetState() == 0)
 		test->SetState(test->GetNumStates()-1);
 	else
