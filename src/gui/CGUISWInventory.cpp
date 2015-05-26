@@ -60,7 +60,7 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	table->SetData("Condition", 0, 3);
 	table->SetData("Cost", 0, 4);
 
-	new CurseGUILabel(ctrls, 1, 11, 12, "Description:");
+	new CurseGUILabel(ctrls, 1, 11, 12, 5, "Description:");
 
 //	new CurseGUILabel(ctrls, 11, );
 	/*CurseGUIButton* destroy_btn;

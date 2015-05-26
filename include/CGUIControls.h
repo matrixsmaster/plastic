@@ -275,7 +275,7 @@ public:
 class CurseGUILabel : public CurseGUIControl
 {
 public:
-	CurseGUILabel(CurseGUICtrlHolder* p, int x, int y, int w, std::string capt);
+	CurseGUILabel(CurseGUICtrlHolder* p, int x, int y, int w, int h, std::string capt);
 	virtual ~CurseGUILabel()				{}
 
 	void SetCaption(std::string capt)		{ text = capt; }

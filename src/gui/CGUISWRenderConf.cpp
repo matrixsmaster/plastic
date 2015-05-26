@@ -40,15 +40,15 @@ CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
 	fogcol = lvr->GetFogColor();
 
 	//Create labels
-	new CurseGUILabel(ctrls,1,1,5,"Scale");
-	new CurseGUILabel(ctrls,1,2,5,"FOV H");
-	new CurseGUILabel(ctrls,1,3,5,"FOV V");
-	new CurseGUILabel(ctrls,1,4,5,"Far");
-	new CurseGUILabel(ctrls,14,1,5,"Fog S");
-	new CurseGUILabel(ctrls,14,2,5,"Fog C");
-	new CurseGUILabel(ctrls,24,2,1,"R");
-	new CurseGUILabel(ctrls,24,3,1,"G");
-	new CurseGUILabel(ctrls,24,4,1,"B");
+	new CurseGUILabel(ctrls,1,1,5,1,"Scale");
+	new CurseGUILabel(ctrls,1,2,5,1,"FOV H");
+	new CurseGUILabel(ctrls,1,3,5,1,"FOV V");
+	new CurseGUILabel(ctrls,1,4,5,1,"Far");
+	new CurseGUILabel(ctrls,14,1,5,1,"Fog S");
+	new CurseGUILabel(ctrls,14,2,5,1,"Fog C");
+	new CurseGUILabel(ctrls,24,2,1,1,"R");
+	new CurseGUILabel(ctrls,24,3,1,1,"G");
+	new CurseGUILabel(ctrls,24,4,1,1,"B");
 
 	//Create controls
 	e_scale = new CurseGUIEditBox(ctrls,6,1,6,"0");

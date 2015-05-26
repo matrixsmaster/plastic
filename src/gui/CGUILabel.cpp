@@ -24,18 +24,34 @@
 using namespace std;
 
 
-CurseGUILabel::CurseGUILabel(CurseGUICtrlHolder* p, int x, int y, int w, std::string capt) :
+CurseGUILabel::CurseGUILabel(CurseGUICtrlHolder* p, int x, int y, int w, int h, std::string capt) :
 		CurseGUIControl(p,x,y)
 {
 	text = capt;
 	g_w = w;
+	g_h = h;
 }
 
 void CurseGUILabel::Update()
 {
+	unsigned i;
+	int x = 0, y = 0;
 	WINDOW* wd = wnd->GetWindow();
 
+	//set label color
 	wcolor_set(wd,wnd->GetColorManager()->CheckPair(&fmt),NULL);
 
-	mvwaddnstr(wd,g_y,g_x,text.c_str(),g_w);
+	//for each symbol
+	for (i = 0; ((i < text.size()) && (y < g_h)); i++) {
+		if ((text.at(i) == '\n') || (x >= g_w)) {
+			x = 0;
+			y++;
+			continue;
+		}
+		mvwaddch(wd,g_y+y,g_x+x,text.at(i));
+		++x;
+	}
+
+	//reset color to default
+	wcolor_set(wd,0,NULL);
 }
