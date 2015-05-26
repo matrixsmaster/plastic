@@ -41,8 +41,8 @@ void CurseGUIActorViewWnd::ResizeWnd()
 	int w,h,x,y;
 	char buf[ACTRVIEWMINW*3];
 	SPAAttrib atrs = actor->GetAttributes();
-//	SPABase bs = actor->GetStats(false);
-//	SPABase cr = actor->GetStats(true);
+	SPABase bs = actor->GetStats(false);
+	SPABase cr = actor->GetStats(true);
 
 	w = parent->GetWidth() / 2;
 	if (w < ACTRVIEWMINW) w = ACTRVIEWMINW;
@@ -64,17 +64,7 @@ void CurseGUIActorViewWnd::ResizeWnd()
 	portrait->SetAutoAlloc(true);
 	portrait->SetPicture(actor->GetPortrait());
 
-//	new CurseGUILabel(ctrls,3,ACTPORTRAITH+1,5,"Type:");
-//	new CurseGUILabel(ctrls,9,ACTPORTRAITH+1,6,((actor->IsNPC())? "NPC":"Player"));
-//	new CurseGUILabel(ctrls,3,ACTPORTRAITH+2,5,"Name:");
-//	new CurseGUILabel(ctrls,9,ACTPORTRAITH+2,ACTPORTRAITW-9,atrs.name);
-//	new CurseGUILabel(ctrls,1,ACTPORTRAITH+3,7,"Gender:");
-//	new CurseGUILabel(ctrls,9,ACTPORTRAITH+3,7,((atrs.female)? "Female":"Male"));
-//	new CurseGUILabel(ctrls,2,ACTPORTRAITH+4,6,"Class:");
-//	new CurseGUILabel(ctrls,9,ACTPORTRAITH+4,ACTPORTRAITW-9,paclass_to_str[atrs.cls].s);
-//	new CurseGUILabel(ctrls,3,ACTPORTRAITH+5,5,"Body:");
-//	new CurseGUILabel(ctrls,9,ACTPORTRAITH+5,ACTPORTRAITW-9,BodyTypeToStr(atrs.body));
-
+	//main attributes
 	snprintf(buf,sizeof(buf),"  Type: %s\n  Name: %s\nGender: %s\n Class: %s\n  Body: %s",
 			((actor->IsNPC())? "NPC":"Player"),
 			atrs.name,
@@ -83,7 +73,60 @@ void CurseGUIActorViewWnd::ResizeWnd()
 			BodyTypeToStr(atrs.body));
 	new CurseGUILabel(ctrls,1,ACTPORTRAITH+1,ACTPORTRAITW,5,buf);
 
-	new CurseGUILabel(ctrls,ACTPORTRAITW+3,1,3,1,"HP:");
+	//stats (main)
+	snprintf(buf,sizeof(buf)," HP: %d (%d)",cr.HP,bs.HP);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+3,1,30,1,buf);
+
+	snprintf(buf,sizeof(buf),"Qual: %d (%d)",cr.Qual,bs.Qual);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+2,2,30,1,buf);
+
+	//stats (phys)
+	snprintf(buf,sizeof(buf)," CC: %d (%d)",cr.CC,bs.CC);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+3,3,30,1,buf);
+
+	snprintf(buf,sizeof(buf),"Spd: %d (%d)",cr.Spd,bs.Spd);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+3,4,30,1,buf);
+
+	snprintf(buf,sizeof(buf),"Str: %d (%d)",cr.Str,bs.Str);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+3,5,30,1,buf);
+
+	snprintf(buf,sizeof(buf),"Eff: %d (%d)",cr.Eff,bs.Eff);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+3,6,30,1,buf);
+
+	snprintf(buf,sizeof(buf)," RS: %d (%d)",cr.RS,bs.RS);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+3,7,30,1,buf);
+
+	snprintf(buf,sizeof(buf),"Acc: %d (%d)",cr.Acc,bs.Acc);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+3,8,30,1,buf);
+
+	//stats (brain)
+	snprintf(buf,sizeof(buf),"Eng: %d (%d)",cr.Eng,bs.Eng);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+3,10,30,1,buf);
+
+	snprintf(buf,sizeof(buf),"Spch: %d (%d)",cr.Spch,bs.Spch);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+2,11,30,1,buf);
+
+	snprintf(buf,sizeof(buf),"Brv: %d (%d)",cr.Brv,bs.Brv);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+3,12,30,1,buf);
+
+	if (atrs.female)
+		snprintf(buf,sizeof(buf),"Bety: %d (%d)",cr.Chr,bs.Chr);
+	else
+		snprintf(buf,sizeof(buf),"Char: %d (%d)",cr.Chr,bs.Chr);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+2,13,30,1,buf);
+
+	snprintf(buf,sizeof(buf),"Trd: %d (%d)",cr.Trd,bs.Trd);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+3,14,30,1,buf);
+
+	//stats (battle)
+	snprintf(buf,sizeof(buf),"AP: %d (%d)",cr.AP,bs.AP);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+4,16,30,1,buf);
+
+	snprintf(buf,sizeof(buf),"DT: %d (%d)",cr.DT,bs.DT);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+4,17,30,1,buf);
+
+	snprintf(buf,sizeof(buf),"DM: %d (%d)",cr.DM,bs.DM);
+	new CurseGUILabel(ctrls,ACTPORTRAITW+4,18,30,1,buf);
 }
 
 bool CurseGUIActorViewWnd::PutEvent(SGUIEvent* e)
