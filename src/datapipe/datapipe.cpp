@@ -348,8 +348,8 @@ bool DataPipe::LoadChunk(SDataPlacement* res, PChunk buf)
 #else
 #define DP_GETVOX_LOCK
 #define DP_GETVOX_UNLOCK
-#define DP_GETVOXDYN_TRLOCK if (!TryLock())
-#define DP_GETVOXDYN_UNLOCK Unlock()
+#define DP_GETVOXDYN_TRLOCK /*if (!TryLock())*/
+#define DP_GETVOXDYN_UNLOCK /*Unlock()*/
 #endif
 
 voxel DataPipe::GetVoxel(const vector3di* p)

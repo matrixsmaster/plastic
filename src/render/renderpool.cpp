@@ -22,11 +22,11 @@
 
 static void* rendpool_lvrthread(void* ptr)
 {
-	SRendPoolDat* me = reinterpret_cast<SRendPoolDat*> (ptr);
+	SRendPoolDat* me = (SRendPoolDat*)ptr;
 	LVR* lvr = me->lvr;
 
 	for (;;) {
-		/* For every allocated renderer, do next sub-frame */
+		/* For allocated renderer, do next sub-frame */
 		if (me->good) {
 			lvr->Frame(); //meanwhile, main thread can copy previous sub-frame
 			/* Optionally, do post-processing */
@@ -46,7 +46,7 @@ static void* rendpool_lvrthread(void* ptr)
 
 		/* Wait for transfer or quit event */
 		while (me->done) {
-			if (me->quit) return NULL;
+			if (me->quit) pthread_exit(NULL);
 			usleep(RENDERPOOLDESW);
 		}
 	}
@@ -57,7 +57,7 @@ static void* rendpool_lvrthread(void* ptr)
 static void* rendpool_mainthread(void* ptr)
 {
 	int i;
-	RenderPool* ths = reinterpret_cast<RenderPool*> (ptr);
+	RenderPool* ths = (RenderPool*)ptr;
 
 	/* Continuously check all renderers with some time gap until quit event */
 	while (!ths->Quantum()) usleep(RENDERPOOLDESW);
@@ -160,8 +160,18 @@ bool RenderPool::Quantum()
 	/* Draw skies background */
 	skies->RenderTo(render+shf,g_w,g_h);
 
-	for (i = 0; i < RENDERPOOLN; i++) {
-		cur = pool + i;
+	/* Test:
+	 * 1. Block pipe
+	 * 2. Send signal to workers to start up
+	 * 3. Double-buffering not needed
+	 * 4. Keep spinning over all workers to get its results until every worker is committed
+	 * 5. Release pipe
+	 * 6. ???
+	 * 7. Go to 1
+	 */
+
+	for (i = 0, cur = pool; i < RENDERPOOLN; i++, cur++) {
+//		cur = pool + i;
 		if (!cur->good) continue; //discard not used renderers
 		lvr = cur->lvr;
 
@@ -187,6 +197,9 @@ bool RenderPool::Quantum()
 		cur->done = false;
 		pthread_mutex_unlock(&(cur->mtx));
 	}
+
+	for (i = 0, cur = pool; i < RENDERPOOLN; i++, cur++)
+		cur->done = false;
 
 	/* Release frame buffer */
 	pthread_mutex_unlock(&m_rend);

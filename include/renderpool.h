@@ -63,6 +63,7 @@ private:
 
 	void SpawnThreads();			//Rendering threads spawner
 	void KillThreads();				//Rendering threads killer
+//	void JoinThreads();				//Rendering threads join barrier
 
 public:
 	RenderPool(DataPipe* pipe);
