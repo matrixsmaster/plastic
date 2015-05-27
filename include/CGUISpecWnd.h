@@ -71,9 +71,8 @@ class CurseGUIInventoryWnd : public CurseGUIWnd {
 private:
 	Inventory* invent;
 	CurseGUITable* table;
-	CurseGUITable* description;
-//	CurseGUILabel* description;
-	//CurseGUILabel* search;
+	CurseGUILabel* description_lbl;
+	CurseGUIProgrBar* prgr_bar;
 
 	CurseGUIButton* destroy_btn;
 	CurseGUIButton* drop_btn;

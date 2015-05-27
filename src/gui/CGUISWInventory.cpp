@@ -38,6 +38,11 @@ void CurseGUIInventoryWnd::ResizeWnd()
 {
 	int w,h,x,y;
 
+	int x1,y1,wt,ht,wwt,nr,nc;
+	wwt = 6; nr = 7; nc = 5;
+	x1 = 1; y1 = 1;
+	ht = 15; wt = wwt * nc + nc + 1;
+
 	w = INVENTSIZEX * parent->GetWidth() / 100;
 	h = INVENTSIZEY * parent->GetHeight() / 100;
 
@@ -53,23 +58,24 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	ctrls = new CurseGUICtrlHolder(this);
 
 	//create controls
-	table = new CurseGUITable(ctrls,1,1,7,5,6,10,25+6);
-	table->SetData("N", 0, 0);
-	table->SetData("Name", 0, 1);
+	table = new CurseGUITable(ctrls,x1,y1,nr,nc,wwt,ht,wt);
+	table->SetData("  N", 0, 0);
+	table->SetData(" Name", 0, 1);
 	table->SetData("Weight", 0, 2);
-	table->SetData("Condition", 0, 3);
-	table->SetData("Cost", 0, 4);
+	table->SetData(" Cond.", 0, 3);
+	table->SetData(" Cost", 0, 4);
 
-	new CurseGUILabel(ctrls, 1, 11, 12, 5, "Description:");
+	new CurseGUILabel(ctrls, x1, y1+ht, wt, 1, "Description:");
+	description_lbl = new CurseGUILabel(ctrls, x1, y1+ht+1, wt, 5, "");
 
-//	new CurseGUILabel(ctrls, 11, );
-	/*CurseGUIButton* destroy_btn;
-	CurseGUIButton* drop_btn;
-	CurseGUIButton* wear_btn;
-	CurseGUIButton* use_btn;
-	CurseGUIButton* repair_btn;
+	destroy_btn = new CurseGUIButton(ctrls, wt+2, y1, 11, "Destroy");
+	drop_btn = new CurseGUIButton(ctrls, wt+2, y1+1, 11, "Drop");
+	wear_btn = new CurseGUIButton(ctrls, wt+2, y1+2, 11, "Wear");
+	use_btn = new CurseGUIButton(ctrls, wt+2, y1+3, 11, "Use");
+	repair_btn = new CurseGUIButton(ctrls, wt+2, y1+4, 11, "Repair");
 
-	CurseGUIEditBox* search_edit;*/
+	new CurseGUILabel(ctrls, wt+3, y1+6, 7, 1, "Search");
+	search_edit = new CurseGUIEditBox(ctrls, wt+2, y1+7, 12, "_____________");
 }
 
 bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
