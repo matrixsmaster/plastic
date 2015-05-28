@@ -23,6 +23,7 @@
 #define ACTOR_H_
 
 #include <string>
+#include <ncurses.h>
 #include "actortypes.h"
 #include "vecmath.h"
 #include "vecmisc.h"
@@ -83,12 +84,14 @@ public:
 class Player : public PlasticActor {
 private:
 	KeyBinder* binder;
+	int maxrspd,rspd;
+	mmask_t rot_hor,rot_ver;
 
 public:
 	Player(SPAAttrib s, DataPipe* pptr);
 	virtual ~Player();
 
-	void ProcessEvent(const SGUIEvent* e);
+	bool ProcessEvent(const SGUIEvent* e);
 };
 
 #endif /* ACTOR_H_ */

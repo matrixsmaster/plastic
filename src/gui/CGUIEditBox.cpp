@@ -98,7 +98,7 @@ bool CurseGUIEditBox::PutEvent(SGUIEvent* e)
 		if ((y < 0) || (y >= 1)) return false;
 
 		//Do some action with button
-		if (e->m.bstate & CGMOUSE_LEFT) {
+		if (e->m.bstate & GUIMOUS_LEFT) {
 			holder->Select(this);
 			return true;
 		}

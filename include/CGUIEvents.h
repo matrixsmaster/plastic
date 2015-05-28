@@ -73,4 +73,11 @@ struct SGUIEvent { /* Use one-char names to make it simpler, keep this structure
 
 #define GUI_DEFCLOSE KEY_F(10)
 
+#define GUIMOUS_LEFT (BUTTON1_PRESSED | BUTTON1_RELEASED)
+#define GUIMOUS_RGHT (BUTTON3_PRESSED | BUTTON3_RELEASED)
+
+#define GUISCRL_UP BUTTON4_PRESSED
+#define GUISCRL_DW (BUTTON2_PRESSED | REPORT_MOUSE_POSITION)
+
+
 #endif /* CGUIEVENTS_H_ */

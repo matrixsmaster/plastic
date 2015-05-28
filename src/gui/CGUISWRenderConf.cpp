@@ -20,24 +20,23 @@
 #include <stdlib.h>
 #include <string>
 #include "CGUISpecWnd.h"
-#include "LVR.h"
+#include "renderpool.h"
 
 using namespace std;
 
 
-CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
-		CurseGUIWnd(scrn,8,8,26,8)
+CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, RenderPool* ppool) :
+		CurseGUIWnd(scrn,8,8,26,9)
 {
 	type = GUIWT_OTHER;
 	name = "LVR config";
 	showname = true;
 
-	lvr = plvr;
-	scale = lvr->GetScale();
-	fov = lvr->GetFOV();
-	far = lvr->GetFarDist();
-	fog = lvr->GetFogStart();
-	fogcol = lvr->GetFogColor();
+	pool = ppool;
+	scale = pool->GetScale();
+	fov = pool->GetFOV();
+	far = pool->GetFarDist();
+	ppset = pool->GetPostprocess();
 
 	//Create labels
 	new CurseGUILabel(ctrls,1,1,5,1,"Scale");
@@ -49,8 +48,9 @@ CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
 	new CurseGUILabel(ctrls,24,2,1,1,"R");
 	new CurseGUILabel(ctrls,24,3,1,1,"G");
 	new CurseGUILabel(ctrls,24,4,1,1,"B");
+	new CurseGUILabel(ctrls,14,5,5,1,"Noise");
 
-	//Create controls
+	//Create edits
 	e_scale = new CurseGUIEditBox(ctrls,6,1,6,"0");
 	e_fovx = new CurseGUIEditBox(ctrls,6,2,6,"0");
 	e_fovy = new CurseGUIEditBox(ctrls,6,3,6,"0");
@@ -59,8 +59,11 @@ CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
 	e_fogr = new CurseGUIEditBox(ctrls,19,2,5,"0");
 	e_fogg = new CurseGUIEditBox(ctrls,19,3,5,"0");
 	e_fogb = new CurseGUIEditBox(ctrls,19,4,5,"0");
-	b_apply = new CurseGUIButton(ctrls,1,6,9,"Apply");
-	b_reset = new CurseGUIButton(ctrls,13,6,9,"Reset");
+	e_noise = new CurseGUIEditBox(ctrls,19,5,6,"0");
+
+	//Create buttons
+	b_apply = new CurseGUIButton(ctrls,1,7,9,"Apply");
+	b_reset = new CurseGUIButton(ctrls,13,7,9,"Reset");
 
 	//Fill them
 	Fill();
@@ -81,15 +84,18 @@ void CurseGUIRenderConfWnd::Fill()
 	snprintf(buf,sizeof(buf),"%d",far);
 	e_far->SetText(string(buf));
 
-	snprintf(buf,sizeof(buf),"%d",fog);
+	snprintf(buf,sizeof(buf),"%d",ppset.fog_dist);
 	e_fog->SetText(string(buf));
 
-	snprintf(buf,sizeof(buf),"%d",fogcol.X);
+	snprintf(buf,sizeof(buf),"%hd",ppset.fog_col.r);
 	e_fogr->SetText(string(buf));
-	snprintf(buf,sizeof(buf),"%d",fogcol.Y);
+	snprintf(buf,sizeof(buf),"%hd",ppset.fog_col.g);
 	e_fogg->SetText(string(buf));
-	snprintf(buf,sizeof(buf),"%d",fogcol.Z);
+	snprintf(buf,sizeof(buf),"%hd",ppset.fog_col.b);
 	e_fogb->SetText(string(buf));
+
+	snprintf(buf,sizeof(buf),"%d",ppset.noise);
+	e_noise->SetText(string(buf));
 }
 
 void CurseGUIRenderConfWnd::Scan()
@@ -104,29 +110,30 @@ void CurseGUIRenderConfWnd::Scan()
 	fov.Y = tmp;
 
 	sscanf((e_far->GetText().c_str()),"%d",&far);
-	sscanf((e_fog->GetText().c_str()),"%d",&fog);
-	sscanf((e_fogr->GetText().c_str()),"%d",&(fogcol.X));
-	sscanf((e_fogg->GetText().c_str()),"%d",&(fogcol.Y));
-	sscanf((e_fogb->GetText().c_str()),"%d",&(fogcol.Z));
+	sscanf((e_fog->GetText().c_str()),"%d",&ppset.fog_dist);
+	sscanf((e_fogr->GetText().c_str()),"%hd",&(ppset.fog_col.r));
+	sscanf((e_fogg->GetText().c_str()),"%hd",&(ppset.fog_col.g));
+	sscanf((e_fogb->GetText().c_str()),"%hd",&(ppset.fog_col.b));
+	sscanf((e_noise->GetText().c_str()),"%d",&(ppset.noise));
 }
 
 void CurseGUIRenderConfWnd::Apply()
 {
-	lvr->SetScale(scale);
-	lvr->SetFOV(fov);
-	lvr->SetFarDist(far);
-	lvr->SetFogStart(fog);
-	lvr->SetFogColor(fogcol);
+	pool->SetScale(scale);
+	pool->SetFOV(fov);
+	pool->SetFarDist(far);
+	pool->SetPostprocess(ppset);
 }
 
 void CurseGUIRenderConfWnd::Reset()
 {
+	SLVRPostProcess temp = DEFPOSTPROC;
+
 	scale = DEFSCALE;
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
 	far = DEFFARPLANE;
-	fog = DEFFOGPLANE;
-	fogcol = vector3di(DEFFOGGRAY);
+	ppset = temp;
 }
 
 bool CurseGUIRenderConfWnd::PutEvent(SGUIEvent* e)

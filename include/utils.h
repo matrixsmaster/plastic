@@ -17,33 +17,23 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Implementation file of a lightweight version of DataPipe */
+/* Plastic Inquisitor Utilities */
 
-#include "vecmisc.h"
-#include "datapipe.h"
+#ifndef UTILS_H_
+#define UTILS_H_
 
+#include "plastic.h"
 
-DataPipeDummy::DataPipeDummy(SGameSettings* sets) :
-		DataPipe(sets,false)
-{
-	if (status == DPIPE_NOTREADY) status = DPIPE_IDLE;
-}
+/// Prints out SGameSettings data.
+void printsettings(SGameSettings* s);
 
-voxel DataPipeDummy::GetVoxel(const vector3di* p)
-{
-	VModVec::iterator mi;
-	voxel tmp = 0;
+///Interactive shell for adjusting settings.
+bool interactive_shell(SGameSettings* s);
 
-	ReadLock();
-	if (!objs.empty()) {
-		for (mi = objs.begin(); mi != objs.end(); ++mi) {
-			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
-				tmp = (*mi)->GetVoxelAt(p);
-				if (tmp) break;
-			}
-		}
-	}
-	ReadUnlock();
+/// Argument parser. Supposed to be used for analyze startup environment.
+bool argparser(int argc, char* argv[], SGameSettings* sets);
 
-	return tmp;
-}
+///Help screen.
+void arghelp(char* pname);
+
+#endif /* UTILS_H_ */

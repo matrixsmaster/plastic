@@ -30,6 +30,7 @@
 #include "misconsts.h"
 #include "datapipe.h"
 #include "LVR.h"
+#include "renderpool.h"
 #include "actor.h"
 #include "vmodel.h"
 #include "hud.h"
@@ -42,12 +43,13 @@ private:
 	int result;
 	SGameSettings* sets;
 	DataPipe* data;
-	LVR* lvr;
+	RenderPool* render;
 	CurseGUI* gui;
 	Player* PC;
 	HUD* hud;
 	KeyBinder* binder;
 	bool once;
+	int g_w,g_h;
 	vector2di curso;
 
 	//holders
@@ -68,6 +70,8 @@ public:
 	///Main method for incremental updating world state.
 	void Quantum();
 
+	void Frame();
+
 	///Returns result of latest operation (mainly for outsiders).
 	int GetLastResult()						{ return result; }
 
@@ -78,7 +82,7 @@ public:
 	void ConnectGUI();
 
 	///Returns a pointer to renderer (for outside use).
-	LVR* GetRenderer()						{ return lvr; }
+	RenderPool* GetRenderer()				{ return render; }
 
 	///Returns HUD pointer.
 	HUD* GetHUD()							{ return hud; }

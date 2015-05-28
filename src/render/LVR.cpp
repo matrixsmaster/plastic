@@ -27,8 +27,11 @@
 #include "debug.h"
 #endif
 
+
 LVR::LVR(DataPipe* pipe)
 {
+	SLVRPostProcess temp = DEFPOSTPROC;
+
 	pipeptr = pipe;
 	render = NULL;
 	activebuf = 0;
@@ -45,34 +48,19 @@ LVR::LVR(DataPipe* pipe)
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
 	far = DEFFARPLANE;
-	fog = DEFFOGPLANE;
-	SetFogColor(vector3di(DEFFOGGRAY));
 
-	skies = (pipe)? (new AtmoSky(pipe)):NULL;
+	pproc = temp;
 }
 
 LVR::~LVR()
 {
-	if (skies) delete skies;
 	if (render) free(render);
 	if (zbuf) free(zbuf);
 	if (pbuf) delete[] pbuf;
 }
 
-bool LVR::Resize(int w, int h)
+void LVR::ReallocBuffers()
 {
-	if (w < 1) w = 0;
-	if (h < 1) h = 0;
-
-	//apply setting
-	g_w = w;
-	g_h = h;
-	rendsize = w * h;
-
-	//get a screen middle point
-	mid.X = w / 2;
-	mid.Y = h / 2;
-
 	if (pbuf) delete[] pbuf;
 
 #ifdef LVRDOUBLEBUFFERED
@@ -95,6 +83,23 @@ bool LVR::Resize(int w, int h)
 	pbuf = new vector3di[rendsize];
 
 #endif
+}
+
+bool LVR::Resize(int w, int h)
+{
+	if (w < 1) w = 0;
+	if (h < 1) h = 0;
+
+	//apply setting
+	g_w = w;
+	g_h = h;
+	rendsize = w * h;
+
+	//get a screen middle point
+	mid.X = w / 2;
+	mid.Y = h / 2;
+
+	ReallocBuffers();
 
 	return ((render != NULL) && (zbuf != NULL) && (pbuf != NULL));
 }
@@ -115,12 +120,6 @@ void LVR::SetMask(char* m, int w, int h)
 	if ((w != g_w) || (h != g_h)) mask = NULL;
 }
 
-void LVR::RemoveSkies()
-{
-	if (skies) delete skies;
-	skies = NULL;
-}
-
 void LVR::SetEulerRotation(const vector3d r)
 {
 	SMatrix3d rx,ry,rz,xy;
@@ -130,9 +129,6 @@ void LVR::SetEulerRotation(const vector3d r)
 	eulerot.Y = r.Z; //swap Y-Z axes
 	eulerot.Z = r.Y;
 	RotNormDegF(&eulerot); //norm it to form [0;360)
-
-	//update skies rotation
-	if (skies) skies->SetEulerAngles(eulerot);
 
 	//generate rotation matrices
 	rx = GenMtxRotX(eulerot.X * M_PI / 180.f);
@@ -179,30 +175,18 @@ void LVR::SetFOV(const vector3d f)
 void LVR::SetFarDist(const int d)
 {
 	far = d;
-	dfog = 1.f / (double)(far - fog);
 
 #ifdef LVRDEBUG
 	dbg_print("LVR Far plane = %d",d);
 #endif
 }
 
-void LVR::SetFogStart(const int d)
+void LVR::SetPostprocess(const SLVRPostProcess p)
 {
-	fog = d;
-	dfog = 1.f / (double)(far - fog);
+	pproc = p;
 
 #ifdef LVRDEBUG
-	dbg_print("LVR Fog dist. = %d",d);
-#endif
-}
-
-void LVR::SetFogColor(const vector3di nfc)
-{
-	fogcol = nfc;
-	dfog = 1.f / (double)(far - fog);
-
-#ifdef LVRDEBUG
-	dbg_print("LVR Fog color: [%d, %d, %d]",nfc.X,nfc.Y,nfc.Z);
+	dbg_print("LVR instance %p post-processing settings changed",this);
 #endif
 }
 
@@ -224,10 +208,23 @@ vector3di LVR::GetProjection(const vector2di pnt)
 	return r;
 }
 
+#ifdef LVRDOUBLEBUFFERED
+#define SETCURRENTBUFS { \
+		frame = render + ((activebuf)? rendsize:0); \
+		curzbuf = zbuf + ((activebuf)? rendsize:0); \
+		curpbuf = pbuf + ((activebuf)? rendsize:0); \
+}
+#else
+#define SETCURRENTBUFS { \
+		frame = render; \
+		curzbuf = zbuf; \
+		curpbuf = pbuf; \
+}
+#endif
+
 void LVR::Frame()
 {
-	int x,y,z,l,fl,s,i,m;
-	double fg;
+	int x,y,z,l,s,i,m;
 	vector3d v,fo,fn;
 	vector3di iv,av;
 	SVoxelInf* vox;
@@ -236,27 +233,20 @@ void LVR::Frame()
 	vector3di* curpbuf;
 	voxel area[6];
 
-	frame = render;
-	curzbuf = zbuf;
-	curpbuf = pbuf;
+	/* Set buffers to active frame */
+	SETCURRENTBUFS;
 
-#ifdef LVRDOUBLEBUFFERED
-	if (activebuf) {
-		frame = &render[rendsize];
-		curzbuf = &zbuf[rendsize];
-		curpbuf = &pbuf[rendsize];
-	}
-#endif
-
+	/* Clear frame data */
 	memset(curzbuf,0,rendsize*sizeof(int));
+	memset(frame,0,rendsize*sizeof(SGUIPixel));
 
-	if (skies)
-		skies->RenderTo(frame,g_w,g_h);
+	/* Lock datapipe until render is done */
+	pipeptr->ReadLock();
 
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
 		for (x = 0; x < g_w; x++,l++) {
-			curpbuf[l] = vector3di(-1);
+			curpbuf[l] = vector3di(-1); //clear pbuf data
 			if ((mask) && (mask[l])) continue;
 
 			//reverse painter's algorithm
@@ -305,47 +295,67 @@ void LVR::Frame()
 					if ((s >= 0) && (s < 6)) {
 						//draw it!
 						frame[l].sym = vox->sides[s];
-
 						//apply voxel' color information
 						frame[l].bg = vox->pix.bg;
 						frame[l].fg = vox->pix.fg;
-
-						//apply simple fog effect
-						//FIXME: maybe put this code somewhere outside? To Postprocess
-						fl = z - fog;
-						if (fl > 0) {
-							fg = dfog * fl;
-							fo = tripletovecf(frame[l].bg);
-							fo *= (1.f - fg);
-							fn.X = fogcol.X;
-							fn.Y = fogcol.Y;
-							fn.Z = fogcol.Z;
-							fn *= fg;
-							fo += fn;
-							frame[l].bg = vecftotriple(fo);
-
-							fo = tripletovecf(frame[l].fg);
-							fo *= (1.f - fg);
-							fo += fn;
-							frame[l].fg = vecftotriple(fo);
-						}
 					} else {
-						//something went wrong
-						frame[l].bg.r = 0;
-						frame[l].bg.g = 0;
-						frame[l].bg.b = 0;
-						frame[l].fg = frame[l].bg;
+						//something went wrong, we're inside the object
+						frame[l].sym = ' ';
 					}
 					break;
 				} //voxel frame
 			} //by Z
 		} //by X
 	} //by Y
+
+	/* Release datapipe */
+	pipeptr->ReadUnlock();
 }
 
 void LVR::Postprocess()
 {
-	//TODO: move fog here
+	int x,y,l;
+	SGUIPixel* frame;
+	int* curzbuf;
+	vector3di* curpbuf;
+	float fa,fb,fc;
+	vector3d vfa,vfb;
+
+	/* Set buffers to active frame */
+	SETCURRENTBUFS;
+
+	for (y = 0, l = 0; y < g_h; y++) {
+		for (x = 0; x < g_w; x++, l++) {
+
+			/* Fog */
+			if (pproc.fog_dist > 0) {
+				fa = curzbuf[l] - pproc.fog_dist;
+				fc = 1.f / (float)(far - pproc.fog_dist);
+				if (fa > 0) {
+					fb = fc * fa;
+					vfa = tripletovecf(frame[l].bg);
+					vfa *= (1.f - fb);
+					vfb.X = pproc.fog_col.r;
+					vfb.Y = pproc.fog_col.g;
+					vfb.Z = pproc.fog_col.b;
+					vfb *= fb;
+					vfa += vfb;
+					frame[l].bg = vecftotriple(vfa);
+
+					vfa = tripletovecf(frame[l].fg);
+					vfa *= (1.f - fb);
+					vfa += vfb;
+					frame[l].fg = vecftotriple(vfa);
+				}
+			}
+
+			/* Noise */
+			if (pproc.noise > 0) {
+				//FIXME: debugging implementation
+				//
+			}
+		}
+	}
 }
 
 void LVR::SwapBuffers()

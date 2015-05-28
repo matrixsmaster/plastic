@@ -26,7 +26,9 @@
 #include <vector>
 #include "CurseGUI.h"
 #include "CGUIControls.h"
+
 #include "vecmath.h"
+#include "LVRconsts.h"
 
 
 /* ********************************** Debug Console ********************************** */
@@ -130,20 +132,21 @@ public:
 
 /* ********************************** Renderer Config window ********************************** */
 
-class LVR;
+class RenderPool;
 
 class CurseGUIRenderConfWnd : public CurseGUIWnd {
 private:
-	LVR* lvr;
+	RenderPool* pool;
 	float scale;
 	vector3d fov;
-	int far,fog;
-	vector3di fogcol;
+	int far;
+	SLVRPostProcess ppset;
 	CurseGUIEditBox* e_scale;
 	CurseGUIEditBox* e_fovx,*e_fovy;
 	CurseGUIEditBox* e_far;
 	CurseGUIEditBox* e_fog;
 	CurseGUIEditBox* e_fogr,*e_fogg,*e_fogb;
+	CurseGUIEditBox* e_noise;
 	CurseGUIButton* b_apply,*b_reset;
 
 	void Fill();
@@ -152,7 +155,7 @@ private:
 	void Reset();
 
 public:
-	CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr);
+	CurseGUIRenderConfWnd(CurseGUI* scrn, RenderPool* ppool);
 	virtual ~CurseGUIRenderConfWnd()	{}
 
 	bool PutEvent(SGUIEvent* e);

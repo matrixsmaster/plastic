@@ -35,17 +35,34 @@
 #include "plastic.h"
 
 
+///Default amount of available RAM.
 #define DEFRAMMAX (2ULL * 1024*1024*1024)
 
+///Block DataPipe on each voxel access operation.
+//#define DPLOCKEACHVOX 1
+
+///Amount of time to wait between locking write operations.
+#define DPWRLOCKTIME 100
+
+///Maximum length of argument string in INI file.
 #define MAXINISTRLEN 256
+///INI file string format.
 #define FMTINISTRING "%s = %255[^\n]"
 
+///Voxel table file name.
 #define VOXTABFILENAME "voxtab.dat"
+
+///Atmospherics settings file name.
 #define ATMOININAME "atmosphere"
+
+///Control bindings file name.
 #define KEYBINDNAME "controls"
+
+///Actors classes data file name.
 #define CLASNFONAME "classes"
 
 
+/* States of DataPipe */
 enum EDPipeStatus {
 	DPIPE_NOTREADY,		//pipe is partially initialized
 	DPIPE_ERROR,		//error state, pipe cannot be used
@@ -53,6 +70,7 @@ enum EDPipeStatus {
 	DPIPE_BUSY			//central chunk is loading
 };
 
+/* States of voxel chunk inside DataPipe */
 enum EDChunkStatus {
 	DPCHK_EMPTY,
 	DPCHK_READY,
@@ -61,6 +79,7 @@ enum EDChunkStatus {
 	DPCHK_ERROR
 };
 
+/* File data placement map record */
 struct SDataPlacement {
 	unsigned filenum;
 	vector3di pos;
@@ -80,19 +99,28 @@ typedef std::map<vector3dulli,SDataPlacement> PlaceMap;
 class DataPipe {
 protected:
 	EDPipeStatus status;
+	char root[MAXPATHLEN];				//root path
+
 	PChunk chunks[HOLDCHUNKS];			//world chunk buffers
 	EDChunkStatus chstat[HOLDCHUNKS];	//chunks status
+	SVoxelTab voxeltab;					//voxel types table
+	PlaceMap placetab;					//chunk displacement map
+	ulli allocated;						//amount of allocated RAM
+	ulli rammax;						//max amount of memory allowed to be allocated
+
 	pthread_mutex_t vmutex;				//main voxel mutex
-	ulli allocated;					//amount of allocated RAM
-	vector3di GP;					//global position of central chunk
-	char root[MAXPATHLEN];			//root path
-	PlaceMap placetab;				//chunk displacement map
-	WorldGen* wgen;					//world generator instance
-	SVoxelTab voxeltab;				//voxel types table
-	IniMap ini;						//map of known (and loaded) ini files
-	ulli rammax;					//max amount of memory allowed to be allocated
-	VModVec objs;					//objects in scene
-	VSprVec sprs;					//sprites in scene
+	pthread_mutex_t cndmtx;				//condition mutex
+	int readcnt;						//read operations counter
+	bool writeatt;						//write attempt flag
+	pthread_cond_t cntcnd;				//read counter condition var
+
+	vector3di GP;						//global position of central chunk
+
+	WorldGen* wgen;						//world generator instance
+	IniMap ini;							//map of known (and loaded) ini files
+
+	VModVec objs;						//objects in scene
+	VSprVec sprs;						//sprites in scene
 
 	bool Allocator(SGameSettings* sets);
 	bool ScanFiles();
@@ -110,9 +138,10 @@ public:
 	virtual EDPipeStatus GetStatus()	{ return status; }
 
 	///Synchronization.
-	int Lock()							{ return pthread_mutex_lock(&vmutex); }
-	int TryLock()						{ return pthread_mutex_trylock(&vmutex); }
-	int Unlock()						{ return pthread_mutex_unlock(&vmutex); }
+	int ReadLock();
+	int ReadUnlock();
+	int WriteLock();
+	int WriteUnlock();
 
 	///Returns amount of RAM allocated by buffers.
 	ulli GetAllocatedRAM()				{ return allocated; }
@@ -170,6 +199,7 @@ public:
 	vector3di GetInitialPCGPos()			{ return wgen->GetPCInitPos(); }
 	vector3di GetInitialPCLPos()			{ return vector3di(128,90,135); } //FIXME
 };
+
 
 /* ********************************** DATA PIPE DUMMY ********************************** */
 /* This class can be used as a lightweight version of DataPipe.

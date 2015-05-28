@@ -27,11 +27,12 @@
 #include <unistd.h>
 #include "plastic.h"
 #include "support.h"
+#include "utils.h"
 #include "debug.h"
 #include "CurseGUI.h"
 #include "world.h"
-#include "LVR.h"
 #include "datapipe.h"
+#include "renderpool.h"
 
 
 static SGameSettings	g_set = DEFAULT_SETTINGS;
@@ -40,8 +41,8 @@ static CurseGUI*		g_gui = NULL;
 static pthread_t		t_event = 0;
 static pthread_t		t_render = 0;
 static pthread_t		t_loader = 0;
-static pthread_mutex_t	m_render,m_resize;
-static bool				g_quit = false;
+static pthread_mutex_t	m_render;
+volatile bool			g_quit = false;
 static uli				g_fps = 0;
 
 
@@ -50,7 +51,6 @@ static uli				g_fps = 0;
 static void* plastic_eventhread(void* ptr)
 {
 	SGUIEvent my_e;
-	bool resz;
 
 	while ((g_gui) && (!g_gui->WillClose())) {
 
@@ -59,15 +59,8 @@ static void* plastic_eventhread(void* ptr)
 
 		/* Events pump */
 		if (!g_gui->PumpEvents(&my_e)) {
-			/* Resize event will interfere with LVR frame processing, so lock it */
-			resz = (my_e.t == GUIEV_RESIZE);
-			if (resz) pthread_mutex_lock(&m_resize);
-
 			/* No one consumed event, need to be processed inside the core */
 			g_wrld->ProcessEvents(&my_e);
-
-			/* Unlock resize mutex if needed */
-			if (resz) pthread_mutex_unlock(&m_resize);
 		}
 
 		g_wrld->GetHUD()->UpdateFPS(g_fps); //FIXME
@@ -80,23 +73,16 @@ static void* plastic_eventhread(void* ptr)
 	}
 	g_quit = true;
 
-	return NULL;
+	pthread_exit(NULL);
 }
 
 static void* plastic_renderthread(void* ptr)
 {
-	LVR* lvr;
 	time_t beg;
 	uli fps = 0;
-
-	lvr = g_wrld->GetRenderer();
 	beg = clock();
 
 	while (!g_quit) {
-		pthread_mutex_lock(&m_resize);
-		lvr->Frame();
-		pthread_mutex_unlock(&m_resize);
-
 		fps++;
 		if ((clock() - beg) >= CLOCKS_PER_SEC) {
 			g_fps = fps;
@@ -105,11 +91,15 @@ static void* plastic_renderthread(void* ptr)
 		}
 
 		pthread_mutex_lock(&m_render);
-		g_gui->Update(true);
+		g_wrld->Frame();		//fast call
+		g_gui->Update(true);	//slow call
 		pthread_mutex_unlock(&m_render);
+
+		/* Make some room between two frames */
+		usleep(UPDATUSLEEP);
 	}
 
-	return NULL;
+	pthread_exit(NULL);
 }
 
 static void* plastic_chunksthread(void* ptr)
@@ -123,7 +113,7 @@ static void* plastic_chunksthread(void* ptr)
 		usleep(CHUNKUSLEEP);
 	}
 
-	return NULL;
+	pthread_exit(NULL);
 }
 
 /* *********************************************************** */
@@ -160,7 +150,6 @@ static void plastic_start()
 
 	/* Create mutexes */
 	pthread_mutex_init(&m_render,NULL);
-	pthread_mutex_init(&m_resize,NULL);
 
 	/* Start chunks loading queue */
 	pthread_create(&t_loader,NULL,plastic_chunksthread,g_wrld->GetDataPipe());
@@ -193,7 +182,6 @@ static void plastic_cleanup()
 
 	/* Destroy mutexes */
 	pthread_mutex_destroy(&m_render);
-	pthread_mutex_destroy(&m_resize);
 
 	/* Destroy debugging UI */
 	dbg_finalize();

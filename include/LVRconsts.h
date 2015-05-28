@@ -17,33 +17,41 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Implementation file of a lightweight version of DataPipe */
+/* Lightweight Voxel Renderer constants and types */
 
-#include "vecmisc.h"
-#include "datapipe.h"
+#ifndef LVRCONSTS_H_
+#define LVRCONSTS_H_
+
+#include "voxel.h"
+#include "visual.h"
 
 
-DataPipeDummy::DataPipeDummy(SGameSettings* sets) :
-		DataPipe(sets,false)
-{
-	if (status == DPIPE_NOTREADY) status = DPIPE_IDLE;
+///Define this to use debugging output.
+//#define LVRDEBUG 1
+
+///Define this to use double-buffering in LVR.
+#define LVRDOUBLEBUFFERED 1
+
+///Set of main settings defaults.
+#define DEFSCALE 1.f
+#define DEFFOVX 115
+#define DEFFOVY 62
+#define DEFFARPLANE 61
+//#define DEFFOGPLANE 21
+//#define DEFFOGGRAY 40
+
+///LVR Post-processing settings.
+struct SLVRPostProcess {
+	int fog_dist;
+	SCTriple fog_col;
+	int noise;
+};
+
+///Default post-processing.
+#define DEFPOSTPROC { \
+	21, \
+	{40, 40, 40}, \
+	0 \
 }
 
-voxel DataPipeDummy::GetVoxel(const vector3di* p)
-{
-	VModVec::iterator mi;
-	voxel tmp = 0;
-
-	ReadLock();
-	if (!objs.empty()) {
-		for (mi = objs.begin(); mi != objs.end(); ++mi) {
-			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
-				tmp = (*mi)->GetVoxelAt(p);
-				if (tmp) break;
-			}
-		}
-	}
-	ReadUnlock();
-
-	return tmp;
-}
+#endif /* LVRCONSTS_H_ */
