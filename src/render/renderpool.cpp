@@ -33,16 +33,23 @@ static void* rendpool_lvrthread(void* ptr)
 			if (me->dopproc)
 				lvr->Postprocess();
 
-			/* Lock and swap */
+			/* Lock renderer for swapping buffers */
 			pthread_mutex_lock(&(me->mtx));
 
 			lvr->SwapBuffers(); //select location for next sub-frame
 
+			/* This renderer is ready to transfer its sub-frame */
+			me->done = true;
+
+			/* Unlock renderer */
+			pthread_mutex_unlock(&(me->mtx));
+
+		} else {
+			/* Just set the done flag */
+			pthread_mutex_lock(&(me->mtx));
+			me->done = true;
 			pthread_mutex_unlock(&(me->mtx));
 		}
-
-		/* This renderer is ready to transfer its sub-frame */
-		me->done = true;
 
 		/* Wait for transfer or quit event */
 		while (me->done) {
@@ -160,18 +167,7 @@ bool RenderPool::Quantum()
 	/* Draw skies background */
 	skies->RenderTo(render+shf,g_w,g_h);
 
-	/* Test:
-	 * 1. Block pipe
-	 * 2. Send signal to workers to start up
-	 * 3. Double-buffering not needed
-	 * 4. Keep spinning over all workers to get its results until every worker is committed
-	 * 5. Release pipe
-	 * 6. ???
-	 * 7. Go to 1
-	 */
-
 	for (i = 0, cur = pool; i < RENDERPOOLN; i++, cur++) {
-//		cur = pool + i;
 		if (!cur->good) continue; //discard not used renderers
 		lvr = cur->lvr;
 
@@ -315,12 +311,14 @@ bool RenderPool::Resize(int w, int h)
 	SpawnThreads();
 
 	for (i = 0, s = 0; i < RENDERPOOLN; i++, s+=n) {
+		pthread_mutex_lock(&(pool[i].mtx));
 		pool[i].start = s * g_w; //sub-frame offset
 		if (s+n >= h) n = h - s; //sub-frame height check
 		pool[i].good = pool[i].lvr->Resize(w,n); //resize sub-frame
 		pool[i].lvr->SetMid(mid); //set sub-frame mid-point
 		mid.Y -= n; //and move mid-point up bu sub-frame height
 		pool[i].done = false; //sub-frame is dirty now and ready to process
+		pthread_mutex_unlock(&(pool[i].mtx));
 	}
 
 	/* Reset post-processing completely */

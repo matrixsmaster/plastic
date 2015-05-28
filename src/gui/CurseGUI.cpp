@@ -420,7 +420,8 @@ bool CurseGUI::PumpEvents(SGUIEvent* e)
 			/* Or, get the keypress event */
 			e->t = GUIEV_KEYPRESS;
 			e->k = getch();
-			while (getch() != ERR) ; //discard all pending events
+			flushinp(); //discard all pending events
+
 			if ((e->k == KEY_MOUSE) || (!e->k) || (e->k == ERR)) {
 
 				/* Or, get the mouse event (least priority) */

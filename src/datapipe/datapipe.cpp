@@ -24,6 +24,7 @@
 #include "support.h"
 #include "vecmisc.h"
 
+#include <unistd.h>
 
 DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 {
@@ -31,14 +32,22 @@ DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 
 	/* Init variables */
 	status = DPIPE_ERROR;
-	pthread_mutex_init(&vmutex,NULL);
+
+	memset(root,0,MAXPATHLEN);
 	memset(chunks,0,sizeof(chunks));
 	memset(chstat,0,sizeof(chstat));
-	allocated = 0;
-	memset(root,0,MAXPATHLEN);
-	wgen = NULL;
 	memset(&voxeltab,0,sizeof(voxeltab));
+	allocated = 0;
+
+	wgen = NULL;
 	rammax = sets->rammax;
+
+	pthread_mutex_init(&vmutex,NULL);
+	pthread_mutex_init(&cndmtx,NULL);
+	pthread_cond_init(&cntcnd,NULL);
+//	pthread_cond_init(&watcnd,NULL);
+	readcnt = 0;
+	writeatt = false;
 
 	/* Copy root path */
 	i = strlen(sets->root);
@@ -65,6 +74,9 @@ DataPipe::~DataPipe()
 	PurgeModels();
 	PurgeChunks();
 
+//	pthread_cond_destroy(&watcnd);
+	pthread_cond_destroy(&cntcnd);
+	pthread_mutex_destroy(&cndmtx);
 	pthread_mutex_destroy(&vmutex);
 }
 
@@ -131,6 +143,75 @@ bool DataPipe::Allocator(SGameSettings* sets)
 	return true;
 }
 
+int DataPipe::ReadLock()
+{
+	int r;
+	r = pthread_mutex_lock(&cndmtx);
+	while (writeatt) {
+		pthread_mutex_unlock(&cndmtx);
+		usleep(100);
+		r = pthread_mutex_lock(&cndmtx);
+//		pthread_cond_wait(&watcnd,&cndmtx);
+	}
+//		pthread_cond_wait(&cntcnd,&cndmtx);
+//	if (r) return r;
+	if (readcnt == 0) {
+		for (;;) {
+			r = pthread_mutex_trylock(&vmutex);
+			if (r == 0) break;
+//			pthread_cond_wait(&watcnd,&cndmtx);
+			pthread_mutex_unlock(&cndmtx);
+			usleep(100);
+			pthread_mutex_lock(&cndmtx);
+//			pthread_cond_wait(&cntcnd,&cndmtx);
+		}
+//		if (r) return r;
+		pthread_mutex_unlock(&vmutex);
+	}
+	readcnt++;
+	pthread_mutex_unlock(&cndmtx);
+	return r;
+}
+
+int DataPipe::ReadUnlock()
+{
+	int r;
+	r = pthread_mutex_lock(&cndmtx);
+//	if (r) return r;
+	if (--readcnt < 0) readcnt = 0;
+	if (readcnt == 0)
+		pthread_cond_signal(&cntcnd);
+	pthread_mutex_unlock(&cndmtx);
+	return r;
+}
+
+int DataPipe::WriteLock()
+{
+	int r;
+	r = pthread_mutex_lock(&cndmtx);
+	writeatt = true;
+//	if (r) return r;
+	while (readcnt) {
+		pthread_cond_wait(&cntcnd,&cndmtx);
+//		pthread_mutex_unlock(&cndmtx);
+//		usleep(50);
+//		pthread_mutex_lock(&cndmtx);
+	}
+	pthread_mutex_lock(&vmutex);
+	pthread_mutex_unlock(&cndmtx);
+	return r;
+}
+
+int DataPipe::WriteUnlock()
+{
+	pthread_mutex_lock(&cndmtx);
+	writeatt = false;
+//	pthread_cond_signal(&cntcnd);
+//	pthread_cond_signal(&watcnd);
+	pthread_mutex_unlock(&cndmtx);
+	return (pthread_mutex_unlock(&vmutex));
+}
+
 bool DataPipe::ScanFiles()
 {
 	//TODO: scan world files to map known chunks
@@ -192,7 +273,7 @@ void DataPipe::PurgeChunks()
 {
 	int i;
 
-	Lock();
+	WriteLock();
 	for (i = 0; i < HOLDCHUNKS; i++)
 		if (chunks[i]) {
 			free(chunks[i]);
@@ -201,7 +282,7 @@ void DataPipe::PurgeChunks()
 		}
 
 	status = DPIPE_NOTREADY;
-	Unlock();
+	WriteUnlock();
 }
 
 void DataPipe::SetGP(vector3di pos)
@@ -210,7 +291,7 @@ void DataPipe::SetGP(vector3di pos)
 
 	GP = pos;
 
-	Lock();
+	WriteLock();
 	status = DPIPE_BUSY;
 
 	for (l = 0; l < HOLDCHUNKS; l++)
@@ -230,16 +311,16 @@ void DataPipe::SetGP(vector3di pos)
 	MakeChunk(l,GP);
 
 	status = DPIPE_IDLE;
-	Unlock();
+	WriteUnlock();
 }
 
 bool DataPipe::Move(EGMoveDir dir)
 {
-	Lock();
+	WriteLock();
 	status = DPIPE_BUSY;
 	//TODO
 	status = DPIPE_IDLE;
-	Unlock();
+	WriteUnlock();
 	return false;
 }
 
@@ -256,8 +337,7 @@ void DataPipe::ChunkQueue()
 	bool fnd = false;
 	unsigned l;
 
-//	Lock();
-//	status = DPIPE_BUSY;
+//	WriteLock();
 
 #if HOLDCHUNKS == 9
 	/* One 3x3 plane of chunks, most widely used scenario */
@@ -315,8 +395,8 @@ chunk_found:
 		MakeChunk(l,cur);
 	}
 
-//	status = DPIPE_IDLE;
-//	Unlock();
+//	WriteUnlock();
+
 #endif
 }
 
@@ -341,15 +421,11 @@ bool DataPipe::LoadChunk(SDataPlacement* res, PChunk buf)
 
 /* GetVoxel() Interlocking macros variations for multithreaded access */
 #ifdef DPLOCKEACHVOX
-#define DP_GETVOX_LOCK Lock()
-#define DP_GETVOX_UNLOCK Unlock()
-#define DP_GETVOXDYN_TRLOCK
-#define DP_GETVOXDYN_UNLOCK
+#define DP_GETVOX_LOCK ReadLock()
+#define DP_GETVOX_UNLOCK ReadUnlock()
 #else
 #define DP_GETVOX_LOCK
 #define DP_GETVOX_UNLOCK
-#define DP_GETVOXDYN_TRLOCK /*if (!TryLock())*/
-#define DP_GETVOXDYN_UNLOCK /*Unlock()*/
 #endif
 
 voxel DataPipe::GetVoxel(const vector3di* p)
@@ -368,20 +444,16 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	DP_GETVOX_LOCK;
 
 	/* Check for dynamic objects */
-	DP_GETVOXDYN_TRLOCK {
-		if (!objs.empty()) {
-			for (mi = objs.begin(); mi != objs.end(); ++mi) {
-				if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
-					tmp = (*mi)->GetVoxelAt(p);
-					if (tmp) {
-						DP_GETVOX_UNLOCK;
-						DP_GETVOXDYN_UNLOCK;
-						return tmp;
-					}
+	if (!objs.empty()) {
+		for (mi = objs.begin(); mi != objs.end(); ++mi) {
+			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
+				tmp = (*mi)->GetVoxelAt(p);
+				if (tmp) {
+					DP_GETVOX_UNLOCK;
+					return tmp;
 				}
 			}
 		}
-		DP_GETVOXDYN_UNLOCK;
 	}
 
 #if HOLDCHUNKS == 1
@@ -483,9 +555,9 @@ VModel* DataPipe::LoadModel(const char* fname, const vector3di pos)
 	allocated += m->GetAllocatedRAM();
 	m->SetPos(pos);
 
-	Lock();
+	WriteLock();
 	objs.push_back(m);
-	Unlock();
+	WriteUnlock();
 
 	return m;
 }
@@ -497,11 +569,11 @@ bool DataPipe::UnloadModel(const VModel* ptr)
 
 	for (it = objs.begin(); it != objs.end(); ++it)
 		if ((*it) == ptr) {
-			Lock();
+			WriteLock();
 			allocated -= (*it)->GetAllocatedRAM();
 			delete ((*it));
 			objs.erase(it);
-			Unlock();
+			WriteUnlock();
 			return true;
 		}
 
@@ -512,14 +584,14 @@ void DataPipe::PurgeModels()
 {
 	VModVec::iterator mi;
 
-	Lock();
+	WriteLock();
 	for (mi = objs.begin(); mi != objs.end(); ++mi) {
 		allocated -= (*mi)->GetAllocatedRAM();
 		delete (*mi);
 	}
 
 	objs.clear();
-	Unlock();
+	WriteUnlock();
 }
 
 VSprite* DataPipe::LoadSprite(const char* fname)

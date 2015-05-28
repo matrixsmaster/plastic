@@ -241,7 +241,7 @@ void LVR::Frame()
 	memset(frame,0,rendsize*sizeof(SGUIPixel));
 
 	/* Lock datapipe until render is done */
-//	pipeptr->Lock();
+	pipeptr->ReadLock();
 
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
@@ -309,7 +309,7 @@ void LVR::Frame()
 	} //by Y
 
 	/* Release datapipe */
-//	pipeptr->Unlock();
+	pipeptr->ReadUnlock();
 }
 
 void LVR::Postprocess()

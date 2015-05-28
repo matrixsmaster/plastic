@@ -34,7 +34,7 @@ voxel DataPipeDummy::GetVoxel(const vector3di* p)
 	VModVec::iterator mi;
 	voxel tmp = 0;
 
-	Lock();
+	ReadLock();
 	if (!objs.empty()) {
 		for (mi = objs.begin(); mi != objs.end(); ++mi) {
 			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
@@ -43,7 +43,7 @@ voxel DataPipeDummy::GetVoxel(const vector3di* p)
 			}
 		}
 	}
-	Unlock();
+	ReadUnlock();
 
 	return tmp;
 }

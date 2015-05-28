@@ -42,7 +42,7 @@ static pthread_t		t_event = 0;
 static pthread_t		t_render = 0;
 static pthread_t		t_loader = 0;
 static pthread_mutex_t	m_render;
-static bool				g_quit = false;
+volatile bool			g_quit = false;
 static uli				g_fps = 0;
 
 

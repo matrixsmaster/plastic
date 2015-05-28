@@ -93,15 +93,15 @@ void PlasticWorld::Quantum()
 		if (!test) abort();
 	}
 
-#if 0
+#if 1
 	//DEBUG:
-	data->Lock();
+	data->WriteLock();
 //	if (data->TryLock()) return;
 	if (test->GetState() == 0)
 		test->SetState(test->GetNumStates()-1);
 	else
 		test->SetState(test->GetState()-1);
-	data->Unlock();
+	data->WriteUnlock();
 #endif
 }
 

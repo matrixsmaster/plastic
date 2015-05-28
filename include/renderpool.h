@@ -35,7 +35,7 @@
 #define RENDERPOOLN 3
 
 ///Desync time for render threads (us).
-#define RENDERPOOLDESW 100
+#define RENDERPOOLDESW 150
 
 
 /* Pool runtime data structure */
@@ -43,11 +43,11 @@ struct SRendPoolDat {
 	pthread_t thr;
 	pthread_mutex_t mtx;
 	LVR* lvr;
-	bool done;
-	bool quit;
+	volatile bool done;
+	volatile bool quit;
 	int start;
-	bool good;
-	bool dopproc;
+	volatile bool good;
+	volatile bool dopproc;
 };
 
 /* RenderPool: multi-thread LVR */
