@@ -30,10 +30,6 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 
 -> Add auto register function of GUI controls to GUI windows (?)
 
--> Implement precise timer in PlasticWorld and start counting game time
-
--> Add Message Box Window
-
--> Add water generation threshold to WorldGen
-
 -> Consider adding lens flare effect for post-processor
+
+-> Test 'textured' rendering of voxel sides
