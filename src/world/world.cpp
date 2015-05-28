@@ -222,12 +222,11 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 					printf("TESTING: YOU SHOULDN'T SEE THIS!!!");
 					redrawwin(gui->GetWindow());
 					return;
-			case 'z': //KEY_F(2): //tmp
-				if(hud) {
-					if(hud->GetTransparent()) {
-						hud->SetTransparent(false);
-					} else hud->SetTransparent(true);
-				}
+			case 'z':
+				if (hud) hud->SetAlpha(OVRL_LOG, 0);
+				break;
+			case 'x':
+				if (hud) hud->SetAlpha(OVRL_LOG, 0.5);
 				break;
 			}
 		}
@@ -251,7 +250,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 			x = lvr->GetProjection(curso);
 			snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
-			hud->PutStrBottom(s);
+			hud->PutStrToLog(s);
 			gui->SetCursorPos(curso.X,curso.Y);
 		}
 		break;

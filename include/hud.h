@@ -26,18 +26,15 @@
 #include "CGUIOverlay.h"
 #include "vecmath.h"
 
-#define FPS_OVRL 	0
-#define BTM_OVRL 	1
-#define STAT_OVRL 	2
-
 #define STAT_OVRL_HEIGHT 3
 
-//enum HUDOverlayType {
-//	FPS_OVRL,
-//	BTM_OVRL,
-//	STATUS
-//};
-
+enum HUDOverlayType {
+	OVRL_FPS = 0,
+	OVRL_LOG,
+	OVRL_ST,
+	OVRL_MAP,
+	OVRL_STBTM
+};
 
 
 class HUD {
@@ -52,6 +49,9 @@ private:
 	void Spawn(int x, int y, int w, int h, bool logging, const char* txt);
 	std::string intToString(int n);
 
+	void ClearLog(HUDOverlayType t);
+	void PutString(HUDOverlayType t, std::string str);
+
 public:
 	HUD(CurseGUI* guiptr);
 	virtual ~HUD();
@@ -62,12 +62,20 @@ public:
 	//Update status message (gpos, lpos, etc)
 	void UpdateStatusOvrl();
 
-	void PutStrBottom(const char* str);
+	//Put string to LOG overlay
+	void PutStrToLog(const char* str);
 
-	bool GetTransparent();
-	void SetTransparent(bool t);
-	void SetAlpha(float a);
+	//Set transparency
+	void SetAlpha(HUDOverlayType t, float a);
+
+	//Set background mask
 	void SetBckgrMask(SGUIPixel* pxl);
+
+	//Draw local world map
+	void DrawMap();
+
+	//Update State overlay
+	void UpdateState(std::string str);
 
 	void SetGPos(vector3di gp) { st_gp = gp; }
 	void SetLPos(vector3di lp) { st_lp = lp; }

@@ -68,14 +68,19 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	new CurseGUILabel(ctrls, x1, y1+ht, wt, 1, "Description:");
 	description_lbl = new CurseGUILabel(ctrls, x1, y1+ht+1, wt, 5, "");
 
-	destroy_btn = new CurseGUIButton(ctrls, wt+2, y1, 11, "Destroy");
-	drop_btn = new CurseGUIButton(ctrls, wt+2, y1+1, 11, "Drop");
-	wear_btn = new CurseGUIButton(ctrls, wt+2, y1+2, 11, "Wear");
-	use_btn = new CurseGUIButton(ctrls, wt+2, y1+3, 11, "Use");
-	repair_btn = new CurseGUIButton(ctrls, wt+2, y1+4, 11, "Repair");
+	destroy_btn = new CurseGUIButton(ctrls, wt+2, y1+1, 11, "Destroy");
+	drop_btn = new CurseGUIButton(ctrls, wt+2, y1+2, 11, "Drop");
+	wear_btn = new CurseGUIButton(ctrls, wt+2, y1+3, 11, "Wear");
+	use_btn = new CurseGUIButton(ctrls, wt+2, y1+4, 11, "Use");
+	repair_btn = new CurseGUIButton(ctrls, wt+2, y1+5, 11, "Repair");
 
-	new CurseGUILabel(ctrls, wt+3, y1+6, 7, 1, "Search");
-	search_edit = new CurseGUIEditBox(ctrls, wt+2, y1+7, 12, "_____________");
+	new CurseGUILabel(ctrls, wt+3, y1+7, 7, 1, " Search");
+	search_edit = new CurseGUIEditBox(ctrls, wt+2, y1+8, 12, "");
+}
+
+void CurseGUIInventoryWnd::FillInventoryTable()
+{
+	//TODO
 }
 
 bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)

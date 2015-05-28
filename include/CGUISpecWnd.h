@@ -84,6 +84,7 @@ private:
 
 
 	void ResizeWnd();
+	void FillInventoryTable();
 
 public:
 	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);

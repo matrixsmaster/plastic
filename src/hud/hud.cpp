@@ -24,16 +24,33 @@ using namespace std;
 
 HUD::HUD(CurseGUI* guiptr)
 {
+	int w, h;
 	gui = guiptr;
 
 	st_gp.X = 0; st_gp.Y = 0; st_gp.Z = 0;
 	st_lp.X = 0; st_lp.Y = 0; st_lp.Z = 0;
 
+	w = gui->GetWidth();
+	h = gui->GetHeight();
 
-	//add some overlays
-	Spawn(0,0, gui->GetWidth()/4, 1, false, "fps = 0"); //top
-	Spawn(0,gui->GetHeight()-gui->GetHeight()/4, gui->GetWidth()/4, gui->GetHeight()/4, true, "Testing bottom overlay"); //bottom
-	Spawn(gui->GetWidth()/5, 0, gui->GetWidth()/5, STAT_OVRL_HEIGHT, false, "");
+	/*add some overlays */
+
+	//fps overlay
+	Spawn(0,0, 10, 1, false, "fps = 0");
+
+	//bottom log overlay
+	Spawn(0,(h-(h/5)), (w/3), (h/5), true,
+			"Testing ovaerlay bla bla bla yeah! Alice in wonderland. Cynic.");
+
+	//status overlay on top
+	Spawn((w/5), 0, (w/5), STAT_OVRL_HEIGHT, false, "");
+
+	//map overlay
+	Spawn((w-(w/4)), 0, (w/4), (h/4), false, "     !!MAAAP!!");
+
+	//bottom state overlay
+	Spawn((w/3), (h-1), w/*-(w/3))*/, 1, false, " STATE string");
+	SetAlpha(OVRL_STBTM, 0);
 }
 
 HUD::~HUD()
@@ -62,27 +79,40 @@ string HUD::intToString(int n)
 	return ss.str();
 }
 
+void HUD::ClearLog(HUDOverlayType t)
+{
+	if(overlays.empty()) return;
+	overlays[t]->ClearLog();
+}
+
+void HUD::PutString(HUDOverlayType t, string str)
+{
+	if(overlays.empty()) return;
+	overlays[t]->PutString(str);
+}
+
 void HUD::UpdateFPS(uli fps)
 {
 	string str;
 
 	if(overlays.empty()) return;
-
-	overlays[FPS_OVRL]->ClearLog();
-
+	ClearLog(OVRL_FPS);
 	str = "fps = ";
 	str += intToString(fps);
-	overlays[FPS_OVRL]->PutString(str);
+	PutString(OVRL_FPS, str);
 }
 
-void HUD::UpdateStatusOvrl() //vector3di gp
+
+void HUD::PutStrToLog(const char* str)
 {
-	//TODO
+	PutString(OVRL_LOG, str);
+}
+
+void HUD::UpdateStatusOvrl()
+{
 	string str;
 
-	if(!(overlays.size() > STAT_OVRL-1)) return;
-
-	overlays[STAT_OVRL]->ClearLog();
+	ClearLog(OVRL_ST);
 	str = "GPos [";
 	str += intToString(st_gp.X);
 	str += " ";
@@ -90,7 +120,7 @@ void HUD::UpdateStatusOvrl() //vector3di gp
 	str += " ";
 	str += intToString(st_gp.Z);
 	str += "]";
-	overlays[STAT_OVRL]->PutString(str);
+	PutString(OVRL_ST, str);
 	str = "LPos [";
 	str += intToString(st_lp.X);
 	str += " ";
@@ -98,36 +128,27 @@ void HUD::UpdateStatusOvrl() //vector3di gp
 	str += " ";
 	str += intToString(st_lp.Z);
 	str += "]";
-	overlays[STAT_OVRL]->PutString(str);
+	PutString(OVRL_ST, str);
 	str = "";
-	overlays[STAT_OVRL]->PutString(str);
+	PutString(OVRL_ST, str);
 }
 
-void HUD::PutStrBottom(const char* str)
+void HUD::DrawMap()
 {
-	if(overlays.size() > 1) {
-		overlays[BTM_OVRL]->PutString(str);
-	}
+	//TODO
 }
 
-bool HUD::GetTransparent()
+void HUD::UpdateState(string str)
 {
-	//TODO check focus
-	if(overlays.size() >  0)
-		return overlays[BTM_OVRL]->IsTransparent();
-	return false;
+	string s = "STATE: ";
+	s += str;
+	PutString(OVRL_STBTM, s);
 }
 
-void HUD::SetTransparent(bool t)
+void HUD::SetAlpha(HUDOverlayType t, float a)
 {
-	//TODO check focus
-	if(!overlays.empty())
-		overlays[BTM_OVRL]->SetTransparent(t);
-}
-
-void HUD::SetAlpha(float a)
-{
-
+	if(overlays.empty()) return;
+	overlays[t]->SetAlpha(a);
 }
 
 void HUD::SetBckgrMask(SGUIPixel* pxl)

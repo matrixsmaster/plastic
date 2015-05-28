@@ -94,40 +94,44 @@ void CurseGUIOverlay::SetBckgrMask(SGUIPixel* pxl)
 
 void CurseGUIOverlay::ClearLog()
 {
+	if (log.empty()) return;
 	log.clear();
 }
 
 void CurseGUIOverlay::PutLog()
 {
 	vector<string>::iterator it;
+	int i, j, ns;
 	int h = g_h - 1;
 	chtype ch = 0;
-	int nl = g_h;
 	int y = m_y+h;
 	SGUIPixel pxl;
 	short lc = -1;
 	short pair;
-	int i;
+
 
 	if (log.empty()) return;
 
 	if (alpha <= 0)
 		wcolor_set(wnd, cmanager->CheckPair(&pixl), NULL);
 
-	if(nl - log.size() >= 0)
-		nl = log.size() + 1;
+	it = log.end() - 1;
+	for(j = 0; j < g_h; j++, --h, --y) {
 
-	for(it = log.end() - 1; it != log.end() - nl; --it, --h, --y) {
-
+		if (j >= (int)log.size())
+			ns = 0;
+		else ns = (int)it->size();
 
 		if (alpha > 0) {
 			//deal with each character separately in transparent mode
-			for (i = 0; i < (int)it->size(); ++i) {
+			for (i = 0; i < g_w; ++i) {
 				//get underlying symbol information
 				ch = mvinch(y, m_x+i);
 				pair = (ch & A_COLOR) >> NCURSES_ATTR_SHIFT;
 
-				pxl.sym = it->at(i);
+				//set the symbol
+				if(i >= ns) pxl.sym = ' ';
+				else pxl.sym = it->at(i);
 
 				//get the color information by pair code
 				if(!cmanager->GetPairColors(&pxl, pair)) continue;
@@ -149,11 +153,13 @@ void CurseGUIOverlay::PutLog()
 
 		} else {
 			//just print out the string
-			mvwaddnstr(wnd,h,m_x,it->c_str(),g_w);
+			if (ns > 0)
+				mvwaddnstr(wnd,h,0,it->c_str(),g_w);
 			//and fill the possible gap
-			i = it->size();
+			i = ns;
 			while (i < g_w)
-				mvwaddch(wnd,h,m_x + i++,' ');
+				mvwaddch(wnd,h,i++,' ');
 		}
+		--it;
 	}
 }
