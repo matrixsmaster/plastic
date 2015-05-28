@@ -38,6 +38,9 @@
 ///Default amount of available RAM.
 #define DEFRAMMAX (2ULL * 1024*1024*1024)
 
+///Define this to enable DataPipe debugging.
+#define DPDEBUG 1
+
 ///Block DataPipe on each voxel access operation.
 //#define DPLOCKEACHVOX 1
 

@@ -20,11 +20,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "datapipe.h"
 #include "support.h"
 #include "vecmisc.h"
 
-#include <unistd.h>
+#ifdef DPDEBUG
+#include "debug.h"
+#endif
+
 
 DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 {
@@ -316,6 +320,10 @@ void DataPipe::SetGP(vector3di pos)
 
 #endif
 
+#ifdef DPDEBUG
+	dbg_print("SetGP(): [%d %d %d]",GP.X,GP.Y,GP.Z);
+#endif
+
 	MakeChunk(l,GP);
 
 	status = DPIPE_IDLE;
@@ -415,10 +423,26 @@ void DataPipe::MakeChunk(unsigned l, vector3di pos)
 	if (!FindChunk(pos,&plc)) {
 		wgen->GenerateChunk(chunks[l],pos);
 		chstat[l] = DPCHK_READY;
-	} else if (!LoadChunk(&plc,chunks[l]))
+
+#ifdef DPDEBUG
+		dbg_print("Chunk %u generated at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
+#endif
+
+	} else if (!LoadChunk(&plc,chunks[l])) {
 		chstat[l] = DPCHK_ERROR;
-	else
+
+#ifdef DPDEBUG
+		dbg_print("Error loading chunk at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
+#endif
+
+	} else {
 		chstat[l] = DPCHK_READY;
+
+#ifdef DPDEBUG
+		dbg_print("Chunk %u loaded at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
+#endif
+
+	}
 }
 
 bool DataPipe::LoadChunk(SDataPlacement* res, PChunk buf)

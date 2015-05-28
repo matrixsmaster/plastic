@@ -194,6 +194,8 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	if (PC->ProcessEvent(e)) {
 		render->SetRot(PC->GetRot());
 		render->SetPos(PC->GetPos());
+		hud->SetGPos(PC->GetGPos());
+		hud->SetLPos(PC->GetPos());
 		return;
 	}
 
