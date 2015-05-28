@@ -41,6 +41,9 @@
 ///Block DataPipe on each voxel access operation.
 //#define DPLOCKEACHVOX 1
 
+///Amount of time to wait between locking write operations.
+#define DPWRLOCKTIME 100
+
 ///Maximum length of argument string in INI file.
 #define MAXINISTRLEN 256
 ///INI file string format.
@@ -108,17 +111,16 @@ protected:
 	pthread_mutex_t vmutex;				//main voxel mutex
 	pthread_mutex_t cndmtx;				//condition mutex
 	int readcnt;						//read operations counter
-	bool writeatt;
+	bool writeatt;						//write attempt flag
 	pthread_cond_t cntcnd;				//read counter condition var
-//	pthread_cond_t watcnd;
 
-	vector3di GP;					//global position of central chunk
+	vector3di GP;						//global position of central chunk
 
-	WorldGen* wgen;					//world generator instance
-	IniMap ini;						//map of known (and loaded) ini files
+	WorldGen* wgen;						//world generator instance
+	IniMap ini;							//map of known (and loaded) ini files
 
-	VModVec objs;					//objects in scene
-	VSprVec sprs;					//sprites in scene
+	VModVec objs;						//objects in scene
+	VSprVec sprs;						//sprites in scene
 
 	bool Allocator(SGameSettings* sets);
 	bool ScanFiles();
@@ -136,9 +138,6 @@ public:
 	virtual EDPipeStatus GetStatus()	{ return status; }
 
 	///Synchronization.
-//	int Lock()							{ return pthread_mutex_lock(&vmutex); }
-//	int TryLock()						{ return pthread_mutex_trylock(&vmutex); }
-//	int Unlock()						{ return pthread_mutex_unlock(&vmutex); }
 	int ReadLock();
 	int ReadUnlock();
 	int WriteLock();

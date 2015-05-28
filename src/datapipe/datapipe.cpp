@@ -45,7 +45,6 @@ DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 	pthread_mutex_init(&vmutex,NULL);
 	pthread_mutex_init(&cndmtx,NULL);
 	pthread_cond_init(&cntcnd,NULL);
-//	pthread_cond_init(&watcnd,NULL);
 	readcnt = 0;
 	writeatt = false;
 
@@ -74,7 +73,6 @@ DataPipe::~DataPipe()
 	PurgeModels();
 	PurgeChunks();
 
-//	pthread_cond_destroy(&watcnd);
 	pthread_cond_destroy(&cntcnd);
 	pthread_mutex_destroy(&cndmtx);
 	pthread_mutex_destroy(&vmutex);
@@ -146,28 +144,18 @@ bool DataPipe::Allocator(SGameSettings* sets)
 int DataPipe::ReadLock()
 {
 	int r;
+
+	/* Lock conditions */
 	r = pthread_mutex_lock(&cndmtx);
+
+	/* If write operation attempted, wait till its finished */
 	while (writeatt) {
 		pthread_mutex_unlock(&cndmtx);
-		usleep(100);
-		r = pthread_mutex_lock(&cndmtx);
-//		pthread_cond_wait(&watcnd,&cndmtx);
+		usleep(DPWRLOCKTIME);
+		pthread_mutex_lock(&cndmtx);
 	}
-//		pthread_cond_wait(&cntcnd,&cndmtx);
-//	if (r) return r;
-	if (readcnt == 0) {
-		for (;;) {
-			r = pthread_mutex_trylock(&vmutex);
-			if (r == 0) break;
-//			pthread_cond_wait(&watcnd,&cndmtx);
-			pthread_mutex_unlock(&cndmtx);
-			usleep(100);
-			pthread_mutex_lock(&cndmtx);
-//			pthread_cond_wait(&cntcnd,&cndmtx);
-		}
-//		if (r) return r;
-		pthread_mutex_unlock(&vmutex);
-	}
+
+	/* Increment readers counter and move on */
 	readcnt++;
 	pthread_mutex_unlock(&cndmtx);
 	return r;
@@ -176,11 +164,17 @@ int DataPipe::ReadLock()
 int DataPipe::ReadUnlock()
 {
 	int r;
+
+	/* Lock conditions */
 	r = pthread_mutex_lock(&cndmtx);
-//	if (r) return r;
+
+	/* Decrement readers counter */
 	if (--readcnt < 0) readcnt = 0;
 	if (readcnt == 0)
+		/* Send a signal to writers (if any) */
 		pthread_cond_signal(&cntcnd);
+
+	/* Release conditions */
 	pthread_mutex_unlock(&cndmtx);
 	return r;
 }
@@ -188,27 +182,41 @@ int DataPipe::ReadUnlock()
 int DataPipe::WriteLock()
 {
 	int r;
+
+	/* Lock conditions */
 	r = pthread_mutex_lock(&cndmtx);
+
+	/* Set write attempt to true */
 	writeatt = true;
-//	if (r) return r;
-	while (readcnt) {
+
+	/* Wait for readers to gone */
+	while (readcnt)
 		pthread_cond_wait(&cntcnd,&cndmtx);
-//		pthread_mutex_unlock(&cndmtx);
-//		usleep(50);
-//		pthread_mutex_lock(&cndmtx);
+
+	/* Try to lock main voxel mutex (write op. mutex) */
+	while (pthread_mutex_trylock(&vmutex)) {
+		/* Release conditions to allow many writers to step in queue */
+		pthread_mutex_unlock(&cndmtx);
+		usleep(DPWRLOCKTIME);
+		pthread_mutex_lock(&cndmtx);
 	}
-	pthread_mutex_lock(&vmutex);
+
+	/* Set write attempt flag again to deal with possible WRUnlock */
+	writeatt = true;
+
+	/* Release conditions and move on */
 	pthread_mutex_unlock(&cndmtx);
 	return r;
 }
 
 int DataPipe::WriteUnlock()
 {
+	/* Set write attempt to false */
 	pthread_mutex_lock(&cndmtx);
 	writeatt = false;
-//	pthread_cond_signal(&cntcnd);
-//	pthread_cond_signal(&watcnd);
 	pthread_mutex_unlock(&cndmtx);
+
+	/* And just unlock main voxel mutex */
 	return (pthread_mutex_unlock(&vmutex));
 }
 
