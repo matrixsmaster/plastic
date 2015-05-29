@@ -73,4 +73,7 @@ void RotNormDegI(vector3di* r);
 ///Check for point inclusion in some volume.
 bool IsPntInsideCubeI(const vector3di* pnt, const vector3di* center, const int side);
 
+///Bilinear int. V is known points (CW from (0,0)). P is point of interest. Returns P with Z calculated.
+vector3d BilinearInterpolation(const vector3d* v, const vector3d* p);
+
 #endif /* VECMISC_H_ */

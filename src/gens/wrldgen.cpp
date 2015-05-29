@@ -145,7 +145,7 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 	int x,y,z,t;
 	voxel v,vgr;
 	SWGCell cell;
-	vector3d crn[4];
+	vector3d crn[4],pnt,tmp;
 	voxel grains[CHUNKBOX/VOXGRAIN][CHUNKBOX/VOXGRAIN][CHUNKBOX/VOXGRAIN];
 
 	if (!buf) return;
@@ -156,7 +156,7 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 	for (z = 0; z < (CHUNKBOX/VOXGRAIN); z++)
 		for (y = 0; y < (CHUNKBOX/VOXGRAIN); y++)
 			for (x = 0; x < (CHUNKBOX/VOXGRAIN); x++)
-				grains[z][y][x] = GetVoxelOfType(VOXT_SAND);
+				grains[z][y][x] = GetVoxelOfType(VOXT_SAND); //FIXME: use cell type
 
 	switch (cell.chunkt) {
 	case WGCT_SURFACE:
@@ -165,7 +165,7 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 
 		crn[1].X = 0;
 		crn[1].Y = CHUNKBOX;
-		crn[1].Z = CHUNKBOX;// * cell.elev;
+		crn[1].Z = CHUNKBOX * cell.elev;
 
 		crn[2].X = CHUNKBOX;
 		crn[2].Y = CHUNKBOX;
@@ -180,11 +180,13 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 		crn[0].Z = CHUNKBOX * GetSurfaceCell(pos+vector3di(0,-1,0)).elev;
 
 		for (y = 0; y < CHUNKBOX; y++) {
+			pnt.Y = y;
 			for (x = 0; x < CHUNKBOX; x++) {
-//				t = InterpolateZQ(crn,x,y) - CHUNKBOX / 2;
-				t = 128;
-				for (z = 0; z < CHUNKBOX; z++) {
+				pnt.X = x;
+				tmp = BilinearInterpolation(crn,&pnt);
+				t = (int)(floor(tmp.Z)) - (CHUNKBOX * cell.elev);
 
+				for (z = 0; z < CHUNKBOX; z++) {
 					vgr = grains[z/VOXGRAIN][y/VOXGRAIN][x/VOXGRAIN];
 					if (rng->RangedNumber(100) < 5) vgr = GetVoxelOfType(VOXT_SAND);
 
@@ -359,6 +361,7 @@ void WorldGen::NewMap(long seed)
 		j = rng->RangedNumber(planev.X);
 
 		flg = false;
+		l = 0;
 		do {
 			/* Move to a random direction */
 			switch (rng->RangedNumber(4)) {
@@ -370,6 +373,7 @@ void WorldGen::NewMap(long seed)
 
 			flg = ((i < 0) || (i >= planev.Y));
 			flg = (flg || (j < 0) || (j >= planev.X));
+			flg = (flg || (++l > WGRIVERMAX));
 
 			if (!flg) {
 				ptr = map + (i * planev.X + j);

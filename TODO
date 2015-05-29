@@ -8,9 +8,9 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 
 -> Fill in some short info into README.md
 
--> Implement DataPipe chunks dumping (saving)
+-> Implement DataPipe chunks saving and loading
 
--> Implement DataPipe chunks swapping and loading
+-> Implement DataPipe chunks swapping in Move()
 
 -> Implement DataPipe chnuks mapping on load
 
@@ -33,3 +33,5 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Consider adding lens flare effect for post-processor
 
 -> Test 'textured' rendering of voxel sides
+
+-> Implement some marks to use in voxel table

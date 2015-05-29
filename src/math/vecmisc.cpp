@@ -233,6 +233,44 @@ bool IsPntInsideCubeI(const vector3di* pnt, const vector3di* center, const int s
 	return true;
 }
 
+vector3d BilinearInterpolation(const vector3d* v, const vector3d* p)
+{
+	vector3d r;
+	double t;
+
+	double x1 = v[0].X;
+	double x2 = v[2].X;
+	if (x2 < x1) {
+		t = x1;
+		x1 = x2;
+		x2 = t;
+	} else if (x2 == x1) {
+		r = v[0];
+		return r;
+	}
+
+	double y1 = v[3].Y;
+	double y2 = v[1].Y;
+	if (y2 < y1) {
+		t = y1;
+		y1 = y2;
+		y2 = t;
+	} else if (y2 == y1) {
+		r = v[1];
+		return r;
+	}
+
+	double k = (x2 - x1) * (y2 - y1);
+	double a = v[0].Z * (x2 - p->X) * (y2 - p->Y);
+	double b = v[1].Z * (x2 - p->X) * (p->Y - y1);
+	double c = v[2].Z * (p->X - x1) * (p->Y - y1);
+	double d = v[3].Z * (p->X - x1) * (y2 - p->Y);
+
+	r = *p;
+	r.Z = (a + b + c + d) / k;
+	return r;
+}
+
 /*
  * PNPOLY - Point Inclusion in Polygon Test
  * (C) W. Randolph Franklin (WRF)
