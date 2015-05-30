@@ -19,6 +19,7 @@
 
 #include <ncurses.h>
 #include "CGUIColorManager.h"
+#include "debug.h" //FIXME: debug
 
 using namespace std;
 
@@ -43,7 +44,17 @@ bool CGUIColorManager::isEqual(const SCTriple* a, const SCTriple* b, const short
 
 short CGUIColorManager::FindNearest(const SCTriple* cl)
 {
-	//TODO
+	short i,tol = COLTOLERANCE;
+
+	//Move through all the colors, increasing tolerance.
+	for (; tol <= 1000; tol += COLTOLERANCE) {
+		for (i = 0; i < (short)colors.size(); i++) {
+			if (isEqual(cl,&(colors.at(i)),tol))
+				return i;
+		}
+	}
+
+	//No hope. This is almost impossible situation.
 	return 0;
 }
 
@@ -110,7 +121,7 @@ short CGUIColorManager::CheckPair(const SGUIPixel* px)
 		npr.cb = CheckColor(&(px->bg));
 		npr.use = 1;
 		npr.inited = false;
-		//add and return new pair index
+		//add new pair and return index
 		pairs.push_back(npr);
 		return ((short)(pairs.size()));
 	}
@@ -152,9 +163,10 @@ void CGUIColorManager::Apply()
 	changed = false;
 }
 
-void CGUIColorManager::CollectGarbage()
+void CGUIColorManager::CollectGarbagePairs()
 {
 	vector<SGUIExtPairs>::iterator ip,jp;
+	SGUIExtPairs tmp;
 	bool flg = false;
 
 	for (ip = pairs.begin(); ip != pairs.end(); ++ip) {
@@ -163,7 +175,16 @@ void CGUIColorManager::CollectGarbage()
 			changed = true;
 
 			//current element is subject to remove
+			tmp = *ip;
+			//FIXME: debug
+			dbg_print("Removing pair %d:%d (%u pairs left)",tmp.cf,tmp.cb,pairs.size());
 			ip = pairs.erase(ip);
+
+#ifdef USECOLRGARBAGE
+			//try to remove unused colors
+			CollectGarbageColor(tmp.cb);
+			CollectGarbageColor(tmp.cf);
+#endif
 
 			//now we should re-init all pairs down (if it wasn't done earlier)
 			if (!flg) {
@@ -177,24 +198,71 @@ void CGUIColorManager::CollectGarbage()
 	}
 }
 
+bool CGUIColorManager::CollectGarbageColor(const short cc)
+{
+	vector<SGUIExtPairs>::iterator ip;
+
+	if ((cc < 0) || (cc >= COLORS)) return false;
+
+	//check this color code isn't used
+	for (ip = pairs.begin(); ip != pairs.end(); ++ip) {
+		if ((ip->cb == cc) || (ip->cf == cc))
+			return false;
+	}
+
+	//remove color
+	colors.erase(colors.begin() + (unsigned)cc);
+	//FIXME: debug
+	dbg_print("Removing color %hd (%u colors left)",cc,colors.size());
+
+	//shift color data
+	for (ip = pairs.begin(); ip != pairs.end(); ++ip) {
+		if (ip->cb > cc) {
+			ip->cb--;
+			ip->inited = false;
+		}
+		if (ip->cf > cc) {
+			ip->cf--;
+			ip->inited = false;
+		}
+	}
+
+	return true;
+}
+
 void CGUIColorManager::StartFrame()
 {
+#ifdef USEPAIRGARBAGE
 	vector<SGUIExtPairs>::iterator ip;
 
 	//decrement usage counters
 	for (ip = pairs.begin(); ip != pairs.end(); ++ip) {
 		ip->use--;
 	}
+#endif
 
 	//collect garbage if enough frames passed
 	if (++frameskip >= PAIRGARBSKIP) {
 		frameskip = 0;
-		CollectGarbage();
+#ifdef USEPAIRGARBAGE
+		//discard everything if color table is full
+		if ((short)colors.size() >= COLORS)
+			Flush();
+		else
+			CollectGarbagePairs();
+#endif
 	}
 }
 
 void CGUIColorManager::EndFrame()
 {
-	//TODO: should we do something else here?
 	Apply();
+
+	//discard all color data
+	if (frameskip == 0) {
+#ifndef USEPAIRGARBAGE
+		//every frame
+		Flush();
+#endif
+	}
 }

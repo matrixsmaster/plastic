@@ -184,7 +184,7 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 			for (x = 0; x < CHUNKBOX; x++) {
 				pnt.X = x;
 				tmp = BilinearInterpolation(crn,&pnt);
-				t = (int)(floor(tmp.Z)) - (CHUNKBOX * cell.elev);
+				t = (int)(floor(tmp.Z));// - (CHUNKBOX * cell.elev);
 
 				for (z = 0; z < CHUNKBOX; z++) {
 					vgr = grains[z/VOXGRAIN][y/VOXGRAIN][x/VOXGRAIN];

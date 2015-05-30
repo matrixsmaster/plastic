@@ -18,7 +18,7 @@
  */
 
 /* Defines the entry point of the application. Please keep this file as clean as possible. */
-/* Note: all threads are gathered here to maintain them simultaneously. */
+/* Note: almost all the threads are gathered here to maintain them easier. */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +32,6 @@
 #include "CurseGUI.h"
 #include "world.h"
 #include "datapipe.h"
-#include "renderpool.h"
 
 
 static SGameSettings	g_set = DEFAULT_SETTINGS;
@@ -44,6 +43,7 @@ static pthread_t		t_loader = 0;
 static pthread_mutex_t	m_render;
 volatile bool			g_quit = false;
 static uli				g_fps = 0;
+static uli				g_frmcnt = 0;
 
 
 /* *********************************************************** */
@@ -91,8 +91,21 @@ static void* plastic_renderthread(void* ptr)
 		}
 
 		pthread_mutex_lock(&m_render);
-		g_wrld->Frame();		//fast call
-		g_gui->Update(true);	//slow call
+
+		g_wrld->Frame();		//fast call, select next frame
+
+		//check failsafe
+//		if (++g_frmcnt > TERM_FAILSAFEFRM)
+//			g_gui->GetColorManager()->Flush();
+
+		g_gui->Update(true);	//slow call, draw everything to terminal
+
+		//update failsafe
+		if (g_frmcnt > TERM_FAILSAFEFRM) {
+//			redrawwin(g_gui->GetWindow());
+			g_frmcnt = 0;
+		}
+
 		pthread_mutex_unlock(&m_render);
 
 		/* Make some room between two frames */

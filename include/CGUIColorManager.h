@@ -24,9 +24,22 @@
 #include "visual.h"
 
 
+///Basic component tolerance to distinguish different colors.
 #define COLTOLERANCE 10
-#define PAIRGARBLEVEL -16
-#define PAIRGARBSKIP 3
+
+///Define this to make frame transitions smooth (for fast output).
+///Undef for slow output to make frames totally independent.
+#define USEPAIRGARBAGE 1
+
+///Define this if your scene uses a lot of colors. (Slows down frame rendering).
+///Undef for scenes with a well-defined set of colors to increase performance.
+#define USECOLRGARBAGE 1
+
+///Every pair, which usage drops lower than this value, will be discarded.
+#define PAIRGARBLEVEL -3
+
+///Skip this amount of frames between garbage collections.
+#define PAIRGARBSKIP 20
 
 
 struct SGUIExtPairs {
@@ -47,7 +60,8 @@ protected:
 	bool isEqual(const SCTriple* a, const SCTriple* b, const short tol);
 	short FindNearest(const SCTriple* cl);
 	short CheckColor(const SCTriple* cl);
-	void CollectGarbage();
+	void CollectGarbagePairs();
+	bool CollectGarbageColor(const short cc);
 
 public:
 	CGUIColorManager();
