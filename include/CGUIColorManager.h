@@ -27,6 +27,12 @@
 ///Basic component tolerance to distinguish different colors.
 #define COLTOLERANCE 10
 
+#define COLTOLERSHFT 2
+
+#define MAXCOLTOLERN 45
+
+#define USEDYNTOLERN 1
+
 ///Define this to make frame transitions smooth (for fast output).
 ///Undef for slow output to make frames totally independent.
 #define USEPAIRGARBAGE 1
@@ -53,6 +59,7 @@ class CGUIColorManager {
 protected:
 	bool changed;
 	int frameskip;
+	short tolerance;
 
 	std::vector<SCTriple> colors;
 	std::vector<SGUIExtPairs> pairs;

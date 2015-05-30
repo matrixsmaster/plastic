@@ -26,6 +26,7 @@ using namespace std;
 CGUIColorManager::CGUIColorManager()
 {
 	Flush();
+	tolerance = COLTOLERANCE;
 }
 
 CGUIColorManager::~CGUIColorManager()
@@ -46,15 +47,15 @@ short CGUIColorManager::FindNearest(const SCTriple* cl)
 {
 	short i,tol = COLTOLERANCE;
 
-	//Move through all the colors, increasing tolerance.
-	for (; tol <= 1000; tol += COLTOLERANCE) {
+	//Move through all the colors, increasing tolerance up to double color range.
+	for (; tol <= 1000; tol += COLTOLERSHFT) {
 		for (i = 0; i < (short)colors.size(); i++) {
 			if (isEqual(cl,&(colors.at(i)),tol))
 				return i;
 		}
 	}
 
-	//No hope. This is almost impossible situation.
+	//No hope. This is impossible situation. But GCC is happy.
 	return 0;
 }
 
@@ -81,7 +82,7 @@ short CGUIColorManager::CheckColor(const SCTriple* cl)
 
 	//check known colors with some tolerance
 	for (i = 0; i < (short)colors.size(); i++) {
-		if (isEqual(cl,&(colors.at(i)),COLTOLERANCE))
+		if (isEqual(cl,&(colors.at(i)),tolerance))
 			return i;
 	}
 
@@ -91,7 +92,7 @@ short CGUIColorManager::CheckColor(const SCTriple* cl)
 		colors.push_back(*cl);
 		return ((short)(colors.size()-1));
 	} else
-		return FindNearest(cl); //unable to append, find color as close as possible
+		return FindNearest(cl); //unable to append, find some color as close as possible
 }
 
 short CGUIColorManager::CheckPair(const SGUIPixel* px)
@@ -101,8 +102,8 @@ short CGUIColorManager::CheckPair(const SGUIPixel* px)
 
 	//check for registered pair
 	for (i = 0; i < (short)pairs.size(); i++) {
-		if (	isEqual(&(px->bg),&(pairs.at(i).tb),COLTOLERANCE) &&
-				isEqual(&(px->fg),&(pairs.at(i).tf),COLTOLERANCE) ) {
+		if (	isEqual(&(px->bg),&(pairs.at(i).tb),tolerance) &&
+				isEqual(&(px->fg),&(pairs.at(i).tf),tolerance) ) {
 			//increment (or restore) usage counter
 			if (pairs[i].use < 0) pairs[i].use = 1;
 			else pairs[i].use++;
@@ -258,11 +259,24 @@ void CGUIColorManager::EndFrame()
 {
 	Apply();
 
-	//discard all color data
 	if (frameskip == 0) {
 #ifndef USEPAIRGARBAGE
-		//every frame
+		//discard all color data
 		Flush();
+#else
+#ifdef USEDYNTOLERN
+		if ((short)colors.size() >= COLORS) {
+			tolerance += COLTOLERSHFT;
+			if (tolerance > MAXCOLTOLERN)
+				tolerance = MAXCOLTOLERN;
+			dbg_print("^Tolerance = %hd",tolerance); //FIXME: debug
+		} else if ((short)colors.size() < (COLORS/2)) {
+			tolerance -= COLTOLERSHFT;
+			if (tolerance < COLTOLERANCE)
+				tolerance = COLTOLERANCE;
+			dbg_print("vTolerance = %hd",tolerance); //FIXME: debug
+		}
+#endif
 #endif
 	}
 }
