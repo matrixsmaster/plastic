@@ -27,6 +27,7 @@
 #include "CurseGUI.h"
 #include "CGUIControls.h"
 
+#include <pthread.h>
 #include "vecmath.h"
 #include "LVRconsts.h"
 
@@ -40,12 +41,15 @@ private:
 	int key;
 	bool edit;
 	std::string edit_line;
+	pthread_mutex_t wmutex;
+	bool scrlk;
+	size_t locked;
 
 	void ResizeWnd();
 
 public:
 	CurseGUIDebugWnd(CurseGUI* scrn);
-	virtual ~CurseGUIDebugWnd()			{}
+	virtual ~CurseGUIDebugWnd();
 
 	//Debug console is always focused if shown.
 	bool GainFocus()					{ return focused; }

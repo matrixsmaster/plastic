@@ -17,22 +17,18 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include <pthread.h>
 #include "debug.h"
 
 CurseGUIDebugWnd* debug_ui = NULL;
-static pthread_mutex_t debug_mutex;
 
 void dbg_init(CurseGUI* gui)
 {
-	pthread_mutex_init(&debug_mutex,NULL);
 	debug_ui = new CurseGUIDebugWnd(gui);
 	gui->AddWindow(debug_ui);
 }
 
 void dbg_finalize()
 {
-	pthread_mutex_destroy(&debug_mutex);
 }
 
 void dbg_toggle()
@@ -42,11 +38,7 @@ void dbg_toggle()
 
 void dbg_logstr(const char* str)
 {
-	if (!debug_ui) return;
-
-	pthread_mutex_lock(&debug_mutex);
-	debug_ui->PutString(str);
-	pthread_mutex_unlock(&debug_mutex);
+	if (debug_ui) debug_ui->PutString(str);
 }
 
 void dbg_print(const char* fmt, ...)
@@ -58,7 +50,5 @@ void dbg_print(const char* fmt, ...)
 	vsnprintf(str,DBGUIMAXLEN,fmt,vl);
 	va_end(vl);
 
-	pthread_mutex_lock(&debug_mutex);
 	debug_ui->PutString(str);
-	pthread_mutex_unlock(&debug_mutex);
 }

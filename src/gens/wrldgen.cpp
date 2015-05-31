@@ -24,6 +24,7 @@
 #include "wrldgen.h"
 #include "vecmath.h"
 #include "vecmisc.h"
+//#include "debug.h" //FIXME: debug
 
 
 WorldGen::WorldGen(uli r, SVoxelTab* tab)
@@ -81,9 +82,12 @@ SWGCell WorldGen::GetCell(vector3di crd)
 		cl.chunkt = WGCT_AIR;
 	} else {
 		l = crd.Y * planev.X + crd.X;
+		//create seed linked with surface cell seed
+		//TODO
+
 		//get surface level at point
 		z = map[l].elev;
-		z = radius - WGAIRCHUNKS - (WGELEVATIONS - z - 1);
+		z = radius - WGAIRCHUNKS - WGELEVATIONS + z;
 
 		if (crd.Z < z) {
 			//water-only chunks under water-only surface cells
@@ -140,6 +144,28 @@ voxel WorldGen::GetVoxelOfType(EVoxelType t)
 	return 0;
 }
 
+void WorldGen::CalcChunkElevRect(vector3d* arr, const vector3di chpos, int qx, int qy)
+{
+	int i,t;
+	vector2di tmp;
+	vector3d shf(qx*CHUNKBOX/2,qy*CHUNKBOX/2,0); //quarter shift off center
+
+	//shift quarter shift itself, to make easy to use it as a simple vector offset
+	if (qx > 0) qx = 0;
+	if (qy > 0) qy = 0;
+
+	//fill rectangle shifted to quarter provided
+	for (i = 0; i < 4; i++) {
+		tmp = RectangleCornerK(i);
+		t = GetSurfaceCell(chpos+vector3di(qx+tmp.X,qy+tmp.Y,0)).elev;
+//		dbg_print("i=%d qx=%d qy=%d tx=%d ty=%d",i,qx,qy,tmp.X+qx,tmp.Y+qy);
+		arr[i].X = tmp.X * CHUNKBOX;
+		arr[i].Y = tmp.Y * CHUNKBOX;
+		arr[i].Z = t * CHUNKBOX + CHUNKBOX / WGELEVHFACTOR;
+		arr[i] += shf;
+	}
+}
+
 void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 {
 	int x,y,z,t;
@@ -150,9 +176,11 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 
 	if (!buf) return;
 
+	//set memory
 	memset(grains,0,sizeof(grains));
 	cell = GetCell(pos);
 
+	//prepare large 'grains' of voxels
 	for (z = 0; z < (CHUNKBOX/VOXGRAIN); z++)
 		for (y = 0; y < (CHUNKBOX/VOXGRAIN); y++)
 			for (x = 0; x < (CHUNKBOX/VOXGRAIN); x++)
@@ -161,35 +189,29 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 	switch (cell.chunkt) {
 	case WGCT_SURFACE:
 
+		//set RNG seed
 		rng->SetSeed(cell.seed);
 
-		crn[1].X = 0;
-		crn[1].Y = CHUNKBOX;
-		crn[1].Z = CHUNKBOX * cell.elev;
-
-		crn[2].X = CHUNKBOX;
-		crn[2].Y = CHUNKBOX;
-		crn[2].Z = CHUNKBOX * GetSurfaceCell(pos+vector3di(1,0,0)).elev;
-
-		crn[3].X = CHUNKBOX;
-		crn[3].Y = 0;
-		crn[3].Z = CHUNKBOX * GetSurfaceCell(pos+vector3di(1,-1,0)).elev;
-
-		crn[0].X = 0;
-		crn[0].Y = 0;
-		crn[0].Z = CHUNKBOX * GetSurfaceCell(pos+vector3di(0,-1,0)).elev;
-
+		//generate chunk data
 		for (y = 0; y < CHUNKBOX; y++) {
 			pnt.Y = y;
 			for (x = 0; x < CHUNKBOX; x++) {
+				//calculate landscape height in current point
 				pnt.X = x;
+				if ((x == 0) || (x == CHUNKBOX/2))
+					//if moved to another quarter, recalc corners rectangle
+					CalcChunkElevRect(crn,pos,((x < CHUNKBOX/2)? -1:1),((y < CHUNKBOX/2)? -1:1));
+				//get bilinear interpolation of landscape
 				tmp = BilinearInterpolation(crn,&pnt);
-				t = (int)(floor(tmp.Z));// - (CHUNKBOX * cell.elev);
+				t = (int)(floor(tmp.Z)) - (cell.elev * CHUNKBOX);
 
+				//go through voxel column
 				for (z = 0; z < CHUNKBOX; z++) {
 					vgr = grains[z/VOXGRAIN][y/VOXGRAIN][x/VOXGRAIN];
-					if (rng->RangedNumber(100) < 5) vgr = GetVoxelOfType(VOXT_SAND);
+					//apply some noise
+					if (rng->RangedNumber(100) < 5) vgr = GetVoxelOfType(VOXT_SAND); //FIXME: use cell type
 
+					//set the actual data
 					v = (z < t)? vgr:0;
 					(*buf)[z][y][x] = v;
 				}
@@ -434,7 +456,7 @@ void WorldGen::NewMap(long seed)
 				if (pcpos == vector3di(0)) {
 					pcpos.X = t;
 					pcpos.Y = q;
-					pcpos.Z = radius - WGAIRCHUNKS - ptr->elev;
+					pcpos.Z = radius - WGAIRCHUNKS - WGELEVATIONS + ptr->elev;
 				}
 			}
 		}

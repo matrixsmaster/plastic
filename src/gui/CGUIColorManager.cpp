@@ -203,7 +203,7 @@ bool CGUIColorManager::CollectGarbageColor(const short cc)
 {
 	vector<SGUIExtPairs>::iterator ip;
 
-	if ((cc < 0) || (cc >= COLORS)) return false;
+	if ((cc < 0) || ((unsigned)cc >= colors.size())) return false;
 
 	//check this color code isn't used
 	for (ip = pairs.begin(); ip != pairs.end(); ++ip) {
@@ -269,12 +269,12 @@ void CGUIColorManager::EndFrame()
 			tolerance += COLTOLERSHFT;
 			if (tolerance > MAXCOLTOLERN)
 				tolerance = MAXCOLTOLERN;
-			dbg_print("^Tolerance = %hd",tolerance); //FIXME: debug
+//			dbg_print("^Tolerance = %hd",tolerance); //FIXME: debug
 		} else if ((short)colors.size() < (COLORS/2)) {
 			tolerance -= COLTOLERSHFT;
 			if (tolerance < COLTOLERANCE)
 				tolerance = COLTOLERANCE;
-			dbg_print("vTolerance = %hd",tolerance); //FIXME: debug
+//			dbg_print("vTolerance = %hd",tolerance); //FIXME: debug
 		}
 #endif
 #endif

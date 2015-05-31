@@ -76,4 +76,7 @@ bool IsPntInsideCubeI(const vector3di* pnt, const vector3di* center, const int s
 ///Bilinear int. V is known points (CW from (0,0)). P is point of interest. Returns P with Z calculated.
 vector3d BilinearInterpolation(const vector3d* v, const vector3d* p);
 
+///Helper function to fill rectangle information to pass to other functions (e.g. BilinearInt.).
+vector2di RectangleCornerK(const int num);
+
 #endif /* VECMISC_H_ */

@@ -27,11 +27,14 @@
 ///Basic component tolerance to distinguish different colors.
 #define COLTOLERANCE 10
 
+///Define this to use dynamic adaptive color tolerance.
+#define USEDYNTOLERN 1
+
+///Adaptive tolerance shift value.
 #define COLTOLERSHFT 2
 
+///Maximum value of color component tolerance.
 #define MAXCOLTOLERN 45
-
-#define USEDYNTOLERN 1
 
 ///Define this to make frame transitions smooth (for fast output).
 ///Undef for slow output to make frames totally independent.
@@ -74,13 +77,19 @@ public:
 	CGUIColorManager();
 	virtual ~CGUIColorManager();
 
+	///Returns a ncurses pair code for a particular pixel template.
 	short CheckPair(const SGUIPixel* px);
+	///Fills RGB colors of a given pair code in dest. Returns false if pair code is unknown.
 	bool GetPairColors(SGUIPixel* dest, short pair);
 
+	///Remove all gathered color information and release color and pair codes.
 	void Flush();
+	///Apply current codes to ncurses.
 	void Apply();
 
+	///Call this in the event of starting frame drawing.
 	void StartFrame();
+	///Call this after the full frame is finished.
 	void EndFrame();
 };
 

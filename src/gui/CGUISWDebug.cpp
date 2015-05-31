@@ -24,17 +24,26 @@ using namespace std;
 CurseGUIDebugWnd::CurseGUIDebugWnd(CurseGUI* scrn) :
 	CurseGUIWnd(scrn,0,0,2,2)
 {
+	//init window
 	type = GUIWT_DEBUGUI;
+	name = "DebugUI";
 	hidden = true;
 	edit_line = ">";
 	key = 0;
 	edit = false;
-	name = "DebugUI";
+	scrlk = false;
+	locked = 0;
 
-	//TODO: do something
-	SGUIEvent e;
-	e.t = GUIEV_RESIZE;
-	PutEvent(&e);
+	//create window mutex to make DebugUI I/O thread-safe
+	pthread_mutex_init(&wmutex,NULL);
+
+	//place window
+	ResizeWnd();
+}
+
+CurseGUIDebugWnd::~CurseGUIDebugWnd()
+{
+	pthread_mutex_destroy(&wmutex);
 }
 
 void CurseGUIDebugWnd::ToggleShow()
@@ -47,41 +56,49 @@ void CurseGUIDebugWnd::ToggleShow()
 
 void CurseGUIDebugWnd::Update(bool refr)
 {
-	vector<string>::iterator it;
+	vector<string>::iterator it,en;
 	int size, w, h, nl, numstr;
 
 	if (hidden) return;
 
+	pthread_mutex_lock(&wmutex);
+
 	wcolor_set(wnd,0,NULL);
 	werase(wnd);
 
-	if(g_h < ((boxed)? 3:2)) return;
-	h = g_h - ((boxed)? 3:2);
-	numstr = h+1;
+	h = g_h - ((boxed)? 3:1);
+	if (h <= 0) return;
+	w = g_w - ((boxed)? 2:0);
+
+	numstr = h;
 
 	/* Add edit line */
 	if (edit) {
 		edit_line += key;
 		edit = false;
 	}
-	mvwaddnstr(wnd, h+1, 1, edit_line.c_str(), -1);
+	mvwaddnstr(wnd, h+1, 1, edit_line.c_str(), w);
 
 	size = log.size();
 	if (size > 0) {
-		if((h - size >= 0))
-			numstr = size + 1;
+		if (numstr > size)
+			numstr = size;
 
-		for (it = log.end()-1; it != log.end() - numstr; it--) {
-			w = g_w - ((boxed)? 2:1);
-			if(it->size() % (w) != 0) {
+		it = (scrlk)? (log.begin() + locked) : (log.end() - 1);
+		en = it - numstr;
+
+		for (; it > en; --it) {
+			if (w < (int)it->size()) {
 				// partitioning into multiple lines
-				nl = (it->size() / (w));
-				for(int i = nl; i >= 0 ; i--) {
+				nl = (it->size() / w);
+				for (int i = nl; i >= 0 ; i--) {
 					mvwaddnstr(wnd, h--, 1, it->c_str()+(w*i), w);
 				}
-			} else mvwaddnstr(wnd, h--, 1, it->c_str(), -1);
+			} else mvwaddnstr(wnd, h--, 1, it->c_str(), w);
 		}
 	}
+
+	pthread_mutex_unlock(&wmutex);
 
 	DrawDecoration();
 	if (refr) wrefresh(wnd);
@@ -97,27 +114,44 @@ bool CurseGUIDebugWnd::PutEvent(SGUIEvent* e)
 	case GUIEV_KEYPRESS:
 		switch (e->k) {
 		case KEY_ENTER:
-		case 10: /* in case enter isn't enter */
+		case 10: /* in case enter isn't KEY_ENTER */
 			//TODO parse command
 			if(edit_line.size() > 1) {
 				PutString(edit_line.c_str()+1);
 				edit_line = ">";
 			}
 			break;
+
 		case KEY_BACKSPACE:
-		case 127: /* in case backspace isn't delete */
-				if(edit_line.size() > 1)
-					edit_line.erase(edit_line.end() - 1);
+		case 127: /* in case backspace isn't KEY_BACKSPACE */
+			if(edit_line.size() > 1)
+				edit_line.erase(edit_line.end() - 1);
 			break;
+
+		case KEY_F(12): /* Scroll Lock */
+			scrlk ^= true;
+			if (scrlk) locked = (log.size())? (log.size()-1) : 0;
+			break;
+
+		case KEY_NPAGE: /* Scroll down */
+			if (scrlk) locked++;
+			if (locked >= log.size()) locked = log.size()-1;
+			break;
+
+		case KEY_PPAGE: /* Scroll up */
+			if (scrlk && locked) locked--;
+			break;
+
 		default:
-				if((e->k >= 'A' && e->k <= 'Z') ||
-						(e->k >= 'a' && e->k <= 'z') ||
-						(e->k == '-') ||
-						(e->k == ' ')) {
-					key = e->k;
-					edit = true;
-					return true;
-				}
+			//FIXME: are we need this?
+			if((e->k >= 'A' && e->k <= 'Z') ||
+					(e->k >= 'a' && e->k <= 'z') ||
+					(e->k == '-') ||
+					(e->k == ' ')) {
+				key = e->k;
+				edit = true;
+				return true;
+			}
 			break;
 		}
 		break;
@@ -128,13 +162,14 @@ bool CurseGUIDebugWnd::PutEvent(SGUIEvent* e)
 
 void CurseGUIDebugWnd::PutString(char* str)
 {
-	string log_str(str);
-	log.push_back(log_str);
+	PutString(string(str));
 }
 
 void CurseGUIDebugWnd::PutString(std::string str)
 {
+	pthread_mutex_lock(&wmutex);
 	log.push_back(str);
+	pthread_mutex_unlock(&wmutex);
 }
 
 void CurseGUIDebugWnd::ResizeWnd()

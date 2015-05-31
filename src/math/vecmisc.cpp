@@ -271,6 +271,20 @@ vector3d BilinearInterpolation(const vector3d* v, const vector3d* p)
 	return r;
 }
 
+vector2di RectangleCornerK(const int num)
+{
+	switch (num) {
+	default:
+		return (vector2di(0));
+	case 1:
+		return (vector2di(0,1));
+	case 2:
+		return (vector2di(1,1));
+	case 3:
+		return (vector2di(1,0));
+	}
+}
+
 /*
  * PNPOLY - Point Inclusion in Polygon Test
  * (C) W. Randolph Franklin (WRF)

@@ -31,8 +31,10 @@
 /* Number of chunks above the surface */
 #define WGAIRCHUNKS 2
 
+//FIXME: comment
 #define WGMINRADIUS (WGAIRCHUNKS + 3 + 1)
 
+//FIXME: comment
 #define WGRIVERQ 0.02
 #define WGRIVERMAX 1999999UL
 #define WGPLANTQ 0.06
@@ -44,7 +46,9 @@
 #define WGCITYSUBS 0.6
 #define WGCITYNOISE 0.2
 
+//FIXME: comment
 #define WGELEVATIONS 3
+#define WGELEVHFACTOR 4
 
 /* Map cell content type (surface cells) */
 #define WGNUMKINDS 12
@@ -152,6 +156,8 @@ public:
 	void WrapCoords(vector3di* pnt);
 
 	voxel GetVoxelOfType(EVoxelType t);
+
+	void CalcChunkElevRect(vector3d* arr, const vector3di chpos, int qx, int qy);
 
 	/* Main chunk generation facility */
 	void GenerateChunk(PChunk buf, vector3di pos);

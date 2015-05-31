@@ -16,7 +16,9 @@ Implement precise timer in PlasticWorld					| assigned	|
 ---------------------------------------------------------------------------------------
 Add water generation threshold to WorldGen				| done		|
 ---------------------------------------------------------------------------------------
-Create landscape interpolator for WorldGen				| in progr	|
+Create landscape interpolator for WorldGen				| done		|
 ---------------------------------------------------------------------------------------
 Fix bug with randomizing colors							| done		|
+---------------------------------------------------------------------------------------
+Implement chunk elevation smoothing in WorldGen			| assigned	|
 ---------------------------------------------------------------------------------------
