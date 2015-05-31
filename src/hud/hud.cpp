@@ -49,7 +49,7 @@ HUD::HUD(CurseGUI* guiptr)
 	Spawn((w-(w/4)), 0, (w/4), (h/4), false, "     !!MAAAP!!");
 
 	//bottom state overlay
-	Spawn((w/3), (h-1), w/*-(w/3))*/, 1, false, " STATE string");
+	Spawn((w/3), (h-1), w-(w/3), 1, false, " STATE string");
 	SetAlpha(OVRL_STBTM, 0);
 }
 

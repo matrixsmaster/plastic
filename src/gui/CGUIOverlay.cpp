@@ -23,22 +23,17 @@
 using namespace std;
 
 CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, bool logg) :
-		CurseGUIWnd(scrn,x,y,0,0)
+		CurseGUIWnd(scrn,x,y,w,h)
 {
 	type = GUIWT_OVERLAY;
 
-	m_x = x;
-	m_y = y;
-	m_w = w;
-	m_h = h;
 	logging = logg;
 	name = "Overlay";
 
-	SGUIEvent e;
-	e.t = GUIEV_RESIZE;
-	PutEvent(&e);
-
 	alpha = CGUIOVERLAYDEFALPHA;
+
+	//create window mutex to make overlay I/O thread-safe
+	pthread_mutex_init(&wmutex,NULL);
 
 	pixl.bg.r = 0; pixl.bg.g = 0; pixl.bg.b = 0;
 	pixl.fg.r = 1000; pixl.fg.g = 500; pixl.fg.b = 1000;
@@ -46,12 +41,15 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, boo
 
 CurseGUIOverlay::~CurseGUIOverlay()
 {
-	//TODO
+	pthread_mutex_destroy(&wmutex);
 }
 
 void CurseGUIOverlay::Update(bool refr)
 {
-	PutLog();
+	pthread_mutex_lock(&wmutex);
+	DrawLog();
+	pthread_mutex_unlock(&wmutex);
+
 	wcolor_set(wnd,0,NULL);
 	if (refr) wrefresh(wnd);
 }
@@ -59,26 +57,21 @@ void CurseGUIOverlay::Update(bool refr)
 bool CurseGUIOverlay::PutEvent(SGUIEvent* e)
 {
 	//OverlayUI events processing
-	switch (e->t) {
-	case GUIEV_RESIZE:
-		Resize(m_w, m_h);
-		break;
-	default: break;
-	}
+	//FIXME: maybe just nothing here?
 	return false;
 }
 
 void CurseGUIOverlay::PutString(const char* str)
 {
-	//Put string to OverlayUI log
-	string log_str(str);
-	log.push_back(log_str);
+	PutString(string(str));
 }
 
 void CurseGUIOverlay::PutString(string str)
 {
 	//Put string to OverlayUI log
+	pthread_mutex_lock(&wmutex);
 	log.push_back(str);
+	pthread_mutex_unlock(&wmutex);
 }
 
 void CurseGUIOverlay::SetBckgrMask(SGUIPixel* pxl)
@@ -95,16 +88,18 @@ void CurseGUIOverlay::SetBckgrMask(SGUIPixel* pxl)
 void CurseGUIOverlay::ClearLog()
 {
 	if (log.empty()) return;
+	pthread_mutex_lock(&wmutex);
 	log.clear();
+	pthread_mutex_unlock(&wmutex);
 }
 
-void CurseGUIOverlay::PutLog()
+void CurseGUIOverlay::DrawLog()
 {
 	vector<string>::iterator it;
 	int i, j, ns;
 	int h = g_h - 1;
 	chtype ch = 0;
-	int y = m_y+h;
+	int y = g_y+h;
 	SGUIPixel pxl;
 	short lc = -1;
 	short pair;
@@ -126,7 +121,7 @@ void CurseGUIOverlay::PutLog()
 			//deal with each character separately in transparent mode
 			for (i = 0; i < g_w; ++i) {
 				//get underlying symbol information
-				ch = mvinch(y, m_x+i);
+				ch = mvinch(y, g_x+i);
 				pair = (ch & A_COLOR) >> NCURSES_ATTR_SHIFT;
 
 				//set the symbol

@@ -17,42 +17,33 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Overlay window is defined here */
+/* GUI overlay is defined here */
 
 #ifndef INCLUDE_CGUIOVERLAY_H_
 #define INCLUDE_CGUIOVERLAY_H_
 
 #include <vector>
 #include <string>
+#include "pthread.h"
 #include "CurseGUI.h"
-
+#include "vecmath.h"
 
 #define CGUIOVERLAYDEFALPHA 0.5
 
-
-struct SPOS {
-	int x, y, z;
-};
-
-// structure to show in status overlay
+//Status data structure.
 struct SOVRLStats {
-	SPOS gp;
-	SPOS lp;
+	vector3di gp,lp;
 };
-
 
 class CurseGUIOverlay : public CurseGUIWnd {
 private:
-	std::vector<std::string> log;
+	std::vector<std::string> log;	//log data
+	float alpha;					//window transparency value
+	bool logging;					//window logging flag
+	SGUIPixel pixl;					//output pixel format
+	pthread_mutex_t wmutex;			//window access mutex
 
-	int m_x, m_y;		//window position
-	int m_w, m_h;		//width and height
-	float alpha;		//window transparency
-	bool logging;		//window logging
-
-	SGUIPixel pixl;
-
-	void PutLog();
+	void DrawLog();
 
 public:
 	CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, bool logg);
@@ -91,7 +82,5 @@ public:
 
 	void ClearLog();
 };
-
-
 
 #endif /* INCLUDE_CGUIOVERLAY_H_ */

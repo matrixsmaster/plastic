@@ -35,12 +35,13 @@
 #include "vmodel.h"
 #include "hud.h"
 #include "keybinder.h"
+#include "pltime.h"
 
 
 class PlasticWorld {
 private:
 	//core variables and instances
-	int result;
+	int result;					//FIXME: comment
 	SGameSettings* sets;
 	DataPipe* data;
 	RenderPool* render;
@@ -51,6 +52,9 @@ private:
 	bool once;
 	int g_w,g_h;
 	vector2di curso;
+	PlasticTime gtime;
+	uli fps;
+	volatile uli frames;
 
 	//holders
 	std::vector<PlasticActor*> actors;
@@ -62,14 +66,25 @@ private:
 	void BindKeys();
 	bool CreateActor();
 	void RemoveAllActors();
+	void UpdateTime();
 
 public:
 	PlasticWorld(SGameSettings* settings);
 	virtual ~PlasticWorld();
 
+	///Realtime clock.
+	ulli GetTime();
+
+	///Game clock.
+	PlasticTime GetGameTime()				{ return gtime; }
+
+	///Game clock.
+	const PlasticTime* GetGameTimePtr()		{ return &gtime; }
+
 	///Main method for incremental updating world state.
 	void Quantum();
 
+	///Generate new rendered frame and blit it to main GUI background.
 	void Frame();
 
 	///Returns result of latest operation (mainly for outsiders).

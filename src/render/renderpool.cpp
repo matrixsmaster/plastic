@@ -81,7 +81,6 @@ RenderPool::RenderPool(DataPipe* pipe) :
 {
 	skies = new AtmoSky(pipe);
 	quit = false;
-	fps = 0;
 
 	/* Create frame mutex */
 	pthread_mutex_init(&m_rend,NULL);

@@ -59,11 +59,9 @@ private:
 	bool quit;						//Quit event flag
 	pthread_t t_rend;				//Main thread
 	pthread_mutex_t m_rend;			//Main thread frame mutex
-	ulli fps;						//FPS counter
 
 	void SpawnThreads();			//Rendering threads spawner
 	void KillThreads();				//Rendering threads killer
-//	void JoinThreads();				//Rendering threads join barrier
 
 public:
 	RenderPool(DataPipe* pipe);
@@ -92,6 +90,9 @@ public:
 	///Made public to be accessible from thread.
 	SRendPoolDat* GetPoolDatN(int n);
 
+	///Returns current skies instance.
+	AtmoSky* GetSkies()				{ return skies; }
+
 	///LVR-compatible frame resizing.
 	bool Resize(int w, int h);
 	///LVR-compatible frame masking.
@@ -108,9 +109,6 @@ public:
 
 	void Frame()					{}
 	void Postprocess()				{}
-
-	///Returns current FPS value.
-	ulli GetFPS()					{ return fps; }
 };
 
 #endif /* RENDERPOOL_H_ */

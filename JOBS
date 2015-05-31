@@ -12,7 +12,7 @@ Create Inventory window									|			| in progr
 ---------------------------------------------------------------------------------------
 Create ActorView window									| done		|
 ---------------------------------------------------------------------------------------
-Implement precise timer in PlasticWorld					| assigned	|
+Implement precise timer in PlasticWorld					| in progr	|
 ---------------------------------------------------------------------------------------
 Add water generation threshold to WorldGen				| done		|
 ---------------------------------------------------------------------------------------
@@ -21,4 +21,6 @@ Create landscape interpolator for WorldGen				| done		|
 Fix bug with randomizing colors							| done		|
 ---------------------------------------------------------------------------------------
 Implement chunk elevation smoothing in WorldGen			| assigned	|
+---------------------------------------------------------------------------------------
+Implement DataPipe chunks swapping in Move()			| assigned	|
 ---------------------------------------------------------------------------------------

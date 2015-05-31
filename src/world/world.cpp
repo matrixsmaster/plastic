@@ -39,6 +39,8 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	binder = NULL;
 	once = false;
 	g_w = g_h = 0;
+	frames = 0;
+	fps = 0;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
@@ -57,6 +59,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 	/* Create render pool */
 	render = new RenderPool(data);
+	render->GetSkies()->SetTime(&gtime);
 
 	/* Create Player */
 	PC = new Player(sets->PCData,data);
@@ -93,16 +96,15 @@ void PlasticWorld::Quantum()
 		if (!test) abort();
 	}
 
-#if 1
+//	UpdateTime();
+
 	//DEBUG:
 	data->WriteLock();
-//	if (data->TryLock()) return;
 	if (test->GetState() == 0)
 		test->SetState(test->GetNumStates()-1);
 	else
 		test->SetState(test->GetState()-1);
 	data->WriteUnlock();
-#endif
 }
 
 void PlasticWorld::Frame()
@@ -112,7 +114,10 @@ void PlasticWorld::Frame()
 	gui->SetBackgroundData(render->GetRender(),render->GetRenderLen());
 	render->SetMask(gui->GetBackmask(),g_w,g_h);
 
-	//TODO: make precision clock inside PlasticWorld (for atmo and physics). Move FPS calc here.
+	frames++;
+
+	hud->UpdateFPS(fps);
+	hud->UpdateStatusOvrl();
 }
 
 void PlasticWorld::ConnectGUI(CurseGUI* guiptr)

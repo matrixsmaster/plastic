@@ -42,7 +42,6 @@ static pthread_t		t_render = 0;
 static pthread_t		t_loader = 0;
 static pthread_mutex_t	m_render;
 volatile bool			g_quit = false;
-static uli				g_fps = 0;
 
 
 /* *********************************************************** */
@@ -62,9 +61,6 @@ static void* plastic_eventhread(void* ptr)
 			g_wrld->ProcessEvents(&my_e);
 		}
 
-		g_wrld->GetHUD()->UpdateFPS(g_fps); //FIXME
-		g_wrld->GetHUD()->UpdateStatusOvrl();
-
 		pthread_mutex_unlock(&m_render);
 
 		/* To keep CPU load low(er) */
@@ -77,21 +73,10 @@ static void* plastic_eventhread(void* ptr)
 
 static void* plastic_renderthread(void* ptr)
 {
-	time_t beg;
-	uli fps = 0;
-	beg = clock();
-
 	while (!g_quit) {
-		fps++;
-		if ((clock() - beg) >= CLOCKS_PER_SEC) {
-			g_fps = fps;
-			fps = 0;
-			beg = clock();
-		}
-
 		pthread_mutex_lock(&m_render);
 
-		g_wrld->Frame();		//fast call, select next frame
+		g_wrld->Frame();		//fast call, update HUD and select next frame
 		g_gui->Update(true);	//slow call, draw everything to terminal
 
 		pthread_mutex_unlock(&m_render);

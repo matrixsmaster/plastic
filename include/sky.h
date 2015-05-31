@@ -24,32 +24,30 @@
 #include "CurseGUI.h"
 #include "vecmath.h"
 #include "misconsts.h"
+#include "pltime.h"
 
 
 #define SKYANGLE 360
 #define SKYSIZE (SKYANGLE * SKYANGLE)
 #define SKYHEMI (SKYANGLE / 2)
 
-struct AtmoTime {
-	//TODO
-};
 
 class AtmoSky {
 private:
-	DataPipe* pipe;			//DataPipe access pointer
-	SGUIPixel sky[SKYSIZE];	//skies buf
-	AtmoTime time;			//atmospheric time
-	vector3d scrot;			//scene rotation
-	float windsp;			//wind speed
-	vector3d wind;			//wind direction
-	SCTriple day_cld;		//clouds color (day)
-	SCTriple day_sky;		//sky main color (day)
+	DataPipe* pipe;				//DataPipe access pointer
+	SGUIPixel sky[SKYSIZE];		//skies buf
+	const PlasticTime* time;	//current time
+	vector3d scrot;				//scene rotation
+	float windsp;				//wind speed
+	vector3d wind;				//wind direction
+	SCTriple day_cld;			//clouds color (day)
+	SCTriple day_sky;			//sky main color (day)
 
 public:
 	AtmoSky(DataPipe* pipeptr);
 	virtual ~AtmoSky();
 
-	void SetTime(const AtmoTime nwtime)				{ time = nwtime; }
+	void SetTime(const PlasticTime* nwtime)			{ time = nwtime; }
 	void SetEulerAngles(const vector3d nwang);
 
 	void Quantum();
