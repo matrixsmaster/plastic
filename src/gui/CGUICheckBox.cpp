@@ -27,6 +27,7 @@ using namespace std;
 CurseGUICheckBox::CurseGUICheckBox(CurseGUICtrlHolder* p, int x, int y, int w, std::string capt) :
 		CurseGUIControl(p,x,y)
 {
+	typ = GUICL_CHECKBOX;
 	g_w = (w < 3)? 3:w;
 	checked = false;
 	disabled = false;

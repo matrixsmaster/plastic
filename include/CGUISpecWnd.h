@@ -32,6 +32,24 @@
 #include "LVRconsts.h"
 
 
+/* ********************************** Message Box ********************************** */
+
+//percent of maximum coverage
+#define MSGBOXSIZEX 50
+
+class CurseGUIMessageBox : public CurseGUIWnd {
+private:
+	void MoveToCenter();
+
+public:
+	CurseGUIMessageBox(CurseGUI* scrn, const char* title, const char* text, const char* butns);
+	virtual ~CurseGUIMessageBox()			{}
+
+	bool PutEvent(SGUIEvent* e);
+
+	int GetButtonPressed();
+};
+
 /* ********************************** Debug Console ********************************** */
 
 class CurseGUIDebugWnd : public CurseGUIWnd {

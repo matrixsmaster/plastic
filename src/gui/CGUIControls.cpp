@@ -101,11 +101,45 @@ void CurseGUICtrlHolder::Select(CurseGUIControl* ctl)
 		(*it)->Select(((*it) == ctl));
 }
 
+int CurseGUICtrlHolder::GetNumControls(ECGUIControlType t)
+{
+	int c;
+	vector<CurseGUIControl*>::iterator it;
+
+	for (c = 0, it = controls.begin(); it != controls.end(); ++it)
+		if ((*it)->GetType() == t) c++;
+
+	return c;
+}
+
+CurseGUIControl* CurseGUICtrlHolder::GetControl(int num)
+{
+	if ((num < 0) || (num >= ((int)controls.size())))
+		return NULL;
+
+	return controls.at(num);
+}
+
+CurseGUIControl* CurseGUICtrlHolder::GetControl(int num, ECGUIControlType t)
+{
+	int c;
+	vector<CurseGUIControl*>::iterator it;
+
+	for (c = 0, it = controls.begin(); it != controls.end(); ++it)
+		if ((*it)->GetType() == t) {
+			if (c++ == num) return (*it);
+		}
+
+	return NULL;
+}
+
 /* ******************************************************************** */
 
 CurseGUIControl::CurseGUIControl(CurseGUICtrlHolder* p, int x, int y)
 {
 	holder = p;
+	typ = GUICL_EMPTY;
+
 	g_x = x;
 	g_y = y;
 	g_w = 0;

@@ -27,6 +27,7 @@ using namespace std;
 CurseGUIProgrBar::CurseGUIProgrBar(CurseGUICtrlHolder* p, int x, int y, int w, int min, int max) :
 		CurseGUIControl(p,x,y)
 {
+	typ = GUICL_PROGRBAR;
 	g_w = w;
 	g_min = min;
 	g_max = max;

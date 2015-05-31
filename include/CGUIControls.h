@@ -24,6 +24,19 @@
 #include "CurseGUI.h"
 
 
+enum ECGUIControlType {
+	GUICL_EMPTY,
+	GUICL_PICTURE,
+	GUICL_BUTTON,
+	GUICL_EDITBOX,
+	GUICL_CHECKBOX,
+	GUICL_PROGRBAR,
+	GUICL_TABLE,
+	GUICL_LABEL
+};
+
+/* ******************************************************************** */
+
 class CurseGUIControl;
 /* Automated storage container for window controls */
 class CurseGUICtrlHolder
@@ -56,6 +69,12 @@ public:
 
 	///Selects particular control, deselects others.
 	void Select(CurseGUIControl* ctl);
+
+	//FIXME: comment
+	int GetNumControls()					{ return ((int)controls.size()); }
+	int GetNumControls(ECGUIControlType t);
+	CurseGUIControl* GetControl(int num);
+	CurseGUIControl* GetControl(int num, ECGUIControlType t);
 };
 
 /* ******************************************************************** */
@@ -65,6 +84,7 @@ class CurseGUIControl
 {
 protected:
 	CurseGUICtrlHolder* holder;
+	ECGUIControlType typ;
 	CurseGUIWnd* wnd;
 	int g_x, g_y, g_w, g_h;
 	SGUIPixel fmt;
@@ -92,6 +112,9 @@ public:
 
 	///Returns selection state of control.
 	virtual bool IsSelected()				{ return selected; }
+
+	///Returns the type of the control element.
+	virtual ECGUIControlType GetType()		{ return typ; }
 
 	///Updates graphical representation of control.
 	virtual void Update() = 0;

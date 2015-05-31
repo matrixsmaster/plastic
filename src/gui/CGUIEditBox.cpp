@@ -27,6 +27,7 @@ using namespace std;
 CurseGUIEditBox::CurseGUIEditBox(CurseGUICtrlHolder* p, int x, int y, int w, std::string txt) :
 		CurseGUIControl(p,x,y)
 {
+	typ = GUICL_EDITBOX;
 	g_w = w;
 	text = txt;
 }

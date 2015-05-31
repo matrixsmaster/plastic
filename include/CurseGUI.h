@@ -196,6 +196,7 @@ public:
 /* Window types enumeration to make windows distinguishable by its purpose */
 enum ECGUIWindowType {
 	GUIWT_BASIC,
+	GUIWT_MSGBOX,
 	GUIWT_OVERLAY,
 	GUIWT_DEBUGUI,
 	GUIWT_OTHER

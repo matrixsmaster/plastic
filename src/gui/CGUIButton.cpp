@@ -27,6 +27,7 @@ using namespace std;
 CurseGUIButton::CurseGUIButton(CurseGUICtrlHolder* p, int x, int y, int w, std::string capt) :
 		CurseGUIControl(p,x,y)
 {
+	typ = GUICL_BUTTON;
 	text = capt;
 	g_w = w;
 }

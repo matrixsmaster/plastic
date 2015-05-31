@@ -31,6 +31,7 @@ using namespace std;
 CurseGUITable::CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int col, int wcell, int htable, int wtable) :
 		CurseGUIControl(p,x,y)
 {
+	typ = GUICL_TABLE;
 	g_col = col;
 	g_rows = rows;
 	g_wcell = wcell;

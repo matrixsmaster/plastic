@@ -248,6 +248,14 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			case 'x':
 				if (hud) hud->SetAlpha(OVRL_LOG, 0.5);
 				break;
+
+			case 'v':
+				SPAWNWNDMACRO("Test One",new CurseGUIMessageBox(gui,"Test One","Testing",NULL));
+				break;
+
+			case 'b':
+				SPAWNWNDMACRO("Message",new CurseGUIMessageBox(gui,NULL,"Some fucking long text. I don't know what to write in here, but this string SHOULD be somewhat longer than possible to contain in 50% of ncurses window. There.",NULL));
+				break;
 			}
 		}
 		test->SetRot(tr); //FIXME: debug only

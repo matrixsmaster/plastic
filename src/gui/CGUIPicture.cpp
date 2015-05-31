@@ -25,6 +25,7 @@
 CurseGUIPicture::CurseGUIPicture(CurseGUICtrlHolder* p, int x, int y, int w, int h) :
 		CurseGUIControl(p,x,y)
 {
+	typ = GUICL_PICTURE;
 	pict = NULL;
 	autoalloc = false;
 	g_w = w;

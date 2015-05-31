@@ -27,6 +27,7 @@ using namespace std;
 CurseGUILabel::CurseGUILabel(CurseGUICtrlHolder* p, int x, int y, int w, int h, std::string capt) :
 		CurseGUIControl(p,x,y)
 {
+	typ = GUICL_LABEL;
 	text = capt;
 	g_w = w;
 	g_h = h;
