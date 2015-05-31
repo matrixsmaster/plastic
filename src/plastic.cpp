@@ -26,12 +26,14 @@
 #include <pthread.h>
 #include <unistd.h>
 #include "plastic.h"
+#include "misconsts.h"
 #include "support.h"
 #include "utils.h"
 #include "debug.h"
 #include "CurseGUI.h"
 #include "world.h"
 #include "datapipe.h"
+#include "pltime.h"
 
 
 static SGameSettings	g_set = DEFAULT_SETTINGS;
@@ -118,6 +120,13 @@ static void plastic_start()
 		abort();
 	}
 
+	/* Check main clock */
+	g_wrld->UpdateTime();
+	if (g_wrld->GetLastResult()) {
+		errout("Unacceptably low system clock resolution!\n");
+		abort();
+	}
+
 	/* Make a CurseGUI */
 	g_gui = new CurseGUI();
 	r = g_gui->GetLastResult();
@@ -149,6 +158,8 @@ static void plastic_start()
 
 static void plastic_cleanup()
 {
+	ulli gamelength = g_wrld->GetTime();
+
 	/* Join all active threads */
 	if (t_render) {
 		errout("Closing render thread... ");
@@ -175,6 +186,9 @@ static void plastic_cleanup()
 	/* Destroy all main classes instances */
 	if (g_wrld) delete g_wrld;
 	if (g_gui) delete g_gui;
+
+	/* Print out the length of game session */
+	printf("\nGame session time = %llu sec.\n",gamelength / PLTIMEMS);
 
 	printf("\nCleanup complete.\n");
 }

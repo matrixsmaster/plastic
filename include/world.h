@@ -25,6 +25,7 @@
 #define WORLD_H_
 
 #include <vector>
+#include <time.h>
 #include "vecmath.h"
 #include "CurseGUI.h"
 #include "misconsts.h"
@@ -53,8 +54,9 @@ private:
 	int g_w,g_h;
 	vector2di curso;
 	PlasticTime gtime;
+	ulli rtime,epoch,passed;
+	timespec* clkres;
 	uli fps;
-	volatile uli frames;
 
 	//holders
 	std::vector<PlasticActor*> actors;
@@ -66,14 +68,13 @@ private:
 	void BindKeys();
 	bool CreateActor();
 	void RemoveAllActors();
-	void UpdateTime();
 
 public:
 	PlasticWorld(SGameSettings* settings);
 	virtual ~PlasticWorld();
 
 	///Realtime clock.
-	ulli GetTime();
+	ulli GetTime()							{ return rtime; }
 
 	///Game clock.
 	PlasticTime GetGameTime()				{ return gtime; }
@@ -104,6 +105,9 @@ public:
 
 	///Returns DataPipe instance currently in use.
 	DataPipe* GetDataPipe()					{ return data; }
+
+	///Main clock facility.
+	void UpdateTime();
 
 	///Main events processing facility.
 	void ProcessEvents(SGUIEvent* e);

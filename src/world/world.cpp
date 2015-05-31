@@ -39,7 +39,8 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	binder = NULL;
 	once = false;
 	g_w = g_h = 0;
-	frames = 0;
+	rtime = epoch = passed = 0;
+	clkres = NULL;
 	fps = 0;
 
 	/* Create and set up DataPipe */
@@ -72,6 +73,7 @@ PlasticWorld::~PlasticWorld()
 	//Game data
 	if (PC) delete PC;
 	RemoveAllActors();
+	if (clkres) delete clkres;
 
 	//UI parts
 	if (binder) delete binder;
@@ -96,7 +98,7 @@ void PlasticWorld::Quantum()
 		if (!test) abort();
 	}
 
-//	UpdateTime();
+	UpdateTime();
 
 	//DEBUG:
 	data->WriteLock();
@@ -114,7 +116,7 @@ void PlasticWorld::Frame()
 	gui->SetBackgroundData(render->GetRender(),render->GetRenderLen());
 	render->SetMask(gui->GetBackmask(),g_w,g_h);
 
-	frames++;
+	gtime.fr++;
 
 	hud->UpdateFPS(fps);
 	hud->UpdateStatusOvrl();
@@ -176,6 +178,43 @@ void PlasticWorld::BindKeys()
 	binder->RegKeyByName("MAP_VIEW");
 	binder->RegKeyByName("INVENTORY");
 	binder->RegKeyByName("RENDER_CFG");
+}
+
+void PlasticWorld::UpdateTime()
+{
+	ulli now;
+	timespec cur;
+
+	//get current time
+	result = 0;
+	clock_gettime(CLOCK_MONOTONIC_RAW,&cur);
+	now = cur.tv_sec * PLTIMEMS + (cur.tv_nsec / PLTIMEUS);
+
+	if (!clkres) {
+		/* Check resolution on first call */
+		clkres = new timespec;
+		clock_getres(CLOCK_MONOTONIC_RAW,clkres);
+		if (clkres->tv_nsec > PLTIMEMINRES) result = 1;
+		epoch = now;
+	}
+
+	//calculate relative time and time gap
+	now -= epoch;
+	passed = now - rtime;
+	rtime = now;
+
+	//update real-time part of game time
+	gtime.rms += passed;
+
+	//deal with frame-time
+	if (gtime.rms >= PLTIMEMS) {
+		gtime.rms = 0;
+		fps = gtime.fr;
+		gtime.fr = 0;
+	}
+
+	//FIXME: debug
+	dbg_print("Time gap %llu",passed);
 }
 
 #define SPAWNWNDMACRO(Name,Create) \

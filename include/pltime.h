@@ -20,6 +20,19 @@
 #ifndef PLTIME_H_
 #define PLTIME_H_
 
+#include "misconsts.h"
+
+///Conversion value (in this case, from ns to ms).
+#define PLTIMEUS 1000000
+
+///Conversion from sec to ms.
+#define PLTIMEMS 1000
+
+///Minimal clock resolution acceptable (ns).
+///Set to 1 ms.
+#define PLTIMEMINRES PLTIMEUS
+
+
 enum EPlDayOfWeek {
 	DOW_ALPHA = 0,
 	DOW_BETA,
@@ -31,7 +44,8 @@ struct PlasticTime {
 	int hr;				//Hours
 	int mn;				//Minutes
 	int sc;				//Seconds
-	int fr;				//Frames
+	volatile int rms;	//Real-world milliseconds
+	volatile uli fr;	//Frames
 	int day;			//Day
 	EPlDayOfWeek dow;	//Day of week
 	int month;			//Month
