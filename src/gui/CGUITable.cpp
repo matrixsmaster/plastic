@@ -24,6 +24,8 @@
 
 using namespace std;
 
+
+//FIXME: what is this, and if it's important move it to definitions file (header)
 #define BW 2
 #define BH 2
 
@@ -35,8 +37,8 @@ CurseGUITable::CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int 
 	g_col = col;
 	g_rows = rows;
 	g_wcell = wcell;
-	g_vhtable = htable;
-	g_vwtable = wtable;
+	g_h = htable;
+	g_w = wtable;
 	cur_x = cur_y = 0;
 	scrolly = scrollx = 0;
 
@@ -155,7 +157,7 @@ int CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 				lx += g_wcell;
 			continue;
 		}
-		if (i > (g_y + g_vhtable)) continue;
+		if (i > (g_y + g_h)) continue;
 
 		if (sx > 0 && (!bordery))
 			lx += (c > 0) ? (sx - 1) : (sx-1 - c);
@@ -164,7 +166,7 @@ int CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 			borderx = ((j == x) || (j == x + w - 1));
 
 			if (j < g_x) continue;
-			if (j > g_x + g_vwtable) {
+			if (j > g_x + g_w) {
 				if(!bordery && !borderx) lx++;
 				continue;
 			}
@@ -203,18 +205,18 @@ void CurseGUITable::Update()
 	WINDOW* wd = wnd->GetWindow();
 
 	th = GetTableHeight();
-	if (th <= g_vhtable) {
+	if (th <= g_h) {
 		scrolly = 0;
-		th = g_vhtable;
-	} else th -= g_vhtable + 1;
+		th = g_h;
+	} else th -= g_h + 1;
 	if (scrolly < 0) scrolly = 0;
 	if (scrolly > th) scrolly = th;
 
 	tw = GetTableWidth();
-	if (tw <= g_vwtable) {
+	if (tw <= g_w) {
 		scrollx = 0;
-		tw = g_vwtable;
-	} else tw -= g_vwtable + 1;
+		tw = g_w;
+	} else tw -= g_w + 1;
 	if (scrollx < 0) scrollx = 0;
 	if (scrollx > tw) scrollx = tw;
 

@@ -45,6 +45,7 @@ void CurseGUILabel::Update()
 	//for each symbol
 	for (i = 0; ((i < text.size()) && (y < g_h)); i++) {
 		if ((text.at(i) == '\n') || (x >= g_w)) {
+			if (x >= g_w) i--; //unget symbol
 			x = 0;
 			y++;
 			continue;

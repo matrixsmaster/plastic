@@ -27,9 +27,11 @@ using namespace std;
 CurseGUIMessageBox::CurseGUIMessageBox(CurseGUI* scrn, const char* title, const char* text, const char* butns) :
 		CurseGUIWnd(scrn,0,0,2,2)
 {
-	int w,h,i,b;
-	char* tok, * hld;
+	int w,h,i,b,s,x;
+	char* tok, * hld, * str, * buf;
+	CurseGUIButton* btn;
 
+	//prepare core variables
 	type = GUIWT_MSGBOX;
 	if (title) {
 		name = string(title);
@@ -41,10 +43,15 @@ CurseGUIMessageBox::CurseGUIMessageBox(CurseGUI* scrn, const char* title, const 
 	stayontop = true;
 	focused = true;
 	boxed = true;
+	result = -1;
 
 	w = strlen(text);							//text width
 	i = MSGBOXSIZEX * parent->GetWidth() / 100;	//max width
 	b = (int)name.size() + 4;					//title width
+	if (butns && (b < (int)strlen(butns)))
+		b = strlen(butns);						//buttons line width
+
+	//select basic width and height of text part of the window
 	if (i < b) i = b;
 	if (w < b) w = b;
 	if (w > i) {
@@ -53,26 +60,52 @@ CurseGUIMessageBox::CurseGUIMessageBox(CurseGUI* scrn, const char* title, const 
 	} else
 		h = 1;
 
+	//create text field
 	new CurseGUILabel(ctrls,1,1,w,h,string(text));
 
 	h += 2; //make room for buttons
 
+	//create buttons
 	b = 0;
-	hld = NULL;
 	if (butns == NULL) {
 		new CurseGUIButton(ctrls,1,h,6,"OK");
-		b++;
+		b = 6;
 	} else {
-		//TODO
+		hld = NULL;
+		buf = (char*)malloc(strlen(butns)+1);
+		if (buf) {
+			strcpy(buf,butns);
+			str = buf;
+			while ((tok = strtok_r(str,"|",&hld))) {
+				str = NULL;
+				s = strlen(tok) + 2;
+				new CurseGUIButton(ctrls,1,h,s,string(tok));
+				b += s;
+			}
+			free(buf);
+		}
 	}
 
-	for (i = 0; i < b; i++) {
-//		ctrls-
+	//check result buttons line width
+	if (b > w) {
+		//no wider than parent
+		if (b <= (parent->GetWidth()-2)) w = b;
 	}
 
+	//sparse buttons
+	x = ctrls->GetNumControls(GUICL_BUTTON);
+	s = (w - 2 - b) / ((x < 2)? 2:x);
+	x = s + 1;
+	for (i = 0; i < ctrls->GetNumControls(GUICL_BUTTON); i++) {
+		btn = reinterpret_cast<CurseGUIButton*> (ctrls->GetControl(i,GUICL_BUTTON));
+		if (!btn) break;
+		btn->Move(x,h);
+		x += s + btn->GetWidth();
+	}
+
+	//finally resize message box window
 	w += 2;
 	h += 2;
-
 	Resize(w,h);
 
 	MoveToCenter();
@@ -80,11 +113,46 @@ CurseGUIMessageBox::CurseGUIMessageBox(CurseGUI* scrn, const char* title, const 
 
 void CurseGUIMessageBox::MoveToCenter()
 {
-	//TODO
+	Move((parent->GetWidth()-g_w)/2,(parent->GetHeight()-g_h)/2);
 }
 
 bool CurseGUIMessageBox::PutEvent(SGUIEvent* e)
 {
-	//TODO
+	int i;
+
+	//consume nothing if closing
+	if (will_close) return false;
+
+	//pump event through all controls
+	if (ctrls->PutEvent(e)) return true;
+
+	//or try to use it
+	switch (e->t) {
+	case GUIEV_KEYPRESS:
+		if (e->k == '\t') ctrls->Rotate();
+		break;
+
+	case GUIEV_RESIZE:
+		UpdateSize();
+		MoveToCenter();
+		break;
+
+	case GUIEV_CTLBACK:
+		if (e->b.t != GUIFB_SWITCHED) return false;
+		for (i = 0; i < ctrls->GetNumControls(GUICL_BUTTON); i++)
+			if (e->b.ctl == ctrls->GetControl(i,GUICL_BUTTON)) {
+				result = i;
+				break;
+			}
+		break;
+
+	default: break;
+	}
 	return false;
+}
+
+int CurseGUIMessageBox::GetButtonPressed()
+{
+	if (result >= 0) parent->RmWindow(this); //close immediately
+	return result;
 }

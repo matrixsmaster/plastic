@@ -39,6 +39,8 @@
 
 class CurseGUIMessageBox : public CurseGUIWnd {
 private:
+	int result;
+
 	void MoveToCenter();
 
 public:
@@ -185,7 +187,8 @@ public:
 
 /* ********************************** Actor View window ********************************** */
 
-#define ACTRVIEWMINW 60
+//Minimal width of Actor View window
+#define ACTRVIEWMINW 50
 
 class PlasticActor;
 

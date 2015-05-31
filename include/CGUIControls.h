@@ -114,12 +114,27 @@ public:
 	virtual bool IsSelected()				{ return selected; }
 
 	///Returns the type of the control element.
-	virtual ECGUIControlType GetType()		{ return typ; }
+	ECGUIControlType GetType()				{ return typ; }
+
+	///Moves the control over the owning window.
+	virtual void Move(int x, int y)			{ g_x = x; g_y = y; }
+
+	///Returns X position of control.
+	int GetPosX()							{ return g_x; }
+
+	///Returns Y position of control.
+	int GetPosY()							{ return g_y; }
+
+	///Returns overall width of control element.
+	virtual int GetWidth()					{ return g_w; }
+
+	///Returns overall height of control element.
+	virtual int GetHeight()					{ return g_h; }
 
 	///Updates graphical representation of control.
 	virtual void Update() = 0;
 
-	///Events pump endpoint.
+	///Events pump endpoint. Returns True if event is consumed.
 	virtual bool PutEvent(SGUIEvent*) = 0;
 
 	///Call this method to destroy and unregister control from its holder.
@@ -254,8 +269,8 @@ private:
 	int g_col;			//quantity of columns
 	int g_rows;			//quantity of rows
 	int g_wcell;		//cell width
-	int g_vhtable;		//visible height of the table
-	int g_vwtable;		//visible width of the table
+//	int g_vhtable;		//visible height of the table (alread have g_w/g_h)
+//	int g_vwtable;		//visible width of the table
 	int cur_x, cur_y;
 	int scrolly, scrollx;
 
@@ -281,7 +296,7 @@ public:
 	void SetData(std::string data, int r, int c);
 	void ClearData(int r, int c);
 
-	//Set  width rows
+	//Set cell width
 	void SetWidth(int width);
 
 	void Update();

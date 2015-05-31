@@ -250,7 +250,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				break;
 
 			case 'v':
-				SPAWNWNDMACRO("Test One",new CurseGUIMessageBox(gui,"Test One","Testing",NULL));
+				SPAWNWNDMACRO("Test One",new CurseGUIMessageBox(gui,"Test One","Testing","OK|Cancel|Something else|No|Yes"));
 				break;
 
 			case 'b':
@@ -287,4 +287,12 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 		errout("Warning: unknown event type pumped. Possibly memory corruption.\n");
 		result = 1;
 	}
+
+	//FIXME: debug
+	wptr = gui->GetWindowN("Message");
+	if (wptr)
+		dbg_print("'Message' window returned %d",((CurseGUIMessageBox*)wptr)->GetButtonPressed());
+	wptr = gui->GetWindowN("Test One");
+	if (wptr)
+		dbg_print("'Test One' window returned %d",((CurseGUIMessageBox*)wptr)->GetButtonPressed());
 }
