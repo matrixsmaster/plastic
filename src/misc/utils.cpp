@@ -103,8 +103,8 @@ opts_begin:
 		printf("World surface area = %llu chunk^2\n",wgen->GetPlaneArea());
 
 		//get RAM weight of world map
-		wgen->NewMap(1); //FIXME: find another way to calc next simple value :)
-		cov = wgen->GetAllocatedRAM() / 1024.f / 1024.f / 1024.f;
+		sz = wgen->GetPlaneArea() * sizeof(SWGCell);
+		cov = (float)sz / 1024.f / 1024.f / 1024.f;
 		printf("World map RAM cost = %llu bytes (%.3f GiB)\n",wgen->GetAllocatedRAM(),cov);
 		//discard world
 		delete wgen;

@@ -50,6 +50,12 @@
 #define WGELEVATIONS 3
 #define WGELEVHFACTOR 4
 
+///Number of cells to apply bilinear filtering for smoother landscape.
+///Set to 0 to disable landscape smoothing feature.
+#define WGSMOOTHCELLS 8
+
+#define WGSMOOTHBOOST 100
+
 /* Map cell content type (surface cells) */
 #define WGNUMKINDS 12
 

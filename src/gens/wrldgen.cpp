@@ -24,7 +24,6 @@
 #include "wrldgen.h"
 #include "vecmath.h"
 #include "vecmisc.h"
-//#include "debug.h" //FIXME: debug
 
 
 WorldGen::WorldGen(uli r, SVoxelTab* tab)
@@ -158,7 +157,6 @@ void WorldGen::CalcChunkElevRect(vector3d* arr, const vector3di chpos, int qx, i
 	for (i = 0; i < 4; i++) {
 		tmp = RectangleCornerK(i);
 		t = GetSurfaceCell(chpos+vector3di(qx+tmp.X,qy+tmp.Y,0)).elev;
-//		dbg_print("i=%d qx=%d qy=%d tx=%d ty=%d",i,qx,qy,tmp.X+qx,tmp.Y+qy);
 		arr[i].X = tmp.X * CHUNKBOX;
 		arr[i].Y = tmp.Y * CHUNKBOX;
 		arr[i].Z = t * CHUNKBOX + CHUNKBOX / WGELEVHFACTOR;
@@ -331,7 +329,9 @@ void WorldGen::NewMap(long seed)
 	SWGCell* ptr,*tmp;
 	bool flg;
 	float df,pr,mm;
-	vector2di cnt;
+	vector2di cnt,tmpiv;
+	vector3d varr[4],tmpfv;
+	vector3di tmpiiv;
 	ulli l;
 
 	/* Allocate map memory */
@@ -364,15 +364,36 @@ void WorldGen::NewMap(long seed)
 			case 2: ptr->t = WGCC_DIRTNSAND; break;
 			default: ptr->t = WGCC_WASTELAND;
 			}
-			//height mapping:
+			//raw height map
 			if (rng->FloatNum() > 0.5) {
 				if (--elv < 0) elv = 0;
 			} else if (rng->FloatNum() > 0.5) {
 				if (++elv > 2) elv = 2;
 			}
 			ptr->elev = elv;
-			//type of chunk here
+			//these cells are always surface
 			ptr->chunkt = WGCT_SURFACE;
+		}
+	}
+
+	/* Smooth the landscape */
+	for (i = 0, ptr = map; (i < planev.Y) && (WGSMOOTHCELLS > 0); i++) {
+		tmpfv.Y = i;
+		for (j = 0; j < planev.X; j++, ptr++) {
+			tmpfv.X = j;
+			for (k = 0; k < 4; k++) {
+				tmpiv = RectangleCornerK(k);
+				tmpiiv.X = tmpiv.X * (j / WGSMOOTHCELLS + 1);
+				tmpiiv.Y = tmpiv.Y * (i / WGSMOOTHCELLS + 1);
+				tmpiiv *= WGSMOOTHCELLS;
+				varr[k] = tmpiiv.ToReal();
+				varr[k].Z = (float)(GetSurfaceCell(tmpiiv).elev) * (float)WGSMOOTHBOOST;
+			}
+			elv = (int)round(BilinearInterpolation(varr,&tmpfv).Z / (float)WGSMOOTHBOOST);
+			elv = (ptr->elev + elv) / 2;
+			if (elv < 0) elv = 0;
+			if (elv >= WGELEVATIONS) elv = WGELEVATIONS - 1;
+			ptr->elev = elv;
 		}
 	}
 
