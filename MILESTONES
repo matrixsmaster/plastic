@@ -1,6 +1,6 @@
 v.0.1 ----------------------------------------------------------
 OK	Fully working LVR (without lighting, though)
-	Working atmosphere (clouds and stars)
+OK	Working atmosphere (clouds and stars)
 	Some rigid actors
 OK	Startup shell (character generation and game options)
 	Working GUI (HUD, console, inventory, stats, map)

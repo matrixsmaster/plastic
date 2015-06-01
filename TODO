@@ -35,3 +35,7 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Implement some marks to use in voxel table
 
 -> Add object view window
+
+-> Create a tree generator
+
+-> Start working on audio system (ALSA PCM output)
