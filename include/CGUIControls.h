@@ -245,6 +245,7 @@ public:
 
 	void SetNumSteps(int n);
 	void Step();
+	void SetValue(int v)					{}
 
 	void SetForegrFormat(SGUIPixel f)		{ foregr = f; }
 

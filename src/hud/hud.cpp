@@ -19,6 +19,7 @@
 
 #include <sstream>
 #include "hud.h"
+#include "CGUIControls.h"
 
 using namespace std;
 
@@ -26,9 +27,6 @@ HUD::HUD(CurseGUI* guiptr)
 {
 	int w, h;
 	gui = guiptr;
-
-	st_gp.X = 0; st_gp.Y = 0; st_gp.Z = 0;
-	st_lp.X = 0; st_lp.Y = 0; st_lp.Z = 0;
 
 	memset(&plt, 0, sizeof(plt));
 
@@ -38,31 +36,31 @@ HUD::HUD(CurseGUI* guiptr)
 	/*add some overlays */
 
 	//Fps overlay
-	Spawn(0,0, 8, 1, false, "fps=0");
+	Spawn(0,0, 8, 1, true, "fps=0");
 
 	//Bottom log overlay
 	Spawn(0,(h-(h/5)), (w/3), (h/5), true, "It's just an overlay");
 
 	//Status overlay on top
 	Spawn((w/5), 0, (w/5), STAT_OVRL_HEIGHT, false, "");
-	SetAlpha(OVRL_ST, 0);
+	SetAlpha(OVRL_STATE, 0);
 
 	//Map overlay
-	Spawn((w-(w/4)), 0, (w/4), (h/4), false, "     !!MAAAP!!");
+	Spawn((w-(w/4)), 0, (w/4), (h/4), true, "     !!MAAAP!!");
 	SetAlpha(OVRL_MAP, 0);
 
-	//Bottom state overlay
-	Spawn((w/3), (h-1), w-(w/3), 1, false, " STATE string");
+	//Status bar overlay
+	Spawn((w/3), (h-1), w-(w/3)-20, 1, true, " STATE string");
 	SetAlpha(OVRL_STBTM, 0);
 
 	//Time overlay
-	Spawn(0,1, 8, 1, false, "00:00:00");
+	Spawn(0,1, 8, 3, true, "");
 
-	//Charge overlay
-	Spawn((w-10),(h-2), 10, 1, false, "{--------}");
+	//Charge and HP overlay
+	Spawn((w-10),(h-2), 10, 2, false, "");
+	SetAlpha(OVRL_CHRG_HP, 0);
 
-	//HP overlay
-	Spawn((w-10), (h-1), 10, 1, false, "{HPHPHPHP}");
+	InitControls();
 }
 
 HUD::~HUD()
@@ -120,29 +118,34 @@ void HUD::PutStrToLog(const char* str)
 	PutString(OVRL_LOG, str);
 }
 
-void HUD::UpdateStatusOvrl()
+void HUD::InitControls()
 {
-	string str;
+	new CurseGUIProgrBar(overlays[OVRL_CHRG_HP]->GetControls(), 0, 0, 10, 0, 100);
+	new CurseGUIProgrBar(overlays[OVRL_CHRG_HP]->GetControls(), 0, 1, 10, 0, 100);
+	new CurseGUILabel(overlays[OVRL_STATE]->GetControls(), 0, 0, gui->GetWidth()/5, 1, "GPos [ 0 0 0 ]");
+	new CurseGUILabel(overlays[OVRL_STATE]->GetControls(), 0, 1, gui->GetWidth()/5, 1, "LPos [ 0 0 0 ]");
+	//TODO add all controls
+}
 
-	ClearLog(OVRL_ST);
-	str = "GPos [";
-	str += intToString(st_gp.X);
-	str += " ";
-	str += intToString(st_gp.Y);
-	str += " ";
-	str += intToString(st_gp.Z);
-	str += "]";
-	PutString(OVRL_ST, str);
-	str = "LPos [";
-	str += intToString(st_lp.X);
-	str += " ";
-	str += intToString(st_lp.Y);
-	str += " ";
-	str += intToString(st_lp.Z);
-	str += "]";
-	PutString(OVRL_ST, str);
-	str = "";
-	PutString(OVRL_ST, str);
+void HUD::UpdateChargeHP()
+{
+	//TODO
+}
+
+void HUD::SetCharge(int v)
+{
+	CurseGUIProgrBar* bar;
+	bar = (CurseGUIProgrBar*)overlays[OVRL_CHRG_HP]->GetControls()->GetControl(1, GUICL_LABEL);
+	if (!bar) return;
+	bar->SetValue(v);
+}
+
+void HUD::SetHP(int v)
+{
+	CurseGUIProgrBar* bar;
+	bar = (CurseGUIProgrBar*)overlays[OVRL_CHRG_HP]->GetControls()->GetControl(0, GUICL_LABEL);
+	if (!bar) return;
+	bar->SetValue(v);
 }
 
 void HUD::DrawMap()
@@ -159,22 +162,21 @@ void HUD::UpdateState(string str)
 
 void HUD::UpdateClock()
 {
-	ClearLog(OVRL_CLOCK);
-	char tmp[8];
-	snprintf(tmp, 8, "%d:%d:%d", plt->hr, plt->mn, plt->sc);
+	char tmp[9];
 
+	ClearLog(OVRL_CLOCK);
+	//name of day
+	snprintf(tmp, 8, "%s", day_to_string[plt->dow].s);
+	PutString(OVRL_CLOCK, string(tmp));
+	//date
+	snprintf(tmp, 9, "%02d/%01d/%03d", plt->day, plt->month, plt->year);
+	PutString(OVRL_CLOCK, string(tmp));
+	//time
+	snprintf(tmp, 9, "%02d:%02d:%02d", plt->hr, plt->mn, plt->sc);
 	PutString(OVRL_CLOCK, string(tmp));
 }
 
-void HUD::UpdateCharge()
-{
-	//TODO
-}
 
-void HUD::UpdateHP()
-{
-	//TODO
-}
 
 void HUD::SetAlpha(HUDOverlayType t, float a)
 {
@@ -190,4 +192,35 @@ void HUD::SetBckgrMask(SGUIPixel* pxl)
 void HUD::SetPTime(PlasticTime* t)
 {
 	plt = t;
+}
+
+void HUD::SetLabelCaption(char *buf, int s, int l, int x, int y, int z)
+{
+	CurseGUILabel* lbl;
+	lbl = (CurseGUILabel*)overlays[OVRL_STATE]->GetControls()->GetControl(l, GUICL_LABEL);
+	if (!lbl) return;
+	snprintf(buf+1, s, "Pos [ %d %d %d ]", x, y, z);
+	lbl->SetCaption(string(buf));
+}
+
+void HUD::SetGPos(vector3di gp)
+{
+	char tmp[20];
+	tmp[0] = 'G';
+	SetLabelCaption(tmp, 20, 0, gp.X, gp.Y, gp.Z);
+}
+
+void HUD::SetLPos(vector3di lp)
+{
+	char tmp[20];
+	tmp[0] = 'L';
+	SetLabelCaption(tmp, 20, 1, lp.X, lp.Y, lp.Z);
+}
+
+void HUD::SetHidden()
+{
+	if (overlays[OVRL_STATE]->GetHidden()) {
+		overlays[OVRL_STATE]->SetHidden(false);
+	} else overlays[OVRL_STATE]->SetHidden(true);
+
 }
