@@ -77,6 +77,9 @@ public:
 	//FIXME: comment it out!
 	void SetBckgrMask(SGUIPixel* pxl);
 
+	//Charge
+	void AddPrgrBar();
+
 	void PutString(const char* str);
 	void PutString(std::string str);
 

@@ -25,6 +25,7 @@
 #include "CurseGUI.h"
 #include "CGUIOverlay.h"
 #include "vecmath.h"
+#include "pltime.h"
 
 #define STAT_OVRL_HEIGHT 3
 
@@ -33,7 +34,10 @@ enum HUDOverlayType {
 	OVRL_LOG,
 	OVRL_ST,
 	OVRL_MAP,
-	OVRL_STBTM
+	OVRL_STBTM,
+	OVRL_CLOCK,
+	OVRL_CHARGE,
+	OVRL_HP
 };
 
 
@@ -44,6 +48,7 @@ private:
 	SOVRLStats stats;
 	vector3di st_gp;
 	vector3di st_lp;
+	PlasticTime* plt;
 
 	///Spawn an overlay window (for internal use only).
 	void Spawn(int x, int y, int w, int h, bool logging, const char* txt);
@@ -77,7 +82,21 @@ public:
 	//Update State overlay
 	void UpdateState(std::string str);
 
+	//Update clock overlay
+	void UpdateClock();
+
+	//Update charge overlay
+	void UpdateCharge();
+
+	//Update HP overlay
+	void UpdateHP();
+
+	void SetPTime(PlasticTime* t);
+
+	//Set global position
 	void SetGPos(vector3di gp) { st_gp = gp; }
+
+	//Set local position
 	void SetLPos(vector3di lp) { st_lp = lp; }
 };
 

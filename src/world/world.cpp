@@ -120,6 +120,7 @@ void PlasticWorld::Frame()
 
 	hud->UpdateFPS(fps);
 	hud->UpdateStatusOvrl();
+	hud->UpdateClock();
 }
 
 void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
@@ -147,6 +148,7 @@ void PlasticWorld::ConnectGUI()
 	//Update HUD sizes, positions etc (reset)
 	if (hud) delete hud;
 	hud = new HUD(gui);
+	hud->SetPTime(&gtime);
 
 	//OK
 	result = 0;

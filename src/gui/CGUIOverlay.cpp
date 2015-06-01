@@ -36,7 +36,8 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, boo
 	pthread_mutex_init(&wmutex,NULL);
 
 	pixl.bg.r = 0; pixl.bg.g = 0; pixl.bg.b = 0;
-	pixl.fg.r = 1000; pixl.fg.g = 500; pixl.fg.b = 1000;
+	pixl.fg.r = 700; pixl.fg.g = 700; pixl.fg.b = 700;
+
 }
 
 CurseGUIOverlay::~CurseGUIOverlay()
@@ -85,6 +86,11 @@ void CurseGUIOverlay::SetBckgrMask(SGUIPixel* pxl)
 	pixl.fg.b = pxl->fg.b;
 }
 
+void CurseGUIOverlay::AddPrgrBar()
+{
+	//FIXME:
+}
+
 void CurseGUIOverlay::ClearLog()
 {
 	if (log.empty()) return;
@@ -125,7 +131,7 @@ void CurseGUIOverlay::DrawLog()
 				pair = (ch & A_COLOR) >> NCURSES_ATTR_SHIFT;
 
 				//set the symbol
-				if(i >= ns) pxl.sym = ' ';
+				if (i >= ns) pxl.sym = ' ';
 				else pxl.sym = it->at(i);
 
 				//get the color information by pair code
@@ -139,6 +145,7 @@ void CurseGUIOverlay::DrawLog()
 				pxl.fg.r = 1000;
 				pxl.fg.g = 1000;
 				pxl.fg.b = 1000;
+
 
 				//Apply new symbol
 				lc = cmanager->CheckPair(&pxl);

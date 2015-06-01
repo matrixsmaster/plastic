@@ -30,27 +30,39 @@ HUD::HUD(CurseGUI* guiptr)
 	st_gp.X = 0; st_gp.Y = 0; st_gp.Z = 0;
 	st_lp.X = 0; st_lp.Y = 0; st_lp.Z = 0;
 
+	memset(&plt, 0, sizeof(plt));
+
 	w = gui->GetWidth();
 	h = gui->GetHeight();
 
 	/*add some overlays */
 
-	//fps overlay
-	Spawn(0,0, 10, 1, false, "fps = 0");
+	//Fps overlay
+	Spawn(0,0, 8, 1, false, "fps=0");
 
-	//bottom log overlay
-	Spawn(0,(h-(h/5)), (w/3), (h/5), true,
-			"Testing ovaerlay bla bla bla yeah! Alice in wonderland. Cynic.");
+	//Bottom log overlay
+	Spawn(0,(h-(h/5)), (w/3), (h/5), true, "It's just an overlay");
 
-	//status overlay on top
+	//Status overlay on top
 	Spawn((w/5), 0, (w/5), STAT_OVRL_HEIGHT, false, "");
+	SetAlpha(OVRL_ST, 0);
 
-	//map overlay
+	//Map overlay
 	Spawn((w-(w/4)), 0, (w/4), (h/4), false, "     !!MAAAP!!");
+	SetAlpha(OVRL_MAP, 0);
 
-	//bottom state overlay
+	//Bottom state overlay
 	Spawn((w/3), (h-1), w-(w/3), 1, false, " STATE string");
 	SetAlpha(OVRL_STBTM, 0);
+
+	//Time overlay
+	Spawn(0,1, 8, 1, false, "00:00:00");
+
+	//Charge overlay
+	Spawn((w-10),(h-2), 10, 1, false, "{--------}");
+
+	//HP overlay
+	Spawn((w-10), (h-1), 10, 1, false, "{HPHPHPHP}");
 }
 
 HUD::~HUD()
@@ -97,7 +109,7 @@ void HUD::UpdateFPS(uli fps)
 
 	if(overlays.empty()) return;
 	ClearLog(OVRL_FPS);
-	str = "fps = ";
+	str = "fps=";
 	str += intToString(fps);
 	PutString(OVRL_FPS, str);
 }
@@ -145,6 +157,25 @@ void HUD::UpdateState(string str)
 	PutString(OVRL_STBTM, s);
 }
 
+void HUD::UpdateClock()
+{
+	ClearLog(OVRL_CLOCK);
+	char tmp[8];
+	snprintf(tmp, 8, "%d:%d:%d", plt->hr, plt->mn, plt->sc);
+
+	PutString(OVRL_CLOCK, string(tmp));
+}
+
+void HUD::UpdateCharge()
+{
+	//TODO
+}
+
+void HUD::UpdateHP()
+{
+	//TODO
+}
+
 void HUD::SetAlpha(HUDOverlayType t, float a)
 {
 	if(overlays.empty()) return;
@@ -154,4 +185,9 @@ void HUD::SetAlpha(HUDOverlayType t, float a)
 void HUD::SetBckgrMask(SGUIPixel* pxl)
 {
 	//TODO
+}
+
+void HUD::SetPTime(PlasticTime* t)
+{
+	plt = t;
 }
