@@ -177,7 +177,7 @@ public:
 	///Move the world to next chunk.
 	///Update chunks buffers either by loading or by generating.
 	///Returns false if move is invalid.
-	virtual bool Move(EGMoveDir dir);
+	virtual bool Move(const vector3di shf);
 
 	///Do NOT call this method in the outside code, unless you're know what you're doing!
 	virtual void ChunkQueue();
@@ -231,7 +231,7 @@ public:
 	void SetVoxTab(SVoxelTab* p)		{ voxeltab = *p; }
 
 	void SetGP(vector3di pos)			{}
-	bool Move(EGMoveDir dir)			{ return false; }
+	bool Move(const vector3di shf)		{ return false; }
 
 	voxel GetVoxel(const vector3di* p);
 };

@@ -32,14 +32,14 @@
 
 
 //Global Movement Directions
-enum EGMoveDir {
-	GMOVE_UP,
-	GMOVE_DOWN,
-	GMOVE_NORTH,
-	GMOVE_SOUTH,
-	GMOVE_WEST,
-	GMOVE_EAST
-};
+//enum EGMoveDir {
+//	GMOVE_UP,
+//	GMOVE_DOWN,
+//	GMOVE_NORTH,
+//	GMOVE_SOUTH,
+//	GMOVE_WEST,
+//	GMOVE_EAST
+//};
 
 //Local Movement Directions
 enum ELMoveDir {

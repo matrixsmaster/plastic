@@ -29,7 +29,7 @@
 #define VOXGRAIN 8
 
 ///Number of chunks in current active buffers.
-#define HOLDCHUNKS 27
+#define HOLDCHUNKS 1
 
 ///Number of intial voxel types.
 #define DEFVOXTYPES 1024

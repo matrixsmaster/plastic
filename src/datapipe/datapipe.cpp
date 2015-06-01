@@ -327,14 +327,40 @@ void DataPipe::SetGP(vector3di pos)
 	WriteUnlock();
 }
 
-bool DataPipe::Move(EGMoveDir dir)
+bool DataPipe::Move(const vector3di shf)
 {
+	vector3di rgp;
+
+	//Check shift vector first
+	if ( (abs(shf.X) > 1) || (abs(shf.Y) > 1) || (abs(shf.Z) > 1) )
+		return false;
+	rgp = GP + shf;
+	//TODO: Z-thru
+	wgen->WrapCoords(&rgp);
+
+#if HOLDCHUNKS == 1
+	SetGP(rgp);
+	return true;
+#else
+
+	//Lock everything
 	WriteLock();
 	status = DPIPE_BUSY;
-	//TODO
+
+#if HOLDCHUNKS == 9
+	//X-axis
+	if (shf.X == 1) {
+
+	}
+#elif HOLDCHUNKS == 18
+#elif HOLDCHUNKS == 27
+#endif
+
+	//Release everything
 	status = DPIPE_IDLE;
 	WriteUnlock();
-	return false;
+	return true;
+#endif
 }
 
 void DataPipe::ChunkQueue()
