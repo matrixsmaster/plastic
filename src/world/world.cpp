@@ -27,6 +27,7 @@
 PlasticWorld::PlasticWorld(SGameSettings* settings)
 {
 	float alloc_gb;
+	PlasticTime* saved_time;
 
 	/* Init internal variables */
 	result = 0;
@@ -54,6 +55,11 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
 	printf("Chunks buffer capacity = %d * (%d ^ 3) voxels\n",HOLDCHUNKS,CHUNKBOX);
 	printf("Initially allocated memory: %llu bytes (%.3f GiB)\n",data->GetAllocatedRAM(),alloc_gb);
+
+	/* Init game time */
+	memset(&gtime,0,sizeof(gtime));
+	saved_time = data->GetSavedTime();
+	if (saved_time) gtime = *saved_time;
 
 	/* Bind keyboard */
 	BindKeys();
@@ -221,6 +227,11 @@ void PlasticWorld::UpdateTime()
 	gtime.mn = gtime.mn % 60;
 	gtime.day += gtime.hr / PLTIMEDAYLEN;
 	gtime.hr = gtime.hr % PLTIMEDAYLEN;
+	gtime.month += gtime.day / (PLTIMENUMWEEKS * PLTIMENUMDAYS);
+	gtime.day = gtime.day % (PLTIMENUMWEEKS * PLTIMENUMDAYS);
+	gtime.year += gtime.month / PLTIMENUMMONTHS;
+	gtime.month = gtime.month % PLTIMENUMMONTHS;
+	gtime.dow = (EPlDayOfWeek)(gtime.day % PLTIMENUMDAYS);
 
 	//FIXME: debug
 	dbg_print("Time gap %llu",passed);

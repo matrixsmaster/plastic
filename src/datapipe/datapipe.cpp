@@ -57,9 +57,11 @@ DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 	if (i > 0) memcpy(root,sets->root,i);
 	else return;
 
-	/* Allocate everything */
+	/* Allocate (and load) everything */
 	if (allocate) {
 		if (!Allocator(sets)) return;
+		if (sets->new_game) SetNewGame();
+		else if (!LoadLastGame()) return;
 	}
 
 	/* OK */
@@ -134,11 +136,6 @@ bool DataPipe::Allocator(SGameSettings* sets)
 			errout("Maximum amount of memory allowed to be used is reached.\n");
 			return false;
 		}
-	}
-
-	//TODO: load Player data
-	if (!sets->new_game) {
-		//...
 	}
 
 	/* All clear. */
@@ -446,6 +443,21 @@ void DataPipe::MakeChunk(unsigned l, vector3di pos)
 }
 
 bool DataPipe::LoadChunk(SDataPlacement* res, PChunk buf)
+{
+	//TODO
+	return false;
+}
+
+void DataPipe::SetNewGame()
+{
+	memset(&svhead,0,sizeof(svhead));
+
+	//TODO
+
+	svhead.gtime.year = PLTIMEINITYEAR;
+}
+
+bool DataPipe::LoadLastGame()
 {
 	//TODO
 	return false;
