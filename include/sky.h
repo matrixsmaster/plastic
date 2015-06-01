@@ -32,22 +32,38 @@
 #define SKYHEMI (SKYANGLE / 2)
 
 
+enum ESkyState {
+	ASKY_NIGHT,
+	ASKY_DAWN,
+	ASKY_DAY,
+	ASKY_DUSK
+};
+
 class AtmoSky {
 private:
 	DataPipe* pipe;				//DataPipe access pointer
 	SGUIPixel sky[SKYSIZE];		//skies buf
-	const PlasticTime* time;	//current time
+	const PlasticTime* ctime;	//current time
+	bool once;					//first update flag
 	vector3d scrot;				//scene rotation
 	float windsp;				//wind speed
 	vector3d wind;				//wind direction
 	SCTriple day_cld;			//clouds color (day)
 	SCTriple day_sky;			//sky main color (day)
+	SCTriple ngh_cld;			//clouds color (night)
+	SCTriple ngh_sky;			//sky main color (night)
+	SCTriple trn_cld;			//clouds color (transition delta)
+	SCTriple trn_sky;			//sky main color (transition delta)
+	int dawnst,duskst;			//dawn and dusk start time (game hour)
+	int tranln;					//transition state length (hours)
+	int evtime;					//current event time
+	ESkyState state;			//current state of skies
 
 public:
 	AtmoSky(DataPipe* pipeptr);
 	virtual ~AtmoSky();
 
-	void SetTime(const PlasticTime* nwtime)			{ time = nwtime; }
+	void SetTime(const PlasticTime* nwtime)			{ ctime = nwtime; }
 	void SetEulerAngles(const vector3d nwang);
 
 	void Quantum();

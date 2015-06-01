@@ -37,6 +37,9 @@
 ///Desync time for render threads (us).
 #define RENDERPOOLDESW 150
 
+///Update time of Sky object (frames).
+#define RENDERPOOLSKYUP 270
+
 
 /* Pool runtime data structure */
 struct SRendPoolDat {
@@ -59,6 +62,7 @@ private:
 	bool quit;						//Quit event flag
 	pthread_t t_rend;				//Main thread
 	pthread_mutex_t m_rend;			//Main thread frame mutex
+	unsigned frames;				//Frame counter
 
 	void SpawnThreads();			//Rendering threads spawner
 	void KillThreads();				//Rendering threads killer
