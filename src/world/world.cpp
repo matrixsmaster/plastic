@@ -206,12 +206,21 @@ void PlasticWorld::UpdateTime()
 	//update real-time part of game time
 	gtime.rms += passed;
 
-	//deal with frame-time
+	//deal with frame-time and game seconds
 	if (gtime.rms >= PLTIMEMS) {
 		gtime.rms = 0;
 		fps = gtime.fr;
 		gtime.fr = 0;
+		gtime.sc += PLTIMESCALE;
 	}
+
+	//calculate game time
+	gtime.mn += gtime.sc / 60;
+	gtime.sc = gtime.sc % 60;
+	gtime.hr += gtime.mn / 60;
+	gtime.mn = gtime.mn % 60;
+	gtime.day += gtime.hr / PLTIMEDAYLEN;
+	gtime.hr = gtime.hr % PLTIMEDAYLEN;
 
 	//FIXME: debug
 	dbg_print("Time gap %llu",passed);

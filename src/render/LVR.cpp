@@ -62,6 +62,7 @@ LVR::~LVR()
 void LVR::ReallocBuffers()
 {
 	if (pbuf) delete[] pbuf;
+	pbuf = NULL;
 
 #ifdef LVRDOUBLEBUFFERED
 	size_t l;
