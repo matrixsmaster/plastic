@@ -30,14 +30,13 @@
 #define STAT_OVRL_HEIGHT 3
 
 enum HUDOverlayType {
-	OVRL_FPS = 0,
-	OVRL_LOG,
-	OVRL_ST,
-	OVRL_MAP,
-	OVRL_STBTM,
-	OVRL_CLOCK,
-	OVRL_CHARGE,
-	OVRL_HP
+	OVRL_FPS = 0,		//Fps
+	OVRL_LOG,			//Log
+	OVRL_STATE,			//Top status overlay
+	OVRL_MAP,			//Map
+	OVRL_STBTM,			//Status Bar
+	OVRL_CLOCK,			//Date and time
+	OVRL_CHRG_HP		//Charge and HP
 };
 
 
@@ -46,16 +45,19 @@ private:
 	CurseGUI* gui;
 	std::vector<CurseGUIOverlay*> overlays;
 	SOVRLStats stats;
-	vector3di st_gp;
-	vector3di st_lp;
 	PlasticTime* plt;
 
 	///Spawn an overlay window (for internal use only).
 	void Spawn(int x, int y, int w, int h, bool logging, const char* txt);
 	std::string intToString(int n);
 
+	///Controls initialization
+	void InitControls();
+
 	void ClearLog(HUDOverlayType t);
 	void PutString(HUDOverlayType t, std::string str);
+
+	void SetLabelCaption(char *buf, int s, int l, int x, int y, int z);
 
 public:
 	HUD(CurseGUI* guiptr);
@@ -64,40 +66,44 @@ public:
 	///Updates FPS counter.
 	void UpdateFPS(uli fps);
 
-	//Update status message (gpos, lpos, etc)
-	void UpdateStatusOvrl();
-
-	//Put string to LOG overlay
+	///Put string to LOG overlay
 	void PutStrToLog(const char* str);
 
-	//Set transparency
+	///Set transparency
 	void SetAlpha(HUDOverlayType t, float a);
 
-	//Set background mask
+	///Set background mask
 	void SetBckgrMask(SGUIPixel* pxl);
 
-	//Draw local world map
+	///Draw local world map
 	void DrawMap();
 
-	//Update State overlay
+	///Update State overlay
 	void UpdateState(std::string str);
 
-	//Update clock overlay
+	///Update clock overlay
 	void UpdateClock();
 
-	//Update charge overlay
-	void UpdateCharge();
+	///Update charge and HP overlay
+	void UpdateChargeHP();
 
-	//Update HP overlay
-	void UpdateHP();
-
+	///Set time
 	void SetPTime(PlasticTime* t);
 
-	//Set global position
-	void SetGPos(vector3di gp) { st_gp = gp; }
+	///Set global position
+	void SetGPos(vector3di gp); //{ st_gp = gp; }
 
-	//Set local position
-	void SetLPos(vector3di lp) { st_lp = lp; }
+	///Set local position
+	void SetLPos(vector3di lp); //{ st_lp = lp; }
+
+	///Set the level of charge
+	void SetCharge(int v);
+
+	///Set the level health points
+	void SetHP(int v);
+
+	///Change the visibility
+	void SetHidden();
 };
 
 #endif /* HUD_H_ */

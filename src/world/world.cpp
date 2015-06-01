@@ -125,7 +125,6 @@ void PlasticWorld::Frame()
 	gtime.fr++;
 
 	hud->UpdateFPS(fps);
-	hud->UpdateStatusOvrl();
 	hud->UpdateClock();
 }
 
@@ -313,6 +312,9 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				break;
 			case 'x':
 				if (hud) hud->SetAlpha(OVRL_LOG, 0.5);
+				break;
+			case 'c':
+				if (hud) hud->SetHidden();
 				break;
 
 			case 'v':

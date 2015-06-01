@@ -28,6 +28,8 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, boo
 	type = GUIWT_OVERLAY;
 
 	logging = logg;
+	hidden = false;
+
 	name = "Overlay";
 
 	alpha = CGUIOVERLAYDEFALPHA;
@@ -47,8 +49,11 @@ CurseGUIOverlay::~CurseGUIOverlay()
 
 void CurseGUIOverlay::Update(bool refr)
 {
+	if (hidden) return;
+
 	pthread_mutex_lock(&wmutex);
 	DrawLog();
+	ctrls->Update();
 	pthread_mutex_unlock(&wmutex);
 
 	wcolor_set(wnd,0,NULL);
@@ -57,6 +62,7 @@ void CurseGUIOverlay::Update(bool refr)
 
 bool CurseGUIOverlay::PutEvent(SGUIEvent* e)
 {
+
 	//OverlayUI events processing
 	//FIXME: maybe just nothing here?
 	return false;
@@ -73,22 +79,6 @@ void CurseGUIOverlay::PutString(string str)
 	pthread_mutex_lock(&wmutex);
 	log.push_back(str);
 	pthread_mutex_unlock(&wmutex);
-}
-
-void CurseGUIOverlay::SetBckgrMask(SGUIPixel* pxl)
-{
-	//TODO
-	pixl.bg.r = pxl->bg.r;
-	pixl.bg.g = pxl->bg.g;
-	pixl.bg.b = pxl->bg.b;
-	pixl.fg.r = pxl->fg.r;
-	pixl.fg.g = pxl->fg.g;
-	pixl.fg.b = pxl->fg.b;
-}
-
-void CurseGUIOverlay::AddPrgrBar()
-{
-	//FIXME:
 }
 
 void CurseGUIOverlay::ClearLog()
@@ -109,7 +99,6 @@ void CurseGUIOverlay::DrawLog()
 	SGUIPixel pxl;
 	short lc = -1;
 	short pair;
-
 
 	if (log.empty()) return;
 

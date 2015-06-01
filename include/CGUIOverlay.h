@@ -26,6 +26,7 @@
 #include <string>
 #include "pthread.h"
 #include "CurseGUI.h"
+#include "CGUIControls.h"
 #include "vecmath.h"
 
 #define CGUIOVERLAYDEFALPHA 0.5
@@ -42,6 +43,7 @@ private:
 	bool logging;					//window logging flag
 	SGUIPixel pixl;					//output pixel format
 	pthread_mutex_t wmutex;			//window access mutex
+	bool hidden;
 
 	void DrawLog();
 
@@ -74,11 +76,11 @@ public:
 	///Returns current format in use.
 	SGUIPixel GetFormat()				{ return pixl; }
 
-	//FIXME: comment it out!
-	void SetBckgrMask(SGUIPixel* pxl);
+	///Show or hide overlay window
+	void SetHidden(bool h)				{ hidden = h; }
 
-	//Charge
-	void AddPrgrBar();
+	///Returns true if an overlay window is hidden
+	bool GetHidden()					{ return hidden; }
 
 	void PutString(const char* str);
 	void PutString(std::string str);
