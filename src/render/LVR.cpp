@@ -330,6 +330,7 @@ void LVR::Postprocess()
 
 			/* Fog */
 			if (pproc.fog_dist > 0) {
+				//FIXME: simplify this!
 				fa = curzbuf[l] - pproc.fog_dist;
 				fc = 1.f / (float)(far - pproc.fog_dist);
 				if (fa > 0) {

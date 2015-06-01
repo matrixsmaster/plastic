@@ -81,6 +81,7 @@ RenderPool::RenderPool(DataPipe* pipe) :
 {
 	skies = new AtmoSky(pipe);
 	quit = false;
+	frames = 0;
 
 	/* Create frame mutex */
 	pthread_mutex_init(&m_rend,NULL);
@@ -198,6 +199,12 @@ bool RenderPool::Quantum()
 
 	/* Release frame buffer */
 	pthread_mutex_unlock(&m_rend);
+
+	/* Update skies */
+	if (++frames >= RENDERPOOLSKYUP) {
+		frames = 0;
+		skies->Quantum();
+	}
 
 	return quit;
 }
