@@ -32,6 +32,7 @@
 #include "wrldgen.h"
 #include "vmodel.h"
 #include "vsprite.h"
+#include "pltime.h"
 #include "plastic.h"
 
 
@@ -89,6 +90,12 @@ struct SDataPlacement {
 	long offset;
 };
 
+/* Save file header structure */
+struct SSavedGameHeader {
+	PlasticTime gtime;
+	int plx,pgx,ply,pgy,plz,pgz;
+};
+
 //Some shortcuts for long-named types
 typedef std::map<std::string,std::string> IniData;
 typedef std::map<std::string,IniData> IniMap;
@@ -121,6 +128,7 @@ protected:
 
 	WorldGen* wgen;						//world generator instance
 	IniMap ini;							//map of known (and loaded) ini files
+	SSavedGameHeader svhead;			//save file header data
 
 	VModVec objs;						//objects in scene
 	VSprVec sprs;						//sprites in scene
@@ -132,6 +140,8 @@ protected:
 	bool LoadIni(const std::string name);
 	void MakeChunk(unsigned l, vector3di pos);
 	bool LoadChunk(SDataPlacement* res, PChunk buf);
+	void SetNewGame();
+	bool LoadLastGame();
 
 public:
 	DataPipe(SGameSettings* sets, bool allocate = true);
@@ -201,6 +211,7 @@ public:
 	vector2di GetGlobalSurfaceSize()		{ return (vector2di(wgen->GetPlaneSide())); }
 	vector3di GetInitialPCGPos()			{ return wgen->GetPCInitPos(); }
 	vector3di GetInitialPCLPos()			{ return vector3di(128,90,135); } //FIXME
+	PlasticTime* GetSavedTime()				{ return &(svhead.gtime); }
 };
 
 
