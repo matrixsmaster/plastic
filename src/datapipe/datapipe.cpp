@@ -477,7 +477,6 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	PChunk ch;
 	int px,py,pz;
 	unsigned l;
-	VModVec::iterator mi;
 	voxel tmp = 0;
 
 #if HOLDCHUNKS > 1
@@ -488,16 +487,10 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	DP_GETVOX_LOCK;
 
 	/* Check for dynamic objects */
-	if (!objs.empty()) {
-		for (mi = objs.begin(); mi != objs.end(); ++mi) {
-			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
-				tmp = (*mi)->GetVoxelAt(p);
-				if (tmp) {
-					DP_GETVOX_UNLOCK;
-					return tmp;
-				}
-			}
-		}
+	tmp = IntersectModel(p,NULL,false);
+	if (tmp) {
+		DP_GETVOX_UNLOCK;
+		return tmp;
 	}
 
 #if HOLDCHUNKS == 1
@@ -569,14 +562,14 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	return tmp;
 }
 
-SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
+const SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
 {
 	voxel v = GetVoxel(p);
 	if (v < voxeltab.len) return &(voxeltab.tab[v]);
 	else return NULL;
 }
 
-SVoxelInf* DataPipe::GetVInfo(const voxel v)
+const SVoxelInf* DataPipe::GetVInfo(const voxel v)
 {
 	if (v < voxeltab.len) return &(voxeltab.tab[v]);
 	else return NULL;
@@ -636,6 +629,31 @@ void DataPipe::PurgeModels()
 
 	objs.clear();
 	WriteUnlock();
+}
+
+voxel DataPipe::IntersectModel(const vector3di* p, VModel** obj, const bool autolock)
+{
+	voxel r;
+	VModVec::iterator mi;
+
+	if (autolock) ReadLock();
+
+	if (!objs.empty()) {
+		for (mi = objs.begin(); mi != objs.end(); ++mi) {
+			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
+				r = (*mi)->GetVoxelAt(p);
+				if (r) {
+					if (autolock) ReadUnlock();
+					if (obj) *obj = *mi;
+					return r;
+				}
+			}
+		}
+	}
+
+	if (autolock) ReadUnlock();
+	if (obj) *obj = NULL;
+	return 0;
 }
 
 VSprite* DataPipe::LoadSprite(const char* fname)

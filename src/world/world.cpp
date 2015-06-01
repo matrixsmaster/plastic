@@ -164,6 +164,7 @@ bool PlasticWorld::CreateActor()
 {
 	//FIXME: debug only
 	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,data);
+	actors.push_back(npc);
 	npc->SetPos(PC->GetPos());
 	return (npc->Spawn());
 }
@@ -250,10 +251,13 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 {
 	CurseGUIWnd* wptr;
 
-	//DEBUG:
+	//FIXME: DEBUG:
 	vector3d tr = test->GetRot();
 	vector3di x;
 	char s[128];
+	VModel* mptr;
+	std::vector<PlasticActor*>::iterator oi;
+	char* aname;
 
 	result = 0;
 
@@ -338,8 +342,21 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			curso.X = e->m.x;
 			curso.Y = e->m.y;
 
+			//FIXME: debug only
 			x = render->GetProjection(curso);
-			snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
+			aname = NULL;
+			if (x != vector3di(-1)) {
+				data->IntersectModel(&x,&mptr,true);
+				if (mptr) {
+					for (oi = actors.begin(); oi != actors.end(); ++oi) {
+						if ((*oi)->GetModel() == mptr) {
+							aname = (*oi)->GetAttributes().name;
+							break;
+						}
+					}
+				}
+			} else mptr = NULL;
+			snprintf(s,128,"%d:%d->%d:%d:%d (%p) %s",curso.X,curso.Y,x.X,x.Y,x.Z,mptr,aname);
 			hud->PutStrToLog(s);
 			gui->SetCursorPos(curso.X,curso.Y);
 		}

@@ -20,9 +20,9 @@ Create landscape interpolator for WorldGen				| done		|
 ---------------------------------------------------------------------------------------
 Fix bug with randomizing colors							| done		|
 ---------------------------------------------------------------------------------------
-Implement chunk elevation smoothing in WorldGen			| in progr	|
+Implement chunk elevation smoothing in WorldGen			| done		|
 ---------------------------------------------------------------------------------------
-Implement DataPipe chunks swapping in Move()			| assigned	|
+Implement DataPipe chunks swapping in Move()			| in progr	|
 ---------------------------------------------------------------------------------------
 Implement global position change of PC					| assigned	|
 ---------------------------------------------------------------------------------------
@@ -30,5 +30,5 @@ Update voxel table (add common types of voxels)			| assigned	| assigned
 ---------------------------------------------------------------------------------------
 Add actors placement									| assigned	|
 ---------------------------------------------------------------------------------------
-Implement projection test for an objects (& actors)		| assigned	|
+Implement projection test for an objects (& actors)		| in progr	|
 ---------------------------------------------------------------------------------------

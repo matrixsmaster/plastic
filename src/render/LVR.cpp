@@ -228,7 +228,7 @@ void LVR::Frame()
 	int x,y,z,l,s,i,m;
 	vector3d v,fo,fn;
 	vector3di iv,av;
-	SVoxelInf* vox;
+	const SVoxelInf* vox;
 	SGUIPixel* frame;
 	int* curzbuf;
 	vector3di* curpbuf;

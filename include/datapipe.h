@@ -183,11 +183,11 @@ public:
 	virtual void ChunkQueue();
 
 	///Returns a specific voxel (or its data) in a loaded space.
-	virtual voxel GetVoxel(const vector3di* p);			//return voxel code
-	virtual SVoxelInf* GetVoxelI(const vector3di* p);	//return voxel info
+	virtual voxel GetVoxel(const vector3di* p);				//return voxel code
+	virtual const SVoxelInf* GetVoxelI(const vector3di* p);	//return voxel info
 
 	///Return an information about voxel by type code.
-	virtual SVoxelInf* GetVInfo(const voxel v);
+	virtual const SVoxelInf* GetVInfo(const voxel v);
 
 	///Supply INI-file based data by INI name and field name.
 	void GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen);
@@ -201,6 +201,10 @@ public:
 
 	///Purge all loaded models.
 	virtual void PurgeModels();
+
+	///Find which dynamic object have a non-empty voxel at given co-ords.
+	///Return voxel code and fills object pointer if supplied.
+	virtual voxel IntersectModel(const vector3di* p, VModel** obj, const bool autolock);
 
 	//FIXME: comment
 	virtual VSprite* LoadSprite(const char* fname);

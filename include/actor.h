@@ -71,6 +71,8 @@ public:
 	Inventory* GetInventory()			{ return &invent; }
 
 	SGUIPixel* GetPortrait()			{ return portrait; }
+	VModel* GetModel()					{ return model; }
+
 	SPAAttrib GetAttributes()			{ return attrib; }
 	SPABase GetStats(bool current);
 
