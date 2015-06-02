@@ -110,13 +110,14 @@ class DataPipe {
 protected:
 	EDPipeStatus status;
 	char root[MAXPATHLEN];				//root path
+	ulli allocated;						//amount of allocated RAM
+	ulli rammax;						//max amount of memory allowed to be allocated
 
 	PChunk chunks[HOLDCHUNKS];			//world chunk buffers
 	EDChunkStatus chstat[HOLDCHUNKS];	//chunks status
-	SVoxelTab voxeltab;					//voxel types table
 	PlaceMap placetab;					//chunk displacement map
-	ulli allocated;						//amount of allocated RAM
-	ulli rammax;						//max amount of memory allowed to be allocated
+
+	SVoxelTab voxeltab;					//voxel types table
 
 	pthread_mutex_t vmutex;				//main voxel mutex
 	pthread_mutex_t cndmtx;				//condition mutex

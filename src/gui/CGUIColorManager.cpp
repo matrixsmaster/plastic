@@ -19,7 +19,10 @@
 
 #include <ncurses.h>
 #include "CGUIColorManager.h"
-#include "debug.h" //FIXME: debug
+
+#ifdef CGUI_CMDEBUG
+#include "debug.h"
+#endif
 
 using namespace std;
 
@@ -177,8 +180,9 @@ void CGUIColorManager::CollectGarbagePairs()
 
 			//current element is subject to remove
 			tmp = *ip;
-			//FIXME: debug
+#ifdef CGUI_CMDEBUG
 			dbg_print("Removing pair %d:%d (%u pairs left)",tmp.cf,tmp.cb,pairs.size());
+#endif
 			ip = pairs.erase(ip);
 
 #ifdef USECOLRGARBAGE
@@ -213,8 +217,9 @@ bool CGUIColorManager::CollectGarbageColor(const short cc)
 
 	//remove color
 	colors.erase(colors.begin() + (unsigned)cc);
-	//FIXME: debug
+#ifdef CGUI_CMDEBUG
 	dbg_print("Removing color %hd (%u colors left)",cc,colors.size());
+#endif
 
 	//shift color data
 	for (ip = pairs.begin(); ip != pairs.end(); ++ip) {
@@ -269,12 +274,16 @@ void CGUIColorManager::EndFrame()
 			tolerance += COLTOLERSHFT;
 			if (tolerance > MAXCOLTOLERN)
 				tolerance = MAXCOLTOLERN;
-//			dbg_print("^Tolerance = %hd",tolerance); //FIXME: debug
+#ifdef CGUI_CMDEBUG
+			dbg_print("^Tolerance = %hd",tolerance);
+#endif
 		} else if ((short)colors.size() < (COLORS/2)) {
 			tolerance -= COLTOLERSHFT;
 			if (tolerance < COLTOLERANCE)
 				tolerance = COLTOLERANCE;
-//			dbg_print("vTolerance = %hd",tolerance); //FIXME: debug
+#ifdef CGUI_CMDEBUG
+			dbg_print("vTolerance = %hd",tolerance);
+#endif
 		}
 #endif
 #endif

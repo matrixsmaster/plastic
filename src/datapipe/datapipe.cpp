@@ -312,7 +312,7 @@ void DataPipe::SetGP(vector3di pos)
 #elif HOLDCHUNKS == 9
 	l = 1 * 3 + 1;
 
-#else
+#else /*18 or 27*/
 	l = 1 * 9 + 1 * 3 + 1;
 
 #endif
@@ -334,24 +334,85 @@ bool DataPipe::Move(const vector3di shf)
 	//Check shift vector first
 	if ( (abs(shf.X) > 1) || (abs(shf.Y) > 1) || (abs(shf.Z) > 1) )
 		return false;
+
+#ifdef DPDEBUG
+	dbg_print("Move(): shift = [%d %d %d]",shf.X,shf.Y,shf.Z);
+#endif
+
 	rgp = GP + shf;
-	//TODO: Z-thru
+	if (rgp.Z == 0) {
+		//TODO: Z-thru
+	}
 	wgen->WrapCoords(&rgp);
 
 #if HOLDCHUNKS == 1
 	SetGP(rgp);
 	return true;
-#else
+
+#else /* 9, 18, 27 */
+	int l,nl,x,y,nx,ny;
+	PChunk swa;
+	EDChunkStatus swb;
+
+#if HOLDCHUNKS == 9
+	if (shf.Z) {
+		SetGP(GP+shf);
+		return true;
+	}
+
+#else /* 18, 27 */
+	int z,nz;
+
+#if HOLDCHUNKS == 18
+	if (shf.Z > 0) {
+		SetGP(GP+shf);
+		return true;
+	}
+
+#endif
+#endif
 
 	//Lock everything
 	WriteLock();
 	status = DPIPE_BUSY;
+	GP = rgp;
 
 #if HOLDCHUNKS == 9
-	//X-axis
-	if (shf.X == 1) {
 
+	//Swap remaining chunks and mark new ones
+	for (x = 0; x < 3; x++) {
+		for (y = 0; y < 3; y++) {
+			nx = (shf.X < 0)? 2-x:x;
+			ny = (shf.Y < 0)? 2-y:y;
+			l = ny * 3 + nx;
+			nl = (ny + shf.Y) * 3 + nx + shf.X;
+			if (	((shf.X > 0) && (nx > 1)) ||
+					((shf.X < 0) && (nx < 1)) ||
+					((shf.Y > 0) && (ny > 1)) ||
+					((shf.Y < 0) && (ny < 1)) ||
+					(nl < 0) || (nl >= HOLDCHUNKS)) {
+				//new chunk
+				chstat[l] = DPCHK_QUEUE;
+#ifdef DPDEBUG
+				dbg_print("Marking chunk %d",l);
+#endif
+				continue;
+			}
+
+#ifdef DPDEBUG
+			dbg_print("Swapping chunks %d <-> %d",l,nl);
+#endif
+			//swap chunks
+			swa = chunks[l];
+			chunks[l] = chunks[nl];
+			chunks[nl] = swa;
+
+			swb = chstat[l];
+			chstat[l] = chstat[nl];
+			chstat[nl] = swb;
+		}
 	}
+
 #elif HOLDCHUNKS == 18
 #elif HOLDCHUNKS == 27
 #endif
@@ -368,7 +429,7 @@ void DataPipe::ChunkQueue()
 	if (status != DPIPE_IDLE) return;
 
 #if HOLDCHUNKS == 1
-	/* One chunk right there, simplest scenario. Do nothing. */
+	/* Do nothing */
 	return;
 #else
 
@@ -376,10 +437,13 @@ void DataPipe::ChunkQueue()
 	bool fnd = false;
 	unsigned l;
 
-//	WriteLock();
+	/* Apply soft-lock to not interfere with rendering
+	 * while time-consuming loading or generation is
+	 * processing.
+	 */
+	ReadLock();
 
 #if HOLDCHUNKS == 9
-	/* One 3x3 plane of chunks, most widely used scenario */
 	int i,j;
 	cur.Z = GP.Z;
 	for (i = -1, l = 0; i < 2; i++) {
@@ -394,7 +458,6 @@ void DataPipe::ChunkQueue()
 	}
 
 #elif HOLDCHUNKS == 18
-	/* Two 3x3 planes (one right there, and one underneath) */
 	int i,j,k;
 	for (i = -1, l = 0; i <= 0; i++) {
 		cur.Z = GP.Z + i;
@@ -411,7 +474,6 @@ void DataPipe::ChunkQueue()
 	}
 
 #elif HOLDCHUNKS == 27
-	/* Full set of 3x3x3 (the most memory hungry scenario) */
 	int i,j,k;
 	for (i = -1, l = 0; i < 2; i++) {
 		cur.Z = GP.Z + i;
@@ -434,7 +496,7 @@ chunk_found:
 		MakeChunk(l,cur);
 	}
 
-//	WriteUnlock();
+	ReadUnlock();
 
 #endif
 }
@@ -573,7 +635,7 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	++z; ++y; ++x; //centerize
 	l = z * 9 + y * 3 + x;
 
-#else
+#else /* Just a compile-time check */
 #error "Invalid value of HOLDCHUNKS!"
 
 #endif

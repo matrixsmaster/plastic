@@ -31,19 +31,5 @@ DataPipeDummy::DataPipeDummy(SGameSettings* sets) :
 
 voxel DataPipeDummy::GetVoxel(const vector3di* p)
 {
-	VModVec::iterator mi;
-	voxel tmp = 0;
-
-	ReadLock();
-	if (!objs.empty()) {
-		for (mi = objs.begin(); mi != objs.end(); ++mi) {
-			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
-				tmp = (*mi)->GetVoxelAt(p);
-				if (tmp) break;
-			}
-		}
-	}
-	ReadUnlock();
-
-	return tmp;
+	return IntersectModel(p,NULL,true);
 }
