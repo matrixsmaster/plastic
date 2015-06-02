@@ -39,7 +39,6 @@ CurseGUIOverlay::CurseGUIOverlay(CurseGUI* scrn, int x, int y, int w, int h, boo
 
 	pixl.bg.r = 0; pixl.bg.g = 0; pixl.bg.b = 0;
 	pixl.fg.r = 700; pixl.fg.g = 700; pixl.fg.b = 700;
-
 }
 
 CurseGUIOverlay::~CurseGUIOverlay()
@@ -52,7 +51,9 @@ void CurseGUIOverlay::Update(bool refr)
 	if (hidden) return;
 
 	pthread_mutex_lock(&wmutex);
-	DrawLog();
+
+	if (logging) DrawLog();
+	else UpdateBack();
 	ctrls->Update();
 	pthread_mutex_unlock(&wmutex);
 
@@ -62,10 +63,14 @@ void CurseGUIOverlay::Update(bool refr)
 
 bool CurseGUIOverlay::PutEvent(SGUIEvent* e)
 {
-
 	//OverlayUI events processing
 	//FIXME: maybe just nothing here?
 	return false;
+}
+
+void CurseGUIOverlay::SetMap(SGUIPixel *p, int l)
+{
+	SetBackgroundData(p, l);
 }
 
 void CurseGUIOverlay::PutString(const char* str)

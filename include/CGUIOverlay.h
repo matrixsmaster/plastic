@@ -58,6 +58,12 @@ public:
 	bool GainFocus()					{ return false; }
 	bool LooseFocus()					{ return true; }
 
+	///Apply logging to overlay window
+	void SetLogging(bool l)				{ logging = l; }
+
+	///Returns true if logging is enable
+	bool GetLogging()					{ return logging; }
+
 	///Apply an alpha-value to overlay window.
 	void SetAlpha(float f)				{ alpha = f; }
 
@@ -81,6 +87,8 @@ public:
 
 	///Returns true if an overlay window is hidden
 	bool GetHidden()					{ return hidden; }
+
+	void SetMap(SGUIPixel *p, int l);
 
 	void PutString(const char* str);
 	void PutString(std::string str);

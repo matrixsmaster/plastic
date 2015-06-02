@@ -72,11 +72,17 @@ public:
 	///Set transparency
 	void SetAlpha(HUDOverlayType t, float a);
 
-	///Set background mask
-	void SetBckgrMask(SGUIPixel* pxl);
+	///Set radar background
+	void SetRadarBckgr(SGUIPixel* pxl, int l);
 
-	///Draw local world map
-	void DrawMap();
+	void SetMapWidth(int w);
+	void SetMapHeight(int h);
+
+	int GetMapWidth();
+	int GetMapHeight();
+
+	///Draw radar
+	void SetMap(SGUIPixel *p, int l);
 
 	///Update State overlay
 	void UpdateState(std::string str);
@@ -103,7 +109,7 @@ public:
 	void SetHP(int v);
 
 	///Change the visibility
-	void SetHidden();
+	void SetHiddenState();
 };
 
 #endif /* HUD_H_ */

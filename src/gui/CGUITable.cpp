@@ -237,10 +237,10 @@ bool CurseGUITable::PutEvent(SGUIEvent* e)
 		if (!selected) return false;
 
 		switch (e->k) {
-		case KEY_UP:
+		case KEY_PPAGE:
 			scrolly--;
 			return true;
-		case KEY_DOWN:
+		case KEY_NPAGE:
 			scrolly++;
 			return true;
 		case KEY_LEFT:

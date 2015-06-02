@@ -32,7 +32,7 @@
 
 
 ///Size of render pool (max number of threads).
-#define RENDERPOOLN 3
+#define RENDERPOOLN 4
 
 ///Desync time for render threads (us).
 #define RENDERPOOLDESW 150
