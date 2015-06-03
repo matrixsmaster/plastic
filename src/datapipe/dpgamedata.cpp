@@ -17,19 +17,56 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Implementation file of a lightweight version of DataPipe */
+/* Part of DataPipe class. Game data management facilities. */
 
-#include "vecmisc.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "datapipe.h"
+#include "support.h"
+#include "vecmisc.h"
+
+#ifdef DPDEBUG
+#include "debug.h"
+#endif
 
 
-DataPipeDummy::DataPipeDummy(SGameSettings* sets) :
-		DataPipe(sets,false)
+void DataPipe::SetNewGame()
 {
-	if (status == DPIPE_NOTREADY) status = DPIPE_IDLE;
+	memset(&svhead,0,sizeof(svhead));
+
+	//TODO
+
+	svhead.gtime.year = PLTIMEINITYEAR;
 }
 
-voxel DataPipeDummy::GetVoxel(const vector3di* p)
+bool DataPipe::LoadLastGame()
 {
-	return IntersectModel(p,NULL,true);
+	//TODO
+	return false;
+}
+
+vector3di DataPipe::GetInitialPCGPos()
+{
+	if (svhead.pgz == 0)
+		return wgen->GetPCInitPos();
+	return (vector3di(svhead.pgx,svhead.pgy,svhead.pgz));
+}
+
+vector3di DataPipe::GetInitialPCLPos()
+{
+	vector3di r;
+	r.X = CHUNKBOX / 2;
+	r.Y = r.X;
+	r.Z = GetElevationUnder(&r) + 1;
+
+#ifdef DPDEBUG
+	dbg_print("Player position calculated as [%d %d %d]",r.X,r.Y,r.Z);
+#endif
+
+	if (r.Z >= CHUNKBOX) {
+		//FIXME: do something in this situation
+	}
+
+	return r;
 }

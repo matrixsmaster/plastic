@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* DataPipe is the main dynamic storage container */
+/* DataPipe is the main dynamic storage container and processor with lots of side features. */
 
 #ifndef DATAPIPE_H_
 #define DATAPIPE_H_
@@ -42,7 +42,7 @@
 ///Define this to enable DataPipe debugging.
 #define DPDEBUG 1
 
-///Block DataPipe on each voxel access operation.
+///Soft lock DataPipe on each voxel access operation.
 //#define DPLOCKEACHVOX 1
 
 ///Amount of time to wait between locking write operations.
@@ -110,13 +110,14 @@ class DataPipe {
 protected:
 	EDPipeStatus status;
 	char root[MAXPATHLEN];				//root path
+	ulli allocated;						//amount of allocated RAM
+	ulli rammax;						//max amount of memory allowed to be allocated
 
 	PChunk chunks[HOLDCHUNKS];			//world chunk buffers
 	EDChunkStatus chstat[HOLDCHUNKS];	//chunks status
-	SVoxelTab voxeltab;					//voxel types table
 	PlaceMap placetab;					//chunk displacement map
-	ulli allocated;						//amount of allocated RAM
-	ulli rammax;						//max amount of memory allowed to be allocated
+
+	SVoxelTab voxeltab;					//voxel types table
 
 	pthread_mutex_t vmutex;				//main voxel mutex
 	pthread_mutex_t cndmtx;				//condition mutex
@@ -189,12 +190,15 @@ public:
 	///Return an information about voxel by type code.
 	virtual const SVoxelInf* GetVInfo(const voxel v);
 
+	///Return an elevation (max Z occupied by voxel) under point on XY-plane.
+	virtual int GetElevationUnder(const vector3di* p);
+
 	///Supply INI-file based data by INI name and field name.
 	void GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen);
 	std::string GetIniDataS(const std::string ininame, const std::string inifield);
 
 	///Load dynamic object into scene.
-	virtual VModel* LoadModel(const char* fname, const vector3di pos);
+	virtual VModel* LoadModel(const char* fname, const vector3di pos, const vector3di gpos);
 
 	///Delete model from scene by pointer.
 	virtual bool UnloadModel(const VModel* ptr);
@@ -211,11 +215,15 @@ public:
 	virtual void PurgeSprites();
 
 	//FIXME: comment
-	const SWGCell* GetGlobalSurfaceMap()	{ return wgen->GetMap(); } //FIXME
-	vector2di GetGlobalSurfaceSize()		{ return (vector2di(wgen->GetPlaneSide())); }
-	vector3di GetInitialPCGPos()			{ return wgen->GetPCInitPos(); }
-	vector3di GetInitialPCLPos()			{ return vector3di(128,90,135); } //FIXME
-	PlasticTime* GetSavedTime()				{ return &(svhead.gtime); }
+	virtual const SWGCell* GetGlobalSurfaceMap()	{ return wgen->GetMap(); } //FIXME
+	virtual vector2di GetGlobalSurfaceSize()		{ return (vector2di(wgen->GetPlaneSide())); }
+
+	//FIXME: comment
+	virtual vector3di GetInitialPCGPos();
+	virtual vector3di GetInitialPCLPos();
+	virtual PlasticTime* GetSavedTime()				{ return &(svhead.gtime); }
+
+	//FIXME: comment
 };
 
 
@@ -234,6 +242,9 @@ public:
 	bool Move(const vector3di shf)		{ return false; }
 
 	voxel GetVoxel(const vector3di* p);
+
+	const SWGCell* GetGlobalSurfaceMap() { return NULL; }
+	vector2di GetGlobalSurfaceSize()	{ return vector2di(); }
 };
 
 #endif /* DATAPIPE_H_ */

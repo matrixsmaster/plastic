@@ -17,19 +17,41 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Implementation file of a lightweight version of DataPipe */
+/* Part of DataPipe class. Utilities. */
 
-#include "vecmisc.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "datapipe.h"
+#include "support.h"
+#include "vecmisc.h"
 
 
-DataPipeDummy::DataPipeDummy(SGameSettings* sets) :
-		DataPipe(sets,false)
+int DataPipe::GetElevationUnder(const vector3di* p)
 {
-	if (status == DPIPE_NOTREADY) status = DPIPE_IDLE;
-}
+	vector3di t = *p;
 
-voxel DataPipeDummy::GetVoxel(const vector3di* p)
-{
-	return IntersectModel(p,NULL,true);
+	//If not locking on each access, lock now.
+#ifndef DPLOCKEACHVOX
+	ReadLock();
+#endif
+
+	//Just go down by Z.
+	for (t.Z = CHUNKBOX-1; t.Z >= 0; t.Z--) {
+		if (GetVoxel(&t)) {
+#ifndef DPLOCKEACHVOX
+			//Don't forget to unlock.
+			ReadUnlock();
+#endif
+			return t.Z;
+		}
+	}
+
+	//Unlock if needed.
+#ifndef DPLOCKEACHVOX
+	ReadUnlock();
+#endif
+
+	//Nothing is found. Empty column.
+	return -1;
 }

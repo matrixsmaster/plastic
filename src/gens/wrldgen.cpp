@@ -82,7 +82,8 @@ SWGCell WorldGen::GetCell(vector3di crd)
 	} else {
 		l = crd.Y * planev.X + crd.X;
 		//create seed linked with surface cell seed
-		//TODO
+		//FIXME: debug only
+		cl.seed = map[l].seed;
 
 		//get surface level at point
 		z = map[l].elev;
@@ -90,17 +91,20 @@ SWGCell WorldGen::GetCell(vector3di crd)
 
 		if (crd.Z < z) {
 			//water-only chunks under water-only surface cells
-			if (map[l].t == WGCC_WATERONLY)
+			if (map[l].t == WGCC_WATERONLY) {
+				//FIXME: do this till some level
 				cl.chunkt = WGCT_WATER;
-			else
+			} else {
 				//regular underground otherwise
 				cl.chunkt = WGCT_UNDERGR;
-		} else if (crd.Z == z)
+			}
+		} else if (crd.Z == z) {
 			//surface level, surface cell
 			cl = map[l];
-		else
+		} else {
 			//above the surface
 			cl.chunkt = WGCT_AIR;
+		}
 	}
 
 	return cl;
@@ -178,19 +182,18 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 	memset(grains,0,sizeof(grains));
 	cell = GetCell(pos);
 
+	//set RNG seed
+	rng->SetSeed(cell.seed);
+
 	//prepare large 'grains' of voxels
 	for (z = 0; z < (CHUNKBOX/VOXGRAIN); z++)
 		for (y = 0; y < (CHUNKBOX/VOXGRAIN); y++)
 			for (x = 0; x < (CHUNKBOX/VOXGRAIN); x++)
 				grains[z][y][x] = GetVoxelOfType(VOXT_SAND); //FIXME: use cell type
 
+	//generate chunk data
 	switch (cell.chunkt) {
 	case WGCT_SURFACE:
-
-		//set RNG seed
-		rng->SetSeed(cell.seed);
-
-		//generate chunk data
 		for (y = 0; y < CHUNKBOX; y++) {
 			pnt.Y = y;
 			for (x = 0; x < CHUNKBOX; x++) {
@@ -232,7 +235,12 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 					(*buf)[z][y][x] = v;
 		break;
 
-	default: break;
+	case WGCT_AIR:
+		for (z = 0; z < CHUNKBOX; z++)
+			for (y = 0; y < CHUNKBOX; y++)
+				for (x = 0; x < CHUNKBOX; x++)
+					(*buf)[z][y][x] = 0;
+		break;
 	}
 
 	rng->TimeSeed(); //reset seed

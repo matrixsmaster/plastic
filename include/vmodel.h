@@ -35,7 +35,8 @@ private:
 	voxel* buf;				//modified (working) buffer
 	ulli buflen;			//linear length of working buf
 	int bufside;			//side length of working buf
-	vector3di pos;			//world position (used passively)
+	vector3di pos;			//world local position (used passively)
+	vector3di gpos;			//world global position (used passively)
 	vector3d rot;			//current rotation vector
 	SMatrix3d rotm;			//current rotation matrix
 	bool changed;			//optimization flag of rotations
@@ -67,6 +68,9 @@ public:
 	void SetPos(const vector3di p)	{ pos = p; }
 	vector3di GetPos()				{ return pos; }
 	vector3di* GetPosP()			{ return &pos; }
+	void SetGPos(const vector3di p)	{ gpos = p; }
+	vector3di GetGPos()				{ return gpos; }
+
 	void SetRot(const vector3d r);
 	vector3d GetRot()				{ return rot; }
 

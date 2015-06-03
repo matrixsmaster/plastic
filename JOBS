@@ -22,13 +22,17 @@ Fix bug with randomizing colors							| done		|
 ---------------------------------------------------------------------------------------
 Implement chunk elevation smoothing in WorldGen			| done		|
 ---------------------------------------------------------------------------------------
-Implement DataPipe chunks swapping in Move()			| in progr	|
+Implement DataPipe chunks swapping in Move()			| done		|
 ---------------------------------------------------------------------------------------
-Implement global position change of PC					| assigned	|
+Implement global position change of PC					| done		|
 ---------------------------------------------------------------------------------------
 Update voxel table (add common types of voxels)			| assigned	| assigned
 ---------------------------------------------------------------------------------------
-Add actors placement									| assigned	|
+Add actors placement									| in progr	|
 ---------------------------------------------------------------------------------------
-Implement projection test for an objects (& actors)		| in progr	|
+Implement projection test for an objects (& actors)		| done		|
+---------------------------------------------------------------------------------------
+Implement objects global movement sync					| done		|
+---------------------------------------------------------------------------------------
+Fix deadlocking at multiple objects presence			| in progr	|
 ---------------------------------------------------------------------------------------

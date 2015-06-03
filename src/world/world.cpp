@@ -70,8 +70,6 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 	/* Create Player */
 	PC = new Player(sets->PCData,data);
-	PC->SetGPos(data->GetInitialPCGPos());
-	PC->SetPos(data->GetInitialPCLPos());
 }
 
 PlasticWorld::~PlasticWorld()
@@ -96,11 +94,17 @@ void PlasticWorld::Quantum()
 	if (!once) {
 		once = true;
 
-		data->SetGP(PC->GetGPos());
+		//Init central chunk with known global position
+		data->SetGP(data->GetInitialPCGPos());
+		//Move PC here
+		PC->SetGPos(data->GetGP());
+		//Now we can calculate local position
+		PC->SetPos(data->GetInitialPCLPos());
+		//And give it to LVR
 		render->SetPos(PC->GetPos());
 
 		//FIXME: debugging stuff
-		test = data->LoadModel("testmodel.dat",vector3di(128,100,135));
+		test = data->LoadModel("testmodel.dat",PC->GetPos()+vector3di(0,0,20),data->GetGP());
 		if (!test) abort();
 	}
 
@@ -165,6 +169,7 @@ bool PlasticWorld::CreateActor()
 	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,data);
 	actors.push_back(npc);
 	npc->SetPos(PC->GetPos());
+	npc->SetGPos(PC->GetGPos());
 	return (npc->Spawn());
 }
 
@@ -234,9 +239,28 @@ void PlasticWorld::UpdateTime()
 	gtime.year += gtime.month / PLTIMENUMMONTHS;
 	gtime.month = gtime.month % PLTIMENUMMONTHS;
 	gtime.dow = (EPlDayOfWeek)(gtime.day % PLTIMENUMDAYS);
+}
 
-	//FIXME: debug
-//	dbg_print("Time gap %llu",passed);
+SWRayObjIntersect* PlasticWorld::ScreenRay(const vector2di p)
+{
+	std::vector<PlasticActor*>::iterator oi;
+
+	cinters.pnt = render->GetProjection(p);
+	cinters.model = NULL;
+	cinters.actor = NULL;
+	if (cinters.pnt != vector3di(-1)) {
+		data->IntersectModel(&(cinters.pnt),&(cinters.model),true);
+		if (cinters.model) {
+			for (oi = actors.begin(); oi != actors.end(); ++oi) {
+				if ((*oi)->GetModel() == cinters.model) {
+					cinters.actor = *oi;
+					break;
+				}
+			}
+		}
+	}
+
+	return &cinters;
 }
 
 #define SPAWNWNDMACRO(Name,Create) \
@@ -255,24 +279,13 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	vector3d tr = test->GetRot();
 	vector3di x;
 	char s[128];
-	VModel* mptr;
-	std::vector<PlasticActor*>::iterator oi;
-	char* aname;
 
 	result = 0;
 
 	if (PC->ProcessEvent(e)) {
-		//FIXME: maybe move this stuff out to Move() of PlasticActor ?
 		/* Player movement */
 		pcmov = PC->GetPos();
-
-		/* Check move out of chunk */
-		if (pcmov.X >= CHUNKBOX) gmov.X = 1;
-		else if (pcmov.X < 0) gmov.X = -1;
-		if (pcmov.Y >= CHUNKBOX) gmov.Y = 1;
-		else if (pcmov.Y < 0) gmov.Y = -1;
-		if (pcmov.Z >= CHUNKBOX) gmov.Z = 1;
-		else if (pcmov.Z < 0) gmov.Z = -1;
+		gmov = PC->GetGMov();
 		if (gmov != vector3di()) {
 			pcmov -= (gmov * CHUNKBOX);
 			PC->SetPos(pcmov);
@@ -365,20 +378,15 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			curso.Y = e->m.y;
 
 			//FIXME: debug only
-			x = render->GetProjection(curso);
-			aname = NULL;
-			if (x != vector3di(-1)) {
-				data->IntersectModel(&x,&mptr,true);
-				if (mptr) {
-					for (oi = actors.begin(); oi != actors.end(); ++oi) {
-						if ((*oi)->GetModel() == mptr) {
-							aname = (*oi)->GetAttributes().name;
-							break;
-						}
-					}
-				}
-			} else mptr = NULL;
-			snprintf(s,128,"%d:%d->%d:%d:%d (%p) %s",curso.X,curso.Y,x.X,x.Y,x.Z,mptr,aname);
+			ScreenRay(curso);
+			x = cinters.pnt;
+			if (cinters.model) {
+				if (cinters.actor)
+					snprintf(s,128,"%d:%d Actor: %s",curso.X,curso.Y,cinters.actor->GetAttributes().name);
+				else
+					snprintf(s,128,"%d:%d->%d:%d:%d (%p)",curso.X,curso.Y,x.X,x.Y,x.Z,cinters.model);
+			} else
+				snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
 			hud->PutStrToLog(s);
 			gui->SetCursorPos(curso.X,curso.Y);
 		}
