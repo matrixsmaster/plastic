@@ -104,7 +104,7 @@ void PlasticWorld::Quantum()
 		render->SetPos(PC->GetPos());
 
 		//FIXME: debugging stuff
-		test = data->LoadModel("testmodel.dat",vector3di(128,100,135));
+		test = data->LoadModel("testmodel.dat",PC->GetPos()+vector3di(0,0,20),data->GetGP());
 		if (!test) abort();
 	}
 
@@ -169,6 +169,7 @@ bool PlasticWorld::CreateActor()
 	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,data);
 	actors.push_back(npc);
 	npc->SetPos(PC->GetPos());
+	npc->SetGPos(PC->GetGPos());
 	return (npc->Spawn());
 }
 

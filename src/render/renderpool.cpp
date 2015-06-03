@@ -67,7 +67,8 @@ static void* rendpool_mainthread(void* ptr)
 	RenderPool* ths = (RenderPool*)ptr;
 
 	/* Continuously check all renderers with some time gap until quit event */
-	while (!ths->Quantum()) usleep(RENDERPOOLDESW);
+	while (!ths->Quantum())
+		usleep(ths->GetRNG()->RangedNumber(RENDERPOOLDESW)); //FIXME: testing
 
 	/* We're quitting, push quit event down to all renderers */
 	for (i = 0; i < RENDERPOOLN; i++)
@@ -82,6 +83,7 @@ RenderPool::RenderPool(DataPipe* pipe) :
 	skies = new AtmoSky(pipe);
 	quit = false;
 	frames = 0;
+	prng = new PRNGen(true);
 
 	/* Create frame mutex */
 	pthread_mutex_init(&m_rend,NULL);
@@ -109,6 +111,7 @@ RenderPool::~RenderPool()
 
 	/* Free other facilities */
 	delete skies;
+	delete prng;
 }
 
 void RenderPool::SpawnThreads()

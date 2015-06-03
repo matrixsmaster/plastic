@@ -198,7 +198,7 @@ public:
 	std::string GetIniDataS(const std::string ininame, const std::string inifield);
 
 	///Load dynamic object into scene.
-	virtual VModel* LoadModel(const char* fname, const vector3di pos);
+	virtual VModel* LoadModel(const char* fname, const vector3di pos, const vector3di gpos);
 
 	///Delete model from scene by pointer.
 	virtual bool UnloadModel(const VModel* ptr);

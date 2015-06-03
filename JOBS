@@ -32,5 +32,7 @@ Add actors placement									| in progr	|
 ---------------------------------------------------------------------------------------
 Implement projection test for an objects (& actors)		| done		|
 ---------------------------------------------------------------------------------------
-Implement objects global movement sync					| in progr	|
+Implement objects global movement sync					| done		|
+---------------------------------------------------------------------------------------
+Fix deadlocking at multiple objects presence			| in progr	|
 ---------------------------------------------------------------------------------------

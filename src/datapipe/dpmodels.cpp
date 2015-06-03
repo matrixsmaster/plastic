@@ -27,7 +27,7 @@
 #include "vecmisc.h"
 
 
-VModel* DataPipe::LoadModel(const char* fname, const vector3di pos)
+VModel* DataPipe::LoadModel(const char* fname, const vector3di pos, const vector3di gpos)
 {
 	VModel* m;
 	char fn[MAXPATHLEN];
@@ -43,6 +43,7 @@ VModel* DataPipe::LoadModel(const char* fname, const vector3di pos)
 
 	allocated += m->GetAllocatedRAM();
 	m->SetPos(pos);
+	m->SetGPos(gpos);
 
 	WriteLock();
 	objs.push_back(m);
@@ -87,12 +88,15 @@ voxel DataPipe::IntersectModel(const vector3di* p, VModel** obj, const bool auto
 {
 	voxel r;
 	VModVec::iterator mi;
+	vector3di pn;
 
 	if (autolock) ReadLock();
 
 	if (!objs.empty()) {
 		for (mi = objs.begin(); mi != objs.end(); ++mi) {
-			if (IsPntInsideCubeI(p,(*mi)->GetPosP(),(*mi)->GetBoundSide())) {
+			pn = ((*mi)->GetGPos()) - GP;
+			pn = ((*mi)->GetPos()) + (pn * CHUNKBOX);
+			if (IsPntInsideCubeI(p,&pn,(*mi)->GetBoundSide())) {
 				r = (*mi)->GetVoxelAt(p);
 				if (r) {
 					if (autolock) ReadUnlock();

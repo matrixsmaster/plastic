@@ -111,7 +111,7 @@ void PlasticActor::Move(ELMoveDir d, float step)
 
 bool PlasticActor::Spawn()
 {
-	model = pipe->LoadModel(attrib.model,pos);
+	model = pipe->LoadModel(attrib.model,pos,gpos);
 	return (model != NULL);
 }
 

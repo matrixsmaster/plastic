@@ -137,11 +137,11 @@ static void plastic_start()
 		abort();
 	}
 
-	/* Connect world to GUI */
-	g_wrld->ConnectGUI(g_gui);
-
 	/* Init debug UI */
 	dbg_init(g_gui);
+
+	/* Connect world to GUI */
+	g_wrld->ConnectGUI(g_gui);
 
 	/* Create mutexes */
 	pthread_mutex_init(&m_render,NULL);
