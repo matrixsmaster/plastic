@@ -28,14 +28,23 @@ Inventory::Inventory()
 	InventoryObject* oj = new InventoryObject();
 	oj->SetName("First");
 	oj->SetDesc("Just an object.");
+	oj->SetWeight(1);
+	oj->SetCondition(5);
+	oj->SetCost(15);
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Second");
 	oj->SetDesc("Yet another useless piece of crap. But this piece have a long description.");
+	oj->SetWeight(12);
+	oj->SetCondition(7);
+	oj->SetCost(150);
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Last");
 	oj->SetDesc("The last object.");
+	oj->SetWeight(5);
+	oj->SetCondition(99);
+	oj->SetCost(7);
 	items.push_back(oj);
 }
 
@@ -49,3 +58,37 @@ Inventory::~Inventory()
 		items.clear();
 	}
 }
+
+int Inventory::GetNumberItems()
+{
+	return items.size();
+}
+
+string Inventory::GetName(int n)
+{
+	if (items.size() > n) return items.at(n)->GetName();
+	return "Unknown";
+}
+
+string Inventory::GetDesc(int n)
+{
+	if (int(items.size()) > n) return items.at(n)->GetDesc();
+	return "Unknown";
+}
+/*
+string Inventory::GetWeight(int n)
+{
+	if (items.size() > n) return items.at(n)->GetWeight();
+	return "";
+}
+string Inventory::GetCondition(int n)
+{
+	if (items.size() > n) return items.at(n)->GetConditions();
+	return "";
+}
+string Inventory::GetCost(int n)
+{
+	if (items.size() > n) return items.at(n)->GetCost();
+	return "";
+}
+*/

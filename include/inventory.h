@@ -28,6 +28,7 @@
 class InventoryObject {
 private:
 	std::string name,desc;
+	int weight,cond,cost;
 
 public:
 	InventoryObject()				{}
@@ -35,6 +36,16 @@ public:
 
 	virtual void SetName(const std::string s)			{ name = s; }
 	virtual void SetDesc(const std::string s)			{ desc = s; }
+	virtual void SetWeight(const int s)			{ weight = s; }
+	virtual void SetCondition(const int s)		{ cond = s; }
+	virtual void SetCost(const int s)			{ cost = s; }
+
+	virtual std::string GetName()						{ return name; }
+	virtual std::string GetDesc()						{ return desc; }
+	virtual int GetWeight()						{ return weight; }
+	virtual int GetConditions()					{ return cond; }
+	virtual int GetCost()						{ return cost; }
+
 };
 
 /* Storage container for all of the inventory items */
@@ -45,6 +56,16 @@ private:
 public:
 	Inventory();
 	virtual ~Inventory();
+
+	int GetNumberItems();
+
+	std::string GetName(int n);
+	std::string GetDesc(int n);
+/*
+	std::string GetWeight(int n);
+	std::string GetCondition(int n);
+	std::string GetCost(int n);
+*/
 };
 
 #endif /* INVENTORY_H_ */

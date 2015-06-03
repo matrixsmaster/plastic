@@ -46,11 +46,11 @@ HUD::HUD(CurseGUI* guiptr)
 	SetAlpha(OVRL_STATE, 0);
 
 	//Map overlay
-	Spawn((w-(w/4)), 0, (w/4), (h/4), true, "     !!MAAAP!!");
+	Spawn((w-(w/4)), 0, (w/4), (h/4), true, "     MAP");
 	SetAlpha(OVRL_MAP, 0);
 
 	//Status bar overlay
-	Spawn((w/3), (h-1), w-(w/3)-20, 1, true, " STATE string");
+	Spawn((w/3), (h-1), w-(w/3)-10, 1, true, " STATE string");
 	SetAlpha(OVRL_STBTM, 0);
 
 	//Time overlay
@@ -82,6 +82,15 @@ void HUD::Spawn(int x, int y, int w, int h, bool logging, const char* txt)
 	ptr->PutString(txt);
 }
 
+void HUD::InitControls()
+{
+	new CurseGUIProgrBar(overlays[OVRL_CHRG_HP]->GetControls(), 0, 0, 10, 0, 100);
+	new CurseGUIProgrBar(overlays[OVRL_CHRG_HP]->GetControls(), 0, 1, 10, 0, 100);
+	new CurseGUILabel(overlays[OVRL_STATE]->GetControls(), 0, 0, gui->GetWidth()/5, 1, "GPos [ 0 0 0 ]");
+	new CurseGUILabel(overlays[OVRL_STATE]->GetControls(), 0, 1, gui->GetWidth()/5, 1, "LPos [ 0 0 0 ]");
+	//TODO add all controls
+}
+
 string HUD::intToString(int n)
 {
 	ostringstream ss;
@@ -101,6 +110,37 @@ void HUD::PutString(HUDOverlayType t, string str)
 	overlays[t]->PutString(str);
 }
 
+void HUD::SetMapWidth(int w)
+{
+	//TODO
+}
+
+void HUD::SetMapHeight(int h)
+{
+	//TODO
+}
+
+int HUD::GetMapWidth()
+{
+	if(overlays.empty()) return 0;
+
+	return overlays[OVRL_MAP]->GetWidth();
+}
+
+int HUD::GetMapHeight()
+{
+	if(overlays.empty()) return 0;
+
+	return overlays[OVRL_MAP]->GetHeight();
+}
+
+void HUD::SetMap(SGUIPixel *pxl, int l)
+{
+	if(overlays.empty()) return;
+
+	overlays[OVRL_MAP]->SetMap(pxl, l);
+}
+
 void HUD::UpdateFPS(uli fps)
 {
 	string str;
@@ -116,15 +156,6 @@ void HUD::UpdateFPS(uli fps)
 void HUD::PutStrToLog(const char* str)
 {
 	PutString(OVRL_LOG, str);
-}
-
-void HUD::InitControls()
-{
-	new CurseGUIProgrBar(overlays[OVRL_CHRG_HP]->GetControls(), 0, 0, 10, 0, 100);
-	new CurseGUIProgrBar(overlays[OVRL_CHRG_HP]->GetControls(), 0, 1, 10, 0, 100);
-	new CurseGUILabel(overlays[OVRL_STATE]->GetControls(), 0, 0, gui->GetWidth()/5, 1, "GPos [ 0 0 0 ]");
-	new CurseGUILabel(overlays[OVRL_STATE]->GetControls(), 0, 1, gui->GetWidth()/5, 1, "LPos [ 0 0 0 ]");
-	//TODO add all controls
 }
 
 void HUD::UpdateChargeHP()
@@ -146,11 +177,6 @@ void HUD::SetHP(int v)
 	bar = (CurseGUIProgrBar*)overlays[OVRL_CHRG_HP]->GetControls()->GetControl(0, GUICL_LABEL);
 	if (!bar) return;
 	bar->SetValue(v);
-}
-
-void HUD::DrawMap()
-{
-	//TODO
 }
 
 void HUD::UpdateState(string str)
@@ -176,17 +202,16 @@ void HUD::UpdateClock()
 	PutString(OVRL_CLOCK, string(tmp));
 }
 
-
-
 void HUD::SetAlpha(HUDOverlayType t, float a)
 {
 	if(overlays.empty()) return;
 	overlays[t]->SetAlpha(a);
 }
 
-void HUD::SetBckgrMask(SGUIPixel* pxl)
+void HUD::SetRadarBckgr(SGUIPixel* pxl, int l)
 {
-	//TODO
+	if (overlays.empty()) return;
+	overlays[OVRL_MAP]->SetMap(pxl, l);
 }
 
 void HUD::SetPTime(PlasticTime* t)
@@ -217,7 +242,7 @@ void HUD::SetLPos(vector3di lp)
 	SetLabelCaption(tmp, 20, 1, lp.X, lp.Y, lp.Z);
 }
 
-void HUD::SetHidden()
+void HUD::SetHiddenState()
 {
 	if (overlays[OVRL_STATE]->GetHidden()) {
 		overlays[OVRL_STATE]->SetHidden(false);

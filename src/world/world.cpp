@@ -339,7 +339,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				if (hud) hud->SetAlpha(OVRL_LOG, 0.5);
 				break;
 			case 'c':
-				if (hud) hud->SetHidden();
+				if (hud) hud->SetHiddenState();
 				break;
 
 			case 'v':

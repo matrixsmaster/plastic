@@ -108,9 +108,18 @@ private:
 
 	CurseGUIEditBox* search_edit;
 
+	int sitem; //selected item in inventory
+	int prev;
+
 
 	void ResizeWnd();
 	void FillInventoryTable();
+
+	void SetSelectedItem();
+	void ShowDescription();
+	void ShowWeight();
+	void ShowCond();
+	void ShowCost();
 
 public:
 	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);
