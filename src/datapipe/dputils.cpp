@@ -17,7 +17,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Part of DataPipe class. Game data management facilities. */
+/* Part of DataPipe class. Utilities. */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,47 +26,32 @@
 #include "support.h"
 #include "vecmisc.h"
 
-#ifdef DPDEBUG
-#include "debug.h"
+
+int DataPipe::GetElevationUnder(const vector3di* p)
+{
+	vector3di t = *p;
+
+	//If not locking on each access, lock now.
+#ifndef DPLOCKEACHVOX
+	ReadLock();
 #endif
 
-
-void DataPipe::SetNewGame()
-{
-	memset(&svhead,0,sizeof(svhead));
-
-	//TODO
-
-	svhead.gtime.year = PLTIMEINITYEAR;
-}
-
-bool DataPipe::LoadLastGame()
-{
-	//TODO
-	return false;
-}
-
-vector3di DataPipe::GetInitialPCGPos()
-{
-	if (svhead.pgz == 0)
-		return wgen->GetPCInitPos();
-	return (vector3di(svhead.pgx,svhead.pgy,svhead.pgz));
-}
-
-vector3di DataPipe::GetInitialPCLPos()
-{
-	vector3di r;
-	r.X = CHUNKBOX / 2;
-	r.Y = r.X;
-	r.Z = GetElevationUnder(&r) + 1;
-
-#ifdef DPDEBUG
-	dbg_print("Player position calculated as [%d %d %d]",r.X,r.Y,r.Z);
+	//Just go down by Z.
+	for (t.Z = CHUNKBOX-1; t.Z >= 0; t.Z--) {
+		if (GetVoxel(&t)) {
+#ifndef DPLOCKEACHVOX
+			//Don't forget to unlock.
+			ReadUnlock();
 #endif
-
-	if (r.Z >= CHUNKBOX) {
-		//FIXME: do something in this situation
+			return t.Z;
+		}
 	}
 
-	return r;
+	//Unlock if needed.
+#ifndef DPLOCKEACHVOX
+	ReadUnlock();
+#endif
+
+	//Nothing is found. Empty column.
+	return -1;
 }

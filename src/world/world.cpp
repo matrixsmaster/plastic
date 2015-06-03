@@ -70,8 +70,6 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 	/* Create Player */
 	PC = new Player(sets->PCData,data);
-	PC->SetGPos(data->GetInitialPCGPos());
-	PC->SetPos(data->GetInitialPCLPos());
 }
 
 PlasticWorld::~PlasticWorld()
@@ -96,7 +94,13 @@ void PlasticWorld::Quantum()
 	if (!once) {
 		once = true;
 
-		data->SetGP(PC->GetGPos());
+		//Init central chunk with known global position
+		data->SetGP(data->GetInitialPCGPos());
+		//Move PC here
+		PC->SetGPos(data->GetGP());
+		//Now we can calculate local position
+		PC->SetPos(data->GetInitialPCLPos());
+		//And give it to LVR
 		render->SetPos(PC->GetPos());
 
 		//FIXME: debugging stuff
