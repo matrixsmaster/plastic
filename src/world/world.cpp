@@ -240,6 +240,28 @@ void PlasticWorld::UpdateTime()
 	gtime.dow = (EPlDayOfWeek)(gtime.day % PLTIMENUMDAYS);
 }
 
+SWRayObjIntersect* PlasticWorld::ScreenRay(const vector2di p)
+{
+	std::vector<PlasticActor*>::iterator oi;
+
+	cinters.pnt = render->GetProjection(p);
+	cinters.model = NULL;
+	cinters.actor = NULL;
+	if (cinters.pnt != vector3di(-1)) {
+		data->IntersectModel(&(cinters.pnt),&(cinters.model),true);
+		if (cinters.model) {
+			for (oi = actors.begin(); oi != actors.end(); ++oi) {
+				if ((*oi)->GetModel() == cinters.model) {
+					cinters.actor = *oi;
+					break;
+				}
+			}
+		}
+	}
+
+	return &cinters;
+}
+
 #define SPAWNWNDMACRO(Name,Create) \
 							wptr = gui->GetWindowN(Name); \
 							if (!wptr) { \
@@ -256,9 +278,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	vector3d tr = test->GetRot();
 	vector3di x;
 	char s[128];
-	VModel* mptr;
-	std::vector<PlasticActor*>::iterator oi;
-	char* aname;
 
 	result = 0;
 
@@ -359,20 +378,15 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			curso.Y = e->m.y;
 
 			//FIXME: debug only
-			x = render->GetProjection(curso);
-			aname = NULL;
-			if (x != vector3di(-1)) {
-				data->IntersectModel(&x,&mptr,true);
-				if (mptr) {
-					for (oi = actors.begin(); oi != actors.end(); ++oi) {
-						if ((*oi)->GetModel() == mptr) {
-							aname = (*oi)->GetAttributes().name;
-							break;
-						}
-					}
-				}
-			} else mptr = NULL;
-			snprintf(s,128,"%d:%d->%d:%d:%d (%p) %s",curso.X,curso.Y,x.X,x.Y,x.Z,mptr,aname);
+			ScreenRay(curso);
+			x = cinters.pnt;
+			if (cinters.model) {
+				if (cinters.actor)
+					snprintf(s,128,"%d:%d Actor: %s",curso.X,curso.Y,cinters.actor->GetAttributes().name);
+				else
+					snprintf(s,128,"%d:%d->%d:%d:%d (%p)",curso.X,curso.Y,x.X,x.Y,x.Z,cinters.model);
+			} else
+				snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
 			hud->PutStrToLog(s);
 			gui->SetCursorPos(curso.X,curso.Y);
 		}

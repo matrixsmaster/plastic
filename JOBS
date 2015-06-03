@@ -30,5 +30,7 @@ Update voxel table (add common types of voxels)			| assigned	| assigned
 ---------------------------------------------------------------------------------------
 Add actors placement									| in progr	|
 ---------------------------------------------------------------------------------------
-Implement projection test for an objects (& actors)		| in progr	|
+Implement projection test for an objects (& actors)		| done		|
+---------------------------------------------------------------------------------------
+Implement objects global movement sync					| in progr	|
 ---------------------------------------------------------------------------------------

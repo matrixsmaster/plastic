@@ -39,6 +39,16 @@
 #include "pltime.h"
 
 
+/* Ray-Object intersection data holding structure */
+struct SWRayObjIntersect {
+	vector3di pnt;
+	VModel* model;
+	PlasticActor* actor;
+};
+
+/* This class is more or less the game itself. It connects all other instances, like
+ * DataPipe, LVR, GUI etc to make the World.
+ */
 class PlasticWorld {
 private:
 	//core variables and instances
@@ -57,6 +67,7 @@ private:
 	ulli rtime,epoch,passed;
 	timespec* clkres;
 	uli fps;
+	SWRayObjIntersect cinters;
 
 	//holders
 	std::vector<PlasticActor*> actors;
@@ -108,6 +119,9 @@ public:
 
 	///Main clock facility.
 	void UpdateTime();
+
+	///Screen space - world intersection test.
+	SWRayObjIntersect* ScreenRay(const vector2di p);
 
 	///Main events processing facility.
 	void ProcessEvents(SGUIEvent* e);
