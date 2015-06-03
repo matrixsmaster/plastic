@@ -377,45 +377,61 @@ bool DataPipe::Move(const vector3di shf)
 	status = DPIPE_BUSY;
 	GP = rgp;
 
-#if HOLDCHUNKS == 9
-
 	//Swap remaining chunks and mark new ones
 	for (x = 0; x < 3; x++) {
 		for (y = 0; y < 3; y++) {
-			nx = (shf.X < 0)? 2-x:x;
-			ny = (shf.Y < 0)? 2-y:y;
-			l = ny * 3 + nx;
-			nl = (ny + shf.Y) * 3 + nx + shf.X;
-			if (	((shf.X > 0) && (nx > 1)) ||
-					((shf.X < 0) && (nx < 1)) ||
-					((shf.Y > 0) && (ny > 1)) ||
-					((shf.Y < 0) && (ny < 1)) ||
-					(nl < 0) || (nl >= HOLDCHUNKS)) {
-				//new chunk
-				chstat[l] = DPCHK_QUEUE;
-#ifdef DPDEBUG
-				dbg_print("Marking chunk %d",l);
+#if HOLDCHUNKS == 18
+			for (z = 0; z < 2; z++) {
+#else
+			for (z = 0; z < 3; z++) {
 #endif
-				continue;
+				nx = (shf.X < 0)? 2-x:x;
+				ny = (shf.Y < 0)? 2-y:y;
+#if HOLDCHUNKS > 9
+#if HOLDCHUNKS == 27
+				nz = (shf.Z < 0)? 2-z:z;
+#else
+				nz = (shf.Z < 0)? 1-z:z;
+#endif
+				l = nz * 9 + ny * 3 + nx;
+				nl = (nz + shf.Z) * 9 + (ny + shf.Y) * 3 + nx + shf.X;
+#else
+				l = ny * 3 + nx;
+				nl = (ny + shf.Y) * 3 + nx + shf.X;
+#endif /* 9 chunks */
+				if (	((shf.X > 0) && (nx > 1)) ||
+						((shf.X < 0) && (nx < 1)) ||
+						((shf.Y > 0) && (ny > 1)) ||
+						((shf.Y < 0) && (ny < 1)) ||
+#if HOLDCHUNKS > 9
+						((shf.Z > 0) && (nz > 1)) ||
+						((shf.Z < 0) && (nz < 1)) ||
+#endif
+						(nl < 0) || (nl >= HOLDCHUNKS)) {
+					//new chunk
+					chstat[l] = DPCHK_QUEUE;
+#ifdef DPDEBUG
+					dbg_print("Marking chunk %d",l);
+#endif
+					continue;
+				}
+
+#ifdef DPDEBUG
+				dbg_print("Swapping chunks %d <-> %d",l,nl);
+#endif
+				//swap chunks
+				swa = chunks[l];
+				chunks[l] = chunks[nl];
+				chunks[nl] = swa;
+
+				swb = chstat[l];
+				chstat[l] = chstat[nl];
+				chstat[nl] = swb;
+#if HOLDCHUNKS > 9
 			}
-
-#ifdef DPDEBUG
-			dbg_print("Swapping chunks %d <-> %d",l,nl);
 #endif
-			//swap chunks
-			swa = chunks[l];
-			chunks[l] = chunks[nl];
-			chunks[nl] = swa;
-
-			swb = chstat[l];
-			chstat[l] = chstat[nl];
-			chstat[nl] = swb;
 		}
 	}
-
-#elif HOLDCHUNKS == 18
-#elif HOLDCHUNKS == 27
-#endif
 
 	//Release everything
 	status = DPIPE_IDLE;

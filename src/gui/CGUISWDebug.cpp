@@ -51,6 +51,7 @@ void CurseGUIDebugWnd::ToggleShow()
 	hidden ^= true;
 	focused = !hidden;
 	stayontop = focused;
+	scrlk = false;
 	edit_line = ">";
 }
 
