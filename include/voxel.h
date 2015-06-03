@@ -34,7 +34,7 @@
  * 18: Two 3x3 planes (one right there, and one underneath)
  * 27: Full set of 3x3x3 (the most memory hungry scenario)
  */
-#define HOLDCHUNKS 18
+#define HOLDCHUNKS 27
 
 ///Number of intial voxel types.
 #define DEFVOXTYPES 1024

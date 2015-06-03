@@ -87,6 +87,7 @@ void CurseGUIDebugWnd::Update(bool refr)
 
 		it = (scrlk)? (log.begin() + locked) : (log.end() - 1);
 		en = it - numstr;
+		if (en < log.begin()) en = log.begin();
 
 		for (; it > en; --it) {
 			if (w < (int)it->size()) {

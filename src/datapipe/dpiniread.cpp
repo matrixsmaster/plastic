@@ -25,6 +25,10 @@
 #include "datapipe.h"
 #include "support.h"
 
+#ifdef DPDEBUG
+#include "debug.h"
+#endif
+
 
 bool DataPipe::LoadIni(const std::string name)
 {

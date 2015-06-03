@@ -34,7 +34,7 @@
 
 ///Time scale between game time and real time.
 ///Game sec = Real sec * scale
-#define PLTIMESCALE 10
+#define PLTIMESCALE 30
 
 ///Length of game day (in hours).
 #define PLTIMEDAYLEN 10
