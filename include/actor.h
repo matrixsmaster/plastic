@@ -41,6 +41,7 @@ class PlasticActor {
 protected:
 	bool isnpc;				//NPC flag
 	vector3di gpos,pos;		//Global and local position
+	vector3di gmov;			//Global movement vector
 	SPAAttrib attrib;		//Basic attribs
 	SPABase base,curr;		//Base and current stats
 	vector3di rot;			//Orientation
@@ -61,12 +62,13 @@ public:
 
 	bool IsNPC()						{ return isnpc; }
 
-	void SetPos(const vector3di p)		{ pos = p; }
+	void SetPos(const vector3di p)		{ pos = p; gmov = vector3di(); }
 	void SetRot(const vector3di r);
 	vector3di GetPos()					{ return pos; }
 	vector3di GetRot()					{ return rot; }
-	void SetGPos(const vector3di p)		{ gpos = p; }
+	void SetGPos(const vector3di p)		{ gpos = p; gmov = vector3di(); }
 	vector3di GetGPos()					{ return gpos; }
+	vector3di GetGMov()					{ return gmov; }
 
 	Inventory* GetInventory()			{ return &invent; }
 

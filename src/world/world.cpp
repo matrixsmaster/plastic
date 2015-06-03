@@ -234,9 +234,6 @@ void PlasticWorld::UpdateTime()
 	gtime.year += gtime.month / PLTIMENUMMONTHS;
 	gtime.month = gtime.month % PLTIMENUMMONTHS;
 	gtime.dow = (EPlDayOfWeek)(gtime.day % PLTIMENUMDAYS);
-
-	//FIXME: debug
-//	dbg_print("Time gap %llu",passed);
 }
 
 #define SPAWNWNDMACRO(Name,Create) \
@@ -262,17 +259,9 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	result = 0;
 
 	if (PC->ProcessEvent(e)) {
-		//FIXME: maybe move this stuff out to Move() of PlasticActor ?
 		/* Player movement */
 		pcmov = PC->GetPos();
-
-		/* Check move out of chunk */
-		if (pcmov.X >= CHUNKBOX) gmov.X = 1;
-		else if (pcmov.X < 0) gmov.X = -1;
-		if (pcmov.Y >= CHUNKBOX) gmov.Y = 1;
-		else if (pcmov.Y < 0) gmov.Y = -1;
-		if (pcmov.Z >= CHUNKBOX) gmov.Z = 1;
-		else if (pcmov.Z < 0) gmov.Z = -1;
+		gmov = PC->GetGMov();
 		if (gmov != vector3di()) {
 			pcmov -= (gmov * CHUNKBOX);
 			PC->SetPos(pcmov);

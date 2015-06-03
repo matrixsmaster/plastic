@@ -99,6 +99,14 @@ void PlasticActor::Move(ELMoveDir d, float step)
 	pos.X += (int)round(v.X);
 	pos.Y += (int)round(v.Y);
 	pos.Z -= (int)round(v.Z); //to conform rotation/movement of renderer (flipped Y axis)
+
+	//Check move out of chunk
+	if (pos.X >= CHUNKBOX) gmov.X += 1;
+	else if (pos.X < 0) gmov.X -= 1;
+	if (pos.Y >= CHUNKBOX) gmov.Y += 1;
+	else if (pos.Y < 0) gmov.Y -= 1;
+	if (pos.Z >= CHUNKBOX) gmov.Z += 1;
+	else if (pos.Z < 0) gmov.Z -= 1;
 }
 
 bool PlasticActor::Spawn()
