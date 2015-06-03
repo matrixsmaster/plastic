@@ -34,5 +34,5 @@ Implement projection test for an objects (& actors)		| done		|
 ---------------------------------------------------------------------------------------
 Implement objects global movement sync					| done		|
 ---------------------------------------------------------------------------------------
-Fix deadlocking at multiple objects presence			| in progr	|
+Fix deadlocking at multiple objects presence			| done		|
 ---------------------------------------------------------------------------------------

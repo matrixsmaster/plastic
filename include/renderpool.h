@@ -64,7 +64,6 @@ private:
 	pthread_t t_rend;				//Main thread
 	pthread_mutex_t m_rend;			//Main thread frame mutex
 	unsigned frames;				//Frame counter
-	PRNGen* prng;
 
 	void SpawnThreads();			//Rendering threads spawner
 	void KillThreads();				//Rendering threads killer
@@ -98,8 +97,6 @@ public:
 
 	///Returns current skies instance.
 	AtmoSky* GetSkies()				{ return skies; }
-
-	PRNGen* GetRNG()				{ return prng; }
 
 	///LVR-compatible frame resizing.
 	bool Resize(int w, int h);

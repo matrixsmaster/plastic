@@ -94,8 +94,10 @@ voxel DataPipe::IntersectModel(const vector3di* p, VModel** obj, const bool auto
 
 	if (!objs.empty()) {
 		for (mi = objs.begin(); mi != objs.end(); ++mi) {
+			//FIXME: long vector operation: bottleneck
 			pn = ((*mi)->GetGPos()) - GP;
 			pn = ((*mi)->GetPos()) + (pn * CHUNKBOX);
+			//FIXME -----------------------------------
 			if (IsPntInsideCubeI(p,&pn,(*mi)->GetBoundSide())) {
 				r = (*mi)->GetVoxelAt(p);
 				if (r) {

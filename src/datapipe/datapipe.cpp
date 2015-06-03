@@ -48,9 +48,8 @@ DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 
 	pthread_mutex_init(&vmutex,NULL);
 	pthread_mutex_init(&cndmtx,NULL);
-	pthread_cond_init(&cntcnd,NULL);
 	readcnt = 0;
-	writeatt = false;
+	writecnt = 0;
 
 	/* Copy root path */
 	i = strlen(sets->root);
@@ -79,7 +78,6 @@ DataPipe::~DataPipe()
 	PurgeModels();
 	PurgeChunks();
 
-	pthread_cond_destroy(&cntcnd);
 	pthread_mutex_destroy(&cndmtx);
 	pthread_mutex_destroy(&vmutex);
 }
@@ -149,8 +147,8 @@ int DataPipe::ReadLock()
 	/* Lock conditions */
 	r = pthread_mutex_lock(&cndmtx);
 
-	/* If write operation attempted, wait till its finished */
-	while (writeatt) {
+	/* If write operation attempted or in progress, wait till its finished */
+	while (writecnt > 0) {
 		pthread_mutex_unlock(&cndmtx);
 		usleep(DPWRLOCKTIME);
 		pthread_mutex_lock(&cndmtx);
@@ -171,9 +169,6 @@ int DataPipe::ReadUnlock()
 
 	/* Decrement readers counter */
 	if (--readcnt < 0) readcnt = 0;
-	if (readcnt == 0)
-		/* Send a signal to writers (if any) */
-		pthread_cond_signal(&cntcnd);
 
 	/* Release conditions */
 	pthread_mutex_unlock(&cndmtx);
@@ -187,12 +182,15 @@ int DataPipe::WriteLock()
 	/* Lock conditions */
 	r = pthread_mutex_lock(&cndmtx);
 
-	/* Set write attempt to true */
-	writeatt = true;
+	/* Set write attempt */
+	writecnt++;
 
 	/* Wait for readers to gone */
-	while (readcnt)
-		pthread_cond_wait(&cntcnd,&cndmtx);
+	while (readcnt > 0) {
+		pthread_mutex_unlock(&cndmtx);
+		usleep(DPRDLOCKTIME);
+		pthread_mutex_lock(&cndmtx);
+	}
 
 	/* Try to lock main voxel mutex (write op. mutex) */
 	while (pthread_mutex_trylock(&vmutex)) {
@@ -202,9 +200,6 @@ int DataPipe::WriteLock()
 		pthread_mutex_lock(&cndmtx);
 	}
 
-	/* Set write attempt flag again to deal with possible WRUnlock */
-	writeatt = true;
-
 	/* Release conditions and move on */
 	pthread_mutex_unlock(&cndmtx);
 	return r;
@@ -212,9 +207,13 @@ int DataPipe::WriteLock()
 
 int DataPipe::WriteUnlock()
 {
-	/* Set write attempt to false */
+	/* Lock conditions */
 	pthread_mutex_lock(&cndmtx);
-	writeatt = false;
+
+	/* Decrement readers counter */
+	if (--writecnt < 0) writecnt = 0;
+
+	/* Release conditions */
 	pthread_mutex_unlock(&cndmtx);
 
 	/* And just unlock main voxel mutex */

@@ -46,7 +46,10 @@
 //#define DPLOCKEACHVOX 1
 
 ///Amount of time to wait between locking write operations.
-#define DPWRLOCKTIME 100
+#define DPWRLOCKTIME 80
+
+///Amount of time to wait between locking write operations.
+#define DPRDLOCKTIME 50
 
 ///Maximum length of argument string in INI file.
 #define MAXINISTRLEN 256
@@ -122,8 +125,7 @@ protected:
 	pthread_mutex_t vmutex;				//main voxel mutex
 	pthread_mutex_t cndmtx;				//condition mutex
 	int readcnt;						//read operations counter
-	bool writeatt;						//write attempt flag
-	pthread_cond_t cntcnd;				//read counter condition var
+	int writecnt;						//write operations counter
 
 	vector3di GP;						//global position of central chunk
 
