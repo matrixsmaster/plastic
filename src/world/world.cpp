@@ -341,7 +341,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			case 'c':
 				if (hud) hud->SetHiddenState();
 				break;
-
 			case 'v':
 				SPAWNWNDMACRO("Test One",new CurseGUIMessageBox(gui,"Test One","Testing","OK|Cancel|Something else|No|Yes"));
 				break;

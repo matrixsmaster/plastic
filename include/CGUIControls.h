@@ -266,10 +266,11 @@ class CurseGUITable : public CurseGUIControl
 {
 private:
 	std::vector<std::vector<std::string> > tbl;
+	std::vector<int> clw;	//array of column widths
 
 	int g_col;			//quantity of columns
 	int g_rows;			//quantity of rows
-	int g_wcell;		//cell width
+//	int g_wcell;		//cell width
 //	int g_vhtable;		//visible height of the table (alread have g_w/g_h)
 //	int g_vwtable;		//visible width of the table
 	int cur_x, cur_y;
@@ -294,11 +295,15 @@ public:
 	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int col, int wcell, int htable, int wtable);
 	virtual ~CurseGUITable()	{}
 
+	///Set data in
 	void SetData(std::string data, int r, int c);
 	void ClearData(int r, int c);
 
-	//Set cell width
+	///Set width all cell in table
 	void SetWidth(int width);
+
+	///Set column width
+	void SetColumnWidth(int c, int w);
 
 	void Update();
 	bool PutEvent(SGUIEvent* e);

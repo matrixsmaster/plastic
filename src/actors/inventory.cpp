@@ -33,7 +33,7 @@ Inventory::Inventory()
 	oj->SetCost(15);
 	items.push_back(oj);
 	oj = new InventoryObject();
-	oj->SetName("Second");
+	oj->SetName("Second object");
 	oj->SetDesc("Yet another useless piece of crap. But this piece have a long description.");
 	oj->SetWeight(12);
 	oj->SetCondition(7);

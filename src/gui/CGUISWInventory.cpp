@@ -66,12 +66,13 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	nr = invent->GetNumberItems() + 1 + 10;
 
 	//create controls
-	table = new CurseGUITable(ctrls,x1,y1,nr,nc,wwt,ht,wt);
-	table->SetData("  N", 0, 0);
+	table = new CurseGUITable(ctrls,x1,y1,20/*nr*/,10/*nc*/,wwt,ht,wt);
+	table->SetData("N", 0, 0);
 	table->SetData(" Name", 0, 1);
 	table->SetData("Weight", 0, 2);
 	table->SetData(" Cond.", 0, 3);
 	table->SetData(" Cost", 0, 4);
+	table->SetColumnWidth(0, 4);
 
 	new CurseGUILabel(ctrls, x1, y1+ht+1, wt, 1, "Description:");
 	description_lbl = new CurseGUILabel(ctrls, x1, y1+ht+2, wt, 5, "");
