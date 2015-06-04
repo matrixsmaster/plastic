@@ -44,6 +44,7 @@ VModel* DataPipe::LoadModel(const char* fname, const vector3di pos, const vector
 	allocated += m->GetAllocatedRAM();
 	m->SetPos(pos);
 	m->SetGPos(gpos);
+	m->SetScenePos(GP);
 
 	WriteLock();
 	objs.push_back(m);
@@ -88,17 +89,12 @@ voxel DataPipe::IntersectModel(const vector3di* p, VModel** obj, const bool auto
 {
 	voxel r;
 	VModVec::iterator mi;
-	vector3di pn;
 
 	if (autolock) ReadLock();
 
 	if (!objs.empty()) {
 		for (mi = objs.begin(); mi != objs.end(); ++mi) {
-			//FIXME: long vector operation: bottleneck
-			pn = ((*mi)->GetGPos()) - GP;
-			pn = ((*mi)->GetPos()) + (pn * CHUNKBOX);
-			//FIXME -----------------------------------
-			if (IsPntInsideCubeI(p,&pn,(*mi)->GetBoundSide())) {
+			if (IsPntInsideCubeI(p,(*mi)->GetSPosP(),(*mi)->GetBoundSide())) {
 				r = (*mi)->GetVoxelAt(p);
 				if (r) {
 					if (autolock) ReadUnlock();
@@ -112,4 +108,13 @@ voxel DataPipe::IntersectModel(const vector3di* p, VModel** obj, const bool auto
 	if (autolock) ReadUnlock();
 	if (obj) *obj = NULL;
 	return 0;
+}
+
+void DataPipe::UpdateModelsSceneRoot()
+{
+	VModVec::iterator mi;
+
+	if (objs.empty()) return;
+	for (mi = objs.begin(); mi != objs.end(); ++mi)
+		(*mi)->SetScenePos(GP);
 }

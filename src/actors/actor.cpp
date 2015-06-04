@@ -24,7 +24,8 @@
 #include "actorhelpers.h"
 
 
-PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr)
+PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr) :
+		VSceneObject()
 {
 	pipe = pptr;
 	InitVars();
@@ -33,7 +34,8 @@ PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr)
 	AutoInitStats();
 }
 
-PlasticActor::PlasticActor(EPAClass c, EPABodyType b, DataPipe* pptr)
+PlasticActor::PlasticActor(EPAClass c, EPABodyType b, DataPipe* pptr) :
+		VSceneObject()
 {
 	pipe = pptr;
 	InitVars();
@@ -54,7 +56,6 @@ PlasticActor::~PlasticActor()
 void PlasticActor::InitVars()
 {
 	isnpc = true;
-	rotmat = GenOMatrix();
 	model = NULL;
 }
 
@@ -72,15 +73,20 @@ void PlasticActor::AutoInitStats()
 	portrait = (SGUIPixel*)malloc(ACTPORTRAITH*ACTPORTRAITW*sizeof(SGUIPixel));
 	VSprite* s = pipe->LoadSprite("spr/testspr.dat");
 	memcpy(portrait,s->GetImage(),ACTPORTRAITH*ACTPORTRAITW*sizeof(SGUIPixel));
-//	pipe->PurgeSprites()
+	pipe->PurgeSprites();
 }
 
-void PlasticActor::SetRot(const vector3di r)
+void PlasticActor::UpdateModelPos()
 {
-	rot = r;
-	RotNormDegI(&rot);
-
-	rotmat = Mtx3Mul(GenMtxRotX(rot.X * M_PI / 180.f),GenMtxRotZ(rot.Z * M_PI / 180.f));
+	if (!model) return;
+	model->SetPos(pos);
+	model->SetScenePos(scenter);
+	model->SetGPos(gpos);
+	model->SetRot(rot);
+//	pos = model->GetPos();
+//	gpos = model->GetGPos();
+//	rot = model->GetRot();
+//	SetRotI();
 }
 
 void PlasticActor::Move(ELMoveDir d, float step)
@@ -94,19 +100,14 @@ void PlasticActor::Move(ELMoveDir d, float step)
 	case LMOVE_FORW: v.Y =  step; break;
 	case LMOVE_BACK: v.Y = -step; break;
 	}
-	v = MtxPntMul(&rotmat,&v);
+	v = MtxPntMul(&rotm,&v);
 
 	pos.X += (int)round(v.X);
 	pos.Y += (int)round(v.Y);
 	pos.Z -= (int)round(v.Z); //to conform rotation/movement of renderer (flipped Y axis)
 
-	//Check move out of chunk
-	if (pos.X >= CHUNKBOX) gmov.X += 1;
-	else if (pos.X < 0) gmov.X -= 1;
-	if (pos.Y >= CHUNKBOX) gmov.Y += 1;
-	else if (pos.Y < 0) gmov.Y -= 1;
-	if (pos.Z >= CHUNKBOX) gmov.Z += 1;
-	else if (pos.Z < 0) gmov.Z -= 1;
+	SetPosI();
+	UpdateModelPos();
 }
 
 bool PlasticActor::Spawn()

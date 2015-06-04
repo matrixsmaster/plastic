@@ -24,7 +24,7 @@
 #include "vecmisc.h"
 
 
-VModel::VModel()
+VModel::VModel() : VSceneObject()
 {
 	s_x = s_y = s_z = 0;
 	dat = NULL;
@@ -33,7 +33,6 @@ VModel::VModel()
 	buf = NULL;
 	buflen = 0;
 	bufside = 0;
-	rotm = GenOMatrix();
 	changed = false;
 	state = 0;
 }
@@ -182,17 +181,14 @@ ulli VModel::GetAllocatedRAM()
 	return ((datlen * nstates + buflen) * sizeof(voxel));
 }
 
-void VModel::SetRot(const vector3d r)
+void VModel::SetRot(const vector3di r)
 {
 	vector3di nres;
 	vector3d test(bufside);
 
-	//Prepare all variables of new rotation
+	//Set new rotation
 	rot = r;
-	RotNormDegF(&rot);
-	rotm = GenMtxRotX(rot.X * M_PI / 180.f);
-	rotm = Mtx3Mul(rotm,GenMtxRotY(rot.Y * M_PI / 180.f));
-	rotm = Mtx3Mul(rotm,GenMtxRotZ(rot.Z * M_PI / 180.f));
+	SetRotI();
 
 	//Check if new rotation makes any sense relatively to old
 	if (!changed) {
@@ -267,7 +263,7 @@ voxel VModel::GetVoxelAt(const vector3di* p)
 	ulli l;
 
 	//move it to positive side
-	vector3di x = *p - pos + center;
+	vector3di x = *p - spos + center;
 	//get offset
 	l = x.Z * bufside * bufside + x.Y * bufside + x.X;
 	if (l >= buflen) return 0;

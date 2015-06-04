@@ -97,6 +97,7 @@ void DataPipe::SetGP(vector3di pos)
 #endif
 
 	MakeChunk(l,GP);
+	UpdateModelsSceneRoot();
 
 	status = DPIPE_IDLE;
 	WriteUnlock();
@@ -207,6 +208,9 @@ bool DataPipe::Move(const vector3di shf)
 #endif
 		}
 	}
+
+	//Update models root
+	UpdateModelsSceneRoot();
 
 	//Release everything
 	status = DPIPE_IDLE;

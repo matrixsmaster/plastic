@@ -199,6 +199,9 @@ public:
 	void GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen);
 	std::string GetIniDataS(const std::string ininame, const std::string inifield);
 
+	///Returns a pointer to models vector.
+	virtual VModVec* GetModels()					{ return &objs; }
+
 	///Load dynamic object into scene.
 	virtual VModel* LoadModel(const char* fname, const vector3di pos, const vector3di gpos);
 
@@ -212,7 +215,11 @@ public:
 	///Return voxel code and fills object pointer if supplied.
 	virtual voxel IntersectModel(const vector3di* p, VModel** obj, const bool autolock);
 
+	///Updates all scene root positions for all loaded models.
+	virtual void UpdateModelsSceneRoot();
+
 	//FIXME: comment
+	virtual VSprVec* GetSprites()					{ return &sprs; }
 	virtual VSprite* LoadSprite(const char* fname);
 	virtual void PurgeSprites();
 

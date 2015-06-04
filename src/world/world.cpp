@@ -90,7 +90,8 @@ PlasticWorld::~PlasticWorld()
 
 void PlasticWorld::Quantum()
 {
-	//TODO: world update (!)
+//	VModVec* objs = data->GetModels();
+
 	if (!once) {
 		once = true;
 
@@ -110,8 +111,8 @@ void PlasticWorld::Quantum()
 
 	UpdateTime();
 
-	//DEBUG:
 	data->WriteLock();
+	//FIXME: debug
 	if (test->GetState() == 0)
 		test->SetState(test->GetNumStates()-1);
 	else
@@ -273,10 +274,9 @@ SWRayObjIntersect* PlasticWorld::ScreenRay(const vector2di p)
 void PlasticWorld::ProcessEvents(SGUIEvent* e)
 {
 	CurseGUIWnd* wptr;
-	vector3di pcmov,gmov;
 
 	//FIXME: DEBUG:
-	vector3d tr = test->GetRot();
+	vector3di tr = test->GetRot();
 	vector3di x;
 	char s[128];
 
@@ -284,21 +284,19 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 	if (PC->ProcessEvent(e)) {
 		/* Player movement */
-		pcmov = PC->GetPos();
-		gmov = PC->GetGMov();
-		if (gmov != vector3di()) {
-			pcmov -= (gmov * CHUNKBOX);
-			PC->SetPos(pcmov);
-			if (data->Move(gmov)) dbg_logstr("Move success");
+		if (PC->GetGMov() != vector3di()) {
+			if (data->Move(PC->GetGMov())) dbg_logstr("Move success");
 			else dbg_logstr("Move failed");
+			PC->GMove();
 			PC->SetGPos(data->GetGP());
+			PC->SetScenePos(data->GetGP());
 		}
 
 		render->SetRot(PC->GetRot());
-		render->SetPos(pcmov);
+		render->SetPos(PC->GetPos());
 
 		hud->SetGPos(PC->GetGPos());
-		hud->SetLPos(pcmov);
+		hud->SetLPos(PC->GetPos());
 		return;
 	}
 
