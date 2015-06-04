@@ -36,7 +36,7 @@ CurseGUITable::CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int 
 	typ = GUICL_TABLE;
 	g_col = col;
 	g_rows = rows;
-//	g_wcell = wcell;
+	g_wcell = wcell;
 	g_h = htable;
 	g_w = wtable;
 	cur_x = cur_y = 0;
@@ -57,21 +57,21 @@ CurseGUITable::CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int 
 
 void CurseGUITable::SetData(string data, int r, int c)
 {
-	if((r >= 0) && (r < g_rows) && (c >= 0) && (c < g_col))
+	if ((r >= 0) && (r < g_rows) && (c >= 0) && (c < g_col))
 		tbl[r][c] = data;
 }
 
 void CurseGUITable::ClearData(int r, int c)
 {
-	if((r >= 0) && (r < g_rows) && (c >= 0) && (c < g_col))
+	if ((r >= 0) && (r < g_rows) && (c >= 0) && (c < g_col))
 		tbl[r][c] = "";
 }
 
 void CurseGUITable::SetWidth(int width)
 {
 	//FIXME it's really need?
-	for (size_t i = 0; i < clw.size(); ++i)
-		clw.at(i) = width;
+//	for (size_t i = 0; i < clw.size(); ++i)
+//		clw.at(i) = width;
 //	g_wcell = width;
 }
 
@@ -84,7 +84,7 @@ void CurseGUITable::SetColumnWidth(int c, int w)
 void CurseGUITable::AddRow()
 {
 	vector<string> row;
-	for(int i = 0; i < g_col; ++i) {
+	for (int i = 0; i < g_col; ++i) {
 		row.push_back("");
 	}
 	tbl.push_back(row);
@@ -100,17 +100,22 @@ void CurseGUITable::DelRow()
 
 void CurseGUITable::AddColumn()
 {
-	for(size_t i = 0; i < tbl.size(); ++i)
+	for (size_t i = 0; i < tbl.size(); ++i) {
 		tbl.at(i).push_back("");
+		clw.push_back(g_wcell);
+	}
 	g_col++;
 }
 
 void CurseGUITable::DelColumn()
 {
-	if(!tbl.empty())
-		for(size_t i = 0; i < tbl.size(); ++i)
-			if(!tbl.at(i).empty())
+	if (!tbl.empty())
+		for (size_t i = 0; i < tbl.size(); ++i) {
+			if (!tbl.at(i).empty())
 				tbl.at(i).pop_back();
+			if (!clw.empty())
+				clw.pop_back();
+		}
 	g_col--;
 }
 
@@ -119,7 +124,7 @@ int CurseGUITable::GetTableHeight()
 	int tmp,i;
 
 	tmp = 1;
-	for(i = 0; i < g_rows; ++i) {
+	for (i = 0; i < g_rows; ++i) {
 		tmp += GetRowHeight(i) + 1;
 	}
 	return tmp;
@@ -135,10 +140,7 @@ int CurseGUITable::GetTableWidth()
 	for (it = clw.begin(); it != clw.end(); ++it)
 		res += (*it) + BW / 2;
 
-//	printf("[ %d  ]\r", res);
-
 	return res + BW /2;
-//	return (g_wcell + BW/2) * g_col + 2;
 }
 
 int CurseGUITable::GetRowHeight(int r)
@@ -153,6 +155,18 @@ int CurseGUITable::GetRowHeight(int r)
 	return (int)h;
 }
 
+int CurseGUITable::GetSumTableWidth(int c)
+{
+	int res, i;;
+
+	res = 0;
+	if ((int)clw.size() > c)
+		for (i = 0; i < c; ++i)
+			res += clw.at(i) + BW / 2;
+
+	return res;
+}
+
 int CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 {
 	char ch = ' ';
@@ -163,15 +177,14 @@ int CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 
 	string str = tbl.at(r).at(c);
 
-	//FIXME remake g_wcell to clw
-	w = clw.at(c) + BW; //g_wcell + BW;
+	w = clw.at(c) + BW;
 	h = GetRowHeight(r) + BH;
 	x = g_x + cur_x - scrollx;
 	y = g_y + cur_y - scrolly;
 
 	lx = 0;
 
-	sx = scrollx - (clw.at(c) + 1) * c;
+	sx = scrollx - GetSumTableWidth(c); //(clw.at(c) + 1) * c;
 //	sx = scrollx - (g_wcell + 1) * c;
 
 	for (int i = y; i < (y + h); ++i) {
@@ -186,13 +199,16 @@ int CurseGUITable::DrawCell(WINDOW* wd, int r, int c)
 		if (i > (g_y + g_h)) continue;
 
 		if (sx > 0 && (!bordery))
-			lx += (c > 0) ? (sx + 1) : (sx - 1 - c);
+			lx += (c > 0) ? (sx - 1) : (sx - 1 - c);
 
 		for (int j = x; j < (x + w); ++j) {
 			borderx = ((j == x) || (j == (x + w - 1)));
 
 			//clipping by x (left)
-			if (j < g_x) continue;
+			if (j < g_x) {
+//				if(!bordery && !borderx) lx++;
+				continue;
+			}
 			//clipping by x (right)
 			if (j > g_x + g_w) {
 				if(!bordery && !borderx) lx++;
@@ -272,9 +288,11 @@ bool CurseGUITable::PutEvent(SGUIEvent* e)
 			scrolly++;
 			return true;
 		case KEY_LEFT:
+		case 'd':
 			scrollx--;
 			return true;
 		case KEY_RIGHT:
+		case 'a':
 			scrollx++;
 			return true;
 		default: break;

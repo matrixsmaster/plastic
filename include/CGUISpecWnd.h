@@ -113,13 +113,16 @@ private:
 
 
 	void ResizeWnd();
+
 	void FillInventoryTable();
 
 	void SetSelectedItem();
+
+	///Show item description
 	void ShowDescription();
-	void ShowWeight();
-	void ShowCond();
-	void ShowCost();
+
+	///Convert int to std::string
+	std::string IntToString(int v);
 
 public:
 	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);

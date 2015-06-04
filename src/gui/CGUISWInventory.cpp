@@ -66,13 +66,15 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	nr = invent->GetNumberItems() + 1 + 10;
 
 	//create controls
-	table = new CurseGUITable(ctrls,x1,y1,20/*nr*/,10/*nc*/,wwt,ht,wt);
+	table = new CurseGUITable(ctrls,x1,y1,nr,nc,wwt,ht,wt);
 	table->SetData("N", 0, 0);
-	table->SetData(" Name", 0, 1);
+	table->SetData("Name", 0, 1);
 	table->SetData("Weight", 0, 2);
-	table->SetData(" Cond.", 0, 3);
-	table->SetData(" Cost", 0, 4);
+	table->SetData("Cond.", 0, 3);
+	table->SetData("Cost", 0, 4);
 	table->SetColumnWidth(0, 4);
+	table->SetColumnWidth(1, 10);
+	table->SetColumnWidth(3, 5);
 
 	new CurseGUILabel(ctrls, x1, y1+ht+1, wt, 1, "Description:");
 	description_lbl = new CurseGUILabel(ctrls, x1, y1+ht+2, wt, 5, "");
@@ -98,10 +100,9 @@ void CurseGUIInventoryWnd::FillInventoryTable()
 		sprintf(tmp, "%d", i);
 		table->SetData(string(tmp), i, 0);
 		table->SetData(invent->GetName(i-1), i, 1);
-		/*table->SetData(invent->GetWeight(i-1), i, 2);
-		table->SetData(invent->GetCondition(i-1), i, 3);
-		table->SetData(invent->GetCost(i-1), i, 4);
-		*/
+		table->SetData(IntToString(invent->GetWeight(i-1)), i, 2);
+		table->SetData(IntToString(invent->GetCondition(i-1)), i, 3);
+		table->SetData(IntToString(invent->GetCost(i-1)), i, 4);
 	}
 }
 
@@ -123,29 +124,11 @@ void CurseGUIInventoryWnd::SetSelectedItem()
 	table->SetData(string(tmp), sitem, 0);
 
 	ShowDescription();
-	ShowWeight();
-	ShowCond();
-	ShowCost();
 }
 
 void CurseGUIInventoryWnd::ShowDescription()
 {
 	description_lbl->SetCaption(invent->GetDesc(sitem-1));
-}
-
-void CurseGUIInventoryWnd::ShowWeight()
-{
-	//TODO
-}
-
-void CurseGUIInventoryWnd::ShowCond()
-{
-	//TODO
-}
-
-void CurseGUIInventoryWnd::ShowCost()
-{
-	//TODO
 }
 
 bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
@@ -181,4 +164,11 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 	default: break;
 	}
 	return false;
+}
+
+string CurseGUIInventoryWnd::IntToString(int v)
+{
+	char tmp[5];
+	snprintf(tmp, 5, "%d", v);
+	return string(tmp);
 }

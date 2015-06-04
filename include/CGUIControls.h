@@ -270,7 +270,7 @@ private:
 
 	int g_col;			//quantity of columns
 	int g_rows;			//quantity of rows
-//	int g_wcell;		//cell width
+	int g_wcell;		//cell width
 //	int g_vhtable;		//visible height of the table (alread have g_w/g_h)
 //	int g_vwtable;		//visible width of the table
 	int cur_x, cur_y;
@@ -280,6 +280,7 @@ private:
 	int GetRowHeight(int r);
 	int GetTableHeight();
 	int GetTableWidth();
+	int GetSumTableWidth(int c);
 
 public:
 	/* CurseGUITable
@@ -291,8 +292,9 @@ public:
 	 * wcell  - cell width
 	 * htable - visible width of the table
 	 * wtable - visible height of the table
+	 * header - if true header in table is static
 	 */
-	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int col, int wcell, int htable, int wtable);
+	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int col, int wcell, int htable, int wtable);//, bool header);
 	virtual ~CurseGUITable()	{}
 
 	///Set data in
