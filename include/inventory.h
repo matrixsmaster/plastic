@@ -31,7 +31,7 @@ private:
 	int weight,cond,cost;
 
 public:
-	InventoryObject()				{}
+	InventoryObject();
 	virtual ~InventoryObject()		{}
 
 	virtual void SetName(const std::string s)			{ name = s; }
@@ -61,11 +61,11 @@ public:
 
 	std::string GetName(int n);
 	std::string GetDesc(int n);
-/*
-	std::string GetWeight(int n);
-	std::string GetCondition(int n);
-	std::string GetCost(int n);
-*/
+
+	int GetWeight(int n);
+	int GetCondition(int n);
+	int GetCost(int n);
+
 };
 
 #endif /* INVENTORY_H_ */

@@ -21,6 +21,13 @@
 
 using namespace std;
 
+InventoryObject::InventoryObject()
+{
+	name = "";
+	desc = "";
+	weight = cond = cost = 0;
+}
+
 
 Inventory::Inventory()
 {
@@ -75,20 +82,20 @@ string Inventory::GetDesc(int n)
 	if (int(items.size()) > n) return items.at(n)->GetDesc();
 	return "Unknown";
 }
-/*
-string Inventory::GetWeight(int n)
+
+int Inventory::GetWeight(int n)
 {
 	if (items.size() > n) return items.at(n)->GetWeight();
-	return "";
+	return 0;
 }
-string Inventory::GetCondition(int n)
+int Inventory::GetCondition(int n)
 {
 	if (items.size() > n) return items.at(n)->GetConditions();
-	return "";
+	return 0;
 }
-string Inventory::GetCost(int n)
+int Inventory::GetCost(int n)
 {
 	if (items.size() > n) return items.at(n)->GetCost();
-	return "";
+	return 0;
 }
-*/
+
