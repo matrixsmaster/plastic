@@ -72,17 +72,14 @@ public:
 	///Set transparency
 	void SetAlpha(HUDOverlayType t, float a);
 
-	///Set radar background
-	void SetRadarBckgr(SGUIPixel* pxl, int l);
-
-	void SetMapWidth(int w);
-	void SetMapHeight(int h);
-
-	int GetMapWidth();
-	int GetMapHeight();
-
-	///Draw radar
+	///Set radar data
 	void SetMap(SGUIPixel *p, int l);
+
+	///Returns radar map width.
+	int GetMapWidth();
+
+	///Returns radar map width.
+	int GetMapHeight();
 
 	///Update State overlay
 	void UpdateState(std::string str);
@@ -108,8 +105,11 @@ public:
 	///Set the level health points
 	void SetHP(int v);
 
-	///Change the visibility
-	void SetHiddenState();
+	///Hide or show miscellaneous parts of the HUD.
+	void ShowMisc(bool s);
+
+	///Toggle visibility of miscellaneous parts of the HUD.
+	void ToggleMisc();
 };
 
 #endif /* HUD_H_ */

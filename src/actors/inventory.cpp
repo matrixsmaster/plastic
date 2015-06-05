@@ -71,6 +71,13 @@ int Inventory::GetNumberItems()
 	return items.size();
 }
 
+/*
+ * FIXME: that's truly horrible. I'm fucking scared to bones.
+ * What is this stuff for? Are you goin' to provide access to every field
+ * of an inventory object?! Why not just return the object's pointer?
+ * Besides, all of the conditions are not met by signedness.
+ */
+
 string Inventory::GetName(int n)
 {
 	if (items.size() > n) return items.at(n)->GetName();
@@ -98,4 +105,3 @@ int Inventory::GetCost(int n)
 	if (items.size() > n) return items.at(n)->GetCost();
 	return 0;
 }
-

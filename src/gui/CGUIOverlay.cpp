@@ -61,18 +61,6 @@ void CurseGUIOverlay::Update(bool refr)
 	if (refr) wrefresh(wnd);
 }
 
-bool CurseGUIOverlay::PutEvent(SGUIEvent* e)
-{
-	//OverlayUI events processing
-	//FIXME: maybe just nothing here?
-	return false;
-}
-
-void CurseGUIOverlay::SetMap(SGUIPixel *p, int l)
-{
-	SetBackgroundData(p, l);
-}
-
 void CurseGUIOverlay::PutString(const char* str)
 {
 	PutString(string(str));

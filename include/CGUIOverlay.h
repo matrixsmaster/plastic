@@ -52,7 +52,9 @@ public:
 	virtual ~CurseGUIOverlay();
 
 	void Update(bool refr);
-	bool PutEvent(SGUIEvent* e);
+
+	///Overlay willn't process GUI events.
+	bool PutEvent(SGUIEvent* e)			{ return false; }
 
 	//Overlay willn't gain or loose the focus.
 	bool GainFocus()					{ return false; }
@@ -86,9 +88,7 @@ public:
 	void SetHidden(bool h)				{ hidden = h; }
 
 	///Returns true if an overlay window is hidden
-	bool GetHidden()					{ return hidden; }
-
-	void SetMap(SGUIPixel *p, int l);
+	bool IsHidden()						{ return hidden; }
 
 	void PutString(const char* str);
 	void PutString(std::string str);
