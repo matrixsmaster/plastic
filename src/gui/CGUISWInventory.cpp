@@ -66,7 +66,7 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	nr = invent->GetNumberItems() + 1 + 10;
 
 	//create controls
-	table = new CurseGUITable(ctrls,x1,y1,nr+5,nc,wwt,ht,wt, true);
+	table = new CurseGUITable(ctrls,x1,y1,nr,nc,wwt,ht,wt, true);
 	table->SetData("N", 0, 0);
 	table->SetData("Name", 0, 1);
 	table->SetData("Weight", 0, 2);
@@ -142,9 +142,7 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 	case GUIEV_KEYPRESS:
 		switch (e->k) {
 		case GUI_DEFCLOSE: will_close = true; return true;
-		case '\t':
-		case 'o':
-			ctrls->Rotate(); break;
+		case '\t': ctrls->Rotate(); break;
 		case KEY_UP:
 			prev = sitem;
 			sitem--;
