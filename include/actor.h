@@ -86,6 +86,8 @@ public:
 	Player(SPAAttrib s, DataPipe* pptr);
 	virtual ~Player();
 
+	const char* GetStateStr();
+
 	bool ProcessEvent(const SGUIEvent* e);
 };
 

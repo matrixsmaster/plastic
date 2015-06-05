@@ -305,6 +305,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 		hud->SetGPos(PC->GetGPos());
 		hud->SetLPos(PC->GetPos());
+//		hud->UpdateState(string(PC->GetStateStr())); //FIXME:
 		return;
 	}
 

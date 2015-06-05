@@ -67,6 +67,8 @@ Player::Player(SPAAttrib s, DataPipe* pptr) :
 	binder->RegKeyByName("TURN_UP",PAKEY_TURN_UP);
 	binder->RegKeyByName("TURN_DW",PAKEY_TURN_DW);
 
+	binder->RegKeyByName("TOGGLE_STATE",PAKEY_TOG_STATE);
+
 	maxrspd = atoi(pptr->GetIniDataS(KEYBINDNAME,"TURN_MAX").c_str());
 	pptr->GetIniDataC(KEYBINDNAME,"WHEEL_HORZ",tmp,sizeof(tmp));
 	rot_hor = mmask_by_str(tmp);
@@ -79,6 +81,13 @@ Player::Player(SPAAttrib s, DataPipe* pptr) :
 Player::~Player()
 {
 	delete binder;
+}
+
+const char* Player::GetStateStr()
+{
+	if (state < PCS_EXPLORING) state = PCS_EXPLORING;
+	if (state > PCS_VEHICLE) state = PCS_VEHICLE;
+	return pcstate_to_str[state];
 }
 
 bool Player::ProcessEvent(const SGUIEvent* e)
@@ -122,6 +131,21 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 		case PAKEY_TURN_RGHT: rot.Z -= rspd; rc = true; break;
 		case PAKEY_TURN_DW: rot.X += rspd; rc = true; break;
 		case PAKEY_TURN_UP: rot.X -= rspd; rc = true; break;
+
+		case PAKEY_TOG_STATE:
+			//TODO: check conditions, apply some changes etc
+			switch (state) {
+			case PCS_EXPLORING:
+				state = PCS_INTERACTING;
+				break;
+			case PCS_INTERACTING:
+				state = PCS_COMBAT;
+				break;
+			case PCS_COMBAT:
+				state = PCS_EXPLORING;
+				break;
+			case PCS_VEHICLE: break;
+			}
 
 		}
 

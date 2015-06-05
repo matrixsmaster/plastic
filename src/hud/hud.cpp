@@ -175,7 +175,7 @@ void HUD::SetHP(int v)
 
 void HUD::UpdateState(string str)
 {
-	string s = "STATE: ";
+	string s = "Player: ";
 	s += str;
 	PutString(OVRL_STBTM, s);
 }
