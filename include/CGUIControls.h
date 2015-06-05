@@ -268,15 +268,13 @@ private:
 	std::vector<std::vector<std::string> > tbl;
 	std::vector<int> clw;	//array of column widths
 
-	int g_col;			//quantity of columns
-	int g_rows;			//quantity of rows
-	int g_wcell;		//cell width
-//	int g_vhtable;		//visible height of the table (alread have g_w/g_h)
-//	int g_vwtable;		//visible width of the table
-	int cur_x, cur_y;
-	int scrolly, scrollx;
+	int g_col;				//quantity of columns
+	int g_rows;				//quantity of rows
+	int cur_x, cur_y;		//the current position of cells
+	int scrolly, scrollx;	//offset count table
+	bool g_header;
 
-	int DrawCell(WINDOW* wd, int x, int y);
+	int DrawCell(WINDOW* wd, int r, int c);
 	int GetRowHeight(int r);
 	int GetTableHeight();
 	int GetTableWidth();
@@ -294,25 +292,31 @@ public:
 	 * wtable - visible height of the table
 	 * header - if true header in table is static
 	 */
-	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int col, int wcell, int htable, int wtable);//, bool header);
+	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int col, int wcell, int htable, int wtable, bool header);
 	virtual ~CurseGUITable()	{}
-
-	///Set data in
-	void SetData(std::string data, int r, int c);
-	void ClearData(int r, int c);
-
-	///Set width all cell in table
-	void SetWidth(int width);
-
-	///Set column width
-	void SetColumnWidth(int c, int w);
 
 	void Update();
 	bool PutEvent(SGUIEvent* e);
 
+	///Write data into a cell
+	void SetData(std::string data, int r, int c);
+
+	///Clear data from a cell
+	void ClearData(int r, int c);
+
+	///Set column width
+	void SetColumnWidth(int c, int w);
+
+	///Add a row to the end of the table
 	void AddRow();
+
+	///Delete a row from the end of the table
 	void DelRow();
-	void AddColumn();
+
+	///Add a column to the end of the table
+	void AddColumn(int width);
+
+	///Delete a column from the end of the table
 	void DelColumn();
 };
 

@@ -33,7 +33,7 @@ Inventory::Inventory()
 {
 	//DEBUG:
 	InventoryObject* oj = new InventoryObject();
-	oj->SetName("First");
+	oj->SetName("First object");
 	oj->SetDesc("Just an object.");
 	oj->SetWeight(1);
 	oj->SetCondition(5);
