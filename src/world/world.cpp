@@ -45,12 +45,14 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	gui = NULL;
 	PC = NULL;
 	hud = NULL;
+	radar = NULL;
 	binder = NULL;
 	once = false;
 	g_w = g_h = 0;
 	rtime = epoch = passed = 0;
 	clkres = NULL;
 	fps = 0;
+	lock_update = true;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
@@ -90,6 +92,7 @@ PlasticWorld::~PlasticWorld()
 	//UI parts
 	if (binder) delete binder;
 	if (hud) delete hud;
+	if (radar) delete radar;
 	if (render) delete render;
 
 	//The last one: DataPipe
@@ -117,7 +120,10 @@ void PlasticWorld::Quantum()
 		if (!test) abort();
 	}
 
+	if (lock_update) return;
+
 	UpdateTime();
+	radar->Update();
 
 	data->WriteLock();
 	//FIXME: debug
@@ -154,6 +160,8 @@ void PlasticWorld::ConnectGUI()
 		return;
 	}
 
+	lock_update = true;
+
 	//resize frame
 	g_w = gui->GetWidth();
 	g_h = gui->GetHeight();
@@ -167,8 +175,14 @@ void PlasticWorld::ConnectGUI()
 	if (hud) delete hud;
 	hud = new HUD(gui);
 	hud->SetPTime(&gtime);
+	if (radar) delete radar;
+	radar = new PlasticRadar(data);
+	radar->SetWH(hud->GetMapWidth(),hud->GetMapHeight());
+	radar->Update();
+	hud->SetMap(radar->GetImage(),radar->GetImageLen());
 
 	//OK
+	lock_update = false;
 	result = 0;
 }
 
@@ -288,8 +302,15 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	vector3di x;
 	char s[128];
 
-	result = 0;
+	result = 1;
 
+	//Check all instances needed
+	if ((!PC) || (!hud) || (!radar)) return;
+
+	result = 0;
+//	lock_update = true;
+
+	//Try to pass event directly to Player
 	if (PC->ProcessEvent(e)) {
 		/* Player movement */
 		if (PC->GetGMov() != vector3di()) {
@@ -306,9 +327,13 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 		hud->SetGPos(PC->GetGPos());
 		hud->SetLPos(PC->GetPos());
 		hud->SetState(PC->GetStateStr());
+		radar->SetCenter(PC->GetPos());
+
+//		lock_update = false;
 		return;
 	}
 
+	//The event is more global
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
 		/* User pressed a key */
@@ -418,4 +443,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	wptr = gui->GetWindowN("Test One");
 	if (wptr)
 		dbg_print("'Test One' window returned %d",((CurseGUIMessageBox*)wptr)->GetButtonPressed());
+
+//	lock_update = false;
 }

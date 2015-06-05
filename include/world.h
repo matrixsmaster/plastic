@@ -37,6 +37,7 @@
 #include "hud.h"
 #include "keybinder.h"
 #include "pltime.h"
+#include "radar.h"
 
 
 /* Ray-Object intersection data holding structure */
@@ -59,6 +60,7 @@ private:
 	CurseGUI* gui;
 	Player* PC;
 	HUD* hud;
+	PlasticRadar* radar;
 	KeyBinder* binder;
 	bool once;
 	int g_w,g_h;
@@ -68,6 +70,7 @@ private:
 	timespec* clkres;
 	uli fps;
 	SWRayObjIntersect cinters;
+	volatile bool lock_update;
 
 	//holders
 	std::vector<PlasticActor*> actors;
