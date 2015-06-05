@@ -137,7 +137,7 @@ void PlasticWorld::Frame()
 
 	gtime.fr++;
 
-	hud->UpdateFPS(fps);
+	hud->SetFPS(fps);
 	hud->UpdateClock();
 }
 
@@ -305,7 +305,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 		hud->SetGPos(PC->GetGPos());
 		hud->SetLPos(PC->GetPos());
-//		hud->UpdateState(string(PC->GetStateStr())); //FIXME:
+		hud->SetState(PC->GetStateStr());
 		return;
 	}
 

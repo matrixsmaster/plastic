@@ -131,7 +131,7 @@ void HUD::SetMap(SGUIPixel *pxl, int l)
 	overlays[OVRL_MAP]->SetBackgroundData(pxl, l);
 }
 
-void HUD::UpdateFPS(uli fps)
+void HUD::SetFPS(uli fps)
 {
 	string str;
 
@@ -173,11 +173,16 @@ void HUD::SetHP(int v)
 	bar->SetValue(v);
 }
 
-void HUD::UpdateState(string str)
+void HUD::SetState(string str)
 {
 	string s = "Player: ";
 	s += str;
 	PutString(OVRL_STBTM, s);
+}
+
+void HUD::SetState(const char* str)
+{
+	SetState(string(str));
 }
 
 void HUD::UpdateClock()
@@ -189,7 +194,7 @@ void HUD::UpdateClock()
 	snprintf(tmp, 8, "%s", day_to_string[plt->dow].s);
 	PutString(OVRL_CLOCK, string(tmp));
 	//date
-	snprintf(tmp, 9, "%02d/%01d/%03d", plt->day, plt->month, plt->year);
+	snprintf(tmp, 9, "%02d/%01d/%03d", (plt->day+1), (plt->month+1), plt->year);
 	PutString(OVRL_CLOCK, string(tmp));
 	//time
 	snprintf(tmp, 9, "%02d:%02d:%02d", plt->hr, plt->mn, plt->sc);

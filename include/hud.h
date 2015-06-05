@@ -64,7 +64,7 @@ public:
 	virtual ~HUD();
 
 	///Updates FPS counter.
-	void UpdateFPS(uli fps);
+	void SetFPS(uli fps);
 
 	///Put string to LOG overlay
 	void PutStrToLog(const char* str);
@@ -82,7 +82,8 @@ public:
 	int GetMapHeight();
 
 	///Update State overlay
-	void UpdateState(std::string str);
+	void SetState(std::string str);
+	void SetState(const char* str);
 
 	///Update clock overlay
 	void UpdateClock();
