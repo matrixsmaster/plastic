@@ -133,12 +133,4 @@ enum EPCState {
 	PCS_VEHICLE
 };
 
-//Player state to string conversion data
-static const char* pcstate_to_str[PCHARNUMSTATES] = {
-		"Exploring",
-		"Interacting",
-		"Combat",
-		"In vehicle"
-};
-
 #endif /* ACTORTYPES_H_ */

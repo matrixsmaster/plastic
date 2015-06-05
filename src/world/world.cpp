@@ -272,12 +272,12 @@ SWRayObjIntersect* PlasticWorld::ScreenRay(const vector2di p)
 	return &cinters;
 }
 
-#define SPAWNWNDMACRO(Name,Create) \
+#define SPAWNWNDMACRO(Name,Create) { \
 							wptr = gui->GetWindowN(Name); \
 							if (!wptr) { \
 								wptr = Create; \
 								gui->AddWindow(wptr); } \
-							gui->SetFocus(wptr);
+							gui->SetFocus(wptr); }
 
 void PlasticWorld::ProcessEvents(SGUIEvent* e)
 {
@@ -317,8 +317,11 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			dbg_toggle();
 			break;
 
-		case PWKEY_CHARTAB: /*PC stats tab*/
-			SPAWNWNDMACRO(WNDNAM_ACTVIEW,new CurseGUIActorViewWnd(gui,PC));
+		case PWKEY_CHARTAB: /*PC/NPC stats tab*/
+			if (cinters.actor && cinters.model)
+				SPAWNWNDMACRO(WNDNAM_ACTVIEW,new CurseGUIActorViewWnd(gui,cinters.actor))
+			else
+				SPAWNWNDMACRO(WNDNAM_ACTVIEW,new CurseGUIActorViewWnd(gui,PC));
 			break;
 
 		case PWKEY_MAPVIEW: /*map view*/

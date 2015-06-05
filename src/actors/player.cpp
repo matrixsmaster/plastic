@@ -42,6 +42,14 @@ enum {
 	PAKEY_TOG_STATE,
 };
 
+/* Player state to string conversion data */
+static const char* pcstate_to_str[PCHARNUMSTATES] = {
+		"Exploring",
+		"Interacting",
+		"Combat",
+		"In vehicle"
+};
+
 Player::Player(SPAAttrib s, DataPipe* pptr) :
 		PlasticActor(s,pptr)
 {
