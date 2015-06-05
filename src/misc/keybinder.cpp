@@ -23,9 +23,9 @@
 using namespace std;
 
 
-int KeyBinder::RegKeyByName(const char* name)
+int KeyBinder::RegKeyByName(const char* name, int descriptor)
 {
-	int x,n;
+	int x;
 	if ((!name) || (!pipe)) return -1; //just in case
 
 	//search INI
@@ -42,9 +42,8 @@ int KeyBinder::RegKeyByName(const char* name)
 	if (!x) return -1; //something wrong, or trying to register zero key code
 
 	//append new pair
-	n = keymap.size();
-	keymap.insert(make_pair(x,n));
-	return n;
+	keymap.insert(make_pair(x,descriptor));
+	return descriptor;
 }
 
 int KeyBinder::DecodeKey(int key)

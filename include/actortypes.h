@@ -123,4 +123,22 @@ static const SEPABRecord pabody_to_str[NUMBODTYPE] = {
 #define ACTPORTRAITW 30
 #define ACTPORTRAITH 20
 
+//Player character state
+#define PCHARNUMSTATES 4
+
+enum EPCState {
+	PCS_EXPLORING,
+	PCS_INTERACTING,
+	PCS_COMBAT,
+	PCS_VEHICLE
+};
+
+//Player state to string conversion data
+static const char* pcstate_to_str[PCHARNUMSTATES] = {
+		"Exploring",
+		"Interacting",
+		"Combat",
+		"In vehicle"
+};
+
 #endif /* ACTORTYPES_H_ */

@@ -34,8 +34,8 @@ public:
 	KeyBinder(DataPipe* pptr)		{ pipe = pptr; }
 	virtual ~KeyBinder()			{ keymap.clear(); }
 
-	///Returns a code associated with key.
-	int RegKeyByName(const char* name);
+	///Returns descriptor associated with key if success.
+	int RegKeyByName(const char* name, int descriptor);
 
 	///Returns code of registered key (if found).
 	int DecodeKey(int key);

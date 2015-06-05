@@ -21,13 +21,14 @@
 #include "CGUIControls.h"
 #include "actor.h"
 #include "actorhelpers.h"
+#include "misconsts.h"
 
 
 CurseGUIActorViewWnd::CurseGUIActorViewWnd(CurseGUI* scrn, PlasticActor* actr) :
 		CurseGUIWnd(scrn,1,1,2,2)
 {
 	type = GUIWT_OTHER;
-	name = "Actor View";
+	name = WNDNAM_ACTVIEW;
 	showname = true;
 
 	actor = actr;

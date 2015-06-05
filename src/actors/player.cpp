@@ -22,29 +22,50 @@
 #include "support.h"
 
 
+enum {
+	PAKEY_WALK_FORW,
+	PAKEY_WALK_BACK,
+	PAKEY_WALK_LEFT,
+	PAKEY_WALK_RGHT,
+	PAKEY_WALK_UP,
+	PAKEY_WALK_DW,
+	PAKEY_RUN_FORW,
+	PAKEY_RUN_BACK,
+	PAKEY_RUN_LEFT,
+	PAKEY_RUN_RGHT,
+	PAKEY_RUN_UP,
+	PAKEY_RUN_DW,
+	PAKEY_TURN_LEFT,
+	PAKEY_TURN_RGHT,
+	PAKEY_TURN_UP,
+	PAKEY_TURN_DW,
+	PAKEY_TOG_STATE,
+};
+
 Player::Player(SPAAttrib s, DataPipe* pptr) :
 		PlasticActor(s,pptr)
 {
 	char tmp[MAXINISTRLEN];
 
 	isnpc = false;
+	state = PCS_EXPLORING;
 
 	binder = new KeyBinder(pptr);
 
-	binder->RegKeyByName("WALK_FORW");
-	binder->RegKeyByName("WALK_BACK");
-	binder->RegKeyByName("WALK_LEFT");
-	binder->RegKeyByName("WALK_RGHT");
+	binder->RegKeyByName("WALK_FORW",PAKEY_WALK_FORW);
+	binder->RegKeyByName("WALK_BACK",PAKEY_WALK_BACK);
+	binder->RegKeyByName("WALK_LEFT",PAKEY_WALK_LEFT);
+	binder->RegKeyByName("WALK_RGHT",PAKEY_WALK_RGHT);
 
-	binder->RegKeyByName("RUN_FORW");
-	binder->RegKeyByName("RUN_BACK");
-	binder->RegKeyByName("RUN_LEFT");
-	binder->RegKeyByName("RUN_RGHT");
+	binder->RegKeyByName("RUN_FORW",PAKEY_RUN_FORW);
+	binder->RegKeyByName("RUN_BACK",PAKEY_RUN_BACK);
+	binder->RegKeyByName("RUN_LEFT",PAKEY_RUN_LEFT);
+	binder->RegKeyByName("RUN_RGHT",PAKEY_RUN_RGHT);
 
-	binder->RegKeyByName("TURN_LEFT");
-	binder->RegKeyByName("TURN_RGHT");
-	binder->RegKeyByName("TURN_UP");
-	binder->RegKeyByName("TURN_DW");
+	binder->RegKeyByName("TURN_LEFT",PAKEY_TURN_LEFT);
+	binder->RegKeyByName("TURN_RGHT",PAKEY_TURN_RGHT);
+	binder->RegKeyByName("TURN_UP",PAKEY_TURN_UP);
+	binder->RegKeyByName("TURN_DW",PAKEY_TURN_DW);
 
 	maxrspd = atoi(pptr->GetIniDataS(KEYBINDNAME,"TURN_MAX").c_str());
 	pptr->GetIniDataC(KEYBINDNAME,"WHEEL_HORZ",tmp,sizeof(tmp));
@@ -87,23 +108,21 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 		switch (binder->DecodeKey(e->k)) {
 		default: return false;
 
-		case 0: Move(LMOVE_FORW,1.2f); break; //FIXME: use speed value
-		case 1: Move(LMOVE_BACK,1.2f); break;
-		case 2: Move(LMOVE_LEFT,1.2f); break;
-		case 3: Move(LMOVE_RGHT,1.2f); break;
+		case PAKEY_WALK_FORW: Move(LMOVE_FORW,1.2f); break; //FIXME: use speed value
+		case PAKEY_WALK_BACK: Move(LMOVE_BACK,1.2f); break;
+		case PAKEY_WALK_LEFT: Move(LMOVE_LEFT,1.2f); break;
+		case PAKEY_WALK_RGHT: Move(LMOVE_RGHT,1.2f); break;
 
-		case 4: Move(LMOVE_FORW,2.2f); break; //FIXME: use speed value
-		case 5: Move(LMOVE_BACK,2.2f); break;
-		case 6: Move(LMOVE_LEFT,2.2f); break;
-		case 7: Move(LMOVE_RGHT,2.2f); break;
+		case PAKEY_RUN_FORW: Move(LMOVE_FORW,2.2f); break; //FIXME: use speed value
+		case PAKEY_RUN_BACK: Move(LMOVE_BACK,2.2f); break;
+		case PAKEY_RUN_LEFT: Move(LMOVE_LEFT,2.2f); break;
+		case PAKEY_RUN_RGHT: Move(LMOVE_RGHT,2.2f); break;
 
-		case  8: rot.Z += rspd; rc = true; break;
-		case  9: rot.Z -= rspd; rc = true; break;
-		case 10: rot.X += rspd; rc = true; break;
-		case 11: rot.X -= rspd; rc = true; break;
+		case PAKEY_TURN_LEFT: rot.Z += rspd; rc = true; break;
+		case PAKEY_TURN_RGHT: rot.Z -= rspd; rc = true; break;
+		case PAKEY_TURN_DW: rot.X += rspd; rc = true; break;
+		case PAKEY_TURN_UP: rot.X -= rspd; rc = true; break;
 
-	//	case : Move(LMOVE_UP,1.2f); break;
-	//	case : Move(LMOVE_DW,1.2f); break;
 		}
 
 	} else

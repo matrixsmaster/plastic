@@ -21,6 +21,7 @@
 #include <string>
 #include "CGUISpecWnd.h"
 #include "renderpool.h"
+#include "misconsts.h"
 
 using namespace std;
 
@@ -29,7 +30,7 @@ CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, RenderPool* ppool) 
 		CurseGUIWnd(scrn,8,8,26,9)
 {
 	type = GUIWT_OTHER;
-	name = "LVR config";
+	name = WNDNAM_LVRCONF;
 	showname = true;
 
 	pool = ppool;

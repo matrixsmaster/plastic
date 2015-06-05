@@ -30,16 +30,10 @@
 #define CHUNKUSLEEP 100000
 #define UPDATUSLEEP 100
 
-
-//Global Movement Directions
-//enum EGMoveDir {
-//	GMOVE_UP,
-//	GMOVE_DOWN,
-//	GMOVE_NORTH,
-//	GMOVE_SOUTH,
-//	GMOVE_WEST,
-//	GMOVE_EAST
-//};
+#define WNDNAM_ACTVIEW "Actor View"
+#define WNDNAM_MAPVIEW "Map View"
+#define WNDNAM_INVENTORY "Inventory"
+#define WNDNAM_LVRCONF "LVR config"
 
 //Local Movement Directions
 enum ELMoveDir {

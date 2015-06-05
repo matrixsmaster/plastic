@@ -17,11 +17,11 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <cstdlib>
 #include "CGUISpecWnd.h"
 #include "CGUIControls.h"
 #include "inventory.h"
-#include <cstdlib>
-
+#include "misconsts.h"
 
 using namespace std;
 
@@ -30,7 +30,7 @@ CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
 	CurseGUIWnd(scrn,0,0,2,2)
 {
 	type = GUIWT_OTHER;
-	name = "Inventory";
+	name = WNDNAM_INVENTORY;
 	showname = true;
 
 	invent = iptr;

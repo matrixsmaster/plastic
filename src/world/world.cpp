@@ -24,6 +24,14 @@
 #include "CGUIControls.h"
 
 
+enum {
+	PWKEY_CONSOLE,
+	PWKEY_CHARTAB,
+	PWKEY_MAPVIEW,
+	PWKEY_INVENTORY,
+	PWKEY_RENDCFG,
+};
+
 PlasticWorld::PlasticWorld(SGameSettings* settings)
 {
 	float alloc_gb;
@@ -187,11 +195,11 @@ void PlasticWorld::BindKeys()
 	if (binder) delete binder;
 	binder = new KeyBinder(data);
 
-	binder->RegKeyByName("CONSOLE");
-	binder->RegKeyByName("CHAR_TAB");
-	binder->RegKeyByName("MAP_VIEW");
-	binder->RegKeyByName("INVENTORY");
-	binder->RegKeyByName("RENDER_CFG");
+	binder->RegKeyByName("CONSOLE",PWKEY_CONSOLE);
+	binder->RegKeyByName("CHAR_TAB",PWKEY_CHARTAB);
+	binder->RegKeyByName("MAP_VIEW",PWKEY_MAPVIEW);
+	binder->RegKeyByName("INVENTORY",PWKEY_INVENTORY);
+	binder->RegKeyByName("RENDER_CFG",PWKEY_RENDCFG);
 }
 
 void PlasticWorld::UpdateTime()
@@ -304,25 +312,25 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	case GUIEV_KEYPRESS:
 		/* User pressed a key */
 		switch (binder->DecodeKey(e->k)) {
-		case 0: /*console*/
+		case PWKEY_CONSOLE: /*console*/
 			dbg_toggle();
 			break;
 
-		case 1: /*PC stats tab*/
-			SPAWNWNDMACRO("Actor View",new CurseGUIActorViewWnd(gui,PC));
+		case PWKEY_CHARTAB: /*PC stats tab*/
+			SPAWNWNDMACRO(WNDNAM_ACTVIEW,new CurseGUIActorViewWnd(gui,PC));
 			break;
 
-		case 2: /*map view*/
-			SPAWNWNDMACRO("Map View",new CurseGUIMapViewWnd(gui,data));
+		case PWKEY_MAPVIEW: /*map view*/
+			SPAWNWNDMACRO(WNDNAM_MAPVIEW,new CurseGUIMapViewWnd(gui,data));
 			(reinterpret_cast<CurseGUIMapViewWnd*>(wptr))->SetPos(PC->GetGPos(),PC->GetPos());
 			break;
 
-		case 3: /*inventory*/
-			SPAWNWNDMACRO("Inventory",new CurseGUIInventoryWnd(gui,PC->GetInventory()));
+		case PWKEY_INVENTORY: /*inventory*/
+			SPAWNWNDMACRO(WNDNAM_INVENTORY,new CurseGUIInventoryWnd(gui,PC->GetInventory()));
 			break;
 
-		case 4: /*LVR config*/
-			SPAWNWNDMACRO("LVR config",new CurseGUIRenderConfWnd(gui,render));
+		case PWKEY_RENDCFG: /*LVR config*/
+			SPAWNWNDMACRO(WNDNAM_LVRCONF,new CurseGUIRenderConfWnd(gui,render));
 			break;
 
 		default:

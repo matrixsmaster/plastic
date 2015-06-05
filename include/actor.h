@@ -80,6 +80,7 @@ private:
 	KeyBinder* binder;
 	int maxrspd,rspd;
 	mmask_t rot_hor,rot_ver;
+	EPCState state;
 
 public:
 	Player(SPAAttrib s, DataPipe* pptr);

@@ -21,6 +21,7 @@
 #include "CGUIControls.h"
 #include "datapipe.h"
 #include "support.h"
+#include "misconsts.h"
 
 
 static const SGUIPixel empty_tile = {
@@ -39,7 +40,7 @@ CurseGUIMapViewWnd::CurseGUIMapViewWnd(CurseGUI* scrn, DataPipe* pdat) :
 		CurseGUIWnd(scrn,0,0,2,2)
 {
 	type = GUIWT_OTHER;
-	name = "Map View";
+	name = WNDNAM_MAPVIEW;
 	showname = true;
 
 	pipe = pdat;
