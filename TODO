@@ -41,5 +41,3 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Start working on audio system (ALSA PCM output)
 
 -> Move map tiles color information to INI
-
--> Reconsider scene position calculation inside DataPipe::IntersectModel()

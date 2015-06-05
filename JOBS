@@ -32,7 +32,7 @@ Add actors placement									| in progr	|
 ---------------------------------------------------------------------------------------
 Implement projection test for an objects (& actors)		| done		|
 ---------------------------------------------------------------------------------------
-Implement objects global movement sync					| fixing	|
+Implement objects global movement sync					| done		|
 ---------------------------------------------------------------------------------------
 Add status info and some local map to new HUD			|			|
 ---------------------------------------------------------------------------------------
