@@ -103,6 +103,12 @@ void PlasticWorld::Quantum()
 {
 //	VModVec* objs = data->GetModels();
 
+	//Check all instances needed
+	if ((!PC) || (!hud) || (!radar)) return;
+
+	//Check if the world is on pause
+	if (lock_update) return;
+
 	if (!once) {
 		once = true;
 
@@ -112,15 +118,16 @@ void PlasticWorld::Quantum()
 		PC->SetGPos(data->GetGP());
 		//Now we can calculate local position
 		PC->SetPos(data->GetInitialPCLPos());
-		//And give it to LVR
-		render->SetPos(PC->GetPos());
+		//And update Player, HUD etc
+		PlayerMoved();
+
+		//Show greeting string
+		hud->PutStrToLog("Welcome to the world!"); //FIXME: Write something here
 
 		//FIXME: debugging stuff
 		test = data->LoadModel("testmodel.dat",PC->GetPos()+vector3di(0,0,20),data->GetGP());
 		if (!test) abort();
 	}
-
-	if (lock_update) return;
 
 	UpdateTime();
 	radar->Update();
@@ -155,12 +162,12 @@ void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
 
 void PlasticWorld::ConnectGUI()
 {
+	lock_update = true;
+
 	if ((!gui) || (!render)) {
 		result = 1;
 		return;
 	}
-
-	lock_update = true;
 
 	//resize frame
 	g_w = gui->GetWidth();
@@ -286,6 +293,26 @@ SWRayObjIntersect* PlasticWorld::ScreenRay(const vector2di p)
 	return &cinters;
 }
 
+void PlasticWorld::PlayerMoved()
+{
+	if (PC->GetGMov() != vector3di()) {
+		if (data->Move(PC->GetGMov())) dbg_logstr("Move success");
+		else dbg_logstr("Move failed");
+		PC->GMove();
+		PC->SetGPos(data->GetGP());
+		PC->SetScenePos(data->GetGP());
+	}
+
+	render->SetRot(PC->GetRot());
+	render->SetPos(PC->GetPos());
+
+	hud->SetGPos(PC->GetGPos());
+	hud->SetLPos(PC->GetPos());
+	hud->SetState(PC->GetStateStr());
+
+	radar->SetCenter(PC->GetPos());
+}
+
 #define SPAWNWNDMACRO(Name,Create) { \
 							wptr = gui->GetWindowN(Name); \
 							if (!wptr) { \
@@ -308,28 +335,11 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	if ((!PC) || (!hud) || (!radar)) return;
 
 	result = 0;
-//	lock_update = true;
 
 	//Try to pass event directly to Player
 	if (PC->ProcessEvent(e)) {
 		/* Player movement */
-		if (PC->GetGMov() != vector3di()) {
-			if (data->Move(PC->GetGMov())) dbg_logstr("Move success");
-			else dbg_logstr("Move failed");
-			PC->GMove();
-			PC->SetGPos(data->GetGP());
-			PC->SetScenePos(data->GetGP());
-		}
-
-		render->SetRot(PC->GetRot());
-		render->SetPos(PC->GetPos());
-
-		hud->SetGPos(PC->GetGPos());
-		hud->SetLPos(PC->GetPos());
-		hud->SetState(PC->GetStateStr());
-		radar->SetCenter(PC->GetPos());
-
-//		lock_update = false;
+		PlayerMoved();
 		return;
 	}
 
@@ -443,6 +453,4 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	wptr = gui->GetWindowN("Test One");
 	if (wptr)
 		dbg_print("'Test One' window returned %d",((CurseGUIMessageBox*)wptr)->GetButtonPressed());
-
-//	lock_update = false;
 }

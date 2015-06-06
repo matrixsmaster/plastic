@@ -48,7 +48,7 @@ private:
 	PlasticTime* plt;
 
 	///Spawn an overlay window (for internal use only).
-	void Spawn(int x, int y, int w, int h, bool logging, const char* txt);
+	void Spawn(int x, int y, int w, int h, bool logging);
 	std::string intToString(int n);
 
 	///Controls initialization
@@ -87,9 +87,6 @@ public:
 
 	///Update clock overlay
 	void UpdateClock();
-
-	///Update charge and HP overlay
-	void UpdateChargeHP();
 
 	///Set time
 	void SetPTime(PlasticTime* t);

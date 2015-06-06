@@ -82,6 +82,7 @@ private:
 	void BindKeys();
 	bool CreateActor();
 	void RemoveAllActors();
+	void PlayerMoved();
 
 public:
 	PlasticWorld(SGameSettings* settings);

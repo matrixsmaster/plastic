@@ -55,6 +55,7 @@ void CurseGUIOverlay::Update(bool refr)
 	if (logging) DrawLog();
 	else UpdateBack();
 	ctrls->Update();
+
 	pthread_mutex_unlock(&wmutex);
 
 	wcolor_set(wnd,0,NULL);

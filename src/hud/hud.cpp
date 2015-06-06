@@ -36,28 +36,28 @@ HUD::HUD(CurseGUI* guiptr)
 	/*add some overlays */
 
 	//Fps overlay
-	Spawn(0,0, 8, 1, true, "FPS=0");
+	Spawn(0,0, 8, 1, true);
 
 	//Bottom log overlay
-	Spawn(0,(h-(h/5)), (w/3), (h/5), true, "");
+	Spawn(0,(h-(h/5)), (w/3), (h/5), true);
 
 	//Status overlay on top
-	Spawn((w/5), 0, (w/5), STAT_OVRL_HEIGHT, false, "");
+	Spawn((w/5), 0, (w/5), STAT_OVRL_HEIGHT, false);
 	SetAlpha(OVRL_STATE, 0);
 
 	//Map overlay
-	Spawn((w-(w/4)), 0, (w/4), (h/4), false, "");
+	Spawn((w-(w/4)), 0, (w/4), (h/4), false);
 	SetAlpha(OVRL_MAP, 0);
 
 	//Status bar overlay
-	Spawn((w/3), (h-1), w-(w/3)-10, 1, true, "");
+	Spawn((w/3), (h-1), w-(w/3)-10, 1, true);
 	SetAlpha(OVRL_STBTM, 0);
 
 	//Time overlay
-	Spawn(0,1, 8, 3, true, "");
+	Spawn(0,1, 8, 3, true);
 
 	//Charge and HP overlay
-	Spawn((w-10),(h-2), 10, 2, false, "");
+	Spawn((w-10),(h-2), 10, 2, false);
 	SetAlpha(OVRL_CHRG_HP, 0);
 
 	InitControls();
@@ -73,13 +73,12 @@ HUD::~HUD()
 	overlays.clear();
 }
 
-void HUD::Spawn(int x, int y, int w, int h, bool logging, const char* txt)
+void HUD::Spawn(int x, int y, int w, int h, bool logging)
 {
 	CurseGUIOverlay* ptr;
 	ptr = new CurseGUIOverlay(gui,x,y, w, h, logging);
 	overlays.push_back(ptr);
 	gui->AddWindow(ptr);
-	ptr->PutString(txt);
 }
 
 void HUD::InitControls()
@@ -144,11 +143,6 @@ void HUD::SetFPS(uli fps)
 void HUD::PutStrToLog(const char* str)
 {
 	if (!overlays.empty()) PutString(OVRL_LOG, str);
-}
-
-void HUD::UpdateChargeHP()
-{
-	//TODO
 }
 
 void HUD::SetCharge(int v)

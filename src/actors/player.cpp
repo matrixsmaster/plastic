@@ -137,8 +137,8 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 
 		case PAKEY_TURN_LEFT: rot.Z += rspd; rc = true; break;
 		case PAKEY_TURN_RGHT: rot.Z -= rspd; rc = true; break;
-		case PAKEY_TURN_DW: rot.X += rspd; rc = true; break;
-		case PAKEY_TURN_UP: rot.X -= rspd; rc = true; break;
+		case PAKEY_TURN_UP: rot.X += rspd; rc = true; break;
+		case PAKEY_TURN_DW: rot.X -= rspd; rc = true; break;
 
 		case PAKEY_TOG_STATE:
 			//TODO: check conditions, apply some changes etc

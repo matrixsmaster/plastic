@@ -51,11 +51,34 @@ void PlasticRadar::SetWH(int w, int h)
 
 void PlasticRadar::Update()
 {
-	int x,y,l;
+	int sx,sy,ex,ey,x,y,l;
+	vector3di p;
+	voxel v;
+	SVoxelTab* tab = pipe->GetVoxTable();
 
-	for (l = 0, y = (-g_h/2); y < g_h/2; y++)
-		for (x = (-g_w/2); x < g_w/2; x++, l++) {
-			rad[l].sym = '1';
-			rad[l].fg.g = 1000;
+	memset(rad,0,g_l*sizeof(SGUIPixel));
+
+	sx = -g_w / 2;
+	ex = sx + g_w;
+	sy = -g_h / 2;
+	ey = sy + g_h;
+	p.Y = (sy + center.Y);// * VOXGRAIN;
+
+	for (l = 0, y = sy; y < ey; y++, p.Y+=VOXGRAIN) {
+		p.X = (sx + center.X);// * VOXGRAIN;
+		for (x = sx; x < ex; x++, p.X+=VOXGRAIN, l++) {
+			p.Z = pipe->GetElevationUnder(&p);
+			if (p.Z < 0) {
+				rad[l].sym = ' ';
+				continue;
+			}
+			v = pipe->GetVoxel(&p);
+			if ((!v) || (v >= tab->len)) {
+				rad[l].sym = ' ';
+				continue;
+			}
+			rad[l] = tab->tab[v].pix;
+			rad[l].sym = '.';
 		}
+	}
 }

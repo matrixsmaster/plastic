@@ -399,10 +399,10 @@ bool CurseGUI::PumpEvents(SGUIEvent* e)
 	bool consumed = false;
 	result = 1;
 
-	if (will_close) {
+	/*if (will_close) {
 		e->t = GUIEV_NONE; //reset event type to prevent loops
 		return true; //to not process event furthermore
-	}
+	}*/
 
 	/* Internal events */
 	if (!eventFIFO.empty()) {
