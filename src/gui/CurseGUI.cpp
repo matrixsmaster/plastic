@@ -263,6 +263,7 @@ void CurseGUI::Update(bool refr)
 void CurseGUI::SoftReset()
 {
 	/* Will look like CurseGUI was reset, but it wasn't */
+	will_close = false;
 	RmAllWindows();
 	wndmove_flag = false;
 	cmanager->Flush();

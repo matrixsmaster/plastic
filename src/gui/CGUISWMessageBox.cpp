@@ -121,7 +121,7 @@ bool CurseGUIMessageBox::PutEvent(SGUIEvent* e)
 	int i;
 
 	//consume nothing if closing
-	if (will_close) return false;
+	if (will_close || (result >= 0)) return false;
 
 	//pump event through all controls
 	if (ctrls->PutEvent(e)) return true;
@@ -135,7 +135,7 @@ bool CurseGUIMessageBox::PutEvent(SGUIEvent* e)
 	case GUIEV_RESIZE:
 		UpdateSize();
 		MoveToCenter();
-		break;
+		return false; //don't consume Resize event
 
 	case GUIEV_CTLBACK:
 		if (e->b.t != GUIFB_SWITCHED) return false;
@@ -148,7 +148,7 @@ bool CurseGUIMessageBox::PutEvent(SGUIEvent* e)
 
 	default: break;
 	}
-	return false;
+	return true; //MessageBox will consume all the events until resolved
 }
 
 int CurseGUIMessageBox::GetButtonPressed()

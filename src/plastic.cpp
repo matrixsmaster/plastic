@@ -51,8 +51,10 @@ volatile bool			g_quit = false;
 static void* plastic_eventhread(void* ptr)
 {
 	SGUIEvent my_e;
+	CurseGUIMessageBox* mbox;
+	int btn;
 
-	while ((g_gui) && (!g_gui->WillClose())) {
+	while ((g_gui) && (!g_quit)) {
 
 		/* Stop rendering any screen data while processing event */
 		pthread_mutex_lock(&m_render);
@@ -63,12 +65,29 @@ static void* plastic_eventhread(void* ptr)
 			g_wrld->ProcessEvents(&my_e);
 		}
 
+		/* Deal with Quit event (Soft Reset) */
+		if (g_gui->WillClose()) {
+			mbox = new CurseGUIMessageBox(g_gui,"Quit","Are you sure you want to quit?","YES|NO");
+			g_gui->AddWindow(mbox);
+			while (mbox && (((btn = mbox->GetButtonPressed())) < 0)) {
+				//GUI idle:
+				usleep(EVENTUSLEEP);
+				g_gui->PumpEvents(&my_e);
+				g_gui->Update(true);
+			}
+			if (btn) {
+				g_gui->SoftReset();
+				dbg_init(g_gui);
+				g_wrld->ConnectGUI(g_gui);
+			} else
+				g_quit = true;
+		}
+
 		pthread_mutex_unlock(&m_render);
 
 		/* To keep CPU load low(er) */
 		usleep(EVENTUSLEEP);
 	}
-	g_quit = true;
 
 	pthread_exit(NULL);
 }
