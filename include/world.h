@@ -38,6 +38,7 @@
 #include "keybinder.h"
 #include "pltime.h"
 #include "radar.h"
+#include "wrldgen.h"
 
 
 /* Ray-Object intersection data holding structure */
@@ -58,6 +59,7 @@ private:
 	DataPipe* data;
 	RenderPool* render;
 	CurseGUI* gui;
+	WorldGen* wgen;
 	Player* PC;
 	HUD* hud;
 	PlasticRadar* radar;
@@ -71,6 +73,7 @@ private:
 	uli fps;
 	SWRayObjIntersect cinters;
 	volatile bool lock_update;
+	SSavedGameHeader gamesave;
 
 	//holders
 	std::vector<PlasticActor*> actors;
@@ -83,6 +86,10 @@ private:
 	bool CreateActor();
 	void RemoveAllActors();
 	void PlayerMoved();
+
+	bool NewGame();
+	bool LoadGame();
+	bool SaveGame();
 
 public:
 	PlasticWorld(SGameSettings* settings);

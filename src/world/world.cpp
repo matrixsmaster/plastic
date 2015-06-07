@@ -35,10 +35,9 @@ enum {
 PlasticWorld::PlasticWorld(SGameSettings* settings)
 {
 	float alloc_gb;
-	PlasticTime* saved_time;
 
 	/* Init internal variables */
-	result = 0;
+	result = -1;
 	sets = settings;
 	data = NULL;
 	render = NULL;
@@ -61,15 +60,34 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 		result = 1;
 		return;
 	}
+
+	/* Create Player */
+	PC = new Player(sets->PCData,data);
+
+	/* Create and init the world generator */
+	if (sets->world_r < WGMINRADIUS) {
+		errout("Impossibly small world radius.\n");
+		result = 2;
+		return;
+	}
+	wgen = new WorldGen(sets->world_r,data->GetVoxTable());
+
+	/* Connect wgen to datapipe */
+	data->ConnectWorldGen(wgen);
+
+	/* Create or Load saved game data */
+	if (sets->new_game) {
+		if (!NewGame()) return;
+	} else if (!LoadGame()) {
+		result = 3;
+		return;
+	}
+
+	/* Get used RAM amount */
 	alloc_gb = (float)(data->GetAllocatedRAM()) / 1024.f / 1024.f / 1024.f;
 	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
 	printf("Chunks buffer capacity = %d * (%d ^ 3) voxels\n",HOLDCHUNKS,CHUNKBOX);
 	printf("Initially allocated memory: %llu bytes (%.3f GiB)\n",data->GetAllocatedRAM(),alloc_gb);
-
-	/* Init game time */
-	memset(&gtime,0,sizeof(gtime));
-	saved_time = data->GetSavedTime();
-	if (saved_time) gtime = *saved_time;
 
 	/* Bind keyboard */
 	BindKeys();
@@ -78,16 +96,19 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	render = new RenderPool(data);
 	render->GetSkies()->SetTime(&gtime);
 
-	/* Create Player */
-	PC = new Player(sets->PCData,data);
+	/* Everything is OK */
+	result = 0;
 }
 
 PlasticWorld::~PlasticWorld()
 {
 	//Game data
+	SaveGame();
 	if (PC) delete PC;
 	RemoveAllActors();
 	if (clkres) delete clkres;
+	data->ConnectWorldGen(NULL); //disconnect WG
+	if (wgen) delete wgen;
 
 	//UI parts
 	if (binder) delete binder;
@@ -112,13 +133,7 @@ void PlasticWorld::Quantum()
 	if (!once) {
 		once = true;
 
-		//Init central chunk with known global position
-		data->SetGP(data->GetInitialPCGPos());
-		//Move PC here
-		PC->SetGPos(data->GetGP());
-		//Now we can calculate local position
-		PC->SetPos(data->GetInitialPCLPos());
-		//And update Player, HUD etc
+		//Update Player, HUD etc
 		PlayerMoved();
 
 		//Show greeting string

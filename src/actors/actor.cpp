@@ -40,8 +40,8 @@ PlasticActor::PlasticActor(EPAClass c, EPABodyType b, DataPipe* pptr) :
 	pipe = pptr;
 	InitVars();
 
-	strcpy(attrib.name,"Auto"); //FIXME: namegen
-	attrib.female = (rand() > RAND_MAX / 3); //kekeke
+	strcpy(attrib.name,"Alice"); //FIXME: namegen
+	attrib.female = true;
 	attrib.cls = c;
 	attrib.body = b;
 

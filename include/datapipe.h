@@ -112,6 +112,7 @@ typedef std::map<vector3dulli,SDataPlacement> PlaceMap;
 class DataPipe {
 protected:
 	EDPipeStatus status;
+	SGameSettings settings;
 	char root[MAXPATHLEN];				//root path
 	ulli allocated;						//amount of allocated RAM
 	ulli rammax;						//max amount of memory allowed to be allocated
@@ -143,8 +144,6 @@ protected:
 	bool LoadIni(const std::string name);
 	void MakeChunk(unsigned l, vector3di pos);
 	bool LoadChunk(SDataPlacement* res, PChunk buf);
-	void SetNewGame();
-	bool LoadLastGame();
 
 public:
 	DataPipe(SGameSettings* sets, bool allocate = true);
@@ -170,6 +169,12 @@ public:
 
 	///Discards all chunks buffers and release memory.
 	virtual void PurgeChunks();
+
+	///Connects (or disconnects) world generator instance.
+	virtual void ConnectWorldGen(WorldGen* ptr);
+
+	///Returns currently active world generator instance.
+	virtual WorldGen* GetWorldGen()		{ return wgen; }
 
 	///Set up the global position of central chunk.
 	virtual void SetGP(vector3di pos);
@@ -224,15 +229,10 @@ public:
 	virtual void PurgeSprites();
 
 	//FIXME: comment
-	virtual const SWGCell* GetGlobalSurfaceMap()	{ return wgen->GetMap(); } //FIXME
-	virtual vector2di GetGlobalSurfaceSize()		{ return (vector2di(wgen->GetPlaneSide())); }
-
-	//FIXME: comment
-	virtual vector3di GetInitialPCGPos();
-	virtual vector3di GetInitialPCLPos();
-	virtual PlasticTime* GetSavedTime()				{ return &(svhead.gtime); }
-
-	//FIXME: comment
+	SSavedGameHeader* LoadGameHeader();
+	bool SaveGameHeader(SSavedGameHeader* hdr);
+	bool LoadStaticWorld();
+	bool SaveStaticWorld();
 };
 
 

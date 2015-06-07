@@ -20,6 +20,7 @@
 #include "CGUISpecWnd.h"
 #include "CGUIControls.h"
 #include "datapipe.h"
+#include "wrldgen.h"
 #include "support.h"
 #include "misconsts.h"
 
@@ -71,9 +72,16 @@ void CurseGUIMapViewWnd::DrawMap()
 	int x,y,l,mx,my,myi,ml,rt,rl;
 	unsigned k,u;
 	char vert[MAPVIEWRULSTR],horz[MAPVIEWRULSTR],botl[MAPVIEWBOTLINSTR];
-	const SWGCell* map = pipe->GetGlobalSurfaceMap();
-	vector2di mbs,msz = pipe->GetGlobalSurfaceSize();
 	vector3d col;
+	const SWGCell* map;
+	vector2di mbs,msz;
+	WorldGen* wg;
+
+	//gather data
+	wg = pipe->GetWorldGen();
+	if (!wg) return; //draw nothing if there's no WG
+	map = wg->GetMap();
+	msz = wg->GetPlaneSide();
 
 	//store dimensions
 	m_w = g_w - 3; //reserve space for a border and a ruler

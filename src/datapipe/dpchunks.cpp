@@ -119,7 +119,8 @@ bool DataPipe::Move(const vector3di shf)
 	if (rgp.Z == 0) {
 		//TODO: Z-thru
 	}
-	wgen->WrapCoords(&rgp);
+	if (wgen)
+		wgen->WrapCoords(&rgp);
 
 #if HOLDCHUNKS == 1
 	SetGP(rgp);
@@ -301,12 +302,18 @@ void DataPipe::MakeChunk(unsigned l, vector3di pos)
 	SDataPlacement plc;
 
 	if (!FindChunk(pos,&plc)) {
-		wgen->GenerateChunk(chunks[l],pos);
-		chstat[l] = DPCHK_READY;
-
+		if (wgen) {
+			wgen->GenerateChunk(chunks[l],pos);
+			chstat[l] = DPCHK_READY;
 #ifdef DPDEBUG
-		dbg_print("Chunk %u generated at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
+			dbg_print("Chunk %u generated at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
 #endif
+		} else {
+			chstat[l] = DPCHK_ERROR;
+#ifdef DPDEBUG
+			dbg_print("No WorldGen instance to generate chunk at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
+#endif
+		}
 
 	} else if (!LoadChunk(&plc,chunks[l])) {
 		chstat[l] = DPCHK_ERROR;

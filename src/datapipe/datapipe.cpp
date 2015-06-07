@@ -36,6 +36,7 @@ DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 
 	/* Init variables */
 	status = DPIPE_ERROR;
+	settings = *sets;
 
 	memset(root,0,MAXPATHLEN);
 	memset(chunks,0,sizeof(chunks));
@@ -56,11 +57,9 @@ DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 	if (i > 0) memcpy(root,sets->root,i);
 	else return;
 
-	/* Allocate (and load) everything */
+	/* Allocate memory */
 	if (allocate) {
 		if (!Allocator(sets)) return;
-		if (sets->new_game) SetNewGame();
-		else if (!LoadLastGame()) return;
 	}
 
 	/* OK */
@@ -71,7 +70,6 @@ DataPipe::~DataPipe()
 {
 	status = DPIPE_NOTREADY;
 
-	if (wgen) delete wgen;
 	if (voxeltab.tab) free(voxeltab.tab);
 
 	PurgeSprites();
@@ -86,7 +84,6 @@ bool DataPipe::Allocator(SGameSettings* sets)
 {
 	int i;
 	size_t sz;
-	char tmp[MAXPATHLEN];
 
 	/* Allocate voxel info table */
 	sz = DEFVOXTYPES * sizeof(SVoxelInf);
@@ -99,27 +96,11 @@ bool DataPipe::Allocator(SGameSettings* sets)
 	memset(voxeltab.tab,0,sz);
 	allocated += sz;
 
-	/* Create and init the world generator */
-	if (sets->world_r < WGMINRADIUS) {
-		errout("Impossibly small world radius.\n");
-		return false;
-	}
-	wgen = new WorldGen(sets->world_r,&voxeltab);
-	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
-
-	if ((sets->new_game) || (!wgen->LoadMap(tmp))) {
-		wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
-		wgen->SaveMap(tmp);
-	} else
-		sets->world_r = wgen->GetRadius(); //override current radius with a saved one
-	allocated += wgen->GetAllocatedRAM();
-
-	/* Load external files */
-	if (!LoadVoxTab()) {		//Voxel table
+	/* Load voxel table */
+	if (!LoadVoxTab()) {
 		errout("Invalid root path or voxel table file is corrupted.\n");
 		return false;
 	}
-	ScanFiles();				//map known chunks
 
 	/* Allocate chunks buffers memory */
 	sz = sizeof(VChunk);
@@ -371,6 +352,17 @@ const SVoxelInf* DataPipe::GetVInfo(const voxel v)
 {
 	if (v < voxeltab.len) return &(voxeltab.tab[v]);
 	else return NULL;
+}
+
+void DataPipe::ConnectWorldGen(WorldGen* ptr)
+{
+	if (ptr) {
+		wgen = ptr;
+		allocated += wgen->GetAllocatedRAM();
+	} else {
+		allocated -= wgen->GetAllocatedRAM();
+		wgen = NULL;
+	}
 }
 
 VSprite* DataPipe::LoadSprite(const char* fname)

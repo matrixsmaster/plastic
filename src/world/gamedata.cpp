@@ -17,63 +17,43 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-/* Part of DataPipe class. Game data management facilities. */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "world.h"
 #include "datapipe.h"
-#include "support.h"
-#include "vecmisc.h"
-
-#ifdef DPDEBUG
-#include "debug.h"
-#endif
 
 
-SSavedGameHeader* DataPipe::LoadGameHeader()
+bool PlasticWorld::NewGame()
 {
-	memset(&svhead,0,sizeof(svhead));
+	vector3di v;
 
-	//TODO
+	/* Init world generator */
+	wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
+	PC->SetGPos(wgen->GetPCInitPos());
+	data->SetGP(PC->GetGPos()); //init central chunk
+	v.X = CHUNKBOX / 2;
+	v.Y = v.X;
+	v.Z = data->GetElevationUnder(&v) + 1;
+	PC->SetPos(v);
 
-	return &svhead;
-}
+	/* Init game time */
+	memset(&gtime,0,sizeof(gtime));
+	gtime.year = PLTIMEINITYEAR;
 
-bool DataPipe::SaveGameHeader(SSavedGameHeader* hdr)
-{
-	if (!wgen) return false;
-
+	/* Place actors */
 	//TODO
 
 	return true;
 }
 
-bool DataPipe::LoadStaticWorld()
+bool PlasticWorld::LoadGame()
 {
-	char tmp[MAXPATHLEN];
-
-	if (!wgen) return false;
-
-	/* Load wgen map */
-	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
-	if (!wgen->LoadMap(tmp)) return false;
-
-	/* Map known chunks */
-	ScanFiles();
-
-	return true;
+	//TODO
+	return false;
 }
 
-bool DataPipe::SaveStaticWorld()
+bool PlasticWorld::SaveGame()
 {
-	char tmp[MAXPATHLEN];
-
-	/* Save wgen map */
-	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
-	wgen->SaveMap(tmp);
-
-	//TODO
+	if (!data->SaveGameHeader(&gamesave)) return false;
+	if (!data->SaveStaticWorld()) return false;
 
 	return true;
 }
