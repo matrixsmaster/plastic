@@ -26,6 +26,7 @@
 #include "CGUIOverlay.h"
 #include "vecmath.h"
 #include "pltime.h"
+#include "actor.h"
 
 #define STAT_OVRL_HEIGHT 3
 
@@ -97,11 +98,11 @@ public:
 	///Set local position
 	void SetLPos(vector3di lp); //{ st_lp = lp; }
 
-	///Set the level of charge
-	void SetCharge(int v);
+	///Set the level of charge (V out of M)
+	void SetCharge(int v, int m);
 
-	///Set the level health points
-	void SetHP(int v);
+	///Set the health points meter (V out of M)
+	void SetHP(int v, int m);
 
 	///Hide or show miscellaneous parts of the HUD.
 	void ShowMisc(bool s);

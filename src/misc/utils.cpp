@@ -136,6 +136,7 @@ opts_begin:
 		printf("Current seed = %ld\n",s->wg_seed);
 		printf("New seed value (long int, %lu bytes)> ",sizeof(s->wg_seed));
 		scanf("%ld",&(s->wg_seed));
+		s->u_seed = s->wg_seed;
 
 		//generate test world
 		puts("Generating test world...");
@@ -369,6 +370,7 @@ bool argparser(int argc, char* argv[], SGameSettings* sets)
 
 			case GAT_SEED:
 				sets->wg_seed = atol(argv[i]);
+				sets->u_seed = sets->wg_seed;
 				fsm = 0;
 				break;
 

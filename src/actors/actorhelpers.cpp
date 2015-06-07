@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "actorhelpers.h"
+#include "gameeqs.h"
 
 using namespace std;
 
@@ -90,6 +91,10 @@ bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe)
 			stat->Oppos = paclass_to_str[i].c;
 			break;
 		}
+
+	//generate quality and calculate HP
+	EQ_RAND_QUAL(stat->Qual,pipe->GetRNG());
+	EQ_HP_FROM_QUAL(stat->HP,stat->Qual);
 
 	//determine body model file name
 	//FIXME

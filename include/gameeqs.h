@@ -17,41 +17,13 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef RADAR_H_
-#define RADAR_H_
+/* This file defines equations for game mechanics */
 
-#include "voxel.h"
-#include "visual.h"
-#include "vecmath.h"
-#include "datapipe.h"
+#ifndef GAMEEQS_H_
+#define GAMEEQS_H_
 
+#define EQ_RAND_QUAL(Qual,Rng) Qual = 100 - Rng->FloatNum() * 40
 
-static const char radar_tiles[NUMVOXTYPES+1] = " ~.^%/#O@$";
+#define EQ_HP_FROM_QUAL(Hp,Qual) Hp = Qual * 20
 
-class PlasticRadar {
-private:
-	DataPipe* pipe;
-	SGUIPixel* rad;
-	int g_w,g_h,g_l;
-	vector3di center;
-	vector3di rot;
-	vector3d fov;
-
-	void Resize();
-
-public:
-	PlasticRadar(DataPipe* pipeptr);
-	virtual ~PlasticRadar();
-
-	void SetWH(int w, int h);
-	void SetFOV(const vector3d f)			{ fov = f; }
-	void SetCenter(const vector3di cpos)	{ center = cpos; }
-	void SetRotation(const vector3di crot)	{ rot = crot; }
-
-	SGUIPixel* GetImage()					{ return rad; }
-	int GetImageLen()						{ return g_l; }
-
-	void Update();
-};
-
-#endif /* RADAR_H_ */
+#endif /* GAMEEQS_H_ */

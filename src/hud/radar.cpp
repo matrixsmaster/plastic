@@ -62,23 +62,43 @@ void PlasticRadar::Update()
 	ex = sx + g_w;
 	sy = -g_h / 2;
 	ey = sy + g_h;
-	p.Y = (sy + center.Y);// * VOXGRAIN;
+	p.Y = (sy + center.Y);
+
+	//TODO: create and rotate view frustrum (pyramid)
 
 	for (l = 0, y = sy; y < ey; y++, p.Y+=VOXGRAIN) {
 		p.X = (sx + center.X);// * VOXGRAIN;
 		for (x = sx; x < ex; x++, p.X+=VOXGRAIN, l++) {
+
+			//check for player's point
+			if ((x == 0) && (y == 0)) {
+				rad[l].fg.r = 1000;
+				rad[l].fg.g = 1000;
+				rad[l].fg.b = 1000;
+				rad[l].sym = 'X';
+				continue;
+			}
+
+			//get 3d point
 			p.Z = pipe->GetElevationUnder(&p);
 			if (p.Z < 0) {
 				rad[l].sym = ' ';
 				continue;
 			}
+
+			//get voxel at this point
 			v = pipe->GetVoxel(&p);
 			if ((!v) || (v >= tab->len)) {
 				rad[l].sym = ' ';
 				continue;
 			}
-			rad[l] = tab->tab[v].pix;
-			rad[l].sym = '.';
+
+			//select representation
+			rad[l].fg = tab->tab[v].pix.fg;
+			rad[l].sym = radar_tiles[tab->tab[v].type];
+
+			//check 3D intersection with view frustrum
+			//TODO
 		}
 	}
 }

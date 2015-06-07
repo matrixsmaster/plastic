@@ -25,7 +25,7 @@
 
 
 CurseGUIActorViewWnd::CurseGUIActorViewWnd(CurseGUI* scrn, PlasticActor* actr) :
-		CurseGUIWnd(scrn,1,1,2,2)
+		CurseGUIWnd(scrn,1,1,ACTRVIEWW,4)
 {
 	type = GUIWT_OTHER;
 	name = WNDNAM_ACTVIEW;
@@ -40,13 +40,12 @@ CurseGUIActorViewWnd::CurseGUIActorViewWnd(CurseGUI* scrn, PlasticActor* actr) :
 void CurseGUIActorViewWnd::ResizeWnd()
 {
 	int w,h,x,y;
-	char buf[ACTRVIEWMINW*3];
+	char buf[ACTRVIEWW*3];
 	SPAAttrib atrs = actor->GetAttributes();
 	SPABase bs = actor->GetStats(false);
 	SPABase cr = actor->GetStats(true);
 
-	w = parent->GetWidth() / 2;
-	if (w < ACTRVIEWMINW) w = ACTRVIEWMINW;
+	w = ACTRVIEWW;
 	h = ACTPORTRAITH + 7;
 
 	//upper-right corner

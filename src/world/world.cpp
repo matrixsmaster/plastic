@@ -146,6 +146,8 @@ void PlasticWorld::Quantum()
 
 	UpdateTime();
 	radar->Update();
+	hud->SetHP(PC->GetStats(true).HP,PC->GetStats(false).HP);
+	hud->SetCharge(PC->GetStats(true).CC,PC->GetStats(false).CC);
 
 	data->WriteLock();
 	//FIXME: debug
@@ -197,9 +199,12 @@ void PlasticWorld::ConnectGUI()
 	if (hud) delete hud;
 	hud = new HUD(gui);
 	hud->SetPTime(&gtime);
+
+	//Reset radar
 	if (radar) delete radar;
 	radar = new PlasticRadar(data);
 	radar->SetWH(hud->GetMapWidth(),hud->GetMapHeight());
+	radar->SetFOV(render->GetFOV());
 	radar->Update();
 	hud->SetMap(radar->GetImage(),radar->GetImageLen());
 
@@ -326,6 +331,7 @@ void PlasticWorld::PlayerMoved()
 	hud->SetState(PC->GetStateStr());
 
 	radar->SetCenter(PC->GetPos());
+	radar->SetRotation(PC->GetRot());
 }
 
 #define SPAWNWNDMACRO(Name,Create) { \

@@ -33,6 +33,7 @@
 #include "vmodel.h"
 #include "vsprite.h"
 #include "pltime.h"
+#include "prngen.h"
 #include "plastic.h"
 
 
@@ -97,6 +98,7 @@ struct SDataPlacement {
 struct SSavedGameHeader {
 	PlasticTime gtime;
 	int plx,pgx,ply,pgy,plz,pgz;
+	long gseed;
 };
 
 //Some shortcuts for long-named types
@@ -131,6 +133,7 @@ protected:
 	vector3di GP;						//global position of central chunk
 
 	WorldGen* wgen;						//world generator instance
+	PRNGen* rngen;						//main random numbers generator instance
 	IniMap ini;							//map of known (and loaded) ini files
 	SSavedGameHeader svhead;			//save file header data
 
@@ -175,6 +178,9 @@ public:
 
 	///Returns currently active world generator instance.
 	virtual WorldGen* GetWorldGen()		{ return wgen; }
+
+	///Returns currently active RNG.
+	virtual PRNGen* GetRNG()			{ return rngen; }
 
 	///Set up the global position of central chunk.
 	virtual void SetGP(vector3di pos);
@@ -251,9 +257,6 @@ public:
 	bool Move(const vector3di shf)		{ return false; }
 
 	voxel GetVoxel(const vector3di* p);
-
-	const SWGCell* GetGlobalSurfaceMap() { return NULL; }
-	vector2di GetGlobalSurfaceSize()	{ return vector2di(); }
 };
 
 #endif /* DATAPIPE_H_ */

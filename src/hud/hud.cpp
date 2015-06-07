@@ -83,10 +83,32 @@ void HUD::Spawn(int x, int y, int w, int h, bool logging)
 
 void HUD::InitControls()
 {
-	new CurseGUIProgrBar(overlays[OVRL_CHRG_HP]->GetControls(), 0, 0, 10, 0, 100);
-	new CurseGUIProgrBar(overlays[OVRL_CHRG_HP]->GetControls(), 0, 1, 10, 0, 100);
+	CurseGUIProgrBar* tmp;
+	SGUIPixel fmt;
+
+	//Create Charge meter
+	memset(&fmt,0,sizeof(SGUIPixel));
+	fmt.fg.r = 100; fmt.fg.g = 100; fmt.fg.b = 900; //light blue (initially as foreground)
+	tmp = new CurseGUIProgrBar(overlays[OVRL_CHRG_HP]->GetControls(), 0, 0, 10, 0, 100); //charge
+	tmp->SetShowPercent(true); //show percent of charge
+	tmp->SetFormat(fmt);
+	fmt.bg = fmt.fg; //swap bg/fg
+	memset(&(fmt.fg),0,sizeof(SCTriple));
+	tmp->SetForegrFormat(fmt);
+
+	//Create health meter
+	memset(&fmt,0,sizeof(SGUIPixel));
+	fmt.fg.r = 1000; fmt.fg.g = 100; fmt.fg.b = 100; //soft red (initially as foreground)
+	tmp = new CurseGUIProgrBar(overlays[OVRL_CHRG_HP]->GetControls(), 0, 1, 10, 0, 100); //HP
+	tmp->SetFormat(fmt);
+	fmt.bg = fmt.fg; //swap bg/fg
+	memset(&(fmt.fg),0,sizeof(SCTriple));
+	tmp->SetForegrFormat(fmt);
+
+	//Create temporary control widget
 	new CurseGUILabel(overlays[OVRL_STATE]->GetControls(), 0, 0, gui->GetWidth()/5, 1, "GPos [ 0 0 0 ]");
 	new CurseGUILabel(overlays[OVRL_STATE]->GetControls(), 0, 1, gui->GetWidth()/5, 1, "LPos [ 0 0 0 ]");
+
 	//TODO add all controls
 }
 
@@ -145,26 +167,30 @@ void HUD::PutStrToLog(const char* str)
 	if (!overlays.empty()) PutString(OVRL_LOG, str);
 }
 
-void HUD::SetCharge(int v)
+void HUD::SetCharge(int v, int m)
 {
+	int tmp;
 	CurseGUIProgrBar* bar;
 
 	if(overlays.empty()) return;
 
-	bar = (CurseGUIProgrBar*)overlays[OVRL_CHRG_HP]->GetControls()->GetControl(1, GUICL_LABEL);
+	bar = (CurseGUIProgrBar*)overlays[OVRL_CHRG_HP]->GetControls()->GetControl(0, GUICL_PROGRBAR);
 	if (!bar) return;
-	bar->SetValue(v);
+	tmp = v * 100 / m;
+	bar->SetValue(tmp);
 }
 
-void HUD::SetHP(int v)
+void HUD::SetHP(int v, int m)
 {
+	int tmp;
 	CurseGUIProgrBar* bar;
 
 	if(overlays.empty()) return;
 
-	bar = (CurseGUIProgrBar*)overlays[OVRL_CHRG_HP]->GetControls()->GetControl(0, GUICL_LABEL);
+	bar = (CurseGUIProgrBar*)overlays[OVRL_CHRG_HP]->GetControls()->GetControl(1, GUICL_PROGRBAR);
 	if (!bar) return;
-	bar->SetValue(v);
+	tmp = v * 100 / m;
+	bar->SetValue(tmp);
 }
 
 void HUD::SetState(string str)

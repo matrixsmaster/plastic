@@ -57,6 +57,10 @@ DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 	if (i > 0) memcpy(root,sets->root,i);
 	else return;
 
+	/* Create PRNG */
+	rngen = new PRNGen(true);
+	if (sets->u_seed) rngen->SetSeed(sets->u_seed);
+
 	/* Allocate memory */
 	if (allocate) {
 		if (!Allocator(sets)) return;
@@ -71,6 +75,7 @@ DataPipe::~DataPipe()
 	status = DPIPE_NOTREADY;
 
 	if (voxeltab.tab) free(voxeltab.tab);
+	if (rngen) delete rngen;
 
 	PurgeSprites();
 	PurgeModels();

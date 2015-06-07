@@ -199,8 +199,8 @@ public:
 
 /* ********************************** Actor View window ********************************** */
 
-//Minimal width of Actor View window
-#define ACTRVIEWMINW 50
+//Width of Actor View window
+#define ACTRVIEWW 54
 
 class PlasticActor;
 

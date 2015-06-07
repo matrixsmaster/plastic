@@ -45,6 +45,7 @@ bool DataPipe::SaveGameHeader(SSavedGameHeader* hdr)
 	if (!wgen) return false;
 
 	//TODO
+	hdr->gseed = rngen->GetSeed();
 
 	return true;
 }
