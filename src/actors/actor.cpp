@@ -83,10 +83,6 @@ void PlasticActor::UpdateModelPos()
 	model->SetScenePos(scenter);
 	model->SetGPos(gpos);
 	model->SetRot(rot);
-//	pos = model->GetPos();
-//	gpos = model->GetGPos();
-//	rot = model->GetRot();
-//	SetRotI();
 }
 
 void PlasticActor::Move(ELMoveDir d, float step)

@@ -85,6 +85,7 @@ private:
 	void BindKeys();
 	bool CreateActor();
 	void RemoveAllActors();
+	void UpdateActorsPresence();
 	void PlayerMoved();
 
 	bool NewGame();

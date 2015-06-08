@@ -149,6 +149,8 @@ void PlasticWorld::Quantum()
 	hud->SetHP(PC->GetStats(true).HP,PC->GetStats(false).HP);
 	hud->SetCharge(PC->GetStats(true).CC,PC->GetStats(false).CC);
 
+	UpdateActorsPresence();
+
 	data->WriteLock();
 	//FIXME: debug
 	if (test->GetState() == 0)
@@ -230,6 +232,26 @@ void PlasticWorld::RemoveAllActors()
 	for (it = actors.begin(); it != actors.end(); ++it)
 		delete ((*it));
 	actors.clear();
+}
+
+void PlasticWorld::UpdateActorsPresence()
+{
+	std::vector<PlasticActor*>::iterator it;
+
+	for (it = actors.begin(); it != actors.end(); ++it) {
+		(*it)->SetScenePos(data->GetGP());
+		if ((*it)->GetModel()) {
+			if (data->IsOutOfScene((*it)->GetSPos())) {
+				(*it)->Delete();
+				dbg_logstr("Actor model removed");
+			}
+		} else {
+			if (!data->IsOutOfScene((*it)->GetSPos())) {
+				(*it)->Spawn();
+				dbg_logstr("Actor model spawned");
+			}
+		}
+	}
 }
 
 void PlasticWorld::BindKeys()

@@ -133,8 +133,11 @@ protected:
 	vector3di GP;						//global position of central chunk
 
 	WorldGen* wgen;						//world generator instance
+	long mapseed;						//world map seed value
+
 	PRNGen* rngen;						//main random numbers generator instance
 	IniMap ini;							//map of known (and loaded) ini files
+
 	SSavedGameHeader svhead;			//save file header data
 
 	VModVec objs;						//objects in scene
@@ -182,6 +185,9 @@ public:
 	///Returns currently active RNG.
 	virtual PRNGen* GetRNG()			{ return rngen; }
 
+	///Returns generated and stored map seed.
+	virtual long GetMapSeed()			{ return mapseed; }
+
 	///Set up the global position of central chunk.
 	virtual void SetGP(vector3di pos);
 
@@ -228,6 +234,9 @@ public:
 
 	///Updates all scene root positions for all loaded models.
 	virtual void UpdateModelsSceneRoot();
+
+	///Returns true if the given point is out of current scene borders.
+	virtual bool IsOutOfScene(const vector3di pnt);
 
 	//FIXME: comment
 	virtual VSprVec* GetSprites()					{ return &sprs; }

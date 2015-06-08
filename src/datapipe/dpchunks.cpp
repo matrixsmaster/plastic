@@ -127,7 +127,7 @@ bool DataPipe::Move(const vector3di shf)
 	return true;
 
 #else /* 9, 18, 27 */
-	int l,nl,x,y,nx,ny;
+	int l,nl,x,y,z,nx,ny;
 	PChunk swa;
 	EDChunkStatus swb;
 
@@ -138,7 +138,7 @@ bool DataPipe::Move(const vector3di shf)
 	}
 
 #else /* 18, 27 */
-	int z,nz;
+	int nz;
 
 #if HOLDCHUNKS == 18
 	if (shf.Z > 0) {
@@ -204,9 +204,7 @@ bool DataPipe::Move(const vector3di shf)
 				swb = chstat[l];
 				chstat[l] = chstat[nl];
 				chstat[nl] = swb;
-#if HOLDCHUNKS > 9
 			}
-#endif
 		}
 	}
 

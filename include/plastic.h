@@ -49,8 +49,7 @@ struct SGameSettings {
 	bool new_game;			//discard old data
 	uli world_r;			//world radius
 	ulli rammax;			//amount of memory that positively allowed to be used
-	long wg_seed;			//seed for world map generation (zero for random seed)
-	long u_seed;			//seed of the universe (zero for random seed)
+	long seed;				//seed of the universe (zero for random seed)
 	SPAAttrib PCData;		//player character settings
 };
 
@@ -60,11 +59,9 @@ struct SGameSettings {
 	true,											\
 	32,												\
 	(4ULL*1024*1024*1024),							\
-	110864270,										\
-	110864270,										\
+	800300,											\
 	{ "Mary", true, PCLS_INQUISITOR, PBOD_PNEUMO, },\
 }
-//24141595
 
 enum EGameArgType {
 	GAT_NOTHING,

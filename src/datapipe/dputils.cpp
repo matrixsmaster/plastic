@@ -55,3 +55,28 @@ int DataPipe::GetElevationUnder(const vector3di* p)
 	//Nothing is found. Empty column.
 	return -1;
 }
+
+bool DataPipe::IsOutOfScene(const vector3di pnt)
+{
+	int cx,cy,cz;
+
+	cx = pnt.X / CHUNKBOX - ((pnt.X < 0)? 1:0);
+	cy = pnt.Y / CHUNKBOX - ((pnt.Y < 0)? 1:0);
+	cz = pnt.Z / CHUNKBOX - ((pnt.Z < 0)? 1:0);
+
+#if HOLDCHUNKS == 1
+	return ( cx + cy + cz != 0);
+
+#elif HOLDCHUNKS == 9
+	return (	(cx < -1) || (cy < -1) || (cz < 0) ||
+				(cx >  1) || (cy >  1) || (cz > 0) );
+
+#elif HOLDCHUNKS == 18
+	return (	(cx < -1) || (cy < -1) || (cz < -1) ||
+				(cx >  1) || (cy >  1) || (cz > 0) );
+
+#elif HOLDCHUNKS == 27
+	return (	(cx < -1) || (cy < -1) || (cz < -1) ||
+				(cx >  1) || (cy >  1) || (cz >  1) );
+#endif
+}

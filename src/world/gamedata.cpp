@@ -26,7 +26,7 @@ bool PlasticWorld::NewGame()
 	vector3di v;
 
 	/* Init world generator */
-	wgen->NewMap((sets->wg_seed)? sets->wg_seed:rand());
+	wgen->NewMap(data->GetMapSeed());
 	PC->SetGPos(wgen->GetPCInitPos());
 	data->SetGP(PC->GetGPos()); //init central chunk
 	v.X = CHUNKBOX / 2;
