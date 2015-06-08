@@ -229,6 +229,9 @@ public:
 	///Updates all scene root positions for all loaded models.
 	virtual void UpdateModelsSceneRoot();
 
+	///Returns true if the given point is out of current scene borders.
+	virtual bool IsOutOfScene(const vector3di pnt);
+
 	//FIXME: comment
 	virtual VSprVec* GetSprites()					{ return &sprs; }
 	virtual VSprite* LoadSprite(const char* fname);
