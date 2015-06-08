@@ -33,14 +33,14 @@ Inventory::Inventory()
 {
 	//DEBUG:
 	InventoryObject* oj = new InventoryObject();
-	oj->SetName("First object");
-	oj->SetDesc("Just an object.");
+	oj->SetName("Scull"); // of enemy
+	oj->SetDesc("Just a bowl.");
 	oj->SetWeight(1);
 	oj->SetCondition(5);
 	oj->SetCost(15);
 	items.push_back(oj);
 	oj = new InventoryObject();
-	oj->SetName("Second object");
+	oj->SetName("Second"); // object
 	oj->SetDesc("Yet another useless piece of crap. But this piece have a long description.");
 	oj->SetWeight(12);
 	oj->SetCondition(7);
@@ -48,7 +48,70 @@ Inventory::Inventory()
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Last");
-	oj->SetDesc("The last object.");
+	oj->SetDesc("The last object. Ever.");
+	oj->SetWeight(5);
+	oj->SetCondition(99);
+	oj->SetCost(7);
+	items.push_back(oj);
+	oj = new InventoryObject();
+	oj->SetName("Shovel");
+	oj->SetDesc("It's just a shovel. It's a multifunctional instrument.");
+	oj->SetWeight(7);
+	oj->SetCondition(70);
+	oj->SetCost(1);
+	items.push_back(oj);
+	oj = new InventoryObject();
+	oj->SetName("Spoon");
+	oj->SetDesc("Slow and not very effective weapon..");
+	oj->SetWeight(0);
+	oj->SetCondition(15);
+	oj->SetCost(7);
+	items.push_back(oj);
+	oj = new InventoryObject();
+	oj->SetName("Chromatic Tuner");
+	oj->SetDesc("It's useful for tune your instrument (e.g. the chainsaw)");
+	oj->SetWeight(5);
+	oj->SetCondition(99);
+	oj->SetCost(7);
+	items.push_back(oj);
+	oj = new InventoryObject();
+	oj->SetName("Chainsaw \"Friendship\"");
+	oj->SetDesc("Musical device.");
+	oj->SetWeight(5);
+	oj->SetCondition(99);
+	oj->SetCost(7);
+	items.push_back(oj);
+	oj = new InventoryObject();
+	oj->SetName("Wheel");
+	oj->SetDesc("Circle.");
+	oj->SetWeight(5);
+	oj->SetCondition(99);
+	oj->SetCost(7);
+	items.push_back(oj);
+	oj = new InventoryObject();
+	oj->SetName("Pitchfork");
+	oj->SetDesc("Good use for lifting persons.");
+	oj->SetWeight(5);
+	oj->SetCondition(99);
+	oj->SetCost(7);
+	items.push_back(oj);
+	oj = new InventoryObject();
+	oj->SetName("Book \"How to kill everyone\"");
+	oj->SetDesc("Wish you a good reading.");
+	oj->SetWeight(5);
+	oj->SetCondition(99);
+	oj->SetCost(7);
+	items.push_back(oj);
+	oj = new InventoryObject();
+	oj->SetName("Telegraph-post");
+	oj->SetDesc("It's hard to move, probably..");
+	oj->SetWeight(5);
+	oj->SetCondition(99);
+	oj->SetCost(7);
+	items.push_back(oj);
+	oj = new InventoryObject();
+	oj->SetName("Wheel");
+	oj->SetDesc("Fuck");
 	oj->SetWeight(5);
 	oj->SetCondition(99);
 	oj->SetCost(7);
@@ -71,37 +134,8 @@ int Inventory::GetNumberItems()
 	return items.size();
 }
 
-/*
- * FIXME: that's truly horrible. I'm fucking scared to bones.
- * What is this stuff for? Are you goin' to provide access to every field
- * of an inventory object?! Why not just return the object's pointer?
- * Besides, all of the conditions are not met by signedness.
- */
-
-string Inventory::GetName(int n)
+InventoryObject* Inventory::GetInventoryObject(int n)
 {
-	if (items.size() > n) return items.at(n)->GetName();
-	return "Unknown";
-}
-
-string Inventory::GetDesc(int n)
-{
-	if (int(items.size()) > n) return items.at(n)->GetDesc();
-	return "Unknown";
-}
-
-int Inventory::GetWeight(int n)
-{
-	if (items.size() > n) return items.at(n)->GetWeight();
-	return 0;
-}
-int Inventory::GetCondition(int n)
-{
-	if (items.size() > n) return items.at(n)->GetConditions();
-	return 0;
-}
-int Inventory::GetCost(int n)
-{
-	if (items.size() > n) return items.at(n)->GetCost();
-	return 0;
+	if (items.empty()) return NULL;
+	return items.at(n);
 }

@@ -47,6 +47,7 @@ private:
 	std::vector<CurseGUIOverlay*> overlays;
 	SOVRLStats stats;
 	PlasticTime* plt;
+	std::string pcname;
 
 	///Spawn an overlay window (for internal use only).
 	void Spawn(int x, int y, int w, int h, bool logging);
@@ -93,10 +94,10 @@ public:
 	void SetPTime(PlasticTime* t);
 
 	///Set global position
-	void SetGPos(vector3di gp); //{ st_gp = gp; }
+	void SetGPos(vector3di gp);
 
 	///Set local position
-	void SetLPos(vector3di lp); //{ st_lp = lp; }
+	void SetLPos(vector3di lp);
 
 	///Set the level of charge (V out of M)
 	void SetCharge(int v, int m);
@@ -109,6 +110,10 @@ public:
 
 	///Toggle visibility of miscellaneous parts of the HUD.
 	void ToggleMisc();
+
+	///Sets the name of the player character
+	void SetPCName(const char* n);
+
 };
 
 #endif /* HUD_H_ */

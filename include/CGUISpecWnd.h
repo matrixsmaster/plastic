@@ -111,6 +111,9 @@ private:
 	int sitem; //selected item in inventory
 	int prev;
 
+	///TODO Sort inventory
+
+	void SearchObject();
 
 	void ResizeWnd();
 

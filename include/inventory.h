@@ -34,16 +34,16 @@ public:
 	InventoryObject();
 	virtual ~InventoryObject()		{}
 
-	virtual void SetName(const std::string s)			{ name = s; }
-	virtual void SetDesc(const std::string s)			{ desc = s; }
+	virtual void SetName(const std::string s)	{ name = s; }
+	virtual void SetDesc(const std::string s)	{ desc = s; }
 	virtual void SetWeight(const int s)			{ weight = s; }
 	virtual void SetCondition(const int s)		{ cond = s; }
 	virtual void SetCost(const int s)			{ cost = s; }
 
-	virtual std::string GetName()						{ return name; }
-	virtual std::string GetDesc()						{ return desc; }
+	virtual std::string GetName()				{ return name; }
+	virtual std::string GetDesc()				{ return desc; }
 	virtual int GetWeight()						{ return weight; }
-	virtual int GetConditions()					{ return cond; }
+	virtual int GetCondition()					{ return cond; }
 	virtual int GetCost()						{ return cost; }
 
 };
@@ -57,14 +57,11 @@ public:
 	Inventory();
 	virtual ~Inventory();
 
+	///Returns the number of objects contained in the inventory
 	int GetNumberItems();
 
-	std::string GetName(int n);
-	std::string GetDesc(int n);
-
-	int GetWeight(int n);
-	int GetCondition(int n);
-	int GetCost(int n);
+	///Returns an object from the inventory
+	InventoryObject * GetInventoryObject(int n);
 
 };
 

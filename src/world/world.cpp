@@ -199,6 +199,7 @@ void PlasticWorld::ConnectGUI()
 	if (hud) delete hud;
 	hud = new HUD(gui);
 	hud->SetPTime(&gtime);
+	hud->SetPCName(PC->GetAttributes().name);
 
 	//Reset radar
 	if (radar) delete radar;

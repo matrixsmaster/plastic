@@ -63,7 +63,7 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	if (ctrls) delete ctrls;
 	ctrls = new CurseGUICtrlHolder(this);
 
-	nr = invent->GetNumberItems() + 1 + 10;
+	nr = invent->GetNumberItems() + 1;
 
 	//create controls
 	table = new CurseGUITable(ctrls,x1,y1,nr,nc,wwt,ht,wt, true);
@@ -99,10 +99,10 @@ void CurseGUIInventoryWnd::FillInventoryTable()
 	for (int i = 1; i < invent->GetNumberItems()+1; ++i) {
 		sprintf(tmp, "%d", i);
 		table->SetData(string(tmp), i, 0);
-		table->SetData(invent->GetName(i-1), i, 1);
-		table->SetData(IntToString(invent->GetWeight(i-1)), i, 2);
-		table->SetData(IntToString(invent->GetCondition(i-1)), i, 3);
-		table->SetData(IntToString(invent->GetCost(i-1)), i, 4);
+		table->SetData(invent->GetInventoryObject(i-1)->GetName(), i, 1);
+		table->SetData(IntToString(invent->GetInventoryObject(i-1)->GetWeight()), i, 2);
+		table->SetData(IntToString(invent->GetInventoryObject(i-1)->GetCondition()), i, 3);
+		table->SetData(IntToString(invent->GetInventoryObject(i-1)->GetCost()), i, 4);
 	}
 }
 
@@ -124,12 +124,41 @@ void CurseGUIInventoryWnd::SetSelectedItem()
 	table->SetData(string(tmp), sitem, 0);
 
 	ShowDescription();
+
+	//FIXME
+	if (sitem > 1) table->scrollup();
+
+
 }
 
 void CurseGUIInventoryWnd::ShowDescription()
 {
-	description_lbl->SetCaption(invent->GetDesc(sitem-1));
+	description_lbl->SetCaption(invent->GetInventoryObject(sitem-1)->GetDesc());
 }
+
+void CurseGUIInventoryWnd::SearchObject()
+{
+	size_t f = 0;
+	int n = -1;
+
+	//FIXME make case_sensivity and find all items in series
+	for (int i = 0; i < invent->GetNumberItems(); ++i) {
+		f = invent->GetInventoryObject(i)->GetName().find(search_edit->GetText());
+		if (f == string::npos) {
+			continue;
+		} else {
+			n = i;
+			break;
+		}
+	}
+	if (n > -1) {
+		prev = sitem;
+		sitem = n+1;
+		SetSelectedItem();
+	}
+}
+
+
 
 bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 {
@@ -144,13 +173,11 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 		case GUI_DEFCLOSE: will_close = true; return true;
 		case '\t': ctrls->Rotate(); break;
 		case KEY_UP:
-			prev = sitem;
-			sitem--;
+			prev = sitem--;
 			SetSelectedItem();
 			return true;
 		case KEY_DOWN:
-			prev = sitem;
-			sitem++;
+			prev = sitem++;
 			SetSelectedItem();
 			return true;
 		}
@@ -160,6 +187,16 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 		ResizeWnd();
 		UpdateSize();
 		return false; //don't consume resize event!
+
+	case GUIEV_CTLBACK:
+		switch (e->b.t) {
+		case GUIFB_EDITOK:
+			SearchObject();
+			break;
+
+		default: break;
+		}
+		break;
 
 	default: break;
 	}
@@ -172,3 +209,5 @@ string CurseGUIInventoryWnd::IntToString(int v)
 	snprintf(tmp, 5, "%d", v);
 	return string(tmp);
 }
+
+

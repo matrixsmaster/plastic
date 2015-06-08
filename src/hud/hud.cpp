@@ -33,6 +33,8 @@ HUD::HUD(CurseGUI* guiptr)
 	w = gui->GetWidth();
 	h = gui->GetHeight();
 
+	pcname = "";
+
 	/*add some overlays */
 
 	//Fps overlay
@@ -195,8 +197,7 @@ void HUD::SetHP(int v, int m)
 
 void HUD::SetState(string str)
 {
-	string s = "Player: ";
-	s += str;
+	string s = pcname + str;
 	PutString(OVRL_STBTM, s);
 }
 
@@ -268,4 +269,9 @@ void HUD::ToggleMisc()
 {
 	if (!overlays.empty())
 		overlays[OVRL_STATE]->SetHidden(!overlays[OVRL_STATE]->IsHidden());
+}
+
+void HUD::SetPCName(const char* n)
+{
+	pcname = string(n) + ": ";
 }

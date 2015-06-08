@@ -275,7 +275,6 @@ private:
 	bool g_header;
 
 	int DrawCell(WINDOW* wd, int r, int c);
-	int GetRowHeight(int r);
 	int GetTableHeight();
 	int GetTableWidth();
 	int GetSumTableWidth(int c);
@@ -318,6 +317,14 @@ public:
 
 	///Delete a column from the end of the table
 	void DelColumn();
+
+	int GetRowHeight(int r);
+
+	bool IsStatic()					{ return g_header; }
+
+	void SetScrolly(int s)			{ scrolly = s; }
+
+	void scrollup()					{ scrolly++; }
 };
 
 /* ******************************************************************** */
