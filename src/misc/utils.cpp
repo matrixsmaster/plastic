@@ -34,7 +34,7 @@ void printsettings(SGameSettings* s)
 	printf("Use startup shell:\t%s\n",	BOOLSTR(s->use_shell));
 	printf("Start new game:\t\t%s\n",	BOOLSTR(s->new_game));
 	printf("World radius:\t\t%lu\n",	s->world_r);
-	printf("World seed value:\t%ld\n",	s->wg_seed);
+	printf("World seed value:\t%ld\n",	s->seed);
 	printf("Max RAM amount:\t\t%llu\n",	s->rammax);
 
 	//don't print player information
@@ -46,6 +46,7 @@ static void ishell_options(SGameSettings* s)
 	int i,in;
 	EGameArgType det;
 	char sfmt[16];
+	DataPipeDummy* dpdum;
 	WorldGen* wgen;
 	ulli sz;
 	float cov,tb,pb;
@@ -133,15 +134,15 @@ opts_begin:
 		break;
 
 	case GAT_SEED:
-		printf("Current seed = %ld\n",s->wg_seed);
-		printf("New seed value (long int, %lu bytes)> ",sizeof(s->wg_seed));
-		scanf("%ld",&(s->wg_seed));
-		s->u_seed = s->wg_seed;
+		printf("Current seed = %ld\n",s->seed);
+		printf("New seed value (long int, %lu bytes)> ",sizeof(s->seed));
+		scanf("%ld",&(s->seed));
 
 		//generate test world
 		puts("Generating test world...");
+		dpdum = new DataPipeDummy(s);
 		wgen = new WorldGen(s->world_r,NULL);
-		wgen->NewMap(s->wg_seed);
+		wgen->NewMap(dpdum->GetMapSeed());
 		printf("Cities generated: %d\n",wgen->GetNumCities());
 		printf("Factories generated: %d\n",wgen->GetNumFactories());
 
@@ -168,6 +169,7 @@ opts_begin:
 
 		//discard testing world
 		delete wgen;
+		delete dpdum;
 		break;
 	}
 
@@ -369,8 +371,7 @@ bool argparser(int argc, char* argv[], SGameSettings* sets)
 				break;
 
 			case GAT_SEED:
-				sets->wg_seed = atol(argv[i]);
-				sets->u_seed = sets->wg_seed;
+				sets->seed = atol(argv[i]);
 				fsm = 0;
 				break;
 

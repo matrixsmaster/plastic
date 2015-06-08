@@ -204,9 +204,7 @@ bool DataPipe::Move(const vector3di shf)
 				swb = chstat[l];
 				chstat[l] = chstat[nl];
 				chstat[nl] = swb;
-//#if HOLDCHUNKS > 9
 			}
-//#endif
 		}
 	}
 

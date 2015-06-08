@@ -59,7 +59,8 @@ DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 
 	/* Create PRNG */
 	rngen = new PRNGen(true);
-	if (sets->u_seed) rngen->SetSeed(sets->u_seed);
+	if (sets->seed) rngen->SetSeed(sets->seed);
+	mapseed = rngen->NextNumber(); //store map generation seed value
 
 	/* Allocate memory */
 	if (allocate) {

@@ -133,8 +133,11 @@ protected:
 	vector3di GP;						//global position of central chunk
 
 	WorldGen* wgen;						//world generator instance
+	long mapseed;						//world map seed value
+
 	PRNGen* rngen;						//main random numbers generator instance
 	IniMap ini;							//map of known (and loaded) ini files
+
 	SSavedGameHeader svhead;			//save file header data
 
 	VModVec objs;						//objects in scene
@@ -181,6 +184,9 @@ public:
 
 	///Returns currently active RNG.
 	virtual PRNGen* GetRNG()			{ return rngen; }
+
+	///Returns generated and stored map seed.
+	virtual long GetMapSeed()			{ return mapseed; }
 
 	///Set up the global position of central chunk.
 	virtual void SetGP(vector3di pos);
