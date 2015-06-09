@@ -56,7 +56,7 @@ int DataPipe::GetElevationUnder(const vector3di* p)
 	return -1;
 }
 
-bool DataPipe::IsOutOfScene(const vector3di pnt)
+bool DataPipe::IsOutOfSceneLC(const vector3di pnt)
 {
 	int cx,cy,cz;
 
@@ -78,5 +78,26 @@ bool DataPipe::IsOutOfScene(const vector3di pnt)
 #elif HOLDCHUNKS == 27
 	return (	(cx < -1) || (cy < -1) || (cz < -1) ||
 				(cx >  1) || (cy >  1) || (cz >  1) );
+#endif
+}
+
+bool DataPipe::IsOutOfSceneGC(const vector3di pnt)
+{
+	vector3di d = pnt - GP;
+
+#if HOLDCHUNKS == 1
+	return ( d.X + d.Y + d.Z != 0);
+
+#elif HOLDCHUNKS == 9
+	return (	(d.X < -1) || (d.Y < -1) || (d.Z < 0) ||
+				(d.X >  1) || (d.Y >  1) || (d.Z > 0) );
+
+#elif HOLDCHUNKS == 18
+	return (	(d.X < -1) || (d.Y < -1) || (d.Z < -1) ||
+				(d.X >  1) || (d.Y >  1) || (d.Z > 0) );
+
+#elif HOLDCHUNKS == 27
+	return (	(d.X < -1) || (d.Y < -1) || (d.Z < -1) ||
+				(d.X >  1) || (d.Y >  1) || (d.Z >  1) );
 #endif
 }

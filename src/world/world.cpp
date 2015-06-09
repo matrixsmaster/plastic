@@ -241,12 +241,12 @@ void PlasticWorld::UpdateActorsPresence()
 	for (it = actors.begin(); it != actors.end(); ++it) {
 		(*it)->SetScenePos(data->GetGP());
 		if ((*it)->GetModel()) {
-			if (data->IsOutOfScene((*it)->GetSPos())) {
+			if (data->IsOutOfSceneGC((*it)->GetGPos())) {
 				(*it)->Delete();
 				dbg_logstr("Actor model removed");
 			}
 		} else {
-			if (!data->IsOutOfScene((*it)->GetSPos())) {
+			if (!data->IsOutOfSceneGC((*it)->GetGPos())) {
 				(*it)->Spawn();
 				dbg_logstr("Actor model spawned");
 			}
