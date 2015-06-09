@@ -35,6 +35,7 @@ CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
 
 	invent = iptr;
 	sitem = prev = 1;
+	temp = 0;
 
 	ResizeWnd();
 	SetSelectedItem();
@@ -88,6 +89,10 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	new CurseGUILabel(ctrls, wt+3, y1+7, 7, 1, " Search");
 	search_edit = new CurseGUIEditBox(ctrls, wt+2, y1+8, 12, "");
 
+	new CurseGUILabel(ctrls, wt+3, y1+9, 7, 1, "Sort");
+	new CurseGUICheckBox(ctrls, wt+5, y1+10, 10, "by name");
+	new CurseGUICheckBox(ctrls, wt+5, y1+10, 10, "by weight");
+
 	FillInventoryTable();
 
 }
@@ -109,6 +114,7 @@ void CurseGUIInventoryWnd::FillInventoryTable()
 void CurseGUIInventoryWnd::SetSelectedItem()
 {
 	char tmp[5];
+	int n;
 
 	if (sitem < 1) sitem = 1;
 	else if (sitem > invent->GetNumberItems()) sitem = invent->GetNumberItems();
@@ -123,12 +129,17 @@ void CurseGUIInventoryWnd::SetSelectedItem()
 	sprintf(tmp, ">%d", sitem);
 	table->SetData(string(tmp), sitem, 0);
 
+	//show description for item from inventory
 	ShowDescription();
 
-	//FIXME
-	if (sitem > 1) table->scrollup();
-
-
+	//scrolling items
+	n = 0;
+	if (sitem == 1) table->SetScrolly(n);
+	else {
+		for (int i = 0; i < sitem; ++i)
+			n += table->GetRowHeight(i);
+		table->SetScrolly(n);
+	}
 }
 
 void CurseGUIInventoryWnd::ShowDescription()
@@ -136,26 +147,44 @@ void CurseGUIInventoryWnd::ShowDescription()
 	description_lbl->SetCaption(invent->GetInventoryObject(sitem-1)->GetDesc());
 }
 
+int CurseGUIInventoryWnd::Search(int n)
+{
+	int i;
+	string nm, pt;
+
+	pt = search_edit->GetText();
+
+	for (i = n; i < invent->GetNumberItems(); i++) {
+		nm = invent->GetInventoryObject(i)->GetName();
+		if (strcasestr(nm.c_str(),pt.c_str()))
+			return i;
+	}
+
+	return -1;
+}
+
 void CurseGUIInventoryWnd::SearchObject()
 {
-	size_t f = 0;
 	int n = -1;
 
-	//FIXME make case_sensivity and find all items in series
-	for (int i = 0; i < invent->GetNumberItems(); ++i) {
-		f = invent->GetInventoryObject(i)->GetName().find(search_edit->GetText());
-		if (f == string::npos) {
-			continue;
-		} else {
-			n = i;
-			break;
-		}
-	}
+	if (Search(temp + 1) == -1)
+		temp = -1;
+	n = Search(temp+1);
+	temp = n;
+
 	if (n > -1) {
 		prev = sitem;
 		sitem = n+1;
 		SetSelectedItem();
 	}
+}
+
+void CurseGUIInventoryWnd::Sort()
+{
+	//TODO
+	//default: by number
+	//by name
+	//by weight
 }
 
 

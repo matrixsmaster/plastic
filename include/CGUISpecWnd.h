@@ -108,15 +108,16 @@ private:
 
 	CurseGUIEditBox* search_edit;
 
-	int sitem; //selected item in inventory
+	CurseGUICheckBox* sortalph;		//Sort by alphabet.
+
+	int sitem; //selected item in inventory.
 	int prev;
+	int temp;
 
 	///TODO Sort inventory
-
-	void SearchObject();
+	void Sort();
 
 	void ResizeWnd();
-
 	void FillInventoryTable();
 
 	void SetSelectedItem();
@@ -126,6 +127,9 @@ private:
 
 	///Convert int to std::string
 	std::string IntToString(int v);
+
+	int Search(int n);
+	void SearchObject();
 
 public:
 	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);
