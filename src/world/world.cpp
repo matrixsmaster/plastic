@@ -149,7 +149,6 @@ void PlasticWorld::Quantum()
 	}
 
 	UpdateTime();
-	radar->Update();
 	hud->SetHP(PC->GetStats(true).HP,PC->GetStats(false).HP);
 	hud->SetCharge(PC->GetStats(true).CC,PC->GetStats(false).CC);
 
@@ -455,8 +454,14 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				SPAWNWNDMACRO("Message",new CurseGUIMessageBox(gui,NULL,"Some fucking long text. I don't know what to write in here, but this string SHOULD be somewhat longer than possible to contain in 50% of ncurses window. There.",NULL));
 				break;
 
-			case 'k': render->Stop(); break;
-			case 'l': render->Start(); break;
+			case 'k':
+				render->Stop();
+				gui->SetBackmasking(false);
+				break;
+			case 'l':
+				render->Start();
+				gui->SetBackmasking(true);
+				break;
 			}
 		}
 		test->SetRot(tr); //FIXME: debug only
@@ -496,6 +501,9 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 		errout("Warning: unknown event type pumped. Possibly memory corruption.\n");
 		result = 1;
 	}
+
+	/* Update radar here, to not intersect with resizing */
+	radar->Update();
 
 	//FIXME: debug
 	wptr = gui->GetWindowN("Message");

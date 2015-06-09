@@ -112,6 +112,7 @@ private:
 	bool wndmove_flag;					//window movement flag
 	int wndmove_ox,wndmove_oy;			//window movement original mouse position
 	CurseGUIWnd* wndmove_wnd;			//window movement pointer holder
+	bool usebackmask;					//backmasking usage flag
 
 	void Reorder(int by);
 
@@ -189,6 +190,12 @@ public:
 
 	///Returns the inactive (background) window border style.
 	const SGUIPixel* GetBackgrWndBorder()		{ return &backgrw; }
+
+	///Enable or disable backmasking feature.
+	void SetBackmasking(bool e);
+
+	///Returns current state of backmasking.
+	bool GetBackmasking()						{ return usebackmask; }
 };
 
 /* ********************************** GUI WINDOWS ********************************** */

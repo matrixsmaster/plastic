@@ -200,6 +200,7 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 
 	/* Deal with size */
 	backmask = NULL;
+	usebackmask = true;
 	PumpEvents(&e);
 
 	/* Set up some aux vars */
@@ -527,7 +528,7 @@ bool CurseGUI::PumpEvents(SGUIEvent* e)
 	}
 
 	/* Update the background masking */
-	if (e->t == GUIEV_RESIZE)
+	if ((e->t == GUIEV_RESIZE) && (usebackmask))
 		backmask = (char*)realloc(backmask,g_w*g_h);
 	UpdateBackmask();
 
@@ -576,6 +577,15 @@ void CurseGUI::UpdateBackmask()
 		k = (*it)->GetHeight() + (*it)->GetPosY();
 		for (i = (*it)->GetPosY(); i < k; i++)
 			memset(backmask+(i*g_w+j),1,(*it)->GetWidth());
+	}
+}
+
+void CurseGUI::SetBackmasking(bool e)
+{
+	usebackmask = e;
+	if ((!e) && (backmask)) {
+		free(backmask);
+		backmask = NULL;
 	}
 }
 
