@@ -33,14 +33,14 @@ Inventory::Inventory()
 {
 	//DEBUG:
 	InventoryObject* oj = new InventoryObject();
-	oj->SetName("Scull"); // of enemy
+	oj->SetName("Scull of enemy");
 	oj->SetDesc("Just a bowl.");
 	oj->SetWeight(1);
 	oj->SetCondition(5);
 	oj->SetCost(15);
 	items.push_back(oj);
 	oj = new InventoryObject();
-	oj->SetName("Second"); // object
+	oj->SetName("Second object");
 	oj->SetDesc("Yet another useless piece of crap. But this piece have a long description.");
 	oj->SetWeight(12);
 	oj->SetCondition(7);

@@ -63,6 +63,8 @@ public:
 	///Returns an object from the inventory
 	InventoryObject * GetInventoryObject(int n);
 
+	///Destroys an object from the inventory
+	bool DestroyObject(InventoryObject* obj);
 };
 
 #endif /* INVENTORY_H_ */
