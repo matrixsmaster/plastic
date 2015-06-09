@@ -454,6 +454,9 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			case 'b':
 				SPAWNWNDMACRO("Message",new CurseGUIMessageBox(gui,NULL,"Some fucking long text. I don't know what to write in here, but this string SHOULD be somewhat longer than possible to contain in 50% of ncurses window. There.",NULL));
 				break;
+
+			case 'k': render->Stop(); break;
+			case 'l': render->Start(); break;
 			}
 		}
 		test->SetRot(tr); //FIXME: debug only

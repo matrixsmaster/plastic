@@ -36,5 +36,7 @@ Implement objects global movement sync					| done		|
 ---------------------------------------------------------------------------------------
 Add status info and some local map to new HUD			| done		|
 ---------------------------------------------------------------------------------------
-Add render pool start/stop methods. Add pre-resize CB.	| in progr	|
+Add render pool start/stop methods.						| done		|
+---------------------------------------------------------------------------------------
+Add pre-resize callback method to deal with SIGSEGVs	| failed	|
 ---------------------------------------------------------------------------------------
