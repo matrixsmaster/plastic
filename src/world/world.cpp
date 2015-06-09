@@ -397,6 +397,10 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 	result = 0;
 
+	//Restart rendering if stopped and a letter key was pressed
+	if ((render->IsStopped()) && (e->t == GUIEV_KEYPRESS) && (isprint(e->k)))
+		StartRendering();
+
 	//Try to pass event directly to Player
 	if (PC->ProcessEvent(e)) {
 		/* Player movement */
@@ -468,8 +472,8 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				SPAWNWNDMACRO("Message",new CurseGUIMessageBox(gui,NULL,"Some fucking long text. I don't know what to write in here, but this string SHOULD be somewhat longer than possible to contain in 50% of ncurses window. There.",NULL));
 				break;
 
-			case 'k': StopRendering(); break;
-			case 'l': StartRendering(); break;
+//			case 'k': StopRendering(); break;
+//			case 'l': StartRendering(); break;
 			}
 		}
 		test->SetRot(tr); //FIXME: debug only
