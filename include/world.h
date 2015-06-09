@@ -39,6 +39,7 @@
 #include "pltime.h"
 #include "radar.h"
 #include "wrldgen.h"
+#include "society.h"
 
 
 /* Ray-Object intersection data holding structure */
@@ -74,6 +75,7 @@ private:
 	SWRayObjIntersect cinters;
 	volatile bool lock_update;
 	SSavedGameHeader gamesave;
+	PlasticSociety* society;
 
 	//holders
 	std::vector<PlasticActor*> actors;

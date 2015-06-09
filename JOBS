@@ -10,7 +10,7 @@ Create new HUD layout									|			| done
 ---------------------------------------------------------------------------------------
 Create Inventory window									|			| in progr
 ---------------------------------------------------------------------------------------
-Create ActorView window									| done		|
+Create ActorView window									| fixing	|
 ---------------------------------------------------------------------------------------
 Implement precise timer in PlasticWorld					| done		|
 ---------------------------------------------------------------------------------------
@@ -35,4 +35,6 @@ Implement projection test for an objects (& actors)		| done		|
 Implement objects global movement sync					| done		|
 ---------------------------------------------------------------------------------------
 Add status info and some local map to new HUD			| done		|
+---------------------------------------------------------------------------------------
+Add render pool start/stop methods. Add pre-resize CB.	| in progr	|
 ---------------------------------------------------------------------------------------

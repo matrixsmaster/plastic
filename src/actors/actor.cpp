@@ -106,6 +106,18 @@ void PlasticActor::Move(ELMoveDir d, float step)
 	UpdateModelPos();
 }
 
+bool PlasticActor::UseObject(InventoryObject* obj)
+{
+	//TODO
+	return false;
+}
+
+bool PlasticActor::WearObject(InventoryObject* obj)
+{
+	//TODO
+	return false;
+}
+
 bool PlasticActor::Spawn()
 {
 	model = pipe->LoadModel(attrib.model,pos,gpos);

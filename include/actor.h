@@ -61,6 +61,8 @@ public:
 	virtual void UpdateModelPos();
 
 	Inventory* GetInventory()			{ return &invent; }
+	bool UseObject(InventoryObject* obj);
+	bool WearObject(InventoryObject* obj);
 
 	SGUIPixel* GetPortrait()			{ return portrait; }
 	VModel* GetModel()					{ return model; }

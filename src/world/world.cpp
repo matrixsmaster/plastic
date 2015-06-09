@@ -64,6 +64,9 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	/* Create Player */
 	PC = new Player(sets->PCData,data);
 
+	/* Create Society */
+	society = new PlasticSociety(data);
+
 	/* Create and init the world generator */
 	if (sets->world_r < WGMINRADIUS) {
 		errout("Impossibly small world radius.\n");
@@ -104,6 +107,7 @@ PlasticWorld::~PlasticWorld()
 {
 	//Game data
 	SaveGame();
+	if (society) delete society;
 	if (PC) delete PC;
 	RemoveAllActors();
 	if (clkres) delete clkres;
