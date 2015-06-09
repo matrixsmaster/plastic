@@ -64,12 +64,13 @@ private:
 	pthread_t t_rend;				//Main thread
 	pthread_mutex_t m_rend;			//Main thread frame mutex
 	unsigned frames;				//Frame counter
+	bool stopped;					//Render pool stopped flag
 
 	void SpawnThreads();			//Rendering threads spawner
 	void KillThreads();				//Rendering threads killer
 
 public:
-	RenderPool(DataPipe* pipe);
+	RenderPool(DataPipe* pipe, bool started = true);
 	virtual ~RenderPool();
 
 	///Internal facility. Do Not Use in external code!
@@ -97,6 +98,15 @@ public:
 
 	///Returns current skies instance.
 	AtmoSky* GetSkies()				{ return skies; }
+
+	///Stops the render pool.
+	void Stop();
+
+	///Starts the render pool.
+	void Start();
+
+	///Returns current render pool state (started or stopped).
+	bool IsStopped()				{ return stopped; }
 
 	///LVR-compatible frame resizing.
 	bool Resize(int w, int h);

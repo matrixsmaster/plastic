@@ -76,18 +76,19 @@ static void* rendpool_mainthread(void* ptr)
 	pthread_exit(NULL);
 }
 
-RenderPool::RenderPool(DataPipe* pipe) :
+RenderPool::RenderPool(DataPipe* pipe, bool started) :
 		LVR(pipe)
 {
 	skies = new AtmoSky(pipe);
 	quit = false;
 	frames = 0;
+	stopped = !started;
 
 	/* Create frame mutex */
 	pthread_mutex_init(&m_rend,NULL);
 
 	/* Spawn all rendering threads */
-	SpawnThreads();
+	if (started) SpawnThreads();
 
 	/* Spawn main thread */
 	pthread_create(&t_rend,NULL,rendpool_mainthread,this);
@@ -138,6 +139,8 @@ void RenderPool::KillThreads()
 
 		/* Now just destroy LVR instance */
 		delete (pool[i].lvr);
+		pool[i].lvr = NULL;
+		pool[i].good = false;
 	}
 }
 
@@ -156,6 +159,12 @@ bool RenderPool::Quantum()
 
 	/* Lock frame mutex */
 	pthread_mutex_lock(&m_rend);
+
+	/* Dry-run: pool stopped */
+	if (stopped) {
+		pthread_mutex_unlock(&m_rend);
+		return quit;
+	}
 
 	/* Hold frame offset value */
 #ifdef LVRDOUBLEBUFFERED
@@ -236,7 +245,7 @@ void RenderPool::SetPos(vector3di p)
 	ipos = p;
 
 	for (i = 0; i < RENDERPOOLN; i++)
-		pool[i].lvr->SetPosition(ps);
+		if (pool[i].lvr) pool[i].lvr->SetPosition(ps);
 }
 
 void RenderPool::SetRot(vector3di r)
@@ -247,7 +256,7 @@ void RenderPool::SetRot(vector3di r)
 	irot = r;
 
 	for (i = 0; i < RENDERPOOLN; i++)
-		pool[i].lvr->SetEulerRotation(rt);
+		if (pool[i].lvr) pool[i].lvr->SetEulerRotation(rt);
 
 	//swap Y-Z
 	tmp = rt.Y;
@@ -266,6 +275,12 @@ SGUIPixel* RenderPool::GetRender()
 
 	/* Lock frame mutex */
 	pthread_mutex_lock(&m_rend);
+
+	/* Return empty frame if pool is stopped */
+	if (stopped) {
+		pthread_mutex_unlock(&m_rend);
+		return NULL;
+	}
 
 	/* We'll return the frame which just have been created,
 	 * so select new frame location.
@@ -291,6 +306,35 @@ SRendPoolDat* RenderPool::GetPoolDatN(int n)
 	return (&(pool[n]));
 }
 
+void RenderPool::Stop()
+{
+	if (stopped) return;
+
+	/* Stop all the threads */
+	pthread_mutex_lock(&m_rend);
+	KillThreads();
+
+	/* Set flag and move on */
+	stopped = true;
+	pthread_mutex_unlock(&m_rend);
+}
+
+void RenderPool::Start()
+{
+	if (!stopped) return;
+
+	/* Lock frame mutex and spawn rendering workers */
+	pthread_mutex_lock(&m_rend);
+	SpawnThreads();
+
+	/* Set flag and release frame */
+	stopped = false;
+	pthread_mutex_unlock(&m_rend);
+
+	/* Resize everything */
+	Resize(g_w,g_h);
+}
+
 bool RenderPool::Resize(int w, int h)
 {
 	int i,n,s;
@@ -308,8 +352,16 @@ bool RenderPool::Resize(int w, int h)
 	g_h = h;
 	rendsize = w * h;
 
-	/* Lock frame mutex and destroy all renderers (just to stop them completely) */
+	/* Lock frame mutex */
 	pthread_mutex_lock(&m_rend);
+
+	/* Early return in case of stopped pool */
+	if (stopped) {
+		pthread_mutex_unlock(&m_rend);
+		return true;
+	}
+
+	/* Destroy all renderers (just to stop them completely) */
 	KillThreads();
 
 	/* Reallocate main buffers and start renderers */
@@ -352,21 +404,21 @@ void RenderPool::SetScale(const double s)
 {
 	scale = vector3d(s);
 	for (int i = 0; i < RENDERPOOLN; i++)
-		pool[i].lvr->SetScale(s);
+		if (pool[i].lvr) pool[i].lvr->SetScale(s);
 }
 
 void RenderPool::SetFOV(const vector3d f)
 {
 	fov = f;
 	for (int i = 0; i < RENDERPOOLN; i++)
-		pool[i].lvr->SetFOV(f);
+		if (pool[i].lvr) pool[i].lvr->SetFOV(f);
 }
 
 void RenderPool::SetFarDist(const int d)
 {
 	far = d;
 	for (int i = 0; i < RENDERPOOLN; i++)
-		pool[i].lvr->SetFarDist(d);
+		if (pool[i].lvr) pool[i].lvr->SetFarDist(d);
 }
 
 void RenderPool::SetPostprocess(const SLVRPostProcess p)
@@ -377,7 +429,8 @@ void RenderPool::SetPostprocess(const SLVRPostProcess p)
 	pproc = p;
 
 	for (int i = 0; i < RENDERPOOLN; i++) {
-		pool[i].lvr->SetPostprocess(p);
+		if (pool[i].lvr)
+			pool[i].lvr->SetPostprocess(p);
 		pool[i].dopproc = ppc;
 	}
 }
