@@ -38,5 +38,5 @@ Add status info and some local map to new HUD			| done		|
 ---------------------------------------------------------------------------------------
 Add render pool start/stop methods.						| done		|
 ---------------------------------------------------------------------------------------
-Add pre-resize callback method to deal with SIGSEGVs	| failed	|
+Add pre-resize callback method to deal with SIGSEGVs	| done		|
 ---------------------------------------------------------------------------------------

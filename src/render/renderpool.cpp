@@ -103,7 +103,7 @@ RenderPool::~RenderPool()
 	pthread_join(t_rend,NULL);
 
 	/* Close all renderers */
-	KillThreads();
+	if (!stopped) KillThreads();
 
 	/* Destroy frame mutex */
 	pthread_mutex_destroy(&m_rend);
@@ -391,12 +391,14 @@ bool RenderPool::Resize(int w, int h)
 void RenderPool::SetMask(char* m, int w, int h)
 {
 	int i;
+	char* msk = m;
 
 	Lock();
-	for (i = 0; i < RENDERPOOLN; i++) {
-		if (pool[i].good) //set the mask for active renderers only
-			pool[i].lvr->SetMask(m+pool[i].start,w,pool[i].lvr->GetHeight());
-	}
+	for (i = 0; i < RENDERPOOLN; i++)
+		if (pool[i].good) {//set the mask for active renderers only
+			msk = m + pool[i].start;
+			pool[i].lvr->SetMask((m)? msk:NULL,w,pool[i].lvr->GetHeight());
+		}
 	Unlock();
 }
 

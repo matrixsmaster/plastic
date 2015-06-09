@@ -26,6 +26,7 @@
 
 #include <vector>
 #include <time.h>
+//#include <pthread.h>
 #include "vecmath.h"
 #include "CurseGUI.h"
 #include "misconsts.h"
@@ -76,6 +77,7 @@ private:
 	volatile bool lock_update;
 	SSavedGameHeader gamesave;
 	PlasticSociety* society;
+//	pthread_mutex_t wrldmtx;
 
 	//holders
 	std::vector<PlasticActor*> actors;
@@ -112,6 +114,12 @@ public:
 
 	///Generate new rendered frame and blit it to main GUI background.
 	void Frame();
+
+	///Stops all the rendering processes.
+	void StopRendering();
+
+	///Starts rendering the world.
+	void StartRendering();
 
 	///Returns result of latest operation (mainly for outsiders).
 	int GetLastResult()						{ return result; }

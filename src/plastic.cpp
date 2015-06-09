@@ -125,6 +125,13 @@ static void* plastic_chunksthread(void* ptr)
 
 /* *********************************************************** */
 
+static void plastic_preresize(void)
+{
+	g_wrld->StopRendering();
+}
+
+/* *********************************************************** */
+
 static void plastic_start()
 {
 	int r;
@@ -161,6 +168,9 @@ static void plastic_start()
 
 	/* Connect world to GUI */
 	g_wrld->ConnectGUI(g_gui);
+
+	/* Register preresize callback */
+	g_gui->SetPreResizeCallback(plastic_preresize);
 
 	/* Create mutexes */
 	pthread_mutex_init(&m_render,NULL);

@@ -149,7 +149,6 @@ void PlasticWorld::Quantum()
 	}
 
 	UpdateTime();
-	radar->Update();
 	hud->SetHP(PC->GetStats(true).HP,PC->GetStats(false).HP);
 	hud->SetCharge(PC->GetStats(true).CC,PC->GetStats(false).CC);
 
@@ -173,8 +172,22 @@ void PlasticWorld::Frame()
 
 	gtime.fr++;
 
-	hud->SetFPS(fps);
-	hud->UpdateClock();
+	if (hud) {
+		hud->SetFPS(fps);
+		hud->UpdateClock();
+	}
+}
+
+void PlasticWorld::StopRendering()
+{
+	render->Stop();
+	gui->SetBackmasking(false);
+}
+
+void PlasticWorld::StartRendering()
+{
+	render->Start();
+	gui->SetBackmasking(true);
 }
 
 void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
@@ -384,6 +397,10 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 	result = 0;
 
+	//Restart rendering if stopped and a letter key was pressed
+	if ((render->IsStopped()) && (e->t == GUIEV_KEYPRESS) && (isprint(e->k)))
+		StartRendering();
+
 	//Try to pass event directly to Player
 	if (PC->ProcessEvent(e)) {
 		/* Player movement */
@@ -455,8 +472,8 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				SPAWNWNDMACRO("Message",new CurseGUIMessageBox(gui,NULL,"Some fucking long text. I don't know what to write in here, but this string SHOULD be somewhat longer than possible to contain in 50% of ncurses window. There.",NULL));
 				break;
 
-			case 'k': render->Stop(); break;
-			case 'l': render->Start(); break;
+//			case 'k': StopRendering(); break;
+//			case 'l': StartRendering(); break;
 			}
 		}
 		test->SetRot(tr); //FIXME: debug only
@@ -496,6 +513,9 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 		errout("Warning: unknown event type pumped. Possibly memory corruption.\n");
 		result = 1;
 	}
+
+	/* Update radar here, to not intersect with resizing */
+	radar->Update();
 
 	//FIXME: debug
 	wptr = gui->GetWindowN("Message");

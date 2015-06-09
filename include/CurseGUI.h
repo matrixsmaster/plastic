@@ -81,8 +81,10 @@ public:
 	///Fills the background with the pixel provided.
 	void FillBackgroundData(const SGUIPixel p);
 
-	//TODO:write comments
+	///Enables or disables auto-allocation of background buffer.
 	bool SetAutoAlloc(bool a);
+
+	///Returns state of auto-allocation of background buffer.
 	bool GetAutoAlloc()					{ return autoalloc; }
 
 	///Returns if the window or frame is going to close.
@@ -98,6 +100,8 @@ public:
 
 class CurseGUIWnd;
 
+typedef void (* CGUIFastCallback)(void);
+
 /* Curse GUI Main class */
 class CurseGUI : public CurseGUIBase {
 private:
@@ -112,6 +116,8 @@ private:
 	bool wndmove_flag;					//window movement flag
 	int wndmove_ox,wndmove_oy;			//window movement original mouse position
 	CurseGUIWnd* wndmove_wnd;			//window movement pointer holder
+	bool usebackmask;					//backmasking usage flag
+	CGUIFastCallback preresize;			//pre-resize event callback pointer
 
 	void Reorder(int by);
 
@@ -189,6 +195,17 @@ public:
 
 	///Returns the inactive (background) window border style.
 	const SGUIPixel* GetBackgrWndBorder()		{ return &backgrw; }
+
+	///Enable or disable backmasking feature.
+	void SetBackmasking(bool e);
+
+	///Returns current state of backmasking.
+	bool GetBackmasking()						{ return usebackmask; }
+
+	///Register pre-resize event callback function.
+	///This will be executed immediately after resize event is received,
+	///before any other GUI procedures.
+	void SetPreResizeCallback(CGUIFastCallback ptr) { preresize = ptr; }
 };
 
 /* ********************************** GUI WINDOWS ********************************** */
