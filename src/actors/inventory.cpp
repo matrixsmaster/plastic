@@ -139,3 +139,18 @@ InventoryObject* Inventory::GetInventoryObject(int n)
 	if (items.empty()) return NULL;
 	return items.at(n);
 }
+
+int Compvar(const void* a, const void* b)
+{
+	InventoryObject* one = (InventoryObject*)a;
+	InventoryObject* two = (InventoryObject*)b;
+
+	if ( one->GetName() < two->GetName() ) return -1;
+	if ( one->GetName() == two->GetName() ) return 0;
+	if ( one->GetName() > two->GetName() ) return 1;
+}
+
+void Inventory::SortByName()
+{
+	qsort(&items[0], items.size(), sizeof(InventoryObject), Compvar);
+}

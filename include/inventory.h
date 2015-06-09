@@ -22,6 +22,7 @@
 
 #include <string>
 #include <vector>
+#include <stdlib.h>
 
 
 /* Basic inventory item */
@@ -65,6 +66,8 @@ public:
 
 	///Destroys an object from the inventory
 	bool DestroyObject(InventoryObject* obj);
+
+	void SortByName();
 };
 
 #endif /* INVENTORY_H_ */

@@ -108,7 +108,8 @@ private:
 
 	CurseGUIEditBox* search_edit;
 
-	CurseGUICheckBox* sortalph;		//Sort by alphabet.
+	CurseGUICheckBox* sortname;		//Sort by name
+	CurseGUICheckBox* sortwght;		//Sort by weight
 
 	int sitem; //selected item in inventory.
 	int prev;
@@ -130,6 +131,13 @@ private:
 
 	int Search(int n);
 	void SearchObject();
+
+	void CheckCbox();
+
+	///Default sorting.
+	void SortByNumber();
+
+	void SortByName();
 
 public:
 	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);

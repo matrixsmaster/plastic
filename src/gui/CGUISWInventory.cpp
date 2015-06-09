@@ -80,18 +80,18 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	new CurseGUILabel(ctrls, x1, y1+ht+1, wt, 1, "Description:");
 	description_lbl = new CurseGUILabel(ctrls, x1, y1+ht+2, wt, 5, "");
 
-	destroy_btn = new CurseGUIButton(ctrls, wt+2, y1+1, 11, "Destroy");
-	drop_btn = new CurseGUIButton(ctrls, wt+2, y1+2, 11, "Drop");
-	wear_btn = new CurseGUIButton(ctrls, wt+2, y1+3, 11, "Wear");
-	use_btn = new CurseGUIButton(ctrls, wt+2, y1+4, 11, "Use");
-	repair_btn = new CurseGUIButton(ctrls, wt+2, y1+5, 11, "Repair");
+	destroy_btn = new CurseGUIButton(ctrls, wt+3, y1+1, 11, "Destroy");
+	drop_btn = new CurseGUIButton(ctrls, wt+3, y1+2, 11, "Drop");
+	wear_btn = new CurseGUIButton(ctrls, wt+3, y1+3, 11, "Wear");
+	use_btn = new CurseGUIButton(ctrls, wt+3, y1+4, 11, "Use");
+	repair_btn = new CurseGUIButton(ctrls, wt+3, y1+5, 11, "Repair");
 
-	new CurseGUILabel(ctrls, wt+3, y1+7, 7, 1, " Search");
+	new CurseGUILabel(ctrls, wt+5, y1+7, 7, 1, "Search");
 	search_edit = new CurseGUIEditBox(ctrls, wt+2, y1+8, 12, "");
 
-	new CurseGUILabel(ctrls, wt+3, y1+9, 7, 1, "Sort");
-	new CurseGUICheckBox(ctrls, wt+5, y1+10, 10, "by name");
-	new CurseGUICheckBox(ctrls, wt+5, y1+10, 10, "by weight");
+	new CurseGUILabel(ctrls, wt+5, y1+9, 7, 1, "Sort");
+	sortname = new CurseGUICheckBox(ctrls, wt+2, y1+10, 13, "by name");
+	sortwght = new CurseGUICheckBox(ctrls, wt+2, y1+11, 13, "by weight");
 
 	FillInventoryTable();
 
@@ -179,6 +179,16 @@ void CurseGUIInventoryWnd::SearchObject()
 	}
 }
 
+void CurseGUIInventoryWnd::SortByNumber()
+{
+	//TODO
+}
+
+void CurseGUIInventoryWnd::SortByName()
+{
+//	invent->SortByName();
+}
+
 void CurseGUIInventoryWnd::Sort()
 {
 	//TODO
@@ -187,7 +197,12 @@ void CurseGUIInventoryWnd::Sort()
 	//by weight
 }
 
-
+void CurseGUIInventoryWnd::CheckCbox()
+{
+	if (sortname->IsSelected()) {
+		SortByName();
+	}
+}
 
 bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 {
@@ -223,6 +238,10 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 			SearchObject();
 			break;
 
+		case GUIFB_CHECKON:
+		case GUIFB_CHECKOFF:
+			CheckCbox();
+			break;
 		default: break;
 		}
 		break;
