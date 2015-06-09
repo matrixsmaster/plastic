@@ -172,8 +172,22 @@ void PlasticWorld::Frame()
 
 	gtime.fr++;
 
-	hud->SetFPS(fps);
-	hud->UpdateClock();
+	if (hud) {
+		hud->SetFPS(fps);
+		hud->UpdateClock();
+	}
+}
+
+void PlasticWorld::StopRendering()
+{
+	render->Stop();
+	gui->SetBackmasking(false);
+}
+
+void PlasticWorld::StartRendering()
+{
+	render->Start();
+	gui->SetBackmasking(true);
 }
 
 void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
@@ -454,14 +468,8 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				SPAWNWNDMACRO("Message",new CurseGUIMessageBox(gui,NULL,"Some fucking long text. I don't know what to write in here, but this string SHOULD be somewhat longer than possible to contain in 50% of ncurses window. There.",NULL));
 				break;
 
-			case 'k':
-				render->Stop();
-				gui->SetBackmasking(false);
-				break;
-			case 'l':
-				render->Start();
-				gui->SetBackmasking(true);
-				break;
+			case 'k': StopRendering(); break;
+			case 'l': StartRendering(); break;
 			}
 		}
 		test->SetRot(tr); //FIXME: debug only

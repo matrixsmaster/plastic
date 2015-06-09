@@ -201,6 +201,7 @@ CurseGUI::CurseGUI() : CurseGUIBase()
 	/* Deal with size */
 	backmask = NULL;
 	usebackmask = true;
+	preresize = NULL;
 	PumpEvents(&e);
 
 	/* Set up some aux vars */
@@ -417,6 +418,9 @@ bool CurseGUI::PumpEvents(SGUIEvent* e)
 		/* External events: resize event (most priority) */
 		if (UpdateSize()) {
 			e->t = GUIEV_RESIZE;
+			/* Call the callback (if registered) */
+			if (preresize != NULL) preresize();
+
 		} else {
 
 			/* Or, get the keypress event */

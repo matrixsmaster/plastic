@@ -103,7 +103,7 @@ RenderPool::~RenderPool()
 	pthread_join(t_rend,NULL);
 
 	/* Close all renderers */
-	KillThreads();
+	if (!stopped) KillThreads();
 
 	/* Destroy frame mutex */
 	pthread_mutex_destroy(&m_rend);

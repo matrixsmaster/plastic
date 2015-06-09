@@ -43,3 +43,5 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Move map tiles color information to INI
 
 -> Fix AtmoSky incorrect transient in case of slow-moving time 
+
+-> Consider adding callback functions for buttons (??)
