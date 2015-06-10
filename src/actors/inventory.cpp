@@ -140,6 +140,19 @@ InventoryObject* Inventory::GetInventoryObject(int n)
 	return items.at(n);
 }
 
+bool Inventory::DestroyObject(InventoryObject* obj)
+{
+	vector<InventoryObject*>::iterator it;
+
+	for (it = items.begin(); it != items.end(); ++it)
+		if ((*it) == obj) {
+			items.erase(it);
+			return true;
+		}
+
+	return false;
+}
+
 static int compdef(const void* a, const void* b)
 {
 	InventoryObject** one = (InventoryObject**)a;

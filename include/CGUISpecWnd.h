@@ -99,15 +99,6 @@ enum InventorySortType {
 	INV_SWEIGHT			//sorting by weight
 };
 
-enum InventoryButtons {
-	BTN_DESTROY,
-	BTN_DROP,
-	BTN_WEAR,
-	BTN_USE,
-	BTN_REAPIR,
-	BTN_SORT
-};
-
 class CurseGUIInventoryWnd : public CurseGUIWnd {
 private:
 	Inventory* invent;
@@ -127,15 +118,20 @@ private:
 	CurseGUICheckBox* sortname;		//Sort by name
 	CurseGUICheckBox* sortwght;		//Sort by weight
 
-	int sitem; //selected item in inventory.
-	int prev;
-	int temp;
+	int sitem;	//selected item in inventory.
+	int prev;	//previous selected object
+	int cso;	//current selected object
+
+	//TODO add HOME and END
 
 	InventorySortType sorttype;
 
-
-
 	void ResizeWnd();
+
+	///Fill the head of the table
+	void FillTableHeader();
+
+	///Fill the table with data
 	void FillInventoryTable();
 
 	void SetSelectedItem();
@@ -152,14 +148,20 @@ private:
 	///
 	void SearchObject();
 
-	///Checking checkBox and set sort type
-	void CheckCbox();
+	///Check checkBox and set sort type
+	void CheckCbox(CurseGUIControl* ctl);
 
-	///Cheking buttons
-	void CheckButtons();
+	///Chek buttons
+	void CheckButtons(CurseGUIControl* ctl);
 
 	///Sorting inventory
 	void Sort();
+
+	void DestroyObject();
+	void DropObjcet();
+	void WearObject();
+	void UseObject();
+	void ReairObject();
 
 public:
 	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);

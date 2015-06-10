@@ -47,6 +47,9 @@ public:
 	virtual int GetCondition()					{ return cond; }
 	virtual int GetCost()						{ return cost; }
 
+//	bool operator == (const CPoint3Di & comp) const 	{ return ((X==comp.X) && (Y==comp.Y) && (Z==comp.Z)); }
+	bool operator == (const InventoryObject & obj) const { return (name == obj.name); }
+
 };
 
 /* Storage container for all of the inventory items */
@@ -58,17 +61,22 @@ public:
 	Inventory();
 	virtual ~Inventory();
 
-	///Returns the number of objects contained in the inventory
+	///Returns the number of objects contained in the inventory.
 	int GetNumberItems();
 
-	///Returns an object from the inventory
+	///Returns an object from the inventory.
 	InventoryObject * GetInventoryObject(int n);
 
-	///Destroys an object from the inventory
+	///Destroys an object from the inventory.
 	bool DestroyObject(InventoryObject* obj);
 
+	///Default inventory sorting.
 	void SortDefault();
+
+	///Sorting inventory by name.
 	void SortByName();
+
+	///Sorting inventory by weight
 	void SortByWeight();
 };
 

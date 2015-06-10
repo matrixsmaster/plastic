@@ -92,8 +92,9 @@ void CurseGUITable::AddRow()
 
 void CurseGUITable::DelRow()
 {
-	if (!tbl.empty())
-		tbl.pop_back();
+	if (tbl.empty()) return;
+
+	tbl.pop_back();
 	g_rows--;
 }
 
@@ -108,13 +109,14 @@ void CurseGUITable::AddColumn(int width)
 
 void CurseGUITable::DelColumn()
 {
-	if (!tbl.empty())
-		for (size_t i = 0; i < tbl.size(); ++i) {
-			if (!tbl.at(i).empty())
-				tbl.at(i).pop_back();
-			if (!clw.empty())
-				clw.pop_back();
-		}
+	if (tbl.empty()) return;
+
+	for (size_t i = 0; i < tbl.size(); ++i) {
+		if (!tbl.at(i).empty())
+			tbl.at(i).pop_back();
+		if (!clw.empty())
+			clw.pop_back();
+	}
 	g_col--;
 }
 

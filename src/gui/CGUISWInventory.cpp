@@ -22,6 +22,7 @@
 #include "CGUIControls.h"
 #include "inventory.h"
 #include "misconsts.h"
+#include "debug.h"
 
 using namespace std;
 
@@ -36,9 +37,7 @@ CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
 
 	invent = iptr;
 	sitem = prev = 1;
-	temp = 0;
-
-	printf("\n[ %d || %d ]\r", scrn->GetWidth(), GetWidth());
+	cso = 0;
 
 	ResizeWnd();
 	SetSelectedItem();
@@ -50,6 +49,10 @@ void CurseGUIInventoryWnd::ResizeWnd()
 
 	int x1,y1,wt,ht,wwt,nr,nc,wb;
 	int fc,hd;
+	SGUIPixel cfmt;
+	memset(&cfmt,0,sizeof(cfmt));
+
+
 	hd = 5; //description height
 	wb = 20; //right buttons an label width
 	wwt = 6; nr = 7; nc = 5;
@@ -86,9 +89,13 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	fc = table->GetTableWidth() - wwt;
 	table->SetColumnWidth(1, wt - fc);
 
+	cfmt.fg.r = 10; cfmt.fg.g = 400; cfmt.fg.b = 10;
+	description_lbl = new CurseGUILabel(ctrls, x1, y1+ht+2, wt, 1, "Description:");
+	description_lbl->SetFormat(cfmt);
 
-	new CurseGUILabel(ctrls, x1, y1+ht+1, wt, 1, "Description:");
-	description_lbl = new CurseGUILabel(ctrls, x1, y1+ht+2, wt, hd, "");
+	cfmt.fg.r = 10; cfmt.fg.g = 700; cfmt.fg.b = 10;
+	description_lbl = new CurseGUILabel(ctrls, x1, y1+ht+3, wt, hd, "");
+	description_lbl->SetFormat(cfmt);
 
 	destr_btn = new CurseGUIButton(ctrls, wt+3, y1+1, 11, "Destroy");
 	drop_btn = new CurseGUIButton(ctrls, wt+3, y1+2, 11, "Drop");
@@ -103,20 +110,23 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	sortname = new CurseGUICheckBox(ctrls, wt+3, y1+11, 13, "by name");
 	sortwght = new CurseGUICheckBox(ctrls, wt+3, y1+12, 13, "by weight");
 
+	FillTableHeader();
 	FillInventoryTable();
 
 }
 
-void CurseGUIInventoryWnd::FillInventoryTable()
+void CurseGUIInventoryWnd::FillTableHeader()
 {
-	char tmp[5];
-
-	//fill table header
 	table->SetData("N", 0, 0);
 	table->SetData("Name", 0, 1);
 	table->SetData("Weight", 0, 2);
 	table->SetData("Cond.", 0, 3);
 	table->SetData("Cost", 0, 4);
+}
+
+void CurseGUIInventoryWnd::FillInventoryTable()
+{
+	char tmp[5];
 
 	for (int i = 1; i < invent->GetNumberItems()+1; ++i) {
 		sprintf(tmp, "%d", i);
@@ -132,16 +142,21 @@ void CurseGUIInventoryWnd::SetSelectedItem()
 {
 	char tmp[5];
 	int n;
+	SGUIPixel pxl;
 
 	if (sitem < 1) sitem = 1;
 	else if (sitem > invent->GetNumberItems()) sitem = invent->GetNumberItems();
+
+
 
 	//previous item
 	sprintf(tmp, "%d", prev);
 	table->SetData(string(tmp), prev, 0);
 
+
 	memset(&tmp, 0, 5);
 
+	pxl.fg.r = 900; pxl.fg.g = 900; pxl.fg.b = 900;
 	//highlight current item
 	sprintf(tmp, ">%d", sitem);
 	table->SetData(string(tmp), sitem, 0);
@@ -184,10 +199,10 @@ void CurseGUIInventoryWnd::SearchObject()
 {
 	int n = -1;
 
-	if (Search(temp + 1) == -1)
-		temp = -1;
-	n = Search(temp+1);
-	temp = n;
+	if (Search(cso + 1) == -1)
+		cso = -1;
+	n = Search(cso+1);
+	cso = n;
 
 	if (n > -1) {
 		prev = sitem;
@@ -196,12 +211,63 @@ void CurseGUIInventoryWnd::SearchObject()
 	}
 }
 
+void CurseGUIInventoryWnd::DestroyObject()
+{
+	InventoryObject *obj;
+	if (!invent->GetNumberItems()) return;
+
+	obj = invent->GetInventoryObject(sitem-1);
+
+	if (!invent->DestroyObject(obj)) {
+		dbg_print("Error destroy \"%s\" ", obj->GetName().c_str());
+
+		return;
+	}
+	//TODO send message to overlay
+	dbg_print("Destroy \"%s\" ", obj->GetName().c_str());
+
+	table->ClearTable();
+	table->DelRow();
+
+	//fill table and select first item
+	FillTableHeader();
+
+	if (invent->GetNumberItems() == 0)
+		description_lbl->SetCaption("You have no items.");
+
+	if(invent->GetNumberItems() > 0) {
+		FillInventoryTable();
+		SetSelectedItem();
+	}
+
+}
+
+void CurseGUIInventoryWnd::DropObjcet()
+{
+	//TODO
+}
+
+void CurseGUIInventoryWnd::WearObject()
+{
+	//TODO
+}
+
+void CurseGUIInventoryWnd::UseObject()
+{
+	//TODO
+}
+
+void CurseGUIInventoryWnd::ReairObject()
+{
+	//TODO
+}
+
 void CurseGUIInventoryWnd::Sort()
 {
 	//clear table
 	table->ClearTable();
 
-	//sorting
+	//choice sorting
 	switch(sorttype) {
 	case INV_SNAME:
 		invent->SortByName();
@@ -220,21 +286,36 @@ void CurseGUIInventoryWnd::Sort()
 	SetSelectedItem();
 }
 
-void CurseGUIInventoryWnd::CheckCbox()
+void CurseGUIInventoryWnd::CheckCbox(CurseGUIControl* ctl)
 {
-	if (sortname->GetChecked() && sortname->IsSelected()) {
-		sortwght->SetChecked(false);
+	if (ctl == sortname) {
+		if (sortwght->GetChecked())
+			sortwght->SetChecked(false);
 		sorttype = INV_SNAME;
-	} else if (sortwght->GetChecked()) {
-		sortname->SetChecked(false);
+	} else if (ctl == sortwght) {
+		if (sortname->GetChecked())
+			sortname->SetChecked(false);
 		sorttype = INV_SWEIGHT;
 	} else sorttype = INV_SDEFAULT;
 }
 
-void CurseGUIInventoryWnd::CheckButtons()
+void CurseGUIInventoryWnd::CheckButtons(CurseGUIControl* ctl)
 {
-
+	if (ctl == destr_btn) {
+		DestroyObject();
+	}  else if (ctl == drop_btn) {
+		//TODO
+	} else if (ctl == wear_btn) {
+		//TODO
+	} else if (ctl == use_btn) {
+		//TODO
+	} else if (ctl == repair_btn) {
+		//TODO
+	} else if (ctl == sort_btn) {
+		Sort();
+	}
 }
+
 
 bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 {
@@ -256,6 +337,16 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 			prev = sitem++;
 			SetSelectedItem();
 			return true;
+		case KEY_HOME:
+			prev = sitem;
+			sitem = 0;
+			SetSelectedItem();
+			break;
+		case KEY_END:
+			prev = sitem;
+			sitem = invent->GetNumberItems();
+			SetSelectedItem();
+			break;
 		}
 		return false;
 
@@ -275,24 +366,12 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 		case GUIFB_CHECKON:
 		case GUIFB_CHECKOFF:
 			//checkboxes
-			CheckCbox();
+			CheckCbox(e->b.ctl);
 			break;
 
 		case GUIFB_SWITCHED:
 			//check buttons
-			if (e->b.ctl == destr_btn) {
-				//TODO
-			}  else if (e->b.ctl == drop_btn) {
-				//TODO
-			} else if (e->b.ctl == wear_btn) {
-				//TODO
-			} else if (e->b.ctl == use_btn) {
-				//TODO
-			} else if (e->b.ctl == repair_btn) {
-				//TODO
-			} else if (e->b.ctl == sort_btn) {
-				Sort();
-			}
+			CheckButtons(e->b.ctl);
 			break;
 		default: break;
 		}

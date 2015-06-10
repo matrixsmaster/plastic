@@ -296,36 +296,42 @@ public:
 	void Update();
 	bool PutEvent(SGUIEvent* e);
 
+	///Returns header static or not.
+	bool IsStatic()								{ return g_header; }
+
+	///Returns all columns width and width of borders.
 	int GetTableWidth();
 
-	///Write data into a cell
-	void SetData(std::string data, int r, int c);
-
-	///Clear data from a cell
-	void ClearData(int r, int c);
-
-	///Set column width
-	void SetColumnWidth(int c, int w);
-
-	///Add a row to the end of the table
-	void AddRow();
-
-	///Delete a row from the end of the table
-	void DelRow();
-
-	///Add a column to the end of the table
-	void AddColumn(int width);
-
-	///Delete a column from the end of the table
-	void DelColumn();
-
+	///Returns row height.
 	int GetRowHeight(int r);
 
-	bool IsStatic()					{ return g_header; }
+	///Write data into a cell.
+	void SetData(std::string data, int r, int c);
 
-	void SetScrolly(int s)			{ scrolly = s; }
+	///Set column width.
+	void SetColumnWidth(int c, int w);
 
+	///Apply scrolling position.
+	void SetScrolly(int s)						{ scrolly = s; }
+
+	///Clear data from all table.
 	void ClearTable();
+
+	///Clear data from a cell.
+	void ClearData(int r, int c);
+
+
+	///Add a row to the end of the table.
+	void AddRow();
+
+	///Delete a row from the end of the table.
+	void DelRow();
+
+	///Add a column to the end of the table.
+	void AddColumn(int width);
+
+	///Delete a column from the end of the table.
+	void DelColumn();
 };
 
 /* ******************************************************************** */
