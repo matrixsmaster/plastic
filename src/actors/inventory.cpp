@@ -111,7 +111,7 @@ Inventory::Inventory()
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Wheel");
-	oj->SetDesc("Fuck");
+	oj->SetDesc("It's just a fucking wheel");
 	oj->SetWeight(5);
 	oj->SetCondition(99);
 	oj->SetCost(7);
@@ -140,17 +140,47 @@ InventoryObject* Inventory::GetInventoryObject(int n)
 	return items.at(n);
 }
 
-static int compvar(const void* a, const void* b)
+static int compdef(const void* a, const void* b)
 {
-	InventoryObject* one = (InventoryObject*)a;
-	InventoryObject* two = (InventoryObject*)b;
+	InventoryObject** one = (InventoryObject**)a;
+	InventoryObject** two = (InventoryObject**)b;
 
-	if ( one->GetName() < two->GetName() ) return -1;
-	if ( one->GetName() > two->GetName() ) return 1;
+	if ( ((*one)) < ((*two)) ) return -1;
+	if ( ((*one)) > ((*two)) ) return 1;
 	return 0;
+}
+
+static int compname(const void* a, const void* b)
+{
+	InventoryObject** one = (InventoryObject**)a;
+	InventoryObject** two = (InventoryObject**)b;
+
+	if ( ((*one)->GetName()) < ((*two)->GetName()) ) return -1;
+	if ( ((*one)->GetName()) > ((*two)->GetName()) ) return 1;
+	return 0;
+}
+
+static int compwght(const void* a, const void* b)
+{
+	InventoryObject** one = (InventoryObject**)a;
+	InventoryObject** two = (InventoryObject**)b;
+
+	if ( ((*one)->GetWeight()) < ((*two)->GetWeight()) ) return -1;
+	if ( ((*one)->GetWeight()) > ((*two)->GetWeight()) ) return 1;
+	return 0;
+}
+
+void Inventory::SortDefault()
+{
+	qsort(&items[0], items.size(), sizeof(InventoryObject*), compdef);
 }
 
 void Inventory::SortByName()
 {
-	qsort(&items[0], items.size(), sizeof(InventoryObject), compvar);
+	qsort(&items[0], items.size(), sizeof(InventoryObject*), compname);
+}
+
+void Inventory::SortByWeight()
+{
+	qsort(&items[0], items.size(), sizeof(InventoryObject*), compwght);
 }
