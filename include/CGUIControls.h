@@ -323,6 +323,8 @@ public:
 	bool IsStatic()					{ return g_header; }
 
 	void SetScrolly(int s)			{ scrolly = s; }
+
+	void ClearTable();
 };
 
 /* ******************************************************************** */

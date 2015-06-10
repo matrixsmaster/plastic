@@ -30,6 +30,7 @@ CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
 	CurseGUIWnd(scrn,0,0,2,2)
 {
 	type = GUIWT_OTHER;
+	sorttype = INV_SDEFAULT;
 	name = WNDNAM_INVENTORY;
 	showname = true;
 
@@ -68,11 +69,6 @@ void CurseGUIInventoryWnd::ResizeWnd()
 
 	//create controls
 	table = new CurseGUITable(ctrls,x1,y1,nr,nc,wwt,ht,wt, true);
-	table->SetData("N", 0, 0);
-	table->SetData("Name", 0, 1);
-	table->SetData("Weight", 0, 2);
-	table->SetData("Cond.", 0, 3);
-	table->SetData("Cost", 0, 4);
 	table->SetColumnWidth(0, 4);
 	table->SetColumnWidth(1, 10);
 	table->SetColumnWidth(3, 5);
@@ -87,11 +83,11 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	repair_btn = new CurseGUIButton(ctrls, wt+3, y1+5, 11, "Repair");
 
 	new CurseGUILabel(ctrls, wt+5, y1+7, 7, 1, "Search");
-	search_edit = new CurseGUIEditBox(ctrls, wt+2, y1+8, 12, "");
+	search_edit = new CurseGUIEditBox(ctrls, wt+3, y1+8, 12, "");
 
-	new CurseGUILabel(ctrls, wt+5, y1+9, 7, 1, "Sort");
-	sortname = new CurseGUICheckBox(ctrls, wt+2, y1+10, 13, "by name");
-	sortwght = new CurseGUICheckBox(ctrls, wt+2, y1+11, 13, "by weight");
+	sort_btn  = new CurseGUIButton(ctrls, wt+3, y1+10, 8, "Sort");
+	sortname = new CurseGUICheckBox(ctrls, wt+3, y1+11, 13, "by name");
+	sortwght = new CurseGUICheckBox(ctrls, wt+3, y1+12, 13, "by weight");
 
 	FillInventoryTable();
 
@@ -100,6 +96,12 @@ void CurseGUIInventoryWnd::ResizeWnd()
 void CurseGUIInventoryWnd::FillInventoryTable()
 {
 	char tmp[5];
+
+	table->SetData("N", 0, 0);
+	table->SetData("Name", 0, 1);
+	table->SetData("Weight", 0, 2);
+	table->SetData("Cond.", 0, 3);
+	table->SetData("Cost", 0, 4);
 
 	for (int i = 1; i < invent->GetNumberItems()+1; ++i) {
 		sprintf(tmp, "%d", i);
@@ -179,29 +181,44 @@ void CurseGUIInventoryWnd::SearchObject()
 	}
 }
 
-void CurseGUIInventoryWnd::SortByNumber()
-{
-	//TODO
-}
-
-void CurseGUIInventoryWnd::SortByName()
-{
-//	invent->SortByName();
-}
-
 void CurseGUIInventoryWnd::Sort()
 {
-	//TODO
-	//default: by number
-	//by name
-	//by weight
+	//clear table
+	table->ClearTable();
+
+	//sorting
+	switch(sorttype) {
+	case INV_SNAME:
+		invent->SortByName();
+		break;
+	case INV_SWEIGHT:
+		invent->SortByWeight();
+		break;
+	default:
+		invent->SortDefault();
+		break;
+	}
+
+	//fill table and select first item
+	FillInventoryTable();
+	prev = sitem = 1;
+	SetSelectedItem();
 }
 
 void CurseGUIInventoryWnd::CheckCbox()
 {
-	if (sortname->IsSelected()) {
-		SortByName();
-	}
+	if (sortname->GetChecked() && sortname->IsSelected()) {
+		sortwght->SetChecked(false);
+		sorttype = INV_SNAME;
+	} else if (sortwght->GetChecked()) {
+		sortname->SetChecked(false);
+		sorttype = INV_SWEIGHT;
+	} else sorttype = INV_SDEFAULT;
+}
+
+void CurseGUIInventoryWnd::CheckButtons()
+{
+
 }
 
 bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
@@ -235,12 +252,32 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 	case GUIEV_CTLBACK:
 		switch (e->b.t) {
 		case GUIFB_EDITOK:
+			//search edit
 			SearchObject();
 			break;
 
+
 		case GUIFB_CHECKON:
 		case GUIFB_CHECKOFF:
+			//checkboxes
 			CheckCbox();
+			break;
+
+		case GUIFB_SWITCHED:
+			//check buttons
+			if (e->b.ctl == destroy_btn) {
+				//TODO
+			}  else if (e->b.ctl == drop_btn) {
+				//TODO
+			} else if (e->b.ctl == wear_btn) {
+				//TODO
+			} else if (e->b.ctl == use_btn) {
+				//TODO
+			} else if (e->b.ctl == repair_btn) {
+				//TODO
+			} else if (e->b.ctl == sort_btn) {
+				Sort();
+			}
 			break;
 		default: break;
 		}

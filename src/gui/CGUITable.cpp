@@ -66,6 +66,14 @@ void CurseGUITable::ClearData(int r, int c)
 		tbl[r][c] = "";
 }
 
+void CurseGUITable::ClearTable()
+{
+	for (int i = 0; i < (int)tbl.size(); ++i) {
+		for (int j = 0; j < (int)tbl.at(i).size(); ++j)
+			tbl.at(i).at(j) = " ";
+	}
+}
+
 void CurseGUITable::SetColumnWidth(int c, int w)
 {
 	if ((c < 0) || (c > (int)clw.size()-1)) return;

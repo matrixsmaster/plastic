@@ -67,7 +67,9 @@ public:
 	///Destroys an object from the inventory
 	bool DestroyObject(InventoryObject* obj);
 
+	void SortDefault();
 	void SortByName();
+	void SortByWeight();
 };
 
 #endif /* INVENTORY_H_ */

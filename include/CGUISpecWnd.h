@@ -93,6 +93,21 @@ public:
 
 class Inventory;
 
+enum InventorySortType {
+	INV_SDEFAULT,		//default sorting
+	INV_SNAME,			//sorting by name
+	INV_SWEIGHT			//sorting by weight
+};
+
+enum InventoryButtons {
+	BTN_DESTROY,
+	BTN_DROP,
+	BTN_WEAR,
+	BTN_USE,
+	BTN_REAPIR,
+	BTN_SORT
+};
+
 class CurseGUIInventoryWnd : public CurseGUIWnd {
 private:
 	Inventory* invent;
@@ -108,6 +123,7 @@ private:
 
 	CurseGUIEditBox* search_edit;
 
+	CurseGUIButton* sort_btn;
 	CurseGUICheckBox* sortname;		//Sort by name
 	CurseGUICheckBox* sortwght;		//Sort by weight
 
@@ -115,8 +131,9 @@ private:
 	int prev;
 	int temp;
 
-	///TODO Sort inventory
-	void Sort();
+	InventorySortType sorttype;
+
+
 
 	void ResizeWnd();
 	void FillInventoryTable();
@@ -129,15 +146,20 @@ private:
 	///Convert int to std::string
 	std::string IntToString(int v);
 
+	///Search an object in the inventory
 	int Search(int n);
+
+	///
 	void SearchObject();
 
+	///Checking checkBox and set sort type
 	void CheckCbox();
 
-	///Default sorting.
-	void SortByNumber();
+	///Cheking buttons
+	void CheckButtons();
 
-	void SortByName();
+	///Sorting inventory
+	void Sort();
 
 public:
 	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);
