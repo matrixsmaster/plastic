@@ -109,7 +109,6 @@ PlasticWorld::~PlasticWorld()
 	SaveGame();
 	if (society) delete society;
 	if (PC) delete PC;
-	RemoveAllActors();
 	if (clkres) delete clkres;
 	data->ConnectWorldGen(NULL); //disconnect WG
 	if (wgen) delete wgen;
@@ -152,7 +151,7 @@ void PlasticWorld::Quantum()
 	hud->SetHP(PC->GetStats(true).HP,PC->GetStats(false).HP);
 	hud->SetCharge(PC->GetStats(true).CC,PC->GetStats(false).CC);
 
-	UpdateActorsPresence();
+	society->UpdateActorsPresence();
 
 	data->WriteLock();
 	//FIXME: debug
@@ -233,44 +232,6 @@ void PlasticWorld::ConnectGUI()
 	result = 0;
 }
 
-bool PlasticWorld::CreateActor()
-{
-	//FIXME: debug only
-	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,data);
-	actors.push_back(npc);
-	npc->SetPos(PC->GetPos());
-	npc->SetGPos(PC->GetGPos());
-	return (npc->Spawn());
-}
-
-void PlasticWorld::RemoveAllActors()
-{
-	std::vector<PlasticActor*>::iterator it;
-	for (it = actors.begin(); it != actors.end(); ++it)
-		delete ((*it));
-	actors.clear();
-}
-
-void PlasticWorld::UpdateActorsPresence()
-{
-	std::vector<PlasticActor*>::iterator it;
-
-	for (it = actors.begin(); it != actors.end(); ++it) {
-		(*it)->SetScenePos(data->GetGP());
-		if ((*it)->GetModel()) {
-			if (data->IsOutOfSceneGC((*it)->GetGPos())) {
-				(*it)->Delete();
-				dbg_logstr("Actor model removed");
-			}
-		} else {
-			if (!data->IsOutOfSceneGC((*it)->GetGPos())) {
-				(*it)->Spawn();
-				dbg_logstr("Actor model spawned");
-			}
-		}
-	}
-}
-
 void PlasticWorld::BindKeys()
 {
 	if (binder) delete binder;
@@ -333,23 +294,14 @@ void PlasticWorld::UpdateTime()
 
 SWRayObjIntersect* PlasticWorld::ScreenRay(const vector2di p)
 {
-	std::vector<PlasticActor*>::iterator oi;
-
 	cinters.pnt = render->GetProjection(p);
 	cinters.model = NULL;
 	cinters.actor = NULL;
 	if (cinters.pnt != vector3di(-1)) {
 		data->IntersectModel(&(cinters.pnt),&(cinters.model),true);
-		if (cinters.model) {
-			for (oi = actors.begin(); oi != actors.end(); ++oi) {
-				if ((*oi)->GetModel() == cinters.model) {
-					cinters.actor = *oi;
-					break;
-				}
-			}
-		}
+		if (cinters.model)
+			cinters.actor = society->GetActor(cinters.model);
 	}
-
 	return &cinters;
 }
 
@@ -447,7 +399,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			case '5': tr.Z -= 2; break;
 			case '6': tr.Z += 2; break;
 			case KEY_F(5):
-					if (CreateActor()) dbg_print("CA Success");
+					if (society->TestActorSpawn(PC)) dbg_print("CA Success");
 					else dbg_print("CA FAILED");
 					return;
 			case KEY_F(4):

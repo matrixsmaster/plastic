@@ -19,6 +19,7 @@
 
 #include "world.h"
 #include "datapipe.h"
+#include "debug.h"
 
 
 bool PlasticWorld::NewGame()
@@ -39,7 +40,8 @@ bool PlasticWorld::NewGame()
 	gtime.year = PLTIMEINITYEAR;
 
 	/* Place actors */
-	//TODO
+	society->CreatePopulation();
+	dbg_print("Population: %u",society->GetNumActors());
 
 	return true;
 }
