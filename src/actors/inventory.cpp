@@ -185,15 +185,18 @@ static int compwght(const void* a, const void* b)
 
 void Inventory::SortDefault()
 {
+	if (items.empty()) return;
 	qsort(&items[0], items.size(), sizeof(InventoryObject*), compdef);
 }
 
 void Inventory::SortByName()
 {
+	if (items.empty()) return;
 	qsort(&items[0], items.size(), sizeof(InventoryObject*), compname);
 }
 
 void Inventory::SortByWeight()
 {
+	if (items.empty()) return;
 	qsort(&items[0], items.size(), sizeof(InventoryObject*), compwght);
 }

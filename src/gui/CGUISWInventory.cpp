@@ -105,10 +105,13 @@ void CurseGUIInventoryWnd::ResizeWnd()
 
 	new CurseGUILabel(ctrls, wt+5, y1+7, 7, 1, "Search");
 	search_edit = new CurseGUIEditBox(ctrls, wt+3, y1+8, 12, "");
+	searchname = new CurseGUICheckBox(ctrls, wt+3, y1+9, 13, "name");
+	searchdesc = new CurseGUICheckBox(ctrls, wt+3, y1+10, 13, "descript");
 
-	sort_btn  = new CurseGUIButton(ctrls, wt+3, y1+10, 8, "Sort");
-	sortname = new CurseGUICheckBox(ctrls, wt+3, y1+11, 13, "by name");
-	sortwght = new CurseGUICheckBox(ctrls, wt+3, y1+12, 13, "by weight");
+
+	sort_btn  = new CurseGUIButton(ctrls, wt+3, y1+12, 8, "Sort");
+	sortname = new CurseGUICheckBox(ctrls, wt+3, y1+13, 13, "by name");
+	sortwght = new CurseGUICheckBox(ctrls, wt+3, y1+14, 13, "by weight");
 
 	FillTableHeader();
 	FillInventoryTable();
@@ -142,21 +145,16 @@ void CurseGUIInventoryWnd::SetSelectedItem()
 {
 	char tmp[5];
 	int n;
-	SGUIPixel pxl;
 
 	if (sitem < 1) sitem = 1;
 	else if (sitem > invent->GetNumberItems()) sitem = invent->GetNumberItems();
-
-
 
 	//previous item
 	sprintf(tmp, "%d", prev);
 	table->SetData(string(tmp), prev, 0);
 
-
 	memset(&tmp, 0, 5);
 
-	pxl.fg.r = 900; pxl.fg.g = 900; pxl.fg.b = 900;
 	//highlight current item
 	sprintf(tmp, ">%d", sitem);
 	table->SetData(string(tmp), sitem, 0);
@@ -232,13 +230,10 @@ void CurseGUIInventoryWnd::DestroyObject()
 	//fill table and select first item
 	FillTableHeader();
 
-	if (invent->GetNumberItems() == 0)
-		description_lbl->SetCaption("You have no items.");
-
 	if(invent->GetNumberItems() > 0) {
 		FillInventoryTable();
 		SetSelectedItem();
-	}
+	} else description_lbl->SetCaption("You have no items.");
 
 }
 
@@ -267,6 +262,8 @@ void CurseGUIInventoryWnd::Sort()
 	//clear table
 	table->ClearTable();
 
+	//FIXME checks
+
 	//choice sorting
 	switch(sorttype) {
 	case INV_SNAME:
@@ -281,6 +278,7 @@ void CurseGUIInventoryWnd::Sort()
 	}
 
 	//fill table and select first item
+	FillTableHeader();
 	FillInventoryTable();
 	prev = sitem = 1;
 	SetSelectedItem();

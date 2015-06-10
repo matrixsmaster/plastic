@@ -117,6 +117,8 @@ private:
 	CurseGUIButton* sort_btn;
 	CurseGUICheckBox* sortname;		//Sort by name
 	CurseGUICheckBox* sortwght;		//Sort by weight
+	CurseGUICheckBox* searchname;		//search in names
+	CurseGUICheckBox* searchdesc;		//Search in description
 
 	int sitem;	//selected item in inventory.
 	int prev;	//previous selected object

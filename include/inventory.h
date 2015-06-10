@@ -47,8 +47,8 @@ public:
 	virtual int GetCondition()					{ return cond; }
 	virtual int GetCost()						{ return cost; }
 
-//	bool operator == (const CPoint3Di & comp) const 	{ return ((X==comp.X) && (Y==comp.Y) && (Z==comp.Z)); }
-	bool operator == (const InventoryObject & obj) const { return (name == obj.name); }
+	bool operator == (const InventoryObject & obj) const { return (name == obj.name) && (desc == obj.desc) && (weight == obj.weight)
+			&& (cond == obj.cond) && (cost == obj.cost); }
 
 };
 
