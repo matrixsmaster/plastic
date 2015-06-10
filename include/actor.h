@@ -69,6 +69,8 @@ public:
 
 	SPAAttrib GetAttributes()			{ return attrib; }
 	SPABase GetStats(bool current);
+	void SetCurStats(const SPABase ns)	{ curr = ns; }
+	void ModCurStats(const SPABase ns);
 
 	void Move(ELMoveDir d, float step);
 

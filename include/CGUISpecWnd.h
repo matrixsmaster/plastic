@@ -236,8 +236,14 @@ public:
 
 /* ********************************** Actor View window ********************************** */
 
-//Width of Actor View window
+//Actor View window width
 #define ACTRVIEWW 54
+//Low attribute color
+#define ACTRVIEWLACOL { 900, 50, 50 }
+//Normal attribute color
+#define ACTRVIEWNACOL { 0, 1000, 0 }
+//High attribute color
+#define ACTRVIEWHACOL { 800, 0, 1000 }
 
 class PlasticActor;
 

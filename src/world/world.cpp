@@ -341,6 +341,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	vector3di tr = test->GetRot();
 	vector3di x;
 	char s[128];
+	SPABase stst;
 
 	result = 1;
 
@@ -424,8 +425,17 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				SPAWNWNDMACRO("Message",new CurseGUIMessageBox(gui,NULL,"Some fucking long text. I don't know what to write in here, but this string SHOULD be somewhat longer than possible to contain in 50% of ncurses window. There.",NULL));
 				break;
 
-//			case 'k': StopRendering(); break;
-//			case 'l': StartRendering(); break;
+			case 'k':
+				memset(&stst,0,sizeof(stst));
+				stst.HP = 2;
+				PC->ModCurStats(stst);
+				break;
+
+			case 'l':
+				memset(&stst,0,sizeof(stst));
+				stst.HP = -2;
+				PC->ModCurStats(stst);
+				break;
 			}
 		}
 		test->SetRot(tr); //FIXME: debug only

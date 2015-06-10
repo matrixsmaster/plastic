@@ -37,13 +37,31 @@ CurseGUIActorViewWnd::CurseGUIActorViewWnd(CurseGUI* scrn, PlasticActor* actr) :
 	ResizeWnd();
 }
 
+#define AV_ADDLABELMACRO(Name,Val,Max,Line,Shift) { \
+		snprintf(buf,sizeof(buf),"%s: %d (%d)",Name,Val,Max); \
+		lbl = new CurseGUILabel(ctrls,ACTPORTRAITW+Shift,Line,30,1,buf); \
+		if (Val < Max) { \
+			cfmt.fg = low; \
+		} else if (Val > Max) { \
+			cfmt.fg = hig; \
+		} else { \
+			cfmt.fg = nor; \
+		} \
+		lbl->SetFormat(cfmt); }
+
 void CurseGUIActorViewWnd::ResizeWnd()
 {
 	int w,h,x,y;
 	char buf[ACTRVIEWW*3];
+	CurseGUILabel* lbl;
 	SPAAttrib atrs = actor->GetAttributes();
 	SPABase bs = actor->GetStats(false);
 	SPABase cr = actor->GetStats(true);
+	SCTriple low = ACTRVIEWLACOL;
+	SCTriple nor = ACTRVIEWNACOL;
+	SCTriple hig = ACTRVIEWHACOL;
+	SGUIPixel cfmt;
+	memset(&cfmt,0,sizeof(cfmt));
 
 	w = ACTRVIEWW;
 	h = ACTPORTRAITH + 7;
@@ -74,59 +92,31 @@ void CurseGUIActorViewWnd::ResizeWnd()
 	new CurseGUILabel(ctrls,1,ACTPORTRAITH+1,ACTPORTRAITW,5,buf);
 
 	//stats (main)
-	snprintf(buf,sizeof(buf)," HP: %d (%d)",cr.HP,bs.HP);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+3,1,30,1,buf);
-
-	snprintf(buf,sizeof(buf),"Qual: %d (%d)",cr.Qual,bs.Qual);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+2,2,30,1,buf);
+	AV_ADDLABELMACRO("HP",cr.HP,bs.HP,1,4);
+	AV_ADDLABELMACRO("Qual",cr.Qual,bs.Qual,2,2);
 
 	//stats (phys)
-	snprintf(buf,sizeof(buf)," CC: %d (%d)",cr.CC,bs.CC);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+3,3,30,1,buf);
-
-	snprintf(buf,sizeof(buf),"Spd: %d (%d)",cr.Spd,bs.Spd);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+3,4,30,1,buf);
-
-	snprintf(buf,sizeof(buf),"Str: %d (%d)",cr.Str,bs.Str);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+3,5,30,1,buf);
-
-	snprintf(buf,sizeof(buf),"Eff: %d (%d)",cr.Eff,bs.Eff);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+3,6,30,1,buf);
-
-	snprintf(buf,sizeof(buf)," RS: %d (%d)",cr.RS,bs.RS);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+3,7,30,1,buf);
-
-	snprintf(buf,sizeof(buf),"Acc: %d (%d)",cr.Acc,bs.Acc);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+3,8,30,1,buf);
+	AV_ADDLABELMACRO("CC",cr.CC,bs.CC,3,4);
+	AV_ADDLABELMACRO("Spd",cr.Spd,bs.Spd,4,3);
+	AV_ADDLABELMACRO("Str",cr.Str,bs.Str,5,3);
+	AV_ADDLABELMACRO("Eff",cr.Eff,bs.Eff,6,3);
+	AV_ADDLABELMACRO("RS",cr.RS,bs.RS,7,4);
+	AV_ADDLABELMACRO("Acc",cr.Acc,bs.Acc,8,3);
 
 	//stats (brain)
-	snprintf(buf,sizeof(buf),"Eng: %d (%d)",cr.Eng,bs.Eng);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+3,10,30,1,buf);
-
-	snprintf(buf,sizeof(buf),"Spch: %d (%d)",cr.Spch,bs.Spch);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+2,11,30,1,buf);
-
-	snprintf(buf,sizeof(buf),"Brv: %d (%d)",cr.Brv,bs.Brv);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+3,12,30,1,buf);
-
+	AV_ADDLABELMACRO("Eng",cr.Eng,bs.Eng,10,3);
+	AV_ADDLABELMACRO("Spch",cr.Spch,bs.Spch,11,2);
+	AV_ADDLABELMACRO("Brv",cr.Brv,bs.Brv,12,3);
 	if (atrs.female)
-		snprintf(buf,sizeof(buf),"Bety: %d (%d)",cr.Chr,bs.Chr);
+		AV_ADDLABELMACRO("Bety",cr.Chr,bs.Chr,13,2)
 	else
-		snprintf(buf,sizeof(buf),"Char: %d (%d)",cr.Chr,bs.Chr);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+2,13,30,1,buf);
-
-	snprintf(buf,sizeof(buf),"Trd: %d (%d)",cr.Trd,bs.Trd);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+3,14,30,1,buf);
+		AV_ADDLABELMACRO("Char",cr.Chr,bs.Chr,13,2)
+	AV_ADDLABELMACRO("Trd",cr.Trd,bs.Trd,14,3);
 
 	//stats (battle)
-	snprintf(buf,sizeof(buf),"AP: %d (%d)",cr.AP,bs.AP);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+4,16,30,1,buf);
-
-	snprintf(buf,sizeof(buf),"DT: %d (%d)",cr.DT,bs.DT);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+4,17,30,1,buf);
-
-	snprintf(buf,sizeof(buf),"DM: %d (%d)",cr.DM,bs.DM);
-	new CurseGUILabel(ctrls,ACTPORTRAITW+4,18,30,1,buf);
+	AV_ADDLABELMACRO("AP",cr.AP,bs.AP,16,4);
+	AV_ADDLABELMACRO("DT",cr.DT,bs.DT,17,4);
+	AV_ADDLABELMACRO("DM",cr.DM,bs.DM,18,4);
 }
 
 bool CurseGUIActorViewWnd::PutEvent(SGUIEvent* e)

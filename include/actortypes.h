@@ -79,6 +79,8 @@ struct SPABase {
 	int DM;				//Damage multiplier (%)
 };
 
+#define ACTORATTRIBMAX 5000
+
 //Actor's attributes
 struct SPAAttrib {
 	char name[MAXACTNAMELEN];	//Actor's name

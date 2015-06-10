@@ -73,7 +73,9 @@ struct SGUIEvent { /* Use one-char names to make it simpler, keep this structure
 
 #define GUI_DEFCLOSE KEY_F(10)
 
+///Shortcut to act for both press and release of the left mouse button.
 #define GUIMOUS_LEFT (BUTTON1_PRESSED | BUTTON1_RELEASED)
+///Shortcut to act for both press and release of the right mouse button.
 #define GUIMOUS_RGHT (BUTTON3_PRESSED | BUTTON3_RELEASED)
 
 #define GUISCRL_UP BUTTON4_PRESSED
