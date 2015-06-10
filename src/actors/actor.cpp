@@ -76,6 +76,31 @@ void PlasticActor::AutoInitStats()
 	pipe->PurgeSprites();
 }
 
+#define PA_MODSTATMACRO(Stat) \
+		if (ns.Stat) curr.Stat += ns.Stat; \
+		if (curr.Stat < 0) curr.Stat = 0; \
+		if (curr.Stat > ACTORATTRIBMAX) curr.Stat = ACTORATTRIBMAX;
+
+void PlasticActor::ModCurStats(const SPABase ns)
+{
+	PA_MODSTATMACRO(HP);
+	PA_MODSTATMACRO(Qual);
+	PA_MODSTATMACRO(CC);
+	PA_MODSTATMACRO(Spd);
+	PA_MODSTATMACRO(Str);
+	PA_MODSTATMACRO(Eff);
+	PA_MODSTATMACRO(RS);
+	PA_MODSTATMACRO(Acc);
+	PA_MODSTATMACRO(Eng);
+	PA_MODSTATMACRO(Spch);
+	PA_MODSTATMACRO(Brv);
+	PA_MODSTATMACRO(Chr);
+	PA_MODSTATMACRO(Trd);
+	PA_MODSTATMACRO(AP);
+	PA_MODSTATMACRO(DT);
+	PA_MODSTATMACRO(DM);
+}
+
 void PlasticActor::UpdateModelPos()
 {
 	if (!model) return;
