@@ -276,7 +276,6 @@ private:
 
 	int DrawCell(WINDOW* wd, int r, int c);
 	int GetTableHeight();
-	int GetTableWidth();
 	int GetSumTableWidth(int c);
 
 public:
@@ -287,8 +286,8 @@ public:
 	 * rows	  - quantity of rows
 	 * col    - quantity of columns
 	 * wcell  - cell width
-	 * htable - visible width of the table
-	 * wtable - visible height of the table
+	 * htable - visible height of the table
+	 * wtable - visible width of the table
 	 * header - if true header in table is static
 	 */
 	CurseGUITable(CurseGUICtrlHolder* p, int x, int y, int rows, int col, int wcell, int htable, int wtable, bool header);
@@ -296,6 +295,8 @@ public:
 
 	void Update();
 	bool PutEvent(SGUIEvent* e);
+
+	int GetTableWidth();
 
 	///Write data into a cell
 	void SetData(std::string data, int r, int c);

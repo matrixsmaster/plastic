@@ -38,6 +38,8 @@ CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
 	sitem = prev = 1;
 	temp = 0;
 
+	printf("\n[ %d || %d ]\r", scrn->GetWidth(), GetWidth());
+
 	ResizeWnd();
 	SetSelectedItem();
 }
@@ -46,13 +48,21 @@ void CurseGUIInventoryWnd::ResizeWnd()
 {
 	int w,h,x,y;
 
-	int x1,y1,wt,ht,wwt,nr,nc;
+	int x1,y1,wt,ht,wwt,nr,nc,wb;
+	int fc,hd;
+	hd = 5; //description height
+	wb = 20; //right buttons an label width
 	wwt = 6; nr = 7; nc = 5;
 	x1 = 1; y1 = 1;
-	ht = 15; wt = wwt * nc + nc + 1;
+	ht = 15;
 
 	w = INVENTSIZEX * parent->GetWidth() / 100;
 	h = INVENTSIZEY * parent->GetHeight() / 100;
+
+	//visible width of table
+	wt = w - wb;
+	//visible height of table
+	ht = h - hd - 5;
 
 	//lower-right corner
 	x = parent->GetWidth() - w;
@@ -65,18 +75,22 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	if (ctrls) delete ctrls;
 	ctrls = new CurseGUICtrlHolder(this);
 
+	//set the number of rows
 	nr = invent->GetNumberItems() + 1;
 
-	//create controls
+	//create table
 	table = new CurseGUITable(ctrls,x1,y1,nr,nc,wwt,ht,wt, true);
 	table->SetColumnWidth(0, 4);
-	table->SetColumnWidth(1, 10);
 	table->SetColumnWidth(3, 5);
 
-	new CurseGUILabel(ctrls, x1, y1+ht+1, wt, 1, "Description:");
-	description_lbl = new CurseGUILabel(ctrls, x1, y1+ht+2, wt, 5, "");
+	fc = table->GetTableWidth() - wwt;
+	table->SetColumnWidth(1, wt - fc);
 
-	destroy_btn = new CurseGUIButton(ctrls, wt+3, y1+1, 11, "Destroy");
+
+	new CurseGUILabel(ctrls, x1, y1+ht+1, wt, 1, "Description:");
+	description_lbl = new CurseGUILabel(ctrls, x1, y1+ht+2, wt, hd, "");
+
+	destr_btn = new CurseGUIButton(ctrls, wt+3, y1+1, 11, "Destroy");
 	drop_btn = new CurseGUIButton(ctrls, wt+3, y1+2, 11, "Drop");
 	wear_btn = new CurseGUIButton(ctrls, wt+3, y1+3, 11, "Wear");
 	use_btn = new CurseGUIButton(ctrls, wt+3, y1+4, 11, "Use");
@@ -97,6 +111,7 @@ void CurseGUIInventoryWnd::FillInventoryTable()
 {
 	char tmp[5];
 
+	//fill table header
 	table->SetData("N", 0, 0);
 	table->SetData("Name", 0, 1);
 	table->SetData("Weight", 0, 2);
@@ -265,7 +280,7 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 
 		case GUIFB_SWITCHED:
 			//check buttons
-			if (e->b.ctl == destroy_btn) {
+			if (e->b.ctl == destr_btn) {
 				//TODO
 			}  else if (e->b.ctl == drop_btn) {
 				//TODO

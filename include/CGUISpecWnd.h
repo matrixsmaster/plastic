@@ -115,7 +115,7 @@ private:
 	CurseGUILabel* description_lbl;
 	CurseGUIProgrBar* prgr_bar;
 
-	CurseGUIButton* destroy_btn;
+	CurseGUIButton* destr_btn;
 	CurseGUIButton* drop_btn;
 	CurseGUIButton* wear_btn;
 	CurseGUIButton* use_btn;
