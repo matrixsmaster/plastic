@@ -79,16 +79,11 @@ private:
 	PlasticSociety* society;
 //	pthread_mutex_t wrldmtx;
 
-	//holders
-	std::vector<PlasticActor*> actors;
-
 	//FIXME: DEBUG
 	VModel* test;
 
 	//internal facilities
 	void BindKeys();
-	bool CreateActor();
-	void RemoveAllActors();
 	void UpdateActorsPresence();
 	void PlayerMoved();
 

@@ -18,9 +18,77 @@
  */
 
 #include "society.h"
+#include "debug.h"
 
 
 PlasticSociety::PlasticSociety(DataPipe* data)
 {
 	pipe = data;
+}
+
+PlasticSociety::~PlasticSociety()
+{
+	RemoveAllActors();
+}
+
+//FIXME: debug only
+bool PlasticSociety::TestActorSpawn(PlasticActor* PC)
+{
+	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,pipe);
+	actors.push_back(npc);
+	npc->SetPos(PC->GetPos());
+	npc->SetGPos(PC->GetGPos());
+	npc->SetRot(PC->GetRot());
+	return (npc->Spawn());
+}
+
+void PlasticSociety::RemoveAllActors()
+{
+	std::vector<PlasticActor*>::iterator it;
+	for (it = actors.begin(); it != actors.end(); ++it)
+		delete ((*it));
+	actors.clear();
+}
+
+void PlasticSociety::UpdateActorsPresence()
+{
+	std::vector<PlasticActor*>::iterator it;
+
+	for (it = actors.begin(); it != actors.end(); ++it) {
+		(*it)->SetScenePos(pipe->GetGP());
+		if ((*it)->GetModel()) {
+			if (pipe->IsOutOfSceneGC((*it)->GetGPos())) {
+				(*it)->Delete();
+				dbg_logstr("Actor model removed");
+			}
+		} else {
+			if (!pipe->IsOutOfSceneGC((*it)->GetGPos())) {
+				(*it)->Spawn();
+				dbg_logstr("Actor model spawned");
+			}
+		}
+	}
+}
+
+void PlasticSociety::CreatePopulation()
+{
+	//TODO
+}
+
+PlasticActor* PlasticSociety::GetActor(VModel* mod)
+{
+	std::vector<PlasticActor*>::iterator oi;
+
+	for (oi = actors.begin(); oi != actors.end(); ++oi) {
+		if ((*oi)->GetModel() == mod)
+			return (*oi);
+	}
+
+	return NULL;
+}
+
+PlasticActor* PlasticSociety::GetActor(uli n)
+{
+	if (n >= actors.size()) return NULL;
+	return actors.at(n);
 }

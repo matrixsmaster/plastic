@@ -20,15 +20,31 @@
 #ifndef SOCIETY_H_
 #define SOCIETY_H_
 
+#include <vector>
+#include "vecmath.h"
 #include "datapipe.h"
+#include "actor.h"
+#include "misconsts.h"
+
 
 class PlasticSociety {
 private:
 	DataPipe* pipe;
+	std::vector<PlasticActor*> actors;
+
+	void RemoveAllActors();
 
 public:
 	PlasticSociety(DataPipe* data);
-	virtual ~PlasticSociety()		{}
+	virtual ~PlasticSociety();
+
+	//FIXME: comments
+	void UpdateActorsPresence();
+	bool TestActorSpawn(PlasticActor* PC); //FIXME: debug only
+	void CreatePopulation();
+	uli GetNumActors()						{ return actors.size(); }
+	PlasticActor* GetActor(VModel* mod);
+	PlasticActor* GetActor(uli n);
 };
 
 #endif /* SOCIETY_H_ */

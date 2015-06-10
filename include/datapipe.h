@@ -158,6 +158,9 @@ public:
 	///Returns a status of the pipe.
 	virtual EDPipeStatus GetStatus()	{ return status; }
 
+	///Returns a pointer to a game settings structure.
+	virtual const SGameSettings* GetGameSettings()	{ return &settings; }
+
 	///Synchronization.
 	int ReadLock();
 	int ReadUnlock();
