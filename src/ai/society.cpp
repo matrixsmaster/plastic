@@ -24,17 +24,19 @@
 PlasticSociety::PlasticSociety(DataPipe* data)
 {
 	pipe = data;
+	names = new NameGen(pipe);
 }
 
 PlasticSociety::~PlasticSociety()
 {
 	RemoveAllActors();
+	delete names;
 }
 
 //FIXME: debug only
 bool PlasticSociety::TestActorSpawn(PlasticActor* PC)
 {
-	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,pipe);
+	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,names,pipe);
 	actors.push_back(npc);
 	npc->SetPos(PC->GetPos());
 	npc->SetGPos(PC->GetGPos());
@@ -72,7 +74,30 @@ void PlasticSociety::UpdateActorsPresence()
 
 void PlasticSociety::CreatePopulation()
 {
-	//TODO
+	int i,j;
+	SWGCell cell;
+	vector3di cgp,clp;
+	PlasticActor* npc;
+	WorldGen* wgen = pipe->GetWorldGen();
+	PRNGen* rng = pipe->GetRNG();
+
+	for (i = 0; i < wgen->GetPlaneSide(); i++) {
+		cgp.Y = i;
+		for (j = 0; j < wgen->GetPlaneSide(); j++) {
+			cgp.X = j;
+			cell = wgen->GetSurfaceCell(&cgp);
+			//FIXME: debug only
+			if (cell.t == WGCC_SPECBUILD) {
+				clp.X = CHUNKBOX / 2;
+				clp.Y = clp.X;
+				clp.Z = pipe->GetElevationUnder(&clp);
+				npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,names,pipe);
+				actors.push_back(npc);
+				npc->SetGPos(cgp);
+				npc->SetPos(clp);
+			}
+		}
+	}
 }
 
 PlasticActor* PlasticSociety::GetActor(VModel* mod)

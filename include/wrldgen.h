@@ -144,9 +144,13 @@ public:
 	bool LoadMap(const char* fname);
 	void SaveMap(const char* fname);
 	void NewMap(long seed);
+
+	/* Map information requests functions */
 	const SWGCell* GetMap()				{ return map; }
 	SWGCell GetCell(vector3di crd);
 	SWGCell GetSurfaceCell(vector3di crd);
+	SWGCell GetSurfaceCell(vector3di* crd);
+	int GetSurfaceAbsElevation(vector3di crd);
 
 	/* Statistics functions and helpers */
 	uli GetRadius()						{ return radius; }

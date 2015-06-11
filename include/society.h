@@ -25,11 +25,13 @@
 #include "datapipe.h"
 #include "actor.h"
 #include "misconsts.h"
+#include "namegen.h"
 
 
 class PlasticSociety {
 private:
 	DataPipe* pipe;
+	NameGen* names;
 	std::vector<PlasticActor*> actors;
 
 	void RemoveAllActors();

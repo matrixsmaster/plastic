@@ -19,3 +19,17 @@
 
 #include "namegen.h"
 #include "misconsts.h"
+
+using namespace std;
+
+NameGen::NameGen(DataPipe* pipeptr)
+{
+	pipe = pipeptr;
+}
+
+string NameGen::GetHumanName(bool female)
+{
+	//FIXME: debug
+	if (female) return "Alice";
+	return "Bob";
+}

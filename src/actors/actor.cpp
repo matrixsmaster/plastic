@@ -34,13 +34,13 @@ PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr) :
 	AutoInitStats();
 }
 
-PlasticActor::PlasticActor(EPAClass c, EPABodyType b, DataPipe* pptr) :
+PlasticActor::PlasticActor(EPAClass c, EPABodyType b, NameGen* names, DataPipe* pptr) :
 		VSceneObject()
 {
 	pipe = pptr;
 	InitVars();
 
-	strcpy(attrib.name,"Alice"); //FIXME: namegen
+	strcpy(attrib.name,names->GetHumanName(true).c_str());
 	attrib.female = true;
 	attrib.cls = c;
 	attrib.body = b;

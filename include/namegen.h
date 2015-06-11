@@ -20,6 +20,18 @@
 #ifndef NAMEGEN_H_
 #define NAMEGEN_H_
 
-void namegen_HumanName();
+#include <string>
+#include "datapipe.h"
+
+class NameGen {
+private:
+	DataPipe* pipe;
+
+public:
+	NameGen(DataPipe* pipeptr);
+	virtual ~NameGen()				{}
+
+	std::string GetHumanName(bool female);
+};
 
 #endif /* NAMEGEN_H_ */

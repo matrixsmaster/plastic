@@ -120,6 +120,23 @@ SWGCell WorldGen::GetSurfaceCell(vector3di crd)
 	return cl;
 }
 
+SWGCell WorldGen::GetSurfaceCell(vector3di* crd)
+{
+	SWGCell cl;
+
+	WrapCoords(crd);
+	cl = map[crd->Y * planev.X + crd->X];
+	crd->Z = ((int)radius - WGAIRCHUNKS - WGELEVATIONS + cl.elev);
+
+	return cl;
+}
+
+int WorldGen::GetSurfaceAbsElevation(vector3di crd)
+{
+	SWGCell cl = GetSurfaceCell(crd);
+	return ((int)radius - WGAIRCHUNKS - WGELEVATIONS + cl.elev);
+}
+
 void WorldGen::WrapCoords(vector3di* pnt)
 {
 	pnt->X = pnt->X % plane;

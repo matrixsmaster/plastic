@@ -34,6 +34,7 @@
 #include "keybinder.h"
 #include "vmodel.h"
 #include "inventory.h"
+#include "namegen.h"
 
 
 //Basic Actor Class
@@ -51,7 +52,7 @@ protected:
 
 public:
 	PlasticActor(SPAAttrib a, DataPipe* pptr);
-	PlasticActor(EPAClass c, EPABodyType b, DataPipe* pptr);
+	PlasticActor(EPAClass c, EPABodyType b, NameGen* names, DataPipe* pptr);
 	virtual ~PlasticActor();
 
 	virtual void AutoInitStats();
