@@ -296,6 +296,12 @@ bool CurseGUITable::PutEvent(SGUIEvent* e)
 		case KEY_RIGHT:
 			scrollx++;
 			return true;
+//		case KEY_HOME:
+//			scrolly = 0;
+//			return true;
+//		case KEY_END:
+//			scrolly = GetTableHeight();
+//			return true;
 		default: break;
 		}
 		break;

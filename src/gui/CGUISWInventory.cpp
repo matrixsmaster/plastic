@@ -38,6 +38,7 @@ CurseGUIInventoryWnd::CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr) :
 	invent = iptr;
 	sitem = prev = 1;
 	cso = 0;
+	srch = 1;
 
 	ResizeWnd();
 	SetSelectedItem();
@@ -106,6 +107,7 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	new CurseGUILabel(ctrls, wt+5, y1+7, 7, 1, "Search");
 	search_edit = new CurseGUIEditBox(ctrls, wt+3, y1+8, 12, "");
 	searchname = new CurseGUICheckBox(ctrls, wt+3, y1+9, 13, "name");
+	searchname->SetChecked(true);
 	searchdesc = new CurseGUICheckBox(ctrls, wt+3, y1+10, 13, "descript");
 
 
@@ -185,7 +187,17 @@ int CurseGUIInventoryWnd::Search(int n)
 	pt = search_edit->GetText();
 
 	for (i = n; i < invent->GetNumberItems(); i++) {
-		nm = invent->GetInventoryObject(i)->GetName();
+		switch(srch) {
+		case 2: //search by description
+			nm = invent->GetInventoryObject(i)->GetDesc();
+			break;
+		case 3: //search by name and description
+			nm = invent->GetInventoryObject(i)->GetName() + " " + invent->GetInventoryObject(i)->GetDesc();;
+			break;
+		default: //search by name
+			nm = invent->GetInventoryObject(i)->GetName();
+			break;
+		}
 		if (strcasestr(nm.c_str(),pt.c_str()))
 			return i;
 	}
@@ -237,7 +249,7 @@ void CurseGUIInventoryWnd::DestroyObject()
 
 }
 
-void CurseGUIInventoryWnd::DropObjcet()
+void CurseGUIInventoryWnd::DropObject()
 {
 	//TODO
 }
@@ -252,17 +264,20 @@ void CurseGUIInventoryWnd::UseObject()
 	//TODO
 }
 
-void CurseGUIInventoryWnd::ReairObject()
+void CurseGUIInventoryWnd::RepairObject()
 {
 	//TODO
 }
 
 void CurseGUIInventoryWnd::Sort()
 {
+	if (invent->GetNumberItems() < 1) return;
+
 	//clear table
 	table->ClearTable();
 
-	//FIXME checks
+	if (!sortname->GetChecked() && !sortwght->GetChecked())
+			sorttype = INV_SDEFAULT;
 
 	//choice sorting
 	switch(sorttype) {
@@ -294,7 +309,14 @@ void CurseGUIInventoryWnd::CheckCbox(CurseGUIControl* ctl)
 		if (sortname->GetChecked())
 			sortname->SetChecked(false);
 		sorttype = INV_SWEIGHT;
-	} else sorttype = INV_SDEFAULT;
+	} else if (ctl == searchname) {
+		if (searchname->GetChecked())
+			srch++;
+		else srch--;
+	} else if (ctl == searchdesc) {
+		if (searchdesc->GetChecked()) srch += 2;
+		else srch -= 2;
+	}
 }
 
 void CurseGUIInventoryWnd::CheckButtons(CurseGUIControl* ctl)
@@ -339,12 +361,12 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 			prev = sitem;
 			sitem = 0;
 			SetSelectedItem();
-			break;
+			return true;
 		case KEY_END:
 			prev = sitem;
 			sitem = invent->GetNumberItems();
 			SetSelectedItem();
-			break;
+			return true;
 		}
 		return false;
 
@@ -359,7 +381,6 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 			//search edit
 			SearchObject();
 			break;
-
 
 		case GUIFB_CHECKON:
 		case GUIFB_CHECKOFF:
