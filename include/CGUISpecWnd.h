@@ -123,6 +123,7 @@ private:
 	int sitem;	//selected item in inventory.
 	int prev;	//previous selected object
 	int cso;	//current selected object
+	short srch;
 
 	//TODO add HOME and END
 
@@ -160,10 +161,10 @@ private:
 	void Sort();
 
 	void DestroyObject();
-	void DropObjcet();
+	void DropObject();
 	void WearObject();
 	void UseObject();
-	void ReairObject();
+	void RepairObject();
 
 public:
 	CurseGUIInventoryWnd(CurseGUI* scrn, Inventory* iptr);
