@@ -36,9 +36,7 @@
 #define DEFSCALE 1.f
 #define DEFFOVX 115
 #define DEFFOVY 62
-#define DEFFARPLANE 61
-//#define DEFFOGPLANE 21
-//#define DEFFOGGRAY 40
+#define DEFFARPLANE 80
 
 ///LVR Post-processing settings.
 struct SLVRPostProcess {
@@ -49,7 +47,7 @@ struct SLVRPostProcess {
 
 ///Default post-processing.
 #define DEFPOSTPROC { \
-	21, \
+	40, \
 	{40, 40, 40}, \
 	0 \
 }

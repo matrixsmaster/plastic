@@ -51,12 +51,16 @@ void PlasticSociety::UpdateActorsPresence()
 		if ((*it)->GetModel()) {
 			if (pipe->IsOutOfSceneGC((*it)->GetGPos())) {
 				(*it)->Delete();
+#ifdef SCDEBUG
 				dbg_logstr("Actor model removed");
+#endif
 			}
 		} else {
 			if (!pipe->IsOutOfSceneGC((*it)->GetGPos())) {
 				(*it)->Spawn();
+#ifdef SCDEBUG
 				dbg_logstr("Actor model spawned");
+#endif
 			}
 		}
 	}
@@ -73,7 +77,9 @@ void PlasticSociety::CreatePopulation()
 	PRNGen* rng = pipe->GetRNG();
 
 	maxpopulation = wgen->GetPlaneArea() * SCMAXPOPPERCHUNK;
+#ifdef SCDEBUG
 	dbg_print("MAX population = %llu",maxpopulation);
+#endif
 
 	for (i = 0; i < wgen->GetPlaneSide(); i++) {
 		cgp.Y = i;
@@ -117,7 +123,9 @@ void PlasticSociety::CreatePopulation()
 					actors.push_back(npc);
 				}
 
+#ifdef SCDEBUG
 				if (n) dbg_print("Generated %d actors on [%d %d]",n,j,i);
+#endif
 				break;
 			}
 		}

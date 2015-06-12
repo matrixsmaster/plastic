@@ -25,11 +25,11 @@
 
 
 #ifndef BUILDNO
-#define BUILDNO 1
+#define BUILDNO 2
 #endif
 
 #define VERMAJOR 0
-#define VERMINOR 0
+#define VERMINOR 1
 
 #define PRODNAME "Plastic Inquisitor"
 
