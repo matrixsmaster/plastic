@@ -49,3 +49,8 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Implement hodeable parts in VModel
 
 -> Add actor's limbs states
+
+-> Fix a bug in CGUITable (very small sized table is going into infinite loop on redraw)
+
+-> LVR: Use FOV.Z instead of separate far plane distance
+ 

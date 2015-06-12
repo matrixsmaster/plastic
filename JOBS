@@ -8,7 +8,7 @@ Merge RenderPool branch into master						| done		|
 ---------------------------------------------------------------------------------------
 Create new HUD layout									|			| done
 ---------------------------------------------------------------------------------------
-Create Inventory window									|			| in progr
+Create Inventory window									|			| done
 ---------------------------------------------------------------------------------------
 Create ActorView window									| done		|
 ---------------------------------------------------------------------------------------
@@ -26,9 +26,9 @@ Implement DataPipe chunks swapping in Move()			| done		|
 ---------------------------------------------------------------------------------------
 Implement global position change of PC					| done		|
 ---------------------------------------------------------------------------------------
-Update voxel table (add common types of voxels)			| in progr	| assigned
+Update voxel table (add common types of voxels)			| moved to v0.2
 ---------------------------------------------------------------------------------------
-Add actors placement									| in progr	|
+Add actors placement									| done		|
 ---------------------------------------------------------------------------------------
 Implement projection test for an objects (& actors)		| done		|
 ---------------------------------------------------------------------------------------

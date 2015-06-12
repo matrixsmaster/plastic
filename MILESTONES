@@ -3,5 +3,15 @@ OK	Fully working LVR (without lighting, though)
 OK	Working atmosphere (clouds and stars)
 	Some rigid actors
 OK	Startup shell (character generation and game options)
-	Working GUI (HUD, console, inventory, stats, map)
+OK	Working GUI (HUD, console, inventory, stats, map)
 OK	Some sort of landscape generation
+
+v.0.2 ----------------------------------------------------------
+	Filled voxel table
+	Simple rigid physics (collisions and gravity)
+	Actors limbs mechanics
+	Actors animations and movement
+	Actors portraits generation
+	Buildings and its generation
+	Working game load/save
+	

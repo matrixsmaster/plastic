@@ -25,6 +25,7 @@ PlasticSociety::PlasticSociety(DataPipe* data)
 {
 	pipe = data;
 	names = new NameGen(pipe);
+	maxpopulation = 0;
 }
 
 PlasticSociety::~PlasticSociety()
@@ -63,30 +64,66 @@ void PlasticSociety::UpdateActorsPresence()
 
 void PlasticSociety::CreatePopulation()
 {
-	int i,j;
+	int i,j,k,n,q,c,w;
+	bool f;
 	SWGCell cell;
 	vector3di cgp,clp;
 	PlasticActor* npc;
 	WorldGen* wgen = pipe->GetWorldGen();
 	PRNGen* rng = pipe->GetRNG();
 
+	maxpopulation = wgen->GetPlaneArea() * SCMAXPOPPERCHUNK;
+	dbg_print("MAX population = %llu",maxpopulation);
+
 	for (i = 0; i < wgen->GetPlaneSide(); i++) {
 		cgp.Y = i;
 		for (j = 0; j < wgen->GetPlaneSide(); j++) {
 			cgp.X = j;
 			cell = wgen->GetSurfaceCell(&cgp);
-			//FIXME: debug only
-			if (cell.t == WGCC_SPECBUILD) {
-				clp.X = CHUNKBOX / 2;
-				clp.Y = clp.X;
-				clp.Z = pipe->GetElevationUnder(&clp);
-				npc = new PlasticActor(PCLS_COMMONER,names,pipe);
-				actors.push_back(npc);
-				npc->SetGPos(cgp);
-				npc->SetPos(clp);
+
+			for (k = 0; k < WGNUMKINDS; k++) {
+				if (cellcap_tab[k].ct != cell.t) continue;
+
+				//calc population of the cell
+				n = rng->RangedNumber(cellcap_tab[k].max-cellcap_tab[k].min+1);
+				n += cellcap_tab[k].min;
+
+				for (q = 0; q < n; q++) {
+					//generate class and gender
+					do {
+						c = rng->RangedNumber(NUMCLASSES);
+						for (w = 0; w < NUMCLASSES; w++) {
+							if (clvolume_tab[w].cls == (EPAClass)c) {
+								if (rng->RangedNumber(100) <= clvolume_tab[w].prc) {
+									f = (rng->RangedNumber(100) <= clvolume_tab[w].female);
+									break;
+								} else {
+									c = 0;
+									break;
+								}
+							}
+						}
+					} while (!c);
+
+					//generate spawn spot
+					clp.X = rng->RangedNumber(CHUNKBOX);
+					clp.Y = rng->RangedNumber(CHUNKBOX);
+					clp.Z = pipe->GetElevationUnder(&clp) + SCACTORELEV;
+
+					//create it
+					npc = new PlasticActor(clvolume_tab[w].cls,f,names,pipe);
+					npc->SetGPos(cgp);
+					npc->SetPos(clp);
+					actors.push_back(npc);
+				}
+
+				if (n) dbg_print("Generated %d actors on [%d %d]",n,j,i);
+				break;
 			}
 		}
 	}
+
+	GatherStatistic();
 }
 
 PlasticActor* PlasticSociety::GetActor(VModel* mod)
@@ -105,4 +142,18 @@ PlasticActor* PlasticSociety::GetActor(uli n)
 {
 	if (n >= actors.size()) return NULL;
 	return actors.at(n);
+}
+
+void PlasticSociety::GatherStatistic()
+{
+	std::vector<PlasticActor*>::iterator oi;
+	SPAAttrib ca;
+
+	memset(&stat,0,sizeof(stat));
+
+	for (oi = actors.begin(); oi != actors.end(); ++oi) {
+		ca = (*oi)->GetAttributes();
+		stat[ca.cls].prc++;
+		if (ca.female) stat[ca.cls].female++;
+	}
 }

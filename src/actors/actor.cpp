@@ -34,15 +34,15 @@ PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr) :
 	AutoInitStats();
 }
 
-PlasticActor::PlasticActor(EPAClass c, NameGen* names, DataPipe* pptr) :
+PlasticActor::PlasticActor(EPAClass c, bool fem, NameGen* names, DataPipe* pptr) :
 		VSceneObject()
 {
 	pipe = pptr;
 	InitVars();
 
 	//Set gender and name
-	attrib.female = (pipe->GetRNG()->FloatNum() < ACTDEFFEMALE);
-	strcpy(attrib.name,names->GetHumanName(attrib.female).c_str());
+	attrib.female = fem;
+	strcpy(attrib.name,names->GetHumanName(fem).c_str());
 
 	//Set class
 	attrib.cls = c;

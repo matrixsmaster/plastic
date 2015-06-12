@@ -42,6 +42,12 @@ bool PlasticWorld::NewGame()
 	/* Place actors */
 	society->CreatePopulation();
 	dbg_print("Population: %u",society->GetNumActors());
+	//FIXME: debug statistics
+	for (int i = 0; i < NUMCLASSES; i++) {
+		dbg_print("Class %s pop. %d, %d women",paclass_to_str[i].s,
+				society->GetStatistic()[i].prc,
+				society->GetStatistic()[i].female);
+	}
 
 	return true;
 }

@@ -26,13 +26,61 @@
 #include "actor.h"
 #include "misconsts.h"
 #include "namegen.h"
+#include "wrldgen.h"
 
+
+//FIXME: comment
+#define SCACTORELEV 6
+#define SCMAXPOPPERCHUNK 10
+
+//FIXME: comment
+struct SSCCellCapacity {
+	EWGCellContent ct;
+	int min,max;
+};
+
+//FIXME: comment
+struct SSCGenderClassification {
+	EPAClass cls;
+	int prc;		//percent of class volume in society
+	int female;		//% of women in particular class
+};
+
+static const SSCCellCapacity cellcap_tab[WGNUMKINDS] = {
+		{ WGCC_WASTELAND, 0, 0, },
+		{ WGCC_DIRTNSAND, 0, 0, },
+		{ WGCC_ROCKSTONE, 0, 0, },
+		{ WGCC_WATERSIDE, 0, 1, },
+		{ WGCC_WATERONLY, 0, 0, },
+		{ WGCC_TREEGRASS, 0, 2, },
+		{ WGCC_CONCRETEB, 0, 0, },
+		{ WGCC_SMALLBLDS, 3, 8, },
+		{ WGCC_MIDDLBLDS, 4, 16 },
+		{ WGCC_HUGEBUILD,10, 24 },
+		{ WGCC_SPECBUILD, 6, 10 },
+		{ WGCC_CITYCENTR, 0, 0, },
+};
+
+static const SSCGenderClassification clvolume_tab[NUMCLASSES] = {
+		{ PCLS_INQUISITOR,	2,	10},
+		{ PCLS_ROGUE,		2,	10},
+		{ PCLS_GUARD,		10,	20},
+		{ PCLS_SEXBOT,		10,	90},
+		{ PCLS_COMMONER,	30, 60},
+		{ PCLS_MAID,		15,	80},
+		{ PCLS_NOBLE,		2,	65},
+		{ PCLS_MECHANIC,	5,	60},
+		{ PCLS_SMUGGLER,	9,	20},
+		{ PCLS_TRADER,		15,	50},
+};
 
 class PlasticSociety {
 private:
 	DataPipe* pipe;
 	NameGen* names;
 	std::vector<PlasticActor*> actors;
+	ulli maxpopulation;
+	SSCGenderClassification stat[NUMCLASSES];
 
 	void RemoveAllActors();
 
@@ -43,9 +91,11 @@ public:
 	//FIXME: comments
 	void UpdateActorsPresence();
 	void CreatePopulation();
-	uli GetNumActors()						{ return actors.size(); }
+	uli GetNumActors()								{ return actors.size(); }
 	PlasticActor* GetActor(VModel* mod);
 	PlasticActor* GetActor(uli n);
+	void GatherStatistic();
+	const SSCGenderClassification* GetStatistic()	{ return stat; }
 };
 
 #endif /* SOCIETY_H_ */
