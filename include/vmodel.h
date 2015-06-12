@@ -41,11 +41,12 @@ private:
 	vector3di dcenter;		//original data center point
 	vector3di center;		//working buf center point
 	int state;				//current state
+	SVoxelTab* vtab;		//voxel table
 
 	bool AllocBuf();
 
 public:
-	VModel();
+	VModel(SVoxelTab* tabptr);
 	virtual ~VModel();
 
 	vector3di GetOrgSize()			{ return vector3di(s_x,s_y,s_z); }

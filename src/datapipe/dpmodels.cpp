@@ -33,7 +33,7 @@ VModel* DataPipe::LoadModel(const char* fname, const vector3di pos, const vector
 	char fn[MAXPATHLEN];
 	if ((status != DPIPE_IDLE) || (allocated >= rammax)) return NULL;
 
-	m = new VModel();
+	m = new VModel(&voxeltab);
 
 	snprintf(fn,MAXPATHLEN,"%s/%s",root,fname);
 	if (!m->LoadFromFile(fn)) {

@@ -24,7 +24,8 @@
 #include "vecmisc.h"
 
 
-VModel::VModel() : VSceneObject()
+VModel::VModel(SVoxelTab* tabptr) :
+		VSceneObject()
 {
 	s_x = s_y = s_z = 0;
 	dat = NULL;
@@ -35,6 +36,7 @@ VModel::VModel() : VSceneObject()
 	bufside = 0;
 	changed = false;
 	state = 0;
+	vtab = tabptr;
 }
 
 VModel::~VModel()
@@ -52,8 +54,9 @@ bool VModel::LoadFromFile(const char* fn)
 	FILE* mf;
 	char* s = NULL;
 	voxel v;
-	int i,k,l,x,y,z,sd,vtc;
+	int i,k,l,x,y,z,sd,vtc,prt;
 	ulli j;
+//	char prf;
 	vector3d rv;
 	SMatrix3d rm;
 	SVoxCharPair* tab = NULL;
@@ -63,8 +66,9 @@ bool VModel::LoadFromFile(const char* fn)
 	mf = fopen(fn,"r");
 	if (!mf) return false;
 
-	//read dimensions, number of states, and number of voxel types used
-	if ( (fscanf(mf,"%d %d %d %d %d\n",&s_x,&s_y,&s_z,&nstates,&vtc) != 5) ||
+	//read dimensions, number of states, number of voxel types used, and number of parts
+	if (	(fscanf(mf,"%d %d %d %d %d %d\n",
+					&s_x,&s_y,&s_z,&nstates,&vtc,&prt) != 6) ||
 			(nstates < 1) )
 		goto bad_exit;
 
@@ -76,9 +80,11 @@ bool VModel::LoadFromFile(const char* fn)
 
 	//read voxel types table (skips empty lines and comments)
 	for (i = 0; ((i < vtc) && (!feof(mf)));) {
+		//TODO: read either a voxel type and select particular voxel
+		//or read voxel mark and find a voxel in tab
 		if (fscanf(mf,"%c = %hu\n",&(tab[i].c),&(tab[i].v)) == 2) i++;
 	}
-	if (feof(mf)) goto bad_exit; //shouldn't be at the end of file
+	if (feof(mf)) goto bad_exit; //shouldn't be at the end of table
 
 	//allocate memory: original data states map
 	datlen = s_x * s_y * s_z;

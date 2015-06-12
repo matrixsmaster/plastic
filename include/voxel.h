@@ -70,6 +70,7 @@ struct SVoxelTab {
 	SVoxelInf* tab;
 	unsigned len;
 	int stat[NUMVOXTYPES];
+	char* marks[DEFVOXTYPES];
 };
 
 ///Chunk data type {[z][y][x]}

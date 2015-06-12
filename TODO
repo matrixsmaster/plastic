@@ -45,3 +45,7 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Fix AtmoSky incorrect transient in case of slow-moving time 
 
 -> Consider adding callback functions for buttons (??)
+
+-> Implement hodeable parts in VModel
+
+-> Add actor's limbs states
