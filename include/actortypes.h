@@ -30,6 +30,7 @@
 
 //Basic types of robotic bodies
 enum EPABodyType {
+	PBOD_INVALID = 0,
 	PBOD_ELMECH = 1,
 	PBOD_PNEUMO = 2,
 	PBOD_HYDROL = 4

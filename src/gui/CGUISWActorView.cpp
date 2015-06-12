@@ -80,7 +80,8 @@ void CurseGUIActorViewWnd::ResizeWnd()
 	//create controls
 	portrait = new CurseGUIPicture(ctrls,1,1,ACTPORTRAITW,ACTPORTRAITH);
 	portrait->SetAutoAlloc(true);
-	portrait->SetPicture(actor->GetPortrait());
+	if (actor->GetPortrait())
+		portrait->SetPicture(actor->GetPortrait());
 
 	//main attributes
 	snprintf(buf,sizeof(buf),"  Type: %s\n  Name: %s\nGender: %s\n Class: %s\n  Body: %s",

@@ -18,6 +18,7 @@
  */
 
 #include "debug.h"
+#include "support.h"
 
 CurseGUIDebugWnd* debug_ui = NULL;
 
@@ -39,16 +40,17 @@ void dbg_toggle()
 void dbg_logstr(const char* str)
 {
 	if (debug_ui) debug_ui->PutString(str);
+	else errout("[DEBUG] %s\n",str);
 }
 
 void dbg_print(const char* fmt, ...)
 {
-	if (!debug_ui) return;
 	char str[DBGUIMAXLEN];
 	va_list vl;
 	va_start(vl,fmt);
 	vsnprintf(str,DBGUIMAXLEN,fmt,vl);
 	va_end(vl);
 
-	debug_ui->PutString(str);
+	if (debug_ui) debug_ui->PutString(str);
+	else errout("[DEBUG] %s\n",str);
 }

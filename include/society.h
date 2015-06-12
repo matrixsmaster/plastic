@@ -42,7 +42,6 @@ public:
 
 	//FIXME: comments
 	void UpdateActorsPresence();
-	bool TestActorSpawn(PlasticActor* PC); //FIXME: debug only
 	void CreatePopulation();
 	uli GetNumActors()						{ return actors.size(); }
 	PlasticActor* GetActor(VModel* mod);

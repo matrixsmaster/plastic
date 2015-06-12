@@ -26,7 +26,7 @@ Implement DataPipe chunks swapping in Move()			| done		|
 ---------------------------------------------------------------------------------------
 Implement global position change of PC					| done		|
 ---------------------------------------------------------------------------------------
-Update voxel table (add common types of voxels)			| assigned	| assigned
+Update voxel table (add common types of voxels)			| in progr	| assigned
 ---------------------------------------------------------------------------------------
 Add actors placement									| in progr	|
 ---------------------------------------------------------------------------------------

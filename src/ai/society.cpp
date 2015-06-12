@@ -33,17 +33,6 @@ PlasticSociety::~PlasticSociety()
 	delete names;
 }
 
-//FIXME: debug only
-bool PlasticSociety::TestActorSpawn(PlasticActor* PC)
-{
-	PlasticActor* npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,names,pipe);
-	actors.push_back(npc);
-	npc->SetPos(PC->GetPos());
-	npc->SetGPos(PC->GetGPos());
-	npc->SetRot(PC->GetRot());
-	return (npc->Spawn());
-}
-
 void PlasticSociety::RemoveAllActors()
 {
 	std::vector<PlasticActor*>::iterator it;
@@ -91,7 +80,7 @@ void PlasticSociety::CreatePopulation()
 				clp.X = CHUNKBOX / 2;
 				clp.Y = clp.X;
 				clp.Z = pipe->GetElevationUnder(&clp);
-				npc = new PlasticActor(PCLS_COMMONER,PBOD_PNEUMO,names,pipe);
+				npc = new PlasticActor(PCLS_COMMONER,names,pipe);
 				actors.push_back(npc);
 				npc->SetGPos(cgp);
 				npc->SetPos(clp);

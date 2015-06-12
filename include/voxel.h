@@ -46,15 +46,15 @@ typedef unsigned short int voxel; //must be a 16-bit wide
 #define NUMVOXTYPES 10
 enum EVoxelType {
 	VOXT_EMPTY = 0,
-	VOXT_WATER,
-	VOXT_SAND,
-	VOXT_STONE,
-	VOXT_DIRT,
-	VOXT_GRASS,
-	VOXT_METAL,
-	VOXT_GLASS,
-	VOXT_PLAST,
-	VOXT_WOOD,
+	VOXT_WATER = 1,
+	VOXT_SAND = 2,
+	VOXT_STONE = 3,
+	VOXT_DIRT = 4,
+	VOXT_GRASS = 5,
+	VOXT_METAL = 6,
+	VOXT_GLASS = 7,
+	VOXT_PLAST = 8,
+	VOXT_WOOD = 9,
 	//append here
 };
 

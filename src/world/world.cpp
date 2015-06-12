@@ -399,10 +399,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			case '4': tr.Y -= 2; break;
 			case '5': tr.Z -= 2; break;
 			case '6': tr.Z += 2; break;
-			case KEY_F(5):
-					if (society->TestActorSpawn(PC)) dbg_print("CA Success");
-					else dbg_print("CA FAILED");
-					return;
+
 			case KEY_F(4):
 					gui->GetColorManager()->Flush();
 					printf("TESTING: YOU SHOULDN'T SEE THIS!!!");

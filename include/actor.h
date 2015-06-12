@@ -37,6 +37,8 @@
 #include "namegen.h"
 
 
+#define ACTDEFFEMALE 0.7
+
 //Basic Actor Class
 class PlasticActor : public VSceneObject {
 protected:
@@ -52,7 +54,7 @@ protected:
 
 public:
 	PlasticActor(SPAAttrib a, DataPipe* pptr);
-	PlasticActor(EPAClass c, EPABodyType b, NameGen* names, DataPipe* pptr);
+	PlasticActor(EPAClass c, NameGen* names, DataPipe* pptr);
 	virtual ~PlasticActor();
 
 	virtual void AutoInitStats();

@@ -82,6 +82,8 @@ bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe)
 	GETSTATFIELD(DT,"_DT");
 	GETSTATFIELD(DM,"_DM");
 
+	//TODO: apply bias to biased values (-1/0/2)
+
 	//determine opposition class
 	fld = pipe->GetIniDataS(CLASNFONAME,cls + "_Oppos");
 	if (fld.empty()) return false;

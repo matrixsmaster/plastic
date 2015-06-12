@@ -34,18 +34,26 @@ PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr) :
 	AutoInitStats();
 }
 
-PlasticActor::PlasticActor(EPAClass c, EPABodyType b, NameGen* names, DataPipe* pptr) :
+PlasticActor::PlasticActor(EPAClass c, NameGen* names, DataPipe* pptr) :
 		VSceneObject()
 {
 	pipe = pptr;
 	InitVars();
 
-	strcpy(attrib.name,names->GetHumanName(true).c_str());
-	attrib.female = true;
-	attrib.cls = c;
-	attrib.body = b;
+	//Set gender and name
+	attrib.female = (pipe->GetRNG()->FloatNum() < ACTDEFFEMALE);
+	strcpy(attrib.name,names->GetHumanName(attrib.female).c_str());
 
-	AutoInitStats();
+	//Set class
+	attrib.cls = c;
+
+	//Generate body type
+	base.Body = 0;
+	attrib.body = PBOD_INVALID;
+	while (!(attrib.body & base.Body)) {
+		attrib.body = (EPABodyType)(1 << (pipe->GetRNG()->RangedNumber(NUMBODTYPE)));
+		AutoInitStats();
+	}
 }
 
 PlasticActor::~PlasticActor()
@@ -57,6 +65,7 @@ void PlasticActor::InitVars()
 {
 	isnpc = true;
 	model = NULL;
+	portrait = NULL;
 }
 
 void PlasticActor::AutoInitStats()
@@ -70,10 +79,12 @@ void PlasticActor::AutoInitStats()
 	}
 
 	//FIXME: debug only!
-	portrait = (SGUIPixel*)malloc(ACTPORTRAITH*ACTPORTRAITW*sizeof(SGUIPixel));
-	VSprite* s = pipe->LoadSprite("spr/testspr.dat");
-	memcpy(portrait,s->GetImage(),ACTPORTRAITH*ACTPORTRAITW*sizeof(SGUIPixel));
-	pipe->PurgeSprites();
+	if (!portrait) {
+		portrait = (SGUIPixel*)malloc(ACTPORTRAITH*ACTPORTRAITW*sizeof(SGUIPixel));
+		VSprite* s = pipe->LoadSprite("spr/testspr.dat");
+		memcpy(portrait,s->GetImage(),ACTPORTRAITH*ACTPORTRAITW*sizeof(SGUIPixel));
+		pipe->PurgeSprites();
+	}
 }
 
 #define PA_MODSTATMACRO(Stat) \
