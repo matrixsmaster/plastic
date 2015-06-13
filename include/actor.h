@@ -60,6 +60,7 @@ public:
 	bool IsNPC()						{ return isnpc; }
 
 	virtual void UpdateModelPos();
+	virtual void ReadModelPos();
 
 	Inventory* GetInventory()			{ return &invent; }
 	bool UseObject(InventoryObject* obj);

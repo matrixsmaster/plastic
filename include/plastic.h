@@ -117,6 +117,7 @@ static const SGameArg argp_table[GAMEARGTYPES] = {
 #define WORLDUSLEEP 90000
 #define CHUNKUSLEEP 100000
 #define UPDATUSLEEP 100
+#define PHYSSUSLEEP 200
 
 
 #endif /* PLASTIC_H_ */

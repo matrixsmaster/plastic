@@ -129,7 +129,12 @@ static void* plastic_physicsthread(void* ptr)
 {
 	PlasticPhysics* phy = reinterpret_cast<PlasticPhysics*> (ptr);
 
-	while (!g_quit) phy->Quantum();
+	while (!g_quit) {
+
+		phy->Quantum();
+
+		usleep(PHYSSUSLEEP);
+	}
 
 	pthread_exit(NULL);
 }

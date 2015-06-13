@@ -121,6 +121,16 @@ void PlasticActor::UpdateModelPos()
 	model->SetRot(rot);
 }
 
+void PlasticActor::ReadModelPos()
+{
+	if (!model) return;
+	pos = model->GetPos();
+	scenter = model->GetScenePos();
+	gpos = model->GetGPos();
+	rot = model->GetRot();
+	SetRotI();
+}
+
 void PlasticActor::Move(ELMoveDir d, float step)
 {
 	vector3d v;
@@ -134,12 +144,14 @@ void PlasticActor::Move(ELMoveDir d, float step)
 	}
 	v = MtxPntMul(&rotm,&v);
 
+	ReadModelPos(); //update our position out of model position in scene
+
 	pos.X += (int)round(v.X);
 	pos.Y += (int)round(v.Y);
 	pos.Z -= (int)round(v.Z); //to conform rotation/movement of renderer (flipped Y axis)
 
-	SetPosI();
-	UpdateModelPos();
+	SetPosI(); //internal settings has to be done
+	UpdateModelPos(); //now update model position back
 }
 
 bool PlasticActor::UseObject(InventoryObject* obj)

@@ -46,6 +46,8 @@ public:
 
 	virtual void SetScenePos(const vector3di* p);
 	virtual void SetScenePos(const vector3di p);
+	virtual vector3di GetScenePos()				{ return scenter; }
+	virtual const vector3di* GetScenePosP()		{ return &scenter; }
 
 	virtual void SetPos(const vector3di p);
 	virtual vector3di GetPos()					{ return pos; }

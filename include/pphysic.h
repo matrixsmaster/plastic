@@ -23,14 +23,28 @@
 #include <vector>
 #include "datapipe.h"
 #include "vecmath.h"
+#include "vmodel.h"
 
+
+struct SPPModelRec {
+	VModel* modptr;
+	vector3di oldspos;
+	bool moved;
+	bool changed;
+};
+
+typedef std::vector<SPPModelRec> PPModVec;
 
 class PlasticPhysics {
-public:
-	PlasticPhysics(DataPipe* pipeptr) {}
-	virtual ~PlasticPhysics() {}
+private:
+	DataPipe* pipe;
+	PPModVec mods;
 
-	void Quantum() {}
+public:
+	PlasticPhysics(DataPipe* pipeptr);
+	virtual ~PlasticPhysics();
+
+	void Quantum();
 };
 
 #endif /* PPHYSIC_H_ */
