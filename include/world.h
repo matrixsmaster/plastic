@@ -41,6 +41,7 @@
 #include "radar.h"
 #include "wrldgen.h"
 #include "society.h"
+#include "pphysic.h"
 
 
 /* Ray-Object intersection data holding structure */
@@ -77,6 +78,7 @@ private:
 	volatile bool lock_update;
 	SSavedGameHeader gamesave;
 	PlasticSociety* society;
+	PlasticPhysics* physics;
 //	pthread_mutex_t wrldmtx;
 
 	//FIXME: DEBUG
@@ -133,6 +135,9 @@ public:
 
 	///Returns DataPipe instance currently in use.
 	DataPipe* GetDataPipe()					{ return data; }
+
+	///Returns active physics engine instance.
+	PlasticPhysics* GetPhyEngine()			{ return physics; }
 
 	///Main clock facility.
 	void UpdateTime();

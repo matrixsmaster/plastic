@@ -34,6 +34,7 @@
 #include "world.h"
 #include "datapipe.h"
 #include "pltime.h"
+#include "pphysic.h"
 
 
 static SGameSettings	g_set = DEFAULT_SETTINGS;
@@ -42,6 +43,7 @@ static CurseGUI*		g_gui = NULL;
 static pthread_t		t_event = 0;
 static pthread_t		t_render = 0;
 static pthread_t		t_loader = 0;
+static pthread_t		t_physic = 0;
 static pthread_mutex_t	m_render;
 volatile bool			g_quit = false;
 
@@ -123,10 +125,24 @@ static void* plastic_chunksthread(void* ptr)
 	pthread_exit(NULL);
 }
 
+static void* plastic_physicsthread(void* ptr)
+{
+	PlasticPhysics* phy = reinterpret_cast<PlasticPhysics*> (ptr);
+
+	while (!g_quit) phy->Quantum();
+
+	pthread_exit(NULL);
+}
+
 /* *********************************************************** */
 
 static void plastic_preresize(void)
 {
+	/* This function stops rendering to not interfere with resizing,
+	 * which can (and should) re-allocate many buffers in memory,
+	 * effectively resulting in SIGSEGVs. So we decided to make a
+	 * simple kludge to prevent such event.
+	 */
 	g_wrld->StopRendering();
 }
 
@@ -166,13 +182,13 @@ static void plastic_start()
 	/* Init debug UI */
 	dbg_init(g_gui);
 
-	/* Connect world to GUI */
+	/* Connect the World to the GUI */
 	g_wrld->ConnectGUI(g_gui);
 
-	/* Register preresize callback */
+	/* Register pre-resize callback (it's a kludge, I know) */
 	g_gui->SetPreResizeCallback(plastic_preresize);
 
-	/* Create mutexes */
+	/* Create rendering lock */
 	pthread_mutex_init(&m_render,NULL);
 
 	/* Start chunks loading queue */
@@ -181,32 +197,31 @@ static void plastic_start()
 	/* Start events processing thread */
 	pthread_create(&t_event,NULL,plastic_eventhread,NULL);
 
+	/* Start physics engine thread */
+	pthread_create(&t_physic,NULL,plastic_physicsthread,g_wrld->GetPhyEngine());
+
 	/* Start rendering thread */
 	pthread_create(&t_render,NULL,plastic_renderthread,NULL);
 }
+
+#define PLA_CLOSETHREAD(Name,Hdl) \
+		if (Hdl) { \
+			errout("Closing %s thread... ",Name); \
+			pthread_join(Hdl,NULL); \
+			errout("OK\n"); \
+		}
 
 static void plastic_cleanup()
 {
 	ulli gamelength = g_wrld->GetTime();
 
 	/* Join all active threads */
-	if (t_render) {
-		errout("Closing render thread... ");
-		pthread_join(t_render,NULL);
-		errout("OK\n");
-	}
-	if (t_event) {
-		errout("Closing events thread... ");
-		pthread_join(t_event,NULL);
-		errout("OK\n");
-	}
-	if (t_loader) {
-		errout("Closing chunks queue... ");
-		pthread_join(t_loader,NULL);
-		errout("OK\n");
-	}
+	PLA_CLOSETHREAD("render",t_render);
+	PLA_CLOSETHREAD("physics",t_physic);
+	PLA_CLOSETHREAD("events",t_event);
+	PLA_CLOSETHREAD("chunks",t_loader);
 
-	/* Destroy mutexes */
+	/* Destroy rendering lock */
 	pthread_mutex_destroy(&m_render);
 
 	/* Destroy debugging UI */

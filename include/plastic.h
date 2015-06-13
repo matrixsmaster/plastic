@@ -112,4 +112,11 @@ static const SGameArg argp_table[GAMEARGTYPES] = {
 								"character. See details in documentation." },
 };
 
+///Sleep timings for different processing threads (us).
+#define EVENTUSLEEP 50000
+#define WORLDUSLEEP 90000
+#define CHUNKUSLEEP 100000
+#define UPDATUSLEEP 100
+
+
 #endif /* PLASTIC_H_ */

@@ -42,6 +42,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	data = NULL;
 	render = NULL;
 	gui = NULL;
+	wgen = NULL;
 	PC = NULL;
 	hud = NULL;
 	radar = NULL;
@@ -52,6 +53,8 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	clkres = NULL;
 	fps = 0;
 	lock_update = true;
+	society = NULL;
+	physics = NULL;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
@@ -60,6 +63,9 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 		result = 1;
 		return;
 	}
+
+	/* Create physics engine */
+	physics = new PlasticPhysics(data);
 
 	/* Create Player */
 	PC = new Player(sets->PCData,data);
@@ -105,6 +111,9 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 PlasticWorld::~PlasticWorld()
 {
+	//Stop physics engine
+	if (physics) delete physics;
+
 	//Game data
 	SaveGame();
 	if (society) delete society;

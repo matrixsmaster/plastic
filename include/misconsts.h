@@ -22,20 +22,19 @@
 #ifndef MISCONSTS_H_
 #define MISCONSTS_H_
 
+///Maximum length of a file path.
 #define MAXPATHLEN 512
+
+///Maximum length of an actor's name.
 #define MAXACTNAMELEN 25
 
-#define EVENTUSLEEP 50000
-#define WORLDUSLEEP 90000
-#define CHUNKUSLEEP 100000
-#define UPDATUSLEEP 100
-
+///Game UI windows names.
 #define WNDNAM_ACTVIEW "Actor View"
 #define WNDNAM_MAPVIEW "Map View"
 #define WNDNAM_INVENTORY "Inventory"
 #define WNDNAM_LVRCONF "LVR config"
 
-//Local Movement Directions
+///Local Movement Directions.
 enum ELMoveDir {
 	LMOVE_UP,
 	LMOVE_DW,
