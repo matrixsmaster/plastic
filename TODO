@@ -8,21 +8,11 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 
 -> Fill in some short info into README.md
 
--> Implement DataPipe chunks saving and loading
-
--> Implement DataPipe chnuks mapping on load
-
 -> Add zlib compression to DataPipe
-
--> Start working on physics system
 
 -> Add vehicle class (mountable actors??)
 
--> Implement atmosphere (day/night cycle, stars, clouds etc)
-
 -> Add "distant landscape" right after DataPipe will be capable of saving/loading
-
--> Move to makefiles or implement "build counter" in eclipse builder (v0.1 and later)
 
 -> Implement some command processor and connect it to world's event pump
 
@@ -32,25 +22,12 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 
 -> Test 'textured' rendering of voxel sides
 
--> Implement some marks to use in voxel table
-
--> Add object view window
-
 -> Create a tree generator
 
 -> Start working on audio system (ALSA PCM output)
 
 -> Move map tiles color information to INI
 
--> Fix AtmoSky incorrect transient in case of slow-moving time 
-
 -> Consider adding callback functions for buttons (??)
 
--> Implement hodeable parts in VModel
-
--> Add actor's limbs states
-
--> Fix a bug in CGUITable (very small sized table is going into infinite loop on redraw)
-
--> LVR: Use FOV.Z instead of separate far plane distance
- 
+-> Move to GNU Autotools. This will cause a lot of work on implementing different use-cases. Most notably, misconsts.h should die.

@@ -228,7 +228,7 @@ int main(int argc, char* argv[])
 {
 	srand(time(NULL));
 
-	printf(HELLOSTR,PRODNAME,VERMAJOR,VERMINOR,BUILDNO,PRODNAME);
+	printf(HELLOSTR,PRODNAME,VERMAJOR,VERMINOR,VERSUBVR,BUILDNO,PRODNAME);
 
 	/* Parse and print current settings. */
 	if (!argparser(argc,argv,&g_set)) {

@@ -1,11 +1,3 @@
-v.0.1 ----------------------------------------------------------
-OK	Fully working LVR (without lighting, though)
-OK	Working atmosphere (clouds and stars)
-OK	Some rigid actors
-OK	Startup shell (character generation and game options)
-OK	Working GUI (HUD, console, inventory, stats, map)
-OK	Some sort of landscape generation
-
 v.0.2 ----------------------------------------------------------
 	Filled voxel table
 	Completed landscape generation
@@ -15,4 +7,11 @@ v.0.2 ----------------------------------------------------------
 	Actors portraits generation
 	Buildings and its generation
 	Working game load/save
-	
+
+v.0.1 ----------------------------------------------------------
+OK	Fully working LVR (without lighting, though)
+OK	Working atmosphere (clouds and stars)
+OK	Some rigid actors
+OK	Startup shell (character generation and game options)
+OK	Working GUI (HUD, console, inventory, stats, map)
+OK	Some sort of landscape generation

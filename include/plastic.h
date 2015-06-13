@@ -24,25 +24,34 @@
 #include "misconsts.h"
 
 
+///That's just a temporary solution until we run Autotools
 #ifndef BUILDNO
-#define BUILDNO 2
+#include "buildnum.h"
 #endif
 
+///Version information
 #define VERMAJOR 0
 #define VERMINOR 1
+#define VERSUBVR 2
 
+///Product name
 #define PRODNAME "Plastic Inquisitor"
 
-#define HELLOSTR  "%s ver.%d.%d build %d\n\
+///First string printed onto the console
+#define HELLOSTR  "%s ver.%d.%d.%d build %d\n\
 Copyright (C) 2015, The Plastic Team\n\
 %s comes with ABSOLUTELY NO WARRANTY.\n\
 This is free software, and you are welcome to redistribute it\n\
 under conditions of GNU GPL v2\n\n"
 
 
+///Number of game argument types (run-time switches)
 #define GAMEARGTYPES 7
+
+///Maximum length of helper string
 #define GAMEARGHELPLEN 360
 
+///Game settings structure
 struct SGameSettings {
 	char root[MAXPATHLEN];	//VFS root dir
 	bool use_shell;			//launch interactive shell
@@ -53,6 +62,7 @@ struct SGameSettings {
 	SPAAttrib PCData;		//player character settings
 };
 
+///Default set of the game settings
 #define DEFAULT_SETTINGS { 							\
 	"./data",										\
 	false, 											\
@@ -63,6 +73,7 @@ struct SGameSettings {
 	{ "Mary", true, PCLS_INQUISITOR, PBOD_PNEUMO, },\
 }
 
+///Enumeration of the types of game arguments
 enum EGameArgType {
 	GAT_NOTHING,
 	GAT_ROOTDIR,
@@ -74,13 +85,15 @@ enum EGameArgType {
 	GAT_PLAYER
 };
 
+///Structure of an argument (holds helper string, switch char etc)
 struct SGameArg {
 	EGameArgType typ;
 	char sw;					//switch character
 	bool edit;					//is this setting is editable in interactive shell
-	char desc[GAMEARGHELPLEN];	//description string
+	char desc[GAMEARGHELPLEN];	//description string (helper string)
 };
 
+///Game arguments table (defines the possible game switches)
 static const SGameArg argp_table[GAMEARGTYPES] = {
 	{ GAT_ROOTDIR,	'r', true,	"Set the root directory of game files." },
 	{ GAT_USESHELL,	's', false,	"Show interactive shell after startup to "\

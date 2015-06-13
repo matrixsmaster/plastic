@@ -1,42 +1,23 @@
 Job														| Master	| Begemot
 ---------------------------------------------------------------------------------------
-Add Message Box Window									| done		|
+Update voxel table (add common types of voxels)			| assigned	| assigned
 ---------------------------------------------------------------------------------------
-Make GUI Label multilined								| done		|
+Implement hideable parts in VModel						| assigned	|
 ---------------------------------------------------------------------------------------
-Merge RenderPool branch into master						| done		|
+Add actor's limbs states								| assigned	|
 ---------------------------------------------------------------------------------------
-Create new HUD layout									|			| done
+LVR: Use FOV.Z instead of separate far plane distance	| assigned	|
 ---------------------------------------------------------------------------------------
-Create Inventory window									|			| done
+Fix a bug in CGUITable (very small sized table is going	|			| assigned
+into infinite loop on redraw)							|			|
 ---------------------------------------------------------------------------------------
-Create ActorView window									| done		|
+Add object view window									| assigned	|
 ---------------------------------------------------------------------------------------
-Implement precise timer in PlasticWorld					| done		|
+Implement some marks to use in voxel table				| assigned	|
 ---------------------------------------------------------------------------------------
-Add water generation threshold to WorldGen				| done		|
+Implement DataPipe chunks saving and loading			| assigned	|
 ---------------------------------------------------------------------------------------
-Create landscape interpolator for WorldGen				| done		|
+Implement DataPipe chnuks mapping on load				| assigned	|
 ---------------------------------------------------------------------------------------
-Fix bug with randomizing colors							| done		|
----------------------------------------------------------------------------------------
-Implement chunk elevation smoothing in WorldGen			| done		|
----------------------------------------------------------------------------------------
-Implement DataPipe chunks swapping in Move()			| done		|
----------------------------------------------------------------------------------------
-Implement global position change of PC					| done		|
----------------------------------------------------------------------------------------
-Update voxel table (add common types of voxels)			| moved to v0.2
----------------------------------------------------------------------------------------
-Add actors placement									| done		|
----------------------------------------------------------------------------------------
-Implement projection test for an objects (& actors)		| done		|
----------------------------------------------------------------------------------------
-Implement objects global movement sync					| done		|
----------------------------------------------------------------------------------------
-Add status info and some local map to new HUD			| done		|
----------------------------------------------------------------------------------------
-Add render pool start/stop methods.						| done		|
----------------------------------------------------------------------------------------
-Add pre-resize callback method to deal with SIGSEGVs	| done		|
+Create physics system stubs, threads etc				| assigned	|
 ---------------------------------------------------------------------------------------
