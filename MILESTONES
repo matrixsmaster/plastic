@@ -1,11 +1,11 @@
 v.0.2 ----------------------------------------------------------
 	Filled voxel table
-	Completed landscape generation
+	Completed static world generation
 	Simple rigid physics (collisions and gravity)
-	Actors limbs mechanics
+	Actors limbs mechanics and somewhat working combat mode
 	Actors animations and movement
 	Actors portraits generation
-	Buildings and its generation
+	Buildings and their generation
 	Working game load/save
 
 v.0.1 ----------------------------------------------------------

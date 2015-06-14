@@ -20,8 +20,6 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 
 -> Consider adding lens flare effect for post-processor
 
--> Test 'textured' rendering of voxel sides
-
 -> Create a tree generator
 
 -> Start working on audio system (ALSA PCM output)
@@ -33,3 +31,11 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Move to GNU Autotools. This will cause a lot of work on implementing different use-cases. Most notably, misconsts.h should die.
 
 -> Consider movement of raycasting calculations from LVR to DataPipe to speed up model intersection testing.
+
+-> Draw some simple buildings (one or two stories)
+
+-> Draw building blocks (single floor) for making large buildings
+
+-> Add generation algorithm to create large buildings out of small blocks
+
+-> Add simple "chip"-based AI and add actors ability to move (without pathfinding)

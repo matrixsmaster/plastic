@@ -19,5 +19,23 @@ Implement DataPipe chunks saving and loading			| assigned	|
 ---------------------------------------------------------------------------------------
 Implement DataPipe chnuks mapping on load				| assigned	|
 ---------------------------------------------------------------------------------------
-Create physics system stubs, threads etc				| in progr	|
+Create physics system stubs, threads etc				| done		|
+---------------------------------------------------------------------------------------
+PHY Collision detection									|			| in progr
+---------------------------------------------------------------------------------------
+PHY Gravity												|			| assigned
+---------------------------------------------------------------------------------------
+Test 'textured' rendering of voxel sides				| assigned	|
+---------------------------------------------------------------------------------------
+Gather portrait generation sprites						|			| assigned
+---------------------------------------------------------------------------------------
+Implement actors limbs mechanics						| assigned	|
+---------------------------------------------------------------------------------------
+Add dictionaries to DP and finish the NameGen			| assigned	|
+---------------------------------------------------------------------------------------
+Add actors animation lists								| assigned	|
+---------------------------------------------------------------------------------------
+Finish WorldGen											| assigned	|
+---------------------------------------------------------------------------------------
+Create voxel destroying stub for combat mode			| assigned	|
 ---------------------------------------------------------------------------------------
