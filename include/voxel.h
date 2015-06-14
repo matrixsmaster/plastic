@@ -60,17 +60,18 @@ enum EVoxelType {
 
 ///Voxel index info structure.
 struct SVoxelInf {
-	EVoxelType type;
-	SGUIPixel pix;
-	char sides[6];
-	char* mark;
+	EVoxelType type;		//Physical type of the voxel.
+	SGUIPixel pix;			//Color format used to display a voxel.
+	char sides[6];			//Symbols for each of six sides of a voxel cube.
+	char* mark;				//Mark. A voxel's 'name'.
 };
 
 ///Unified voxel table structure.
 struct SVoxelTab {
-	SVoxelInf* tab;
-	unsigned len;
-	int stat[NUMVOXTYPES];
+	SVoxelInf* tab;			//The table (array of SVoxelInf) itself.
+	unsigned len;			//Length of allocated table.
+	unsigned rlen;			//Real table length (number of voxels defined).
+	int stat[NUMVOXTYPES];	//Statistic. Number of voxels defined for each voxel type.
 };
 
 ///Chunk data type {[z][y][x]}

@@ -75,9 +75,9 @@ DataPipe::~DataPipe()
 {
 	status = DPIPE_NOTREADY;
 
-	if (voxeltab.tab) free(voxeltab.tab);
 	if (rngen) delete rngen;
 
+	FreeVoxTab();
 	PurgeSprites();
 	PurgeModels();
 	PurgeChunks();
@@ -94,6 +94,7 @@ bool DataPipe::Allocator(SGameSettings* sets)
 	/* Allocate voxel info table */
 	sz = DEFVOXTYPES * sizeof(SVoxelInf);
 	voxeltab.len = DEFVOXTYPES;
+	voxeltab.rlen = 0;
 	voxeltab.tab = (SVoxelInf*)malloc(sz);
 	if (!voxeltab.tab) {
 		errout("Unable to allocate RAM for voxel table.\n");
@@ -258,8 +259,25 @@ bool DataPipe::LoadVoxTab()
 		if (n >= voxeltab.len) break;
 	}
 
+	//set the number of voxels defined in table file
+	voxeltab.rlen = n;
+
+	//we're good to go
 	fclose(vtf);
 	return true;
+}
+
+void DataPipe::FreeVoxTab()
+{
+	unsigned i;
+
+	for (i = 0; i < voxeltab.len; i++) {
+		if (voxeltab.tab[i].mark) free(voxeltab.tab[i].mark);
+	}
+
+	if (voxeltab.tab) free(voxeltab.tab);
+
+	memset(&voxeltab,0,sizeof(voxeltab));
 }
 
 /* GetVoxel() Interlocking macros variations for multithreaded access */

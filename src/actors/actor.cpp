@@ -66,6 +66,7 @@ void PlasticActor::InitVars()
 	isnpc = true;
 	model = NULL;
 	portrait = NULL;
+	anim = NULL;
 }
 
 void PlasticActor::AutoInitStats()

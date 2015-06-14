@@ -46,7 +46,8 @@ enum ELMoveDir {
 
 /*
  * I don't want to use <inttypes.h> because it causes all kinds of problems
- * on different platforms. Or even with different versions of glibc inclusion files.
+ * on different distros. Or even with different versions of glibc inclusion files.
+ * That should be changed after we switch to some build system (e.g. GNU Autotools).
  */
 typedef unsigned long long int ulli; //for short
 typedef unsigned long int uli;

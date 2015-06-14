@@ -35,6 +35,7 @@
 #include "vmodel.h"
 #include "inventory.h"
 #include "namegen.h"
+#include "animator.h"
 
 
 //Basic Actor Class
@@ -47,6 +48,7 @@ protected:
 	VModel* model;			//Actor's model
 	Inventory invent;		//Actor's inventory
 	SGUIPixel* portrait;	//Actor's portrait
+	DAnimator* anim;		//Actor's animations
 
 	void InitVars();
 

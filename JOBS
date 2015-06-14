@@ -33,9 +33,9 @@ Implement actors limbs mechanics						| assigned	|
 ---------------------------------------------------------------------------------------
 Add dictionaries to DP and finish the NameGen			| assigned	|
 ---------------------------------------------------------------------------------------
-Add actors animation lists								| assigned	|
+Add actors animation lists								| in progr	|
 ---------------------------------------------------------------------------------------
 Finish WorldGen											| assigned	|
 ---------------------------------------------------------------------------------------
-Create voxel destroying stub for combat mode			| assigned	|
+Add voxel destroying test for combat mode				| assigned	|
 ---------------------------------------------------------------------------------------

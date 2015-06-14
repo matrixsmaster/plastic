@@ -95,6 +95,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	/* Get used RAM amount */
 	alloc_gb = (float)(data->GetAllocatedRAM()) / 1024.f / 1024.f / 1024.f;
 	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
+	printf("Voxel table of %u voxels loaded\n",data->GetVoxTable()->rlen);
 	printf("Chunks buffer capacity = %d * (%d ^ 3) voxels\n",HOLDCHUNKS,CHUNKBOX);
 	printf("Initially allocated memory: %llu bytes (%.3f GiB)\n",data->GetAllocatedRAM(),alloc_gb);
 

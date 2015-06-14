@@ -154,6 +154,7 @@ protected:
 	bool ScanFiles();
 	bool FindChunk(vector3di pos, SDataPlacement* res);
 	bool LoadVoxTab();
+	void FreeVoxTab();
 	bool LoadIni(const std::string name);
 	void MakeChunk(unsigned l, vector3di pos);
 	bool LoadChunk(SDataPlacement* res, PChunk buf);
