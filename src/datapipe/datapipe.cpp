@@ -257,7 +257,7 @@ bool DataPipe::LoadVoxTab()
 #define DP_GETVOX_UNLOCK
 #endif
 
-voxel DataPipe::GetVoxel(const vector3di* p)
+voxel DataPipe::GetVoxel(const vector3di* p, bool dynskip)
 {
 	PChunk ch;
 	int px,py,pz;
@@ -272,10 +272,12 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	DP_GETVOX_LOCK;
 
 	/* Check for dynamic objects */
-	tmp = IntersectModel(p,NULL,false);
-	if (tmp) {
-		DP_GETVOX_UNLOCK;
-		return tmp;
+	if (!dynskip) {
+		tmp = IntersectModel(p,NULL,false);
+		if (tmp) {
+			DP_GETVOX_UNLOCK;
+			return tmp;
+		}
 	}
 
 #if HOLDCHUNKS == 1
@@ -347,9 +349,9 @@ voxel DataPipe::GetVoxel(const vector3di* p)
 	return tmp;
 }
 
-const SVoxelInf* DataPipe::GetVoxelI(const vector3di* p)
+const SVoxelInf* DataPipe::GetVoxelI(const vector3di* p, bool dynskip)
 {
-	voxel v = GetVoxel(p);
+	voxel v = GetVoxel(p,dynskip);
 	if (v < voxeltab.len) return &(voxeltab.tab[v]);
 	else return NULL;
 }

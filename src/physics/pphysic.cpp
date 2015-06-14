@@ -33,11 +33,21 @@ PlasticPhysics::~PlasticPhysics()
 	//TODO
 }
 
+const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
+{
+	SPPCollision res;
+
+	res.no_collision = true; //FIXME
+
+	return res;
+}
+
 void PlasticPhysics::Quantum()
 {
 	PPModVec::iterator im;
 	VModVec::iterator iv;
 	SPPModelRec cur;
+	SPPCollision ccol;
 	VModVec* fmod = pipe->GetModels();
 	bool sys_changed = false;
 
@@ -51,6 +61,7 @@ void PlasticPhysics::Quantum()
 			cur.oldspos = (*iv)->GetPos();
 			cur.moved = false;
 			cur.changed = false;
+			cur.contact = false;
 			mods.push_back(cur);
 			im = mods.end();
 			dbg_print("[PHY] Added model %p",(im-1)->modptr);
@@ -74,13 +85,26 @@ void PlasticPhysics::Quantum()
 	}
 	pipe->ReadUnlock();
 
-	/* Calculate movements */
-	//TODO
+	/* Calculate collisions */
+	for (im = mods.begin(); im < mods.end(); ++im) {
+		//skip contacting objects, which isn't moved
+		if ((!im->changed) && (!im->moved) && (im->contact)) continue;
+
+		ccol = Collision(&(*im));
+		if (ccol.no_collision) continue;
+
+		//TODO: gravity
+
+		//TODO: move object
+
+		im->changed = true;
+		sys_changed = true;
+	}
 
 	/* Change system */
 	if (!sys_changed) return;
 
-	pipe->WriteLock();
+	pipe->ReadLock();
 
 	im = mods.begin();
 	for (iv = fmod->begin(); iv != fmod->end(); ++iv, ++im) {
@@ -98,5 +122,5 @@ void PlasticPhysics::Quantum()
 		im->modptr->SetPos(im->oldspos);
 	}
 
-	pipe->WriteUnlock();
+	pipe->ReadUnlock();
 }

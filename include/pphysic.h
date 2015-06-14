@@ -31,9 +31,18 @@ struct SPPModelRec {
 	vector3di oldspos;
 	bool moved;
 	bool changed;
+	bool contact;
 };
 
 typedef std::vector<SPPModelRec> PPModVec;
+
+struct SPPCollision {
+	vector3di start;
+	int depth;
+	bool no_collision;
+	SPPModelRec* next_obj;
+//	bool contact;
+};
 
 class PlasticPhysics {
 private:
@@ -43,6 +52,8 @@ private:
 public:
 	PlasticPhysics(DataPipe* pipeptr);
 	virtual ~PlasticPhysics();
+
+	const SPPCollision Collision(const SPPModelRec* mod);
 
 	void Quantum();
 };

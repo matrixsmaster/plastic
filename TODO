@@ -31,3 +31,5 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Consider adding callback functions for buttons (??)
 
 -> Move to GNU Autotools. This will cause a lot of work on implementing different use-cases. Most notably, misconsts.h should die.
+
+-> Consider movement of raycasting calculations from LVR to DataPipe to speed up model intersection testing.

@@ -206,8 +206,9 @@ public:
 	virtual void ChunkQueue();
 
 	///Returns a specific voxel (or its data) in a loaded space.
-	virtual voxel GetVoxel(const vector3di* p);				//return voxel code
-	virtual const SVoxelInf* GetVoxelI(const vector3di* p);	//return voxel info
+	///Set dynskip to skip testing for dynamic objects.
+	virtual voxel GetVoxel(const vector3di* p, bool dynskip = false);				//return voxel code
+	virtual const SVoxelInf* GetVoxelI(const vector3di* p, bool dynskip = false);	//return voxel info
 
 	///Return an information about voxel by type code.
 	virtual const SVoxelInf* GetVInfo(const voxel v);
