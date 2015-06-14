@@ -63,6 +63,7 @@ struct SVoxelInf {
 	EVoxelType type;
 	SGUIPixel pix;
 	char sides[6];
+	char* mark;
 };
 
 ///Unified voxel table structure.
@@ -70,7 +71,6 @@ struct SVoxelTab {
 	SVoxelInf* tab;
 	unsigned len;
 	int stat[NUMVOXTYPES];
-	char* marks[DEFVOXTYPES];
 };
 
 ///Chunk data type {[z][y][x]}

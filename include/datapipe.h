@@ -57,6 +57,13 @@
 ///INI file string format.
 #define FMTINISTRING "%s = %255[^\n]"
 
+///Maximum length of a voxel mark.
+#define MAXVOXMARKLEN 48
+///Voxel definition string format,
+#define VOXTABSTRING "%c%d %hd %hd %hd %hd %hd %hd %6c %47[^\n]"
+///Number of parameters in voxel definition string.
+#define VOXTABSTRPARAMS 10
+
 ///Voxel table file name.
 #define VOXTABFILENAME "voxtab.dat"
 

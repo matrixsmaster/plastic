@@ -211,6 +211,7 @@ bool DataPipe::LoadVoxTab()
 {
 	FILE* vtf;
 	char pth[MAXPATHLEN];
+	char mark[MAXVOXMARKLEN];
 	char fx;
 	SVoxelInf cvf;
 	int r;
@@ -223,24 +224,37 @@ bool DataPipe::LoadVoxTab()
 
 	//read table
 	while (!feof(vtf)) {
-		r = fscanf(vtf,"%c%d %hd %hd %hd %hd %hd %hd %6c\n",&fx,
+		//reset
+		memset(&cvf,0,sizeof(cvf));
+		memset(mark,0,sizeof(mark));
+
+		//read and parse the string
+		r = fscanf(vtf,VOXTABSTRING,&fx,
 				(int*)&(cvf.type),
 				&(cvf.pix.fg.r),&(cvf.pix.fg.g),&(cvf.pix.fg.b),
 				&(cvf.pix.bg.r),&(cvf.pix.bg.g),&(cvf.pix.bg.b),
-				cvf.sides);
+				cvf.sides,mark);
 
-		if (r < 9) continue; //check number of successfully parsed params
+		//check the number of successfully parsed params and string prefix
+		if ((r < VOXTABSTRPARAMS) || (fx != 'V')) continue;
 
-		if (fx == 'V') {
-			if ((cvf.type >= 0) && (cvf.type < NUMVOXTYPES))
-				voxeltab.stat[cvf.type]++;
-			else {
-				errout("Unknown voxel type %d\n",(int)cvf.type);
-				fclose(vtf);
-				return false;
-			}
-			voxeltab.tab[n++] = cvf;
+		//check voxel type
+		if ((cvf.type >= 0) && (cvf.type < NUMVOXTYPES))
+			voxeltab.stat[cvf.type]++;
+		else {
+			errout("Unknown voxel type %d\n",(int)cvf.type);
+			fclose(vtf);
+			return false;
 		}
+
+		//apply a mark
+		if ((strlen(mark) > 1) && (mark[0] != '!')) {
+			cvf.mark = (char*)malloc(strlen(mark)+1);
+			if (cvf.mark) strcpy(cvf.mark,mark);
+		}
+
+		//append new voxel
+		voxeltab.tab[n++] = cvf;
 		if (n >= voxeltab.len) break;
 	}
 

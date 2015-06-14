@@ -13,7 +13,7 @@ into infinite loop on redraw)							|			|
 ---------------------------------------------------------------------------------------
 Add object view window									| assigned	|
 ---------------------------------------------------------------------------------------
-Implement some marks to use in voxel table				| assigned	|
+Implement some marks to use in voxel table				| in progr	|
 ---------------------------------------------------------------------------------------
 Implement DataPipe chunks saving and loading			| assigned	|
 ---------------------------------------------------------------------------------------
