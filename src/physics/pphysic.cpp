@@ -44,7 +44,7 @@ void PlasticPhysics::Quantum()
 	/* Check and update models presence */
 	pipe->ReadLock();
 	im = mods.begin();
-	for (iv = fmod->begin(); iv < fmod->end(); ++iv, ++im) {
+	for (iv = fmod->begin(); iv < fmod->end(); ++iv) {
 		//if a foreign model vector is larger than ours, add new model
 		if (im >= mods.end()) {
 			cur.modptr = *iv;
@@ -52,7 +52,8 @@ void PlasticPhysics::Quantum()
 			cur.moved = false;
 			cur.changed = false;
 			mods.push_back(cur);
-			im = mods.end() - 1;
+			im = mods.end();
+			dbg_print("[PHY] Added model %p",(im-1)->modptr);
 			continue;
 		}
 
@@ -63,9 +64,11 @@ void PlasticPhysics::Quantum()
 				im->oldspos = (*iv)->GetPos();
 				im->moved = true;
 			}
+			++im;
 		} else {
 			//model vector is out of sync
-			im = mods.erase(im) - 1;
+			dbg_print("[PHY] Removing model %p",im->modptr);
+			im = mods.erase(im);
 			--iv;
 		}
 	}
@@ -83,7 +86,7 @@ void PlasticPhysics::Quantum()
 	for (iv = fmod->begin(); iv != fmod->end(); ++iv, ++im) {
 		//don't forget to make sure we're still in sync
 		if ((*iv) != im->modptr) {
-			dbg_print("Early return due to model vectors is out of sync");
+			dbg_print("[PHY] Early return due to model vectors is out of sync");
 			pipe->WriteUnlock();
 			return;
 		}
