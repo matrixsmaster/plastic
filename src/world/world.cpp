@@ -55,6 +55,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	lock_update = true;
 	society = NULL;
 	physics = NULL;
+	msgsys = NULL;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
@@ -106,6 +107,10 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	render = new RenderPool(data);
 	render->GetSkies()->SetTime(&gtime);
 
+	/* Create text messages system */
+	msgsys = new GameMessages(data);
+	msgsys->SetPCName(PC->GetAttributes().name);
+
 	/* Everything is OK */
 	result = 0;
 }
@@ -122,6 +127,7 @@ PlasticWorld::~PlasticWorld()
 	if (clkres) delete clkres;
 	data->ConnectWorldGen(NULL); //disconnect WG
 	if (wgen) delete wgen;
+	if (msgsys) delete msgsys;
 
 	//UI parts
 	if (binder) delete binder;
@@ -150,7 +156,7 @@ void PlasticWorld::Quantum()
 		PlayerMoved();
 
 		//Show greeting string
-		hud->PutStrToLog("Welcome to the world!"); //FIXME: Write something here
+		hud->PutStrToLog(msgsys->GetMessage("WELCOME_LOG"));
 
 		//FIXME: debugging stuff
 		test = data->LoadModel("testmodel.dat",PC->GetPos()+vector3di(0,0,20),data->GetGP());

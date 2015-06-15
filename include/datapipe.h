@@ -76,6 +76,9 @@
 ///Actors classes data file name.
 #define CLASNFONAME "classes"
 
+///Game text messages db file name.
+#define MSGSDBFNAME "messages"
+
 
 /* States of DataPipe */
 enum EDPipeStatus {

@@ -169,6 +169,11 @@ void HUD::PutStrToLog(const char* str)
 	if (!overlays.empty()) PutString(OVRL_LOG, str);
 }
 
+void HUD::PutStrToLog(string str)
+{
+	if (!overlays.empty()) PutString(OVRL_LOG, str);
+}
+
 void HUD::PrintStrToLog(const char* fmt, ...)
 {
 	char str[LOG_OVRL_MAXSTRLEN];

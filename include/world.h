@@ -42,6 +42,7 @@
 #include "wrldgen.h"
 #include "society.h"
 #include "pphysic.h"
+#include "gamemsg.h"
 
 
 /* Ray-Object intersection data holding structure */
@@ -79,6 +80,7 @@ private:
 	SSavedGameHeader gamesave;
 	PlasticSociety* society;
 	PlasticPhysics* physics;
+	GameMessages* msgsys;
 //	pthread_mutex_t wrldmtx;
 
 	//FIXME: DEBUG

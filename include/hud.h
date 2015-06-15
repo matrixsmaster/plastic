@@ -71,6 +71,7 @@ public:
 
 	///Put string to LOG overlay
 	void PutStrToLog(const char* str);
+	void PutStrToLog(std::string str);
 	void PrintStrToLog(const char* fmt, ...);
 
 	///Set transparency
