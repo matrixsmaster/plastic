@@ -39,6 +39,7 @@ void dbg_toggle()
 
 void dbg_logstr(const char* str)
 {
+	if (!str) return;
 	if (debug_ui) debug_ui->PutString(str);
 	else errout("[DEBUG] %s\n",str);
 }
@@ -47,6 +48,9 @@ void dbg_print(const char* fmt, ...)
 {
 	char str[DBGUIMAXLEN];
 	va_list vl;
+
+	if (!fmt) return;
+
 	va_start(vl,fmt);
 	vsnprintf(str,DBGUIMAXLEN,fmt,vl);
 	va_end(vl);
