@@ -89,7 +89,7 @@ void CurseGUIDebugWnd::Update(bool refr)
 		en = it - numstr;
 		if (en < log.begin()) en = log.begin();
 
-		for (; it > en; --it) {
+		for (; it >= en; --it) {
 			if (w < (int)it->size()) {
 				// partitioning into multiple lines
 				nl = (it->size() / w);
@@ -167,7 +167,7 @@ void CurseGUIDebugWnd::PutString(char* str)
 	PutString(string(str));
 }
 
-void CurseGUIDebugWnd::PutString(std::string str)
+void CurseGUIDebugWnd::PutString(string str)
 {
 	pthread_mutex_lock(&wmutex);
 	log.push_back(str);

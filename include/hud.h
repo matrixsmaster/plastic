@@ -21,6 +21,7 @@
 #define HUD_H_
 
 #include <vector>
+#include <stdarg.h>
 #include "misconsts.h"
 #include "CurseGUI.h"
 #include "CGUIOverlay.h"
@@ -29,6 +30,7 @@
 #include "actor.h"
 
 #define STAT_OVRL_HEIGHT 3
+#define LOG_OVRL_MAXSTRLEN 512
 
 enum HUDOverlayType {
 	OVRL_FPS = 0,		//Fps
@@ -39,7 +41,6 @@ enum HUDOverlayType {
 	OVRL_CLOCK,			//Date and time
 	OVRL_CHRG_HP		//Charge and HP
 };
-
 
 class HUD {
 private:
@@ -70,6 +71,8 @@ public:
 
 	///Put string to LOG overlay
 	void PutStrToLog(const char* str);
+	void PutStrToLog(std::string str);
+	void PrintStrToLog(const char* fmt, ...);
 
 	///Set transparency
 	void SetAlpha(HUDOverlayType t, float a);

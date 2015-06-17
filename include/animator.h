@@ -17,44 +17,25 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "debug.h"
-#include "support.h"
+#ifndef ANIMATOR_H_
+#define ANIMATOR_H_
 
-CurseGUIDebugWnd* debug_ui = NULL;
+#include "voxel.h"
+#include "datapipe.h"
+#include "vmodel.h"
 
-void dbg_init(CurseGUI* gui)
-{
-	debug_ui = new CurseGUIDebugWnd(gui);
-	gui->AddWindow(debug_ui);
-}
 
-void dbg_finalize()
-{
-}
+/* Discrete animator */
+class DAnimator {
+private:
+	DataPipe* pipe;
+	VModel* model;
 
-void dbg_toggle()
-{
-	if (debug_ui) debug_ui->ToggleShow();
-}
+public:
+	DAnimator(DataPipe* pipeptr);
+	virtual ~DAnimator();
 
-void dbg_logstr(const char* str)
-{
-	if (!str) return;
-	if (debug_ui) debug_ui->PutString(str);
-	else errout("[DEBUG] %s\n",str);
-}
+	void SetModel(VModel* mod);
+};
 
-void dbg_print(const char* fmt, ...)
-{
-	char str[DBGUIMAXLEN];
-	va_list vl;
-
-	if (!fmt) return;
-
-	va_start(vl,fmt);
-	vsnprintf(str,DBGUIMAXLEN,fmt,vl);
-	va_end(vl);
-
-	if (debug_ui) debug_ui->PutString(str);
-	else errout("[DEBUG] %s\n",str);
-}
+#endif /* ANIMATOR_H_ */

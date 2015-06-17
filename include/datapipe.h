@@ -57,6 +57,13 @@
 ///INI file string format.
 #define FMTINISTRING "%s = %255[^\n]"
 
+///Maximum length of a voxel mark.
+#define MAXVOXMARKLEN 48
+///Voxel definition string format,
+#define VOXTABSTRING "%c%d %hd %hd %hd %hd %hd %hd %6c %47[^\n]"
+///Number of parameters in voxel definition string.
+#define VOXTABSTRPARAMS 10
+
 ///Voxel table file name.
 #define VOXTABFILENAME "voxtab.dat"
 
@@ -68,6 +75,9 @@
 
 ///Actors classes data file name.
 #define CLASNFONAME "classes"
+
+///Game text messages db file name.
+#define MSGSDBFNAME "messages"
 
 
 /* States of DataPipe */
@@ -147,6 +157,7 @@ protected:
 	bool ScanFiles();
 	bool FindChunk(vector3di pos, SDataPlacement* res);
 	bool LoadVoxTab();
+	void FreeVoxTab();
 	bool LoadIni(const std::string name);
 	void MakeChunk(unsigned l, vector3di pos);
 	bool LoadChunk(SDataPlacement* res, PChunk buf);

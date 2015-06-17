@@ -17,44 +17,35 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include "debug.h"
-#include "support.h"
+#ifndef GAMEMSG_H_
+#define GAMEMSG_H_
 
-CurseGUIDebugWnd* debug_ui = NULL;
+#include <string>
+#include "datapipe.h"
 
-void dbg_init(CurseGUI* gui)
-{
-	debug_ui = new CurseGUIDebugWnd(gui);
-	gui->AddWindow(debug_ui);
-}
+class GameMessages {
+private:
+	/* core */
+	DataPipe* pipe;
 
-void dbg_finalize()
-{
-}
+	/* current values */
+	std::string pcname;
 
-void dbg_toggle()
-{
-	if (debug_ui) debug_ui->ToggleShow();
-}
+	///Resolves format token.
+	std::string GetToken(std::string tok);
 
-void dbg_logstr(const char* str)
-{
-	if (!str) return;
-	if (debug_ui) debug_ui->PutString(str);
-	else errout("[DEBUG] %s\n",str);
-}
+	///Parses format string and returns compiled result.
+	std::string Translate(std::string fmt);
 
-void dbg_print(const char* fmt, ...)
-{
-	char str[DBGUIMAXLEN];
-	va_list vl;
+public:
+	GameMessages(DataPipe* pipeptr);
+	virtual ~GameMessages()						{}
 
-	if (!fmt) return;
+	void SetPCName(const char* name)			{ pcname = std::string(name); }
+	//TODO: append more
 
-	va_start(vl,fmt);
-	vsnprintf(str,DBGUIMAXLEN,fmt,vl);
-	va_end(vl);
+	std::string GetMessage(const char* descr);
+	std::string GetMessage(std::string descr);
+};
 
-	if (debug_ui) debug_ui->PutString(str);
-	else errout("[DEBUG] %s\n",str);
-}
+#endif /* GAMEMSG_H_ */

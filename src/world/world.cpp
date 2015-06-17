@@ -55,6 +55,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	lock_update = true;
 	society = NULL;
 	physics = NULL;
+	msgsys = NULL;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
@@ -95,6 +96,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	/* Get used RAM amount */
 	alloc_gb = (float)(data->GetAllocatedRAM()) / 1024.f / 1024.f / 1024.f;
 	printf("Size of voxel = %lu bytes\n",sizeof(voxel));
+	printf("Voxel table of %u voxels loaded\n",data->GetVoxTable()->rlen);
 	printf("Chunks buffer capacity = %d * (%d ^ 3) voxels\n",HOLDCHUNKS,CHUNKBOX);
 	printf("Initially allocated memory: %llu bytes (%.3f GiB)\n",data->GetAllocatedRAM(),alloc_gb);
 
@@ -104,6 +106,10 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	/* Create render pool */
 	render = new RenderPool(data);
 	render->GetSkies()->SetTime(&gtime);
+
+	/* Create text messages system */
+	msgsys = new GameMessages(data);
+	msgsys->SetPCName(PC->GetAttributes().name);
 
 	/* Everything is OK */
 	result = 0;
@@ -121,6 +127,7 @@ PlasticWorld::~PlasticWorld()
 	if (clkres) delete clkres;
 	data->ConnectWorldGen(NULL); //disconnect WG
 	if (wgen) delete wgen;
+	if (msgsys) delete msgsys;
 
 	//UI parts
 	if (binder) delete binder;
@@ -149,7 +156,7 @@ void PlasticWorld::Quantum()
 		PlayerMoved();
 
 		//Show greeting string
-		hud->PutStrToLog("Welcome to the world!"); //FIXME: Write something here
+		hud->PutStrToLog(msgsys->GetMessage("WELCOME_LOG"));
 
 		//FIXME: debugging stuff
 		test = data->LoadModel("testmodel.dat",PC->GetPos()+vector3di(0,0,20),data->GetGP());
@@ -349,7 +356,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	//FIXME: DEBUG:
 	vector3di tr = test->GetRot();
 	vector3di x;
-	char s[128];
+//	char s[128];
 	SPABase stst;
 
 	result = 1;
@@ -463,12 +470,12 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			x = cinters.pnt;
 			if (cinters.model) {
 				if (cinters.actor)
-					snprintf(s,128,"%d:%d Actor: %s",curso.X,curso.Y,cinters.actor->GetAttributes().name);
+					hud->PrintStrToLog("%d:%d Actor: %s",curso.X,curso.Y,cinters.actor->GetAttributes().name);
 				else
-					snprintf(s,128,"%d:%d->%d:%d:%d (%p)",curso.X,curso.Y,x.X,x.Y,x.Z,cinters.model);
+					hud->PrintStrToLog("%d:%d->%d:%d:%d (%p)",curso.X,curso.Y,x.X,x.Y,x.Z,cinters.model);
 			} else
-				snprintf(s,128,"%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
-			hud->PutStrToLog(s);
+				hud->PrintStrToLog("%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
+//			hud->PutStrToLog(s);
 			gui->SetCursorPos(curso.X,curso.Y);
 		}
 		break;
