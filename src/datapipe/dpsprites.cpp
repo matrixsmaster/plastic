@@ -17,24 +17,39 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef NAMEGEN_H_
-#define NAMEGEN_H_
-
-#include <string>
+#include <stdio.h>
 #include "datapipe.h"
 
-#define NMGFEMALEDICT "names_f"
-#define NMGMALEDICT "names_m"
+VSprite* DataPipe::LoadSprite(const char* fname)
+{
+	char fn[MAXPATHLEN];
+	VSprite* spr = new VSprite();
 
-class NameGen {
-private:
-	DataPipe* pipe;
+	snprintf(fn,MAXPATHLEN,"%s/%s",root,fname);
+	if (!spr->LoadFromFile(fn)) {
+		delete spr;
+		return NULL;
+	}
 
-public:
-	NameGen(DataPipe* pipeptr);
-	virtual ~NameGen()				{}
+	allocated += spr->GetAllocatedRAM();
 
-	std::string GetHumanName(bool female);
-};
+	WriteLock();
+	sprs.push_back(spr);
+	WriteUnlock();
 
-#endif /* NAMEGEN_H_ */
+	return spr;
+}
+
+void DataPipe::PurgeSprites()
+{
+	VSprVec::iterator mi;
+
+	WriteLock();
+	for (mi = sprs.begin(); mi != sprs.end(); ++mi) {
+		allocated -= (*mi)->GetAllocatedRAM();
+		delete (*mi);
+	}
+
+	sprs.clear();
+	WriteUnlock();
+}

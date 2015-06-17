@@ -29,7 +29,18 @@ NameGen::NameGen(DataPipe* pipeptr)
 
 string NameGen::GetHumanName(bool female)
 {
-	//FIXME: debug
-	if (female) return "Alice";
-	return "Bob";
+	DPDict* dct;
+	string r;
+	PRNGen* rng = pipe->GetRNG();
+
+	//Load first names dictionary
+	dct = (female)? pipe->GetDictionary(NMGFEMALEDICT):pipe->GetDictionary(NMGMALEDICT);
+	if (!dct) return r;
+
+	//Select a random first name
+	r = dct->at(rng->RangedNumber((int)dct->size()));
+
+	//TODO: Generate true random last name
+
+	return r;
 }

@@ -31,7 +31,7 @@ Gather portrait generation sprites						|			| assigned
 ---------------------------------------------------------------------------------------
 Implement actors limbs mechanics						| assigned	|
 ---------------------------------------------------------------------------------------
-Add dictionaries to DP and finish the NameGen			| assigned	|
+Add dictionaries to DP and finish the NameGen			| in progr	|
 ---------------------------------------------------------------------------------------
 Add actors animation lists								| in progr	|
 ---------------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ Finish WorldGen											| assigned	|
 ---------------------------------------------------------------------------------------
 Add voxel destroying test for combat mode				| assigned	|
 ---------------------------------------------------------------------------------------
-Create messages loading & translation system			| in progr	|
+Create messages loading & translation system			| done		|
 ---------------------------------------------------------------------------------------
 Test 'tup' as a temporary build system					| assigned	|
 ---------------------------------------------------------------------------------------

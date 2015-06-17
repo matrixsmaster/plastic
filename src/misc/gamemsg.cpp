@@ -30,9 +30,13 @@ GameMessages::GameMessages(DataPipe* pipeptr)
 
 string GameMessages::GetToken(string tok)
 {
-	if (tok == "PCName") {
+	if (tok == "PCName")
 		return pcname;
-	} else {
+
+	else if (tok == "AName")
+		return actname;
+
+	else {
 		dbg_print("Unknown token '%s'",tok.c_str());
 		return "";
 	}

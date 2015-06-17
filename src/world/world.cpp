@@ -469,9 +469,14 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			ScreenRay(curso);
 			x = cinters.pnt;
 			if (cinters.model) {
-				if (cinters.actor)
-					hud->PrintStrToLog("%d:%d Actor: %s",curso.X,curso.Y,cinters.actor->GetAttributes().name);
-				else
+				if (cinters.actor) {
+//					hud->PrintStrToLog("%d:%d Actor: %s",curso.X,curso.Y,cinters.actor->GetAttributes().name);
+					msgsys->SetActorName(cinters.actor->GetAttributes().name);
+					if (cinters.actor->GetAttributes().female)
+						hud->PutStrToLog(msgsys->GetMessage("ACTRESS_LOG"));
+					else
+						hud->PutStrToLog(msgsys->GetMessage("ACTOR_LOG"));
+				} else
 					hud->PrintStrToLog("%d:%d->%d:%d:%d (%p)",curso.X,curso.Y,x.X,x.Y,x.Z,cinters.model);
 			} else
 				hud->PrintStrToLog("%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);

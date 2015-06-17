@@ -57,6 +57,11 @@
 ///INI file string format.
 #define FMTINISTRING "%s = %255[^\n]"
 
+///Maximum length of a word in a dictionary.
+#define MAXDICTSTRLEN 512
+///Dictionary file string format.
+//#define FMTDICTSTRING "%511[^\n]"
+
 ///Maximum length of a voxel mark.
 #define MAXVOXMARKLEN 48
 ///Voxel definition string format,
@@ -117,6 +122,8 @@ typedef std::map<std::string,IniData> IniMap;
 typedef std::vector<VModel*> VModVec;
 typedef std::vector<VSprite*> VSprVec;
 typedef std::map<vector3dulli,SDataPlacement> PlaceMap;
+typedef std::vector<std::string> DPDict;
+typedef std::map<std::string,DPDict> DPDictMap;
 
 
 /* ********************************** DATA PIPE MAIN ********************************** */
@@ -147,6 +154,7 @@ protected:
 
 	PRNGen* rngen;						//main random numbers generator instance
 	IniMap ini;							//map of known (and loaded) ini files
+	DPDictMap dicts;					//all loaded dictionaries
 
 	SSavedGameHeader svhead;			//save file header data
 
@@ -159,6 +167,7 @@ protected:
 	bool LoadVoxTab();
 	void FreeVoxTab();
 	bool LoadIni(const std::string name);
+	bool LoadDict(const std::string name);
 	void MakeChunk(unsigned l, vector3di pos);
 	bool LoadChunk(SDataPlacement* res, PChunk buf);
 
@@ -266,6 +275,10 @@ public:
 	bool SaveGameHeader(SSavedGameHeader* hdr);
 	bool LoadStaticWorld();
 	bool SaveStaticWorld();
+
+	//FIXME: comment
+	DPDict* GetDictionary(const char* dct_name);
+	DPDict* GetDictionary(const std::string dct_name);
 };
 
 

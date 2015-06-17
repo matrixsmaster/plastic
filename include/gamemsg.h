@@ -30,6 +30,7 @@ private:
 
 	/* current values */
 	std::string pcname;
+	std::string actname;
 
 	///Resolves format token.
 	std::string GetToken(std::string tok);
@@ -42,6 +43,7 @@ public:
 	virtual ~GameMessages()						{}
 
 	void SetPCName(const char* name)			{ pcname = std::string(name); }
+	void SetActorName(const char* name)			{ actname = std::string(name); }
 	//TODO: append more
 
 	std::string GetMessage(const char* descr);
