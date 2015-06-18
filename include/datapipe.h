@@ -59,8 +59,6 @@
 
 ///Maximum length of a word in a dictionary.
 #define MAXDICTSTRLEN 512
-///Dictionary file string format.
-//#define FMTDICTSTRING "%511[^\n]"
 
 ///Maximum length of a voxel mark.
 #define MAXVOXMARKLEN 48

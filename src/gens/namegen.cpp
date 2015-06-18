@@ -25,13 +25,37 @@ using namespace std;
 NameGen::NameGen(DataPipe* pipeptr)
 {
 	pipe = pipeptr;
+	rng = pipe->GetRNG();
+}
+
+string NameGen::Syllable()
+{
+	int i,j,n;
+	bool c;
+	string r;
+	DPDict* vow,* con,* cur;
+
+	vow = pipe->GetDictionary(NMGVOWELS);
+	con = pipe->GetDictionary(NMGCONSON);
+
+	n = (rng->FloatNum() < NMGPSYLNUMCH)? 3:2;
+	c = (rng->FloatNum() < NMGPSYLSTCON);
+	for (i = 0; i < n; i++) {
+		cur = (c)? con:vow;
+		j = rng->RangedNumber((int)cur->size());
+		r += cur->at(j);
+		c ^= true;
+	}
+
+	return r;
 }
 
 string NameGen::GetHumanName(bool female)
 {
 	DPDict* dct;
 	string r;
-	PRNGen* rng = pipe->GetRNG();
+	int n;
+	unsigned i;
 
 	//Load first names dictionary
 	dct = (female)? pipe->GetDictionary(NMGFEMALEDICT):pipe->GetDictionary(NMGMALEDICT);
@@ -40,7 +64,12 @@ string NameGen::GetHumanName(bool female)
 	//Select a random first name
 	r = dct->at(rng->RangedNumber((int)dct->size()));
 
-	//TODO: Generate true random last name
+	//Generate true random last name
+	r += ' '; //a space between first and last names
+	n = rng->RangedNumber(NMGMAXSYLL) + 1; //number of syllables
+	i = r.size();
+	while (n--) r += Syllable();
+	r[i] = toupper(r[i]); //make first character upper-cased
 
 	return r;
 }

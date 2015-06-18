@@ -26,6 +26,8 @@
 #include "misconsts.h"
 #include "vobject.h"
 
+#define VOXMARKERLEN 64
+#define VOXMARKERFMT "%c = %63[^\n]"
 
 class VModel : public VSceneObject {
 private:
@@ -42,6 +44,8 @@ private:
 	vector3di center;		//working buf center point
 	int state;				//current state
 	SVoxelTab* vtab;		//voxel table
+	voxel hd_voxel;			//hide by voxel
+	EVoxelType hd_voxt;		//hide by type
 
 	bool AllocBuf();
 

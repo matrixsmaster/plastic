@@ -37,6 +37,8 @@ VModel::VModel(SVoxelTab* tabptr) :
 	changed = false;
 	state = 0;
 	vtab = tabptr;
+	hd_voxel = 0;
+	hd_voxt = VOXT_EMPTY;
 }
 
 VModel::~VModel()
@@ -54,11 +56,11 @@ bool VModel::LoadFromFile(const char* fn)
 	FILE* mf;
 	char* s = NULL;
 	voxel v;
-	int i,k,l,x,y,z,sd,vtc,prt;
+	int i,k,l,x,y,z,sd,vtc;
 	ulli j;
-//	char prf;
 	vector3d rv;
 	SMatrix3d rm;
+	EVoxelType tp;
 	SVoxCharPair* tab = NULL;
 
 	if ((dat) || (buf) || (!fn)) return false;
@@ -66,9 +68,9 @@ bool VModel::LoadFromFile(const char* fn)
 	mf = fopen(fn,"r");
 	if (!mf) return false;
 
-	//read dimensions, number of states, number of voxel types used, and number of parts
-	if (	(fscanf(mf,"%d %d %d %d %d %d\n",
-					&s_x,&s_y,&s_z,&nstates,&vtc,&prt) != 6) ||
+	//read dimensions, number of states and number of voxel types used
+	if (	(fscanf(mf,"%d %d %d %d %d\n",
+					&s_x,&s_y,&s_z,&nstates,&vtc) != 5) ||
 			(nstates < 1) )
 		goto bad_exit;
 
@@ -78,11 +80,52 @@ bool VModel::LoadFromFile(const char* fn)
 	if (!tab) goto bad_exit; //this would happen if table dimension is invalid
 	memset(tab,0,j);
 
+	//reserve memory for a voxel mark string
+	s = (char*)malloc(VOXMARKERLEN);
+	if (!s) goto bad_exit;
+
 	//read voxel types table (skips empty lines and comments)
 	for (i = 0; ((i < vtc) && (!feof(mf)));) {
-		//TODO: read either a voxel type and select particular voxel
-		//or read voxel mark and find a voxel in tab
-		if (fscanf(mf,"%c = %hu\n",&(tab[i].c),&(tab[i].v)) == 2) i++;
+
+		switch (fgetc(mf)) {
+		case '!':
+			//read the direct voxel number
+			if (fscanf(mf,"%c = %hu\n",&(tab[i].c),&(tab[i].v)) == 2) i++;
+			break;
+
+		case '?':
+			//read the type
+			if ( (fscanf(mf,"%c = %d\n",&(tab[i].c),((int*)&tp)) == 2) &&
+					(tp >= 0) && (tp < NUMVOXTYPES) ) {
+				//search for a first voxel with that type
+				tab[i].v = 0;
+				for (j = 0; j < vtab->len; j++)
+					if (vtab->tab[j].type == tp) {
+						tab[i].v = (voxel)j;
+						break;
+					}
+				i++;
+			}
+			break;
+
+		case '@':
+			//read the mark
+			if (fscanf(mf,VOXMARKERFMT,&(tab[i].c),s) == 2) {
+				//search for a first voxel with that mark
+				tab[i].v = 0;
+				for (j = 0; j < vtab->len; j++)
+					if ((vtab->tab[j].mark) && (!strcmp(vtab->tab[j].mark,s))) {
+						tab[i].v = (voxel)j;
+						break;
+					}
+				i++;
+			}
+			break;
+
+		default:
+			//skip everything till next line or eof
+			while ((fgetc(mf) != '\n') && (!feof(mf))) ;
+		}
 	}
 	if (feof(mf)) goto bad_exit; //shouldn't be at the end of table
 
@@ -267,11 +310,19 @@ void VModel::ApplyRot()
 voxel VModel::GetVoxelAt(const vector3di* p)
 {
 	ulli l;
+	voxel r;
 
 	//move it to positive side
 	vector3di x = *p - spos + center;
 	//get offset
 	l = x.Z * bufside * bufside + x.Y * bufside + x.X;
 	if (l >= buflen) return 0;
-	else return buf[l]; //got the voxel
+	r = buf[l]; //got the voxel
+
+	//check if voxel is hidden
+	if ((hd_voxel) && (hd_voxel == r)) return 0; //hidden
+	if ((hd_voxt) && (vtab->tab[r].type == hd_voxt)) return 0; //hidden
+
+	//OK
+	return r;
 }

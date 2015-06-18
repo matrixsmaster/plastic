@@ -28,7 +28,6 @@ using namespace std;
 bool DataPipe::LoadDict(const std::string name)
 {
 	FILE* f;
-//	int r;
 	char nm[MAXPATHLEN];
 	char buf[MAXDICTSTRLEN];
 	vector<string> cur;
