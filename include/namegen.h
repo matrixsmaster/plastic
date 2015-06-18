@@ -25,14 +25,22 @@
 
 #define NMGFEMALEDICT "names_f"
 #define NMGMALEDICT "names_m"
+#define NMGVOWELS "vowels"
+#define NMGCONSON "consonants"
+#define NMGMAXSYLL 3
+#define NMGPSYLNUMCH 0.4
+#define NMGPSYLSTCON 0.25
 
 class NameGen {
 private:
 	DataPipe* pipe;
+	PRNGen* rng;
 
 public:
 	NameGen(DataPipe* pipeptr);
 	virtual ~NameGen()				{}
+
+	std::string Syllable();
 
 	std::string GetHumanName(bool female);
 };
