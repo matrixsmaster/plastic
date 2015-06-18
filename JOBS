@@ -2,7 +2,7 @@ Job														| Master	| Begemot
 ---------------------------------------------------------------------------------------
 Update voxel table (add common types of voxels)			| assigned	| assigned
 ---------------------------------------------------------------------------------------
-Implement hideable parts in VModel						| assigned	|
+Implement hideable parts in VModel						| in progr	|
 ---------------------------------------------------------------------------------------
 Add actor's limbs states								| assigned	|
 ---------------------------------------------------------------------------------------
@@ -13,7 +13,7 @@ into infinite loop on redraw)							|			|
 ---------------------------------------------------------------------------------------
 Add object view window									| assigned	|
 ---------------------------------------------------------------------------------------
-Implement some marks to use in voxel table				| in progr	|
+Implement some marks to use in voxel table				| done		|
 ---------------------------------------------------------------------------------------
 Implement DataPipe chunks saving and loading			| assigned	|
 ---------------------------------------------------------------------------------------
@@ -42,4 +42,6 @@ Add voxel destroying test for combat mode				| assigned	|
 Create messages loading & translation system			| done		|
 ---------------------------------------------------------------------------------------
 Test 'tup' as a temporary build system					| assigned	|
+---------------------------------------------------------------------------------------
+Move html2vsprite tool in as a submodule				| assigned	|
 ---------------------------------------------------------------------------------------

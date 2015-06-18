@@ -37,14 +37,14 @@ VModel::VModel(SVoxelTab* tabptr) :
 	changed = false;
 	state = 0;
 	vtab = tabptr;
-	hd_voxel = 0;
-	hd_voxt = VOXT_EMPTY;
+	hdtab = NULL;
 }
 
 VModel::~VModel()
 {
 	int i;
 	if (buf) free(buf);
+	if (hdtab) free(hdtab);
 	if (dat) {
 		for (i = 0; i < nstates; i++) free(dat[i]);
 		free(dat);
@@ -74,7 +74,7 @@ bool VModel::LoadFromFile(const char* fn)
 			(nstates < 1) )
 		goto bad_exit;
 
-	//make a char to voxel table
+	//make a char to voxel conversion table and reset it
 	j = vtc * sizeof(SVoxCharPair);
 	tab = (SVoxCharPair*)malloc(j);
 	if (!tab) goto bad_exit; //this would happen if table dimension is invalid
@@ -127,7 +127,19 @@ bool VModel::LoadFromFile(const char* fn)
 			while ((fgetc(mf) != '\n') && (!feof(mf))) ;
 		}
 	}
+	free(s); //free temporary string memory
+
 	if (feof(mf)) goto bad_exit; //shouldn't be at the end of table
+
+	//create and initialize voxel hide table
+	j = (vtc + 1) * sizeof(SVoxHide); //reserve space for a stopper
+	hdtab = (SVoxHide*)malloc(j);
+	if (!hdtab) goto bad_exit;
+	memset(hdtab,0,j);
+	for (i = 0, j = 0; i < vtc; i++) {
+		//copy non-zero voxels
+		if (tab[i].v) hdtab[j++].v = tab[i].v;
+	}
 
 	//allocate memory: original data states map
 	datlen = s_x * s_y * s_z;
@@ -304,25 +316,32 @@ void VModel::ApplyRot()
 		}
 	}
 
+	HideEm();
 	changed = false;
+}
+
+void VModel::HideEm()
+{
+	int i;
+	ulli l;
+
+	for (i = 0; (hdtab[i].v); i++) {
+		if (!hdtab[i].hidden) continue;
+
+		for (l = 0; l < buflen; l++)
+			if (buf[l] == hdtab[i].v)
+				buf[l] = 0;
+	}
 }
 
 voxel VModel::GetVoxelAt(const vector3di* p)
 {
 	ulli l;
-	voxel r;
 
 	//move it to positive side
 	vector3di x = *p - spos + center;
 	//get offset
 	l = x.Z * bufside * bufside + x.Y * bufside + x.X;
 	if (l >= buflen) return 0;
-	r = buf[l]; //got the voxel
-
-	//check if voxel is hidden
-	if ((hd_voxel) && (hd_voxel == r)) return 0; //hidden
-	if ((hd_voxt) && (vtab->tab[r].type == hd_voxt)) return 0; //hidden
-
-	//OK
-	return r;
+	return buf[l]; //got the voxel
 }

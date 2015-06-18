@@ -18,3 +18,20 @@
  */
 
 #include "animator.h"
+
+
+DAnimator::DAnimator(DataPipe* pipeptr)
+{
+	pipe = pipeptr;
+	model = NULL;
+}
+
+DAnimator::~DAnimator()
+{
+	//TODO
+}
+
+void DAnimator::SetModel(VModel* mod)
+{
+	model = mod;
+}

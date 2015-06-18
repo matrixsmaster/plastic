@@ -29,6 +29,16 @@
 #define VOXMARKERLEN 64
 #define VOXMARKERFMT "%c = %63[^\n]"
 
+struct SVoxCharPair {
+	char c;
+	voxel v;
+};
+
+struct SVoxHide {
+	voxel v;
+	bool hidden;
+};
+
 class VModel : public VSceneObject {
 private:
 	int s_x,s_y,s_z;		//extent
@@ -44,10 +54,10 @@ private:
 	vector3di center;		//working buf center point
 	int state;				//current state
 	SVoxelTab* vtab;		//voxel table
-	voxel hd_voxel;			//hide by voxel
-	EVoxelType hd_voxt;		//hide by type
+	SVoxHide* hdtab;		//voxel hide table
 
 	bool AllocBuf();
+	void HideEm();
 
 public:
 	VModel(SVoxelTab* tabptr);
@@ -72,11 +82,6 @@ public:
 	void ApplyRot();
 
 	voxel GetVoxelAt(const vector3di* p);
-};
-
-struct SVoxCharPair {
-	char c;
-	voxel v;
 };
 
 #endif /* VMODEL_H_ */
