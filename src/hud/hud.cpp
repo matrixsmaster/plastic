@@ -217,6 +217,7 @@ void HUD::SetHP(int v, int m)
 void HUD::SetState(string str)
 {
 	string s = pcname + str;
+	ClearLog(OVRL_STBTM);
 	PutString(OVRL_STBTM, s);
 }
 

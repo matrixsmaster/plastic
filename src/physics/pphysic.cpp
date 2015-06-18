@@ -36,9 +36,62 @@ PlasticPhysics::~PlasticPhysics()
 const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 {
 	SPPCollision res;
+	int b;				//bound side
+	voxel sv,ov;		//scene voxel, object voxel
+	vector3di sp,p,op;	//scene point, ... ,object point
 
 	res.no_collision = true; //FIXME
+	res.depth = 0;
 
+	b = mod->modptr->GetBoundSide();
+	sp = mod->modptr->GetSPos();
+
+#if 0
+	//Search one-dimensional collision
+	for (p.X = (sp.X - b/2); p.X < (sp.X + b/2); ++(p.X)) {
+		for (p.Y = (sp.Y - b/2); p.Y < (sp.Y + b/2); ++(p.Y)) {
+			for (p.Z = (sp.Z - b/2); p.Z < (sp.Z + b/2); ++(p.Z)) {
+				//TODO contact
+				sv = pipe->GetVoxel(&p, true);
+				ov = mod->modptr->GetVoxelAt(&p);
+
+				if (sv && ov && (res.no_collision)) {
+					res.no_collision = false;
+					res.start = p;
+					res.depth = 1;
+					break;
+				}
+
+			}
+			if (!res.no_collision) break;
+		}
+		if (!res.no_collision) break;
+	}
+#endif
+
+//	p = res.start;
+//	p.Z -= 1;
+//	//do something
+//	sv = pipe->GetVoxel(&p, true);
+//
+//
+//	p.Z += 1;
+//	p.X -= 1;
+//	//do s
+//	p.X += 1;
+//	p.Z += 1;
+//	//do s
+//	p.Z -= 1;
+//	p.X += 1;
+//	//do s
+//	p.X -= 1;
+//	p.Y -= 1;
+//	//do s
+//	p.Y += 2;
+//	//do s
+
+//	if (!res.no_collision)
+//		dbg_print("coll: %d, start [ %d %d %d ], depth = %d, (%p)", res.no_collision, res.start.X, res.start.Y, res.start.Z, res.depth, mod->modptr);
 	return res;
 }
 
@@ -83,7 +136,6 @@ void PlasticPhysics::Quantum()
 			--iv;
 		}
 	}
-	pipe->ReadUnlock();
 
 	/* Calculate collisions */
 	for (im = mods.begin(); im < mods.end(); ++im) {
@@ -91,7 +143,10 @@ void PlasticPhysics::Quantum()
 		if ((!im->changed) && (!im->moved) && (im->contact)) continue;
 
 		ccol = Collision(&(*im));
-		if (ccol.no_collision) continue;
+		if (ccol.no_collision) {
+			im->changed = false;
+			continue;
+		}
 
 		//TODO: gravity
 
@@ -102,16 +157,17 @@ void PlasticPhysics::Quantum()
 	}
 
 	/* Change system */
-	if (!sys_changed) return;
-
-	pipe->ReadLock();
+	if (!sys_changed) {
+		pipe->ReadUnlock();
+		return;
+	}
 
 	im = mods.begin();
 	for (iv = fmod->begin(); iv != fmod->end(); ++iv, ++im) {
 		//don't forget to make sure we're still in sync
 		if ((*iv) != im->modptr) {
 			dbg_print("[PHY] Early return due to model vectors is out of sync");
-			pipe->WriteUnlock();
+			pipe->ReadUnlock();
 			return;
 		}
 
@@ -124,3 +180,4 @@ void PlasticPhysics::Quantum()
 
 	pipe->ReadUnlock();
 }
+
