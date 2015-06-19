@@ -26,18 +26,27 @@
 #include "pltime.h"
 
 
+struct SDAFrame {
+	int state;
+	int wait_ms;
+};
+
 /* Discrete animator */
 class DAnimator {
 private:
 	DataPipe* pipe;
 	VModel* model;
 	const PlasticTime* gtime;
+	char* mdname;
+	int frames;
+	int loop_b, loop_e;
+	SDAFrame* anim;
 
 public:
-	DAnimator(DataPipe* pipeptr, const PlasticTime* gtptr);
+	DAnimator(DataPipe* pipeptr, const PlasticTime* gtptr, VModel* modptr, const char* modnm);
 	virtual ~DAnimator();
 
-	void SetModel(VModel* mod);
+	bool LoadAnim(const char* name);
 };
 
 #endif /* ANIMATOR_H_ */

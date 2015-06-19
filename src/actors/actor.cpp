@@ -175,7 +175,8 @@ bool PlasticActor::Spawn(PlasticWorld* wrld)
 	model = pipe->LoadModel(attrib.model,pos,gpos);
 	if (model == NULL) return false;
 	world = wrld;
-	anim = new DAnimator(pipe,world->GetGameTimePtr());
+	anim = new DAnimator(pipe,world->GetGameTimePtr(),model,attrib.model);
+	anim->LoadAnim("walking"); //FIXME: debug
 	return true;
 }
 

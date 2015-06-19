@@ -17,22 +17,77 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <libgen.h>
 #include "animator.h"
 
 
-DAnimator::DAnimator(DataPipe* pipeptr, const PlasticTime* gtptr)
+DAnimator::DAnimator(DataPipe* pipeptr, const PlasticTime* gtptr, VModel* modptr, const char* modnm)
 {
 	pipe = pipeptr;
 	gtime = gtptr;
-	model = NULL;
+	model = modptr;
+	mdname = NULL;
+	frames = 0;
+	loop_b = loop_e = 0;
+	anim = NULL;
+
+	//extract the model's name
+	mdname = (char*)malloc(strlen(modnm));
+	if (mdname) {
+		strcpy(mdname,modnm); //copy full original string, including path and extension
+		memmove(mdname,basename(mdname),strlen(basename(mdname))); //hopefully thread-safe
+		*(strchrnul(mdname,'.')) = 0; //locate an extension and break a string there
+	}
 }
 
 DAnimator::~DAnimator()
 {
-	//TODO
+	if (mdname) free(mdname);
+	if (anim) free(anim);
 }
 
-void DAnimator::SetModel(VModel* mod)
+bool DAnimator::LoadAnim(const char* name)
 {
-	model = mod;
+	int i;
+	size_t l;
+	char ini[MAXPATHLEN], fld[MAXINISTRLEN], res[MAXINISTRLEN];
+
+	if ((!mdname) || (!name)) return false;
+
+	//create animation file path (relative to VFS)
+	snprintf(ini,sizeof(ini),"anm/%s_%s",mdname,name);
+
+	//read frames count
+	pipe->GetIniDataC(ini,"Frames",res,sizeof(res));
+	frames = atoi(res);
+	if (!frames) return false;
+
+	//allocate and setup animation memory
+	l = (size_t)frames * sizeof(SDAFrame);
+	anim = (SDAFrame*)realloc(anim,l);
+	if (!anim) return false;
+	memset(anim,0,l);
+
+	//get looping data
+	pipe->GetIniDataC(ini,"LoopStart",res,sizeof(res));
+	loop_b = atoi(res);
+	pipe->GetIniDataC(ini,"LoopEnd",res,sizeof(res));
+	loop_e = atoi(res);
+
+	//load frames data
+	for (i = 0; i < frames; i++) {
+		//state number
+		snprintf(fld,sizeof(fld),"Frame%d",i);
+		pipe->GetIniDataC(ini,fld,res,sizeof(res));
+		anim[i].state = atoi(res);
+		//timeout
+		snprintf(fld,sizeof(fld),"Frame%dTime",i);
+		pipe->GetIniDataC(ini,fld,res,sizeof(res));
+		anim[i].wait_ms = atoi(res);
+	}
+
+	return true;
 }
