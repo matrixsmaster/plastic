@@ -38,6 +38,8 @@
 #include "animator.h"
 
 
+class PlasticWorld;
+
 //Basic Actor Class
 class PlasticActor : public VSceneObject {
 protected:
@@ -45,6 +47,7 @@ protected:
 	SPAAttrib attrib;		//Basic attribs
 	SPABase base,curr;		//Base and current stats
 	DataPipe* pipe;			//DataPipe instance
+	PlasticWorld* world;	//World instance
 	VModel* model;			//Actor's model
 	Inventory invent;		//Actor's inventory
 	SGUIPixel* portrait;	//Actor's portrait
@@ -78,7 +81,7 @@ public:
 
 	void Move(ELMoveDir d, float step);
 
-	bool Spawn();
+	bool Spawn(PlasticWorld* wrld);
 	void Delete();
 };
 

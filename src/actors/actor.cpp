@@ -22,6 +22,7 @@
 #include <math.h>
 #include "actor.h"
 #include "actorhelpers.h"
+#include "world.h"
 
 
 PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr) :
@@ -59,6 +60,7 @@ PlasticActor::PlasticActor(EPAClass c, bool fem, NameGen* names, DataPipe* pptr)
 PlasticActor::~PlasticActor()
 {
 	Delete();
+	if (portrait) free(portrait);
 }
 
 void PlasticActor::InitVars()
@@ -67,6 +69,7 @@ void PlasticActor::InitVars()
 	model = NULL;
 	portrait = NULL;
 	anim = NULL;
+	world = NULL;
 }
 
 void PlasticActor::AutoInitStats()
@@ -167,18 +170,22 @@ bool PlasticActor::WearObject(InventoryObject* obj)
 	return false;
 }
 
-bool PlasticActor::Spawn()
+bool PlasticActor::Spawn(PlasticWorld* wrld)
 {
 	model = pipe->LoadModel(attrib.model,pos,gpos);
-	return (model != NULL);
+	if (model == NULL) return false;
+	world = wrld;
+	anim = new DAnimator(pipe,world->GetGameTimePtr());
+	return true;
 }
 
 void PlasticActor::Delete()
 {
 	if (model) pipe->UnloadModel(model);
+	if (anim) delete anim;
+	anim = NULL;
 	model = NULL;
-	if (portrait) free(portrait);
-	portrait = NULL;
+	world = NULL;
 }
 
 SPABase PlasticActor::GetStats(bool current)

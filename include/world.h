@@ -81,6 +81,7 @@ private:
 	PlasticSociety* society;
 	PlasticPhysics* physics;
 	GameMessages* msgsys;
+	float timescale;
 //	pthread_mutex_t wrldmtx;
 
 	//FIXME: DEBUG
@@ -99,6 +100,9 @@ public:
 	PlasticWorld(SGameSettings* settings);
 	virtual ~PlasticWorld();
 
+	///Returns result of latest operation.
+	int GetLastResult()						{ return result; }
+
 	///Realtime clock.
 	ulli GetTime()							{ return rtime; }
 
@@ -107,6 +111,9 @@ public:
 
 	///Game clock.
 	const PlasticTime* GetGameTimePtr()		{ return &gtime; }
+
+	///Main clock facility.
+	void UpdateTime();
 
 	///Main method for incremental updating world state.
 	void Quantum();
@@ -120,29 +127,26 @@ public:
 	///Starts rendering the world.
 	void StartRendering();
 
-	///Returns result of latest operation (mainly for outsiders).
-	int GetLastResult()						{ return result; }
-
 	///Connects the game world to CurseGUI.
 	void ConnectGUI(CurseGUI* guiptr);
 
 	///Restore or update CurseGUI connection.
 	void ConnectGUI();
 
-	///Returns a pointer to renderer (for outside use).
+	///Returns a renderer instance.
 	RenderPool* GetRenderer()				{ return render; }
 
-	///Returns HUD pointer.
+	///Returns HUD instance.
 	HUD* GetHUD()							{ return hud; }
 
-	///Returns DataPipe instance currently in use.
+	///Returns main DataPipe instance.
 	DataPipe* GetDataPipe()					{ return data; }
 
 	///Returns active physics engine instance.
 	PlasticPhysics* GetPhyEngine()			{ return physics; }
 
-	///Main clock facility.
-	void UpdateTime();
+	///Returns a game text messages system instance.
+	GameMessages* GetMsgSys()				{ return msgsys; }
 
 	///Screen space - world intersection test.
 	SWRayObjIntersect* ScreenRay(const vector2di p);

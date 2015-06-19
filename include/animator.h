@@ -23,6 +23,7 @@
 #include "voxel.h"
 #include "datapipe.h"
 #include "vmodel.h"
+#include "pltime.h"
 
 
 /* Discrete animator */
@@ -30,9 +31,10 @@ class DAnimator {
 private:
 	DataPipe* pipe;
 	VModel* model;
+	const PlasticTime* gtime;
 
 public:
-	DAnimator(DataPipe* pipeptr);
+	DAnimator(DataPipe* pipeptr, const PlasticTime* gtptr);
 	virtual ~DAnimator();
 
 	void SetModel(VModel* mod);

@@ -8,9 +8,6 @@ Add actor's limbs states								| assigned	|
 ---------------------------------------------------------------------------------------
 LVR: Use FOV.Z instead of separate far plane distance	| assigned	|
 ---------------------------------------------------------------------------------------
-Fix a bug in CGUITable (very small sized table is going	|			| assigned
-into infinite loop on redraw)							|			|
----------------------------------------------------------------------------------------
 Add object view window									| assigned	|
 ---------------------------------------------------------------------------------------
 Implement some marks to use in voxel table				| done		|
@@ -44,4 +41,6 @@ Create messages loading & translation system			| done		|
 Test 'tup' as a temporary build system					| assigned	|
 ---------------------------------------------------------------------------------------
 Move html2vsprite tool in as a submodule				| assigned	|
+---------------------------------------------------------------------------------------
+Fix PHY system models sync								| assigned	|
 ---------------------------------------------------------------------------------------

@@ -17,13 +17,17 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <string.h>
 #include "society.h"
+
+#ifdef SCDEBUG
 #include "debug.h"
+#endif
 
-
-PlasticSociety::PlasticSociety(DataPipe* data)
+PlasticSociety::PlasticSociety(DataPipe* data, PlasticWorld* wrld)
 {
 	pipe = data;
+	world = wrld;
 	names = new NameGen(pipe);
 	maxpopulation = 0;
 }
@@ -57,7 +61,7 @@ void PlasticSociety::UpdateActorsPresence()
 			}
 		} else {
 			if (!pipe->IsOutOfSceneGC((*it)->GetGPos())) {
-				(*it)->Spawn();
+				(*it)->Spawn(world);
 #ifdef SCDEBUG
 				dbg_logstr("Actor model spawned");
 #endif

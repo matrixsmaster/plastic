@@ -81,7 +81,8 @@ struct PlasticTime {
 	int hr;				//Hours
 	int mn;				//Minutes
 	int sc;				//Seconds
-	volatile int rms;	//Real-world milliseconds
+	volatile int rms;	//Real time milliseconds
+	volatile float sms;	//Precise scaled time milliseconds
 	volatile uli fr;	//Frames
 	int day;			//Day
 	EPlDayOfWeek dow;	//Day of week

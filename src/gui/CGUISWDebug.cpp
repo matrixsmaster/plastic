@@ -68,7 +68,10 @@ void CurseGUIDebugWnd::Update(bool refr)
 	werase(wnd);
 
 	h = g_h - ((boxed)? 3:1);
-	if (h <= 0) return;
+	if (h <= 0) {
+		pthread_mutex_unlock(&wmutex);
+		return;
+	}
 	w = g_w - ((boxed)? 2:0);
 
 	numstr = h;

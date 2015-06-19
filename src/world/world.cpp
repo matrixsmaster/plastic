@@ -56,6 +56,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	society = NULL;
 	physics = NULL;
 	msgsys = NULL;
+	timescale = 1.f;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
@@ -72,7 +73,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	PC = new Player(sets->PCData,data);
 
 	/* Create Society */
-	society = new PlasticSociety(data);
+	society = new PlasticSociety(data,this);
 
 	/* Create and init the world generator */
 	if (sets->world_r < WGMINRADIUS) {
@@ -153,6 +154,7 @@ void PlasticWorld::Quantum()
 		once = true;
 
 		//Update Player, HUD etc
+//		PC->Spawn(this);
 		PlayerMoved();
 
 		//Show greeting string
@@ -286,6 +288,9 @@ void PlasticWorld::UpdateTime()
 	//update real-time part of game time
 	gtime.rms += passed;
 
+	//update scaled time
+	gtime.sms += timescale * (float)passed;
+
 	//deal with frame-time and game seconds
 	if (gtime.rms >= PLTIMEMS) {
 		gtime.rms = 0;
@@ -332,7 +337,7 @@ void PlasticWorld::PlayerMoved()
 	}
 
 	render->SetRot(PC->GetRot());
-	render->SetPos(PC->GetPos());
+	render->SetPos(PC->GetPos()); //+vector3di(0,0,10));
 
 	hud->SetGPos(PC->GetGPos());
 	hud->SetLPos(PC->GetPos());

@@ -20,9 +20,10 @@
 #include "animator.h"
 
 
-DAnimator::DAnimator(DataPipe* pipeptr)
+DAnimator::DAnimator(DataPipe* pipeptr, const PlasticTime* gtptr)
 {
 	pipe = pipeptr;
+	gtime = gtptr;
 	model = NULL;
 }
 

@@ -30,6 +30,7 @@
 
 
 //FIXME: comment
+//#define SCDEBUG 1
 #define SCACTORELEV 6
 #define SCMAXPOPPERCHUNK 10
 
@@ -77,6 +78,7 @@ static const SSCGenderClassification clvolume_tab[NUMCLASSES] = {
 class PlasticSociety {
 private:
 	DataPipe* pipe;
+	PlasticWorld* world;
 	NameGen* names;
 	std::vector<PlasticActor*> actors;
 	ulli maxpopulation;
@@ -85,7 +87,7 @@ private:
 	void RemoveAllActors();
 
 public:
-	PlasticSociety(DataPipe* data);
+	PlasticSociety(DataPipe* data, PlasticWorld* wrld);
 	virtual ~PlasticSociety();
 
 	//FIXME: comments
