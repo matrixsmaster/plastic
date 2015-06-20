@@ -1,0 +1,16 @@
+Eclipse CDT
+Version: Kepler Service Release 2
+Build id: 20140224-0627
+
+---------------------------------------------------------------------------------------
+
+The UPdater setup
+Got from https://groups.google.com/forum/#!topic/tup-users/7qNxtgh9Z-s
+
+Parsers:
+tup warning: .*
+[ \t0-9]+% [0-9]+\) \[[0-9.]+s\] .*
+\[ tup \] \[[0-9.]+s\] .*
+tup error: .*
+
+Severity: ignore
