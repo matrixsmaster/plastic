@@ -160,7 +160,7 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 	} else
 		return false;
 
-	if (rc) SetRotI(); //Update rotation
+	if (rc) SetRot(rot); //Update rotation
 
 	return true;
 }

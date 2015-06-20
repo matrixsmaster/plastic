@@ -176,6 +176,8 @@ void PlasticSociety::RollAnimations()
 {
 	vector<PlasticActor*>::iterator oi;
 
+	pipe->ReadLock();
 	for (oi = actors.begin(); oi != actors.end(); ++oi)
 		(*oi)->Animate();
+	pipe->ReadUnlock();
 }

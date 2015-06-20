@@ -154,7 +154,7 @@ void PlasticWorld::Quantum()
 		once = true;
 
 		//Update Player, HUD etc
-//		PC->Spawn(this);
+		PC->Spawn(this);
 		PlayerMoved();
 
 		//Show greeting string
@@ -172,13 +172,13 @@ void PlasticWorld::Quantum()
 	society->UpdateActorsPresence();
 	society->RollAnimations();
 
-	data->WriteLock();
+//	data->WriteLock();
 	//FIXME: debug
 	if (test->GetState() == 0)
 		test->SetState(test->GetNumStates()-1);
 	else
 		test->SetState(test->GetState()-1);
-	data->WriteUnlock();
+//	data->WriteUnlock();
 }
 
 void PlasticWorld::Frame()
@@ -335,10 +335,11 @@ void PlasticWorld::PlayerMoved()
 		PC->GMove();
 		PC->SetGPos(data->GetGP());
 		PC->SetScenePos(data->GetGP());
+		PC->UpdateModelPos();
 	}
 
 	render->SetRot(PC->GetRot());
-	render->SetPos(PC->GetPos()); //+vector3di(0,0,10));
+	render->SetPos(PC->GetPos()+vector3di(0,0,10)); //FIXME: use head position
 
 	hud->SetGPos(PC->GetGPos());
 	hud->SetLPos(PC->GetPos());
@@ -474,7 +475,9 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			ScreenRay(curso);
 			x = cinters.pnt;
 			if (cinters.model) {
-				if (cinters.actor) {
+				if (cinters.model == PC->GetModel()) {
+					hud->PutStrToLog(msgsys->GetMessage("SELFPOINT_LOG"));
+				} else if (cinters.actor) {
 					msgsys->SetActorName(cinters.actor->GetAttributes().name);
 					if (cinters.actor->GetAttributes().female)
 						hud->PutStrToLog(msgsys->GetMessage("ACTRESS_LOG"));

@@ -135,6 +135,20 @@ void PlasticActor::ReadModelPos()
 	SetRotI();
 }
 
+void PlasticActor::SetPos(const vector3di p)
+{
+	pos = p;
+	SetPosI();
+	UpdateModelPos();
+}
+
+void PlasticActor::SetRot(const vector3di r)
+{
+	rot = r;
+	SetRotI();
+	UpdateModelPos();
+}
+
 void PlasticActor::Move(ELMoveDir d, float step)
 {
 	vector3d v;

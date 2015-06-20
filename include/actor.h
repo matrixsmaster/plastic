@@ -67,6 +67,9 @@ public:
 	virtual void UpdateModelPos();
 	virtual void ReadModelPos();
 
+	virtual void SetPos(const vector3di p);
+	virtual void SetRot(const vector3di r);
+
 	Inventory* GetInventory()			{ return &invent; }
 	bool UseObject(InventoryObject* obj);
 	bool WearObject(InventoryObject* obj);

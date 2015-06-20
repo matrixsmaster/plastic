@@ -142,11 +142,11 @@ void PlasticPhysics::Quantum()
 		//skip contacting objects, which isn't moved
 		if ((!im->changed) && (!im->moved) && (im->contact)) continue;
 
-		ccol = Collision(&(*im));
-		if (ccol.no_collision) {
-			im->changed = false;
-			continue;
-		}
+//		ccol = Collision(&(*im));
+//		if (ccol.no_collision) {
+//			im->changed = false;
+//			continue;
+//		}
 
 		//TODO: gravity
 
