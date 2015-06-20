@@ -1,3 +1,5 @@
+*.o
 /Debug/
+/.tup/
 /data/usr/*
 !/data/usr/README
