@@ -1,0 +1,10 @@
+CXXFLAGS += -Wall
+CXXFLAGS += -O0 -g3
+CXXFLAGS += -pthread -fPIC
+CXXFLAGS += -I../../include -Iinclude
+LDFLAGS += -pthread -lncurses
+TOP = $(TUP_CWD)
+.gitignore
+
+!cxx = |> g++ $(CXXFLAGS) -c %f -o %o |> %B.o $(TOP)/<objgroup>
+

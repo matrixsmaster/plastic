@@ -1,0 +1,6 @@
+APP = plastic
+include_rules
+
+: foreach src/*.cpp |> !cxx |>
+: <objgroup> |> g++ $(LDFLAGS) %<objgroup> -o %o |> $(APP)
+
