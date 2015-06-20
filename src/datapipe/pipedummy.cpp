@@ -29,6 +29,14 @@ DataPipeDummy::DataPipeDummy(SGameSettings* sets) :
 	if (status == DPIPE_NOTREADY) status = DPIPE_IDLE;
 }
 
+DataPipeDummy::~DataPipeDummy()
+{
+	status = DPIPE_NOTREADY;
+
+	//reset voxel tab to not to destroy its contents
+	voxeltab.tab = NULL;
+}
+
 voxel DataPipeDummy::GetVoxel(const vector3di* p)
 {
 	return IntersectModel(p,NULL,true);

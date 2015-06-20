@@ -271,11 +271,12 @@ void DataPipe::FreeVoxTab()
 {
 	unsigned i;
 
-	for (i = 0; i < voxeltab.len; i++) {
-		if (voxeltab.tab[i].mark) free(voxeltab.tab[i].mark);
+	if (voxeltab.tab) {
+		for (i = 0; i < voxeltab.len; i++) {
+			if (voxeltab.tab[i].mark) free(voxeltab.tab[i].mark);
+		}
+		free(voxeltab.tab);
 	}
-
-	if (voxeltab.tab) free(voxeltab.tab);
 
 	memset(&voxeltab,0,sizeof(voxeltab));
 }

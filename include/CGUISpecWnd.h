@@ -272,24 +272,28 @@ public:
 //FIXME: comment
 #define VMODEDITMINW 10
 #define VMODEDITMINH 5
+#define VMODEDITRPAN 10
+#define VMODEDITBPAN 2
 
 class VModel;
 class KeyBinder;
+class DataPipeDummy;
 
 class CurseGUIVModEditWnd : public CurseGUIWnd {
 private:
-	DataPipe* pipe;
+	DataPipeDummy* pipe;
 	VModel* model;
 	bool readonly;
 	KeyBinder* binder;
 	LVR* lvr;
 	CurseGUIPicture* surf;
+	vector3d campos;
 
 	void ResizeWnd(int w, int h);
 	void Retrace();
 
 public:
-	CurseGUIVModEditWnd(CurseGUI* scrn, VModel* mod, SGameSettings* setts, bool rw = false);
+	CurseGUIVModEditWnd(CurseGUI* scrn, VModel* mod, SGameSettings* setts, SVoxelTab* vtab, bool rw = false);
 	virtual ~CurseGUIVModEditWnd();
 
 	bool PutEvent(SGUIEvent* e);

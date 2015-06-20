@@ -38,7 +38,7 @@ Create messages loading & translation system			| done		|
 ---------------------------------------------------------------------------------------
 Test 'tup' as a temporary build system					| stall		|
 ---------------------------------------------------------------------------------------
-Move html2vsprite tool in as a submodule				| stall		|
+Move html2vsprite tool in as a submodule				| in progr	|
 ---------------------------------------------------------------------------------------
 Fix PHY system models sync								| assigned	|
 ---------------------------------------------------------------------------------------

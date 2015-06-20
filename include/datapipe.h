@@ -254,6 +254,12 @@ public:
 	///Return voxel code and fills object pointer if supplied.
 	virtual voxel IntersectModel(const vector3di* p, VModel** obj, const bool autolock);
 
+	///Adds an existing model to working set.
+	virtual void AddModel(VModel* obj);
+
+	///Explicitly removes a particular model from a working set (doesn't destroy a model).
+	virtual bool RemoveModel(VModel* obj);
+
 	///Updates all scene root positions for all loaded models.
 	virtual void UpdateModelsSceneRoot();
 
@@ -288,6 +294,7 @@ class DataPipeDummy : public DataPipe
 {
 public:
 	DataPipeDummy(SGameSettings* sets);
+	virtual ~DataPipeDummy();
 
 	void SetVoxTab(SVoxelTab* p)		{ voxeltab = *p; }
 

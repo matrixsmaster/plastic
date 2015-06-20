@@ -422,7 +422,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			case '5': tr.Z -= 2; break;
 			case '6': tr.Z += 2; break;
 
-			case '8': SPAWNWNDMACRO(WNDNAM_VMODEDIT,new CurseGUIVModEditWnd(gui,test,sets,true)); break;
+			case '8': SPAWNWNDMACRO(WNDNAM_VMODEDIT,new CurseGUIVModEditWnd(gui,test,sets,data->GetVoxTable(),true)); break;
 
 			case KEY_F(4):
 					gui->GetColorManager()->Flush();

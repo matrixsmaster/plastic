@@ -28,22 +28,29 @@
 
 enum {
 	OBJEDIT_ZOOMP,
+	OBJEDIT_ZOOMM,
 };
 
-CurseGUIVModEditWnd::CurseGUIVModEditWnd(CurseGUI* scrn, VModel* mod, SGameSettings* setts, bool rw) :
+CurseGUIVModEditWnd::CurseGUIVModEditWnd(CurseGUI* scrn, VModel* mod, SGameSettings* setts, SVoxelTab* vtab, bool rw) :
 		CurseGUIWnd(scrn,0,0,4,4)
 {
 	type = GUIWT_OTHER;
 	name = (rw)? WNDNAM_VMODEDIT:WNDNAM_VMODVIEW;
 	showname = true;
+	readonly = !rw;
 
 	pipe = new DataPipeDummy(setts);
+	pipe->SetVoxTab(vtab);
 	model = mod;
-	readonly = !rw;
-	binder = new KeyBinder(pipe);
-	lvr = new LVR(pipe);
+	pipe->AddModel(model);
 
+	lvr = new LVR(pipe);
+	campos = model->GetPos().ToReal();
+	lvr->SetPosition(campos);
+
+	binder = new KeyBinder(pipe);
 	binder->RegKeyByName("OBJEDIT_ZOOMP",OBJEDIT_ZOOMP);
+	binder->RegKeyByName("OBJEDIT_ZOOMM",OBJEDIT_ZOOMM);
 
 	SetAutoAlloc(true);
 	ResizeWnd(scrn->GetWidth()/2,scrn->GetHeight()/2);
@@ -53,6 +60,8 @@ CurseGUIVModEditWnd::~CurseGUIVModEditWnd()
 {
 	delete binder;
 	delete lvr;
+
+	pipe->RemoveModel(model);
 	delete pipe;
 }
 
@@ -84,18 +93,21 @@ void CurseGUIVModEditWnd::ResizeWnd(int w, int h)
 	Move(w,h);
 
 	//create working surface
-	w = g_w - 2;
-	h = g_h - 2;
+	w = g_w - 2 - ((readonly)? 0:VMODEDITRPAN);
+	h = g_h - 2 - ((readonly)? 0:VMODEDITBPAN);
 	surf = new CurseGUIPicture(ctrls,1,1,w,h);
-	//FIXME:debug
-	surf->SetAutoAlloc(true);
-	SCTriple tst = {200,0,500};
-	surf->ColorFill(tst);
+	lvr->Resize(w,h);
+
+	Retrace();
 }
 
 void CurseGUIVModEditWnd::Retrace()
 {
-	//TODO
+	lvr->Frame();
+#ifdef LVRDOUBLEBUFFERED
+	lvr->SwapBuffers();
+#endif
+	surf->SetPicture(lvr->GetRender());
 }
 
 bool CurseGUIVModEditWnd::PutEvent(SGUIEvent* e)
@@ -110,16 +122,33 @@ bool CurseGUIVModEditWnd::PutEvent(SGUIEvent* e)
 	case GUIEV_KEYPRESS:
 		switch (e->k) {
 		case GUI_DEFCLOSE: will_close = true; return true;
-		case '\t': ctrls->Rotate(); return true;
+		case '\t': ctrls->Rotate(); break;
+		default:
+			switch (binder->DecodeKey(e->k)) {
+			case OBJEDIT_ZOOMP:
+				campos.Y += 1;
+				lvr->SetPosition(campos);
+				break;
+
+			case OBJEDIT_ZOOMM:
+				campos.Y -= 1;
+				lvr->SetPosition(campos);
+				break;
+			}
 		}
-		return false;
+		Retrace();
+		return true;
 
-		case GUIEV_RESIZE:
-			UpdateSize();
-			ResizeWnd(g_w,g_h);
-			return false; //don't consume resize event!
+//	case GUIEV_MOUSE:
+//		//TODO
+//		return true;
 
-		default: break;
+	case GUIEV_RESIZE:
+		UpdateSize();
+		ResizeWnd(g_w,g_h);
+		return false; //don't consume resize event!
+
+	default: break;
 	}
 
 	/* That's not our event, pass thru */

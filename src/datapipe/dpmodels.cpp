@@ -110,6 +110,30 @@ voxel DataPipe::IntersectModel(const vector3di* p, VModel** obj, const bool auto
 	return 0;
 }
 
+void DataPipe::AddModel(VModel* obj)
+{
+	WriteLock();
+	objs.push_back(obj);
+	WriteUnlock();
+}
+
+bool DataPipe::RemoveModel(VModel* obj)
+{
+	VModVec::iterator mi;
+
+	if (objs.empty()) return false;
+
+	for (mi = objs.begin(); mi != objs.end(); ++mi)
+		if ((*mi) == obj) {
+			WriteLock();
+			objs.erase(mi);
+			WriteUnlock();
+			return true;
+		}
+
+	return false;
+}
+
 void DataPipe::UpdateModelsSceneRoot()
 {
 	VModVec::iterator mi;
