@@ -27,6 +27,7 @@
 #include <vector>
 #include <time.h>
 //#include <pthread.h>
+#include "plastic.h"
 #include "vecmath.h"
 #include "CurseGUI.h"
 #include "misconsts.h"

@@ -33,6 +33,8 @@
 #define WNDNAM_MAPVIEW "Map View"
 #define WNDNAM_INVENTORY "Inventory"
 #define WNDNAM_LVRCONF "LVR config"
+#define WNDNAM_VMODEDIT "Model Editor"
+#define WNDNAM_VMODVIEW "Model Viewer"
 
 ///Local Movement Directions.
 enum ELMoveDir {

@@ -26,18 +26,18 @@
 using namespace std;
 
 
-CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, RenderPool* ppool) :
+CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
 		CurseGUIWnd(scrn,8,8,26,9)
 {
 	type = GUIWT_OTHER;
 	name = WNDNAM_LVRCONF;
 	showname = true;
 
-	pool = ppool;
-	scale = pool->GetScale();
-	fov = pool->GetFOV();
-	far = pool->GetFarDist();
-	ppset = pool->GetPostprocess();
+	lvr = plvr;
+	scale = lvr->GetScale();
+	fov = lvr->GetFOV();
+	far = lvr->GetFarDist();
+	ppset = lvr->GetPostprocess();
 
 	//Create labels
 	new CurseGUILabel(ctrls,1,1,5,1,"Scale");
@@ -120,10 +120,10 @@ void CurseGUIRenderConfWnd::Scan()
 
 void CurseGUIRenderConfWnd::Apply()
 {
-	pool->SetScale(scale);
-	pool->SetFOV(fov);
-	pool->SetFarDist(far);
-	pool->SetPostprocess(ppset);
+	lvr->SetScale(scale);
+	lvr->SetFOV(fov);
+	lvr->SetFarDist(far);
+	lvr->SetPostprocess(ppset);
 }
 
 void CurseGUIRenderConfWnd::Reset()

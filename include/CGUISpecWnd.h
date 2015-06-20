@@ -30,6 +30,7 @@
 #include <pthread.h>
 #include "vecmath.h"
 #include "LVRconsts.h"
+#include "plastic.h"
 
 
 /* ********************************** Message Box ********************************** */
@@ -210,11 +211,11 @@ public:
 
 /* ********************************** Renderer Config window ********************************** */
 
-class RenderPool;
+class LVR;
 
 class CurseGUIRenderConfWnd : public CurseGUIWnd {
 private:
-	RenderPool* pool;
+	LVR* lvr;
 	float scale;
 	vector3d fov;
 	int far;
@@ -233,7 +234,7 @@ private:
 	void Reset();
 
 public:
-	CurseGUIRenderConfWnd(CurseGUI* scrn, RenderPool* ppool);
+	CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr);
 	virtual ~CurseGUIRenderConfWnd()	{}
 
 	bool PutEvent(SGUIEvent* e);
@@ -262,6 +263,34 @@ private:
 public:
 	CurseGUIActorViewWnd(CurseGUI* scrn, PlasticActor* actr);
 	virtual ~CurseGUIActorViewWnd()		{}
+
+	bool PutEvent(SGUIEvent* e);
+};
+
+/* ********************************** VModel Editor window ********************************** */
+
+//FIXME: comment
+#define VMODEDITMINW 10
+#define VMODEDITMINH 5
+
+class VModel;
+class KeyBinder;
+
+class CurseGUIVModEditWnd : public CurseGUIWnd {
+private:
+	DataPipe* pipe;
+	VModel* model;
+	bool readonly;
+	KeyBinder* binder;
+	LVR* lvr;
+	CurseGUIPicture* surf;
+
+	void ResizeWnd(int w, int h);
+	void Retrace();
+
+public:
+	CurseGUIVModEditWnd(CurseGUI* scrn, VModel* mod, SGameSettings* setts, bool rw = false);
+	virtual ~CurseGUIVModEditWnd();
 
 	bool PutEvent(SGUIEvent* e);
 };

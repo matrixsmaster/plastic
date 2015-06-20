@@ -4,11 +4,9 @@ Update voxel table (add common types of voxels)			| assigned	| assigned
 ---------------------------------------------------------------------------------------
 Implement hideable parts in VModel						| in progr	|
 ---------------------------------------------------------------------------------------
-Add actor's limbs states								| assigned	|
----------------------------------------------------------------------------------------
 LVR: Use FOV.Z instead of separate far plane distance	| assigned	|
 ---------------------------------------------------------------------------------------
-Add object view window									| assigned	|
+Add object view window									| in progr	|
 ---------------------------------------------------------------------------------------
 Implement some marks to use in voxel table				| done		|
 ---------------------------------------------------------------------------------------
@@ -38,9 +36,13 @@ Add voxel destroying test for combat mode				| assigned	|
 ---------------------------------------------------------------------------------------
 Create messages loading & translation system			| done		|
 ---------------------------------------------------------------------------------------
-Test 'tup' as a temporary build system					| assigned	|
+Test 'tup' as a temporary build system					| stall		|
 ---------------------------------------------------------------------------------------
-Move html2vsprite tool in as a submodule				| assigned	|
+Move html2vsprite tool in as a submodule				| stall		|
 ---------------------------------------------------------------------------------------
 Fix PHY system models sync								| assigned	|
+---------------------------------------------------------------------------------------
+Implement society data (actors etc) saving and loading	| assigned	|
+---------------------------------------------------------------------------------------
+Implement world gamedata saving and loading				| assigned	|
 ---------------------------------------------------------------------------------------
