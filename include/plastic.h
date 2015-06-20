@@ -23,8 +23,6 @@
 #include "actortypes.h"
 #include "misconsts.h"
 
-
-///That's just a temporary solution until we run Autotools
 #ifndef BUILDNO
 #include "buildnum.h"
 #endif
@@ -32,7 +30,7 @@
 ///Version information
 #define VERMAJOR 0
 #define VERMINOR 1
-#define VERSUBVR 2
+#define VERSUBVR 3
 
 ///Product name
 #define PRODNAME "Plastic Inquisitor"

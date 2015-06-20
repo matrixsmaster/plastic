@@ -153,7 +153,7 @@ void PlasticWorld::Quantum()
 	if (!once) {
 		once = true;
 
-		//Update Player, HUD etc
+		//Spawn player's model
 		PC->Spawn(this);
 		PlayerMoved();
 

@@ -30,6 +30,7 @@ bool PlasticWorld::NewGame()
 	wgen->NewMap(data->GetMapSeed());
 	PC->SetGPos(wgen->GetPCInitPos());
 	data->SetGP(PC->GetGPos()); //init central chunk
+	PC->SetScenePos(data->GetGP());
 	v.X = CHUNKBOX / 2;
 	v.Y = v.X;
 	v.Z = data->GetElevationUnder(&v) + 1;
