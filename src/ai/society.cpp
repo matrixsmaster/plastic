@@ -24,6 +24,8 @@
 #include "debug.h"
 #endif
 
+using namespace std;
+
 PlasticSociety::PlasticSociety(DataPipe* data, PlasticWorld* wrld)
 {
 	pipe = data;
@@ -40,7 +42,7 @@ PlasticSociety::~PlasticSociety()
 
 void PlasticSociety::RemoveAllActors()
 {
-	std::vector<PlasticActor*>::iterator it;
+	vector<PlasticActor*>::iterator it;
 	for (it = actors.begin(); it != actors.end(); ++it)
 		delete ((*it));
 	actors.clear();
@@ -48,7 +50,7 @@ void PlasticSociety::RemoveAllActors()
 
 void PlasticSociety::UpdateActorsPresence()
 {
-	std::vector<PlasticActor*>::iterator it;
+	vector<PlasticActor*>::iterator it;
 
 	for (it = actors.begin(); it != actors.end(); ++it) {
 		(*it)->SetScenePos(pipe->GetGP());
@@ -140,7 +142,7 @@ void PlasticSociety::CreatePopulation()
 
 PlasticActor* PlasticSociety::GetActor(VModel* mod)
 {
-	std::vector<PlasticActor*>::iterator oi;
+	vector<PlasticActor*>::iterator oi;
 
 	for (oi = actors.begin(); oi != actors.end(); ++oi) {
 		if ((*oi)->GetModel() == mod)
@@ -158,7 +160,7 @@ PlasticActor* PlasticSociety::GetActor(uli n)
 
 void PlasticSociety::GatherStatistic()
 {
-	std::vector<PlasticActor*>::iterator oi;
+	vector<PlasticActor*>::iterator oi;
 	SPAAttrib ca;
 
 	memset(&stat,0,sizeof(stat));
@@ -168,4 +170,12 @@ void PlasticSociety::GatherStatistic()
 		stat[ca.cls].prc++;
 		if (ca.female) stat[ca.cls].female++;
 	}
+}
+
+void PlasticSociety::RollAnimations()
+{
+	vector<PlasticActor*>::iterator oi;
+
+	for (oi = actors.begin(); oi != actors.end(); ++oi)
+		(*oi)->Animate();
 }

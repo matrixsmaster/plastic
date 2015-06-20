@@ -29,6 +29,7 @@
 struct SDAFrame {
 	int state;
 	int wait_ms;
+	float last;
 };
 
 /* Discrete animator */
@@ -41,12 +42,15 @@ private:
 	int frames;
 	int loop_b, loop_e;
 	SDAFrame* anim;
+	int cframe;
 
 public:
 	DAnimator(DataPipe* pipeptr, const PlasticTime* gtptr, VModel* modptr, const char* modnm);
 	virtual ~DAnimator();
 
 	bool LoadAnim(const char* name);
+
+	void Update();
 };
 
 #endif /* ANIMATOR_H_ */

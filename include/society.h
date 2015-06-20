@@ -91,13 +91,16 @@ public:
 	virtual ~PlasticSociety();
 
 	//FIXME: comments
-	void UpdateActorsPresence();
 	void CreatePopulation();
 	uli GetNumActors()								{ return actors.size(); }
 	PlasticActor* GetActor(VModel* mod);
 	PlasticActor* GetActor(uli n);
 	void GatherStatistic();
 	const SSCGenderClassification* GetStatistic()	{ return stat; }
+
+	//FIXME: comments
+	void UpdateActorsPresence();
+	void RollAnimations();
 };
 
 #endif /* SOCIETY_H_ */

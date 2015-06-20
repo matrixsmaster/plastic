@@ -33,6 +33,7 @@ DAnimator::DAnimator(DataPipe* pipeptr, const PlasticTime* gtptr, VModel* modptr
 	frames = 0;
 	loop_b = loop_e = 0;
 	anim = NULL;
+	cframe = 0;
 
 	//extract the model's name
 	mdname = (char*)malloc(strlen(modnm));
@@ -55,6 +56,7 @@ bool DAnimator::LoadAnim(const char* name)
 	size_t l;
 	char ini[MAXPATHLEN], fld[MAXINISTRLEN], res[MAXINISTRLEN];
 
+	cframe = 0;
 	if ((!mdname) || (!name)) return false;
 
 	//create animation file path (relative to VFS)
@@ -90,4 +92,22 @@ bool DAnimator::LoadAnim(const char* name)
 	}
 
 	return true;
+}
+
+void DAnimator::Update()
+{
+	//failsafe
+	if ((cframe >= frames) || (cframe < 0))
+		return;
+
+	//should we wait some more?
+	if (round(gtime->sms - anim[cframe].last) < anim[cframe].wait_ms)
+		return;
+
+	//switch to next frame
+	if (cframe == loop_e) cframe = loop_b;
+	else cframe++;
+	if (cframe >= frames) return; //no loop in animation, and animation has played
+	anim[cframe].last = gtime->sms;
+	model->SetState(anim[cframe].state);
 }

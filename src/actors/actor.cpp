@@ -189,6 +189,11 @@ void PlasticActor::Delete()
 	world = NULL;
 }
 
+void PlasticActor::Animate()
+{
+	if (model && anim) anim->Update();
+}
+
 SPABase PlasticActor::GetStats(bool current)
 {
 	if (current) return curr;

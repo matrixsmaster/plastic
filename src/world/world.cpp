@@ -170,6 +170,7 @@ void PlasticWorld::Quantum()
 	hud->SetCharge(PC->GetStats(true).CC,PC->GetStats(false).CC);
 
 	society->UpdateActorsPresence();
+	society->RollAnimations();
 
 	data->WriteLock();
 	//FIXME: debug
@@ -361,7 +362,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	//FIXME: DEBUG:
 	vector3di tr = test->GetRot();
 	vector3di x;
-//	char s[128];
 	SPABase stst;
 
 	result = 1;
@@ -475,7 +475,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			x = cinters.pnt;
 			if (cinters.model) {
 				if (cinters.actor) {
-//					hud->PrintStrToLog("%d:%d Actor: %s",curso.X,curso.Y,cinters.actor->GetAttributes().name);
 					msgsys->SetActorName(cinters.actor->GetAttributes().name);
 					if (cinters.actor->GetAttributes().female)
 						hud->PutStrToLog(msgsys->GetMessage("ACTRESS_LOG"));
@@ -485,7 +484,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 					hud->PrintStrToLog("%d:%d->%d:%d:%d (%p)",curso.X,curso.Y,x.X,x.Y,x.Z,cinters.model);
 			} else
 				hud->PrintStrToLog("%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
-//			hud->PutStrToLog(s);
 			gui->SetCursorPos(curso.X,curso.Y);
 		}
 		break;

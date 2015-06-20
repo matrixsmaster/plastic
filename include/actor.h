@@ -83,6 +83,7 @@ public:
 
 	bool Spawn(PlasticWorld* wrld);
 	void Delete();
+	void Animate();
 };
 
 //Special case for a player character
