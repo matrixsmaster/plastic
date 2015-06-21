@@ -27,9 +27,10 @@
 
 
 ///Define this to use debugging output.
-//#define LVRDEBUG 1
+#define LVRDEBUG 1
 
 ///Define this to use double-buffering in LVR.
+///It's required to be enabled if using RenderPool.
 #define LVRDOUBLEBUFFERED 1
 
 ///Set of main settings defaults.
@@ -43,13 +44,15 @@ struct SLVRPostProcess {
 	int fog_dist;
 	SCTriple fog_col;
 	int noise;
+	int txd_plane;
 };
 
 ///Default post-processing.
 #define DEFPOSTPROC { \
 	40, \
 	{40, 40, 40}, \
-	0 \
+	0, \
+	15, \
 }
 
 #endif /* LVRCONSTS_H_ */

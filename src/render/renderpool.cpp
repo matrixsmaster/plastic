@@ -76,10 +76,10 @@ static void* rendpool_mainthread(void* ptr)
 	pthread_exit(NULL);
 }
 
-RenderPool::RenderPool(DataPipe* pipe, bool started) :
-		LVR(pipe)
+RenderPool::RenderPool(DataPipe* data, bool started) :
+		LVR(data)
 {
-	skies = new AtmoSky(pipe);
+	skies = new AtmoSky(data);
 	quit = false;
 	frames = 0;
 	stopped = !started;
@@ -119,7 +119,7 @@ void RenderPool::SpawnThreads()
 		memset(&pool[i],0,sizeof(SRendPoolDat));
 
 		/* Create LVR instance */
-		pool[i].lvr = new LVR(pipeptr);
+		pool[i].lvr = new LVR(pipe);
 
 		/* Create renderer mutex and start rendering thread */
 		pthread_mutex_init(&(pool[i].mtx),NULL);
@@ -426,7 +426,7 @@ void RenderPool::SetFarDist(const int d)
 void RenderPool::SetPostprocess(const SLVRPostProcess p)
 {
 	bool ppc = (	(p.fog_dist) ||
-					(p.noise) );
+					(p.noise) || (p.txd_plane)); //FIXME: move texturization to RP's PP
 
 	pproc = p;
 

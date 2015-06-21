@@ -285,6 +285,55 @@ vector2di RectangleCornerK(const int num)
 	}
 }
 
+int FindSubRectDI(vector3di* arr, vector3di* ul, vector3di* br, vector3di* cont, const vector3di* zero, const int w, const int h)
+{
+	int i,j,sx,sy,ex,ey;
+	unsigned l;
+	bool f = false;
+
+	//init container
+	*cont = *zero;
+
+	//move through whole array
+	for (i = 0, l = 0; i < h; i++) {
+		for (j = 0; j < w; j++, l++) {
+			//if container is empty
+			if (*cont == *zero) {
+				//and point is interesting
+				if (arr[l] != *zero) {
+					*cont = arr[l]; //save the point
+					arr[l] = *zero; //and mark its location
+					sx = j;
+					sy = i;
+					ex = sx;
+					ey = sy;
+				}
+			} else {
+				//now check if current point is equal to our point-of-interest
+				if (arr[l] == *cont) {
+					arr[l] = *zero; //mark this
+					if (j < sx) sx = j;
+					if (j > ex) ex = j;
+					if (i < sy) sy = i;
+					if (i > ey) ey = i;
+					f = true; //we've got at least two points
+				}
+			}
+		}
+	}
+
+	//check the results
+	if (f && (ex != sx) && (ey != sy)) {
+		//our borders are good, can pass'em out
+		*ul = vector3di(sx,sy,0);
+		*br = vector3di(ex,ey,0);
+		return 1;
+	}
+
+	//nothing can be found
+	return 0;
+}
+
 /*
  * PNPOLY - Point Inclusion in Polygon Test
  * (C) W. Randolph Franklin (WRF)

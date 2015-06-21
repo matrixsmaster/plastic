@@ -70,7 +70,7 @@ private:
 	void KillThreads();				//Rendering threads killer
 
 public:
-	RenderPool(DataPipe* pipe, bool started = true);
+	RenderPool(DataPipe* data, bool started = true);
 	virtual ~RenderPool();
 
 	///Internal facility. Do Not Use in external code!

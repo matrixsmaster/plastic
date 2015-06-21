@@ -104,6 +104,7 @@ void CurseGUIVModEditWnd::ResizeWnd(int w, int h)
 void CurseGUIVModEditWnd::Retrace()
 {
 	lvr->Frame();
+	lvr->Postprocess();
 #ifdef LVRDOUBLEBUFFERED
 	lvr->SwapBuffers();
 #endif

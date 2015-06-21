@@ -20,7 +20,7 @@ PHY Collision detection									|			| in progr
 ---------------------------------------------------------------------------------------
 PHY Gravity												|			| assigned
 ---------------------------------------------------------------------------------------
-Test 'textured' rendering of voxel sides				| assigned	|
+Test 'textured' rendering of voxel sides				| in progr	|
 ---------------------------------------------------------------------------------------
 Gather portrait generation sprites						|			| assigned
 ---------------------------------------------------------------------------------------
@@ -45,4 +45,6 @@ Fix PHY system models sync								| assigned	|
 Implement society data (actors etc) saving and loading	| assigned	|
 ---------------------------------------------------------------------------------------
 Implement world gamedata saving and loading				| assigned	|
+---------------------------------------------------------------------------------------
+Speed up LVR fog by implementing look-up table			| assigned	|
 ---------------------------------------------------------------------------------------

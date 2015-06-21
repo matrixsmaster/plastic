@@ -41,7 +41,7 @@ protected:
 	vector3d fov;					//Field Of View
 	SMatrix3d rot;					//Camera rotation matrix
 	vector3d offset,eulerot,scale;	//Camera transformations
-	DataPipe* pipeptr;				//DataPipe instance
+	DataPipe* pipe;					//DataPipe instance
 	SGUIPixel* render;				//Rendered frame data pointer
 	int activebuf;					//Active (drawing) buffer number
 	int* zbuf;						//Depth buffer
@@ -52,7 +52,7 @@ protected:
 	void ReallocBuffers();
 
 public:
-	LVR(DataPipe* pipe);
+	LVR(DataPipe* data);
 	virtual ~LVR();
 
 	//TODO: comment it

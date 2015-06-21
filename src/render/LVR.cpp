@@ -22,17 +22,18 @@
 #include "LVR.h"
 #include "support.h"
 #include "cube.h"
+#include "vsprite.h" //textures
 
 #ifdef LVRDEBUG
 #include "debug.h"
 #endif
 
 
-LVR::LVR(DataPipe* pipe)
+LVR::LVR(DataPipe* data)
 {
 	SLVRPostProcess temp = DEFPOSTPROC;
 
-	pipeptr = pipe;
+	pipe = data;
 	render = NULL;
 	activebuf = 0;
 	rendsize = 0;
@@ -140,7 +141,7 @@ void LVR::SetEulerRotation(const vector3d r)
 	rot = Mtx3Mul(xy,rz);
 
 #ifdef LVRDEBUG
-	dbg_print("LVR Cam Rot = [%.1f, %.1f, %.1f]",eulerot.X,eulerot.Y,eulerot.Z);
+	dbg_print("[LVR] Cam Rot = [%.1f, %.1f, %.1f]",eulerot.X,eulerot.Y,eulerot.Z);
 #endif
 }
 
@@ -151,7 +152,7 @@ void LVR::SetPosition(const vector3d pos)
 	offset.Z = pos.Y;
 
 #ifdef LVRDEBUG
-	dbg_print("LVR Cam Pos = [%.1f, %.1f, %.1f]",pos.X,pos.Z,pos.Y);
+	dbg_print("[LVR] Cam Pos = [%.1f, %.1f, %.1f]",pos.X,pos.Z,pos.Y);
 #endif
 }
 
@@ -160,7 +161,7 @@ void LVR::SetScale(const double s)
 	scale = vector3d(s);
 
 #ifdef LVRDEBUG
-	dbg_print("LVR Scale = %.4f",s);
+	dbg_print("[LVR] Scale = %.4f",s);
 #endif
 }
 
@@ -169,7 +170,7 @@ void LVR::SetFOV(const vector3d f)
 	fov = f;
 
 #ifdef LVRDEBUG
-	dbg_print("LVR FOV = [%.2f, %.2f]",f.X,f.Y);
+	dbg_print("[LVR] FOV = [%.2f, %.2f]",f.X,f.Y);
 #endif
 }
 
@@ -178,7 +179,7 @@ void LVR::SetFarDist(const int d)
 	far = d;
 
 #ifdef LVRDEBUG
-	dbg_print("LVR Far plane = %d",d);
+	dbg_print("[LVR] Far plane = %d",d);
 #endif
 }
 
@@ -187,7 +188,7 @@ void LVR::SetPostprocess(const SLVRPostProcess p)
 	pproc = p;
 
 #ifdef LVRDEBUG
-	dbg_print("LVR instance %p post-processing settings changed",this);
+	dbg_print("[LVR] instance %p post-processing settings changed",this);
 #endif
 }
 
@@ -242,7 +243,7 @@ void LVR::Frame()
 	memset(frame,0,rendsize*sizeof(SGUIPixel));
 
 	/* Lock datapipe until render is done */
-	pipeptr->ReadLock();
+	pipe->ReadLock();
 
 	/* Scanline renderer */
 	for (y = 0, l = 0; y < g_h; y++) {
@@ -250,7 +251,7 @@ void LVR::Frame()
 			curpbuf[l] = vector3di(-1); //clear pbuf data
 			if ((mask) && (mask[l])) continue;
 
-			//reverse painter's algorithm
+			//trace a ray into scene
 			for (z = 1; z <= far; z++) {
 				//make current point vector
 				v.X = (double)x;
@@ -268,7 +269,7 @@ void LVR::Frame()
 				iv.X = (int)(round(v.X));
 				iv.Y = (int)(round(v.Z)); //swap Y-Z axes
 				iv.Z = (int)(round(v.Y));
-				vox = pipeptr->GetVoxelI(&iv);
+				vox = pipe->GetVoxelI(&iv);
 
 				//if voxel found isn't empty, draw it and break current z-axis loop
 				if (vox->type != VOXT_EMPTY) {
@@ -286,7 +287,7 @@ void LVR::Frame()
 						case 1: av.Y += s; break;
 						case 2: av.Z += s; break;
 						}
-						area[i] = pipeptr->GetVoxel(&av);
+						area[i] = pipe->GetVoxel(&av);
 						m *= area[i]; //must be zero if at least one voxel isn't occupied
 					}
 
@@ -310,30 +311,34 @@ void LVR::Frame()
 	} //by Y
 
 	/* Release datapipe */
-	pipeptr->ReadUnlock();
+	pipe->ReadUnlock();
 }
 
 void LVR::Postprocess()
 {
-	int x,y,l;
+	int x,y,z;
+	unsigned l;
 	SGUIPixel* frame;
 	int* curzbuf;
-	vector3di* curpbuf;
+	vector3di* curpbuf,* npbuf;
+	const SVoxelInf* vox;
 	float fa,fb,fc;
 	vector3d vfa,vfb;
+	vector3di via,vib,vic,viz;
 
 	/* Set buffers to active frame */
 	SETCURRENTBUFS;
 
 	for (y = 0, l = 0; y < g_h; y++) {
 		for (x = 0; x < g_w; x++, l++) {
+			if ((mask) && (mask[l])) continue;
 
 			/* Fog */
 			if (pproc.fog_dist > 0) {
 				//FIXME: simplify this!
 				fa = curzbuf[l] - pproc.fog_dist;
-				fc = 1.f / (float)(far - pproc.fog_dist);
 				if (fa > 0) {
+					fc = 1.f / (float)(far - pproc.fog_dist);
 					fb = fc * fa;
 					vfa = tripletovecf(frame[l].bg);
 					vfa *= (1.f - fb);
@@ -353,10 +358,60 @@ void LVR::Postprocess()
 
 			/* Noise */
 			if (pproc.noise > 0) {
-				//FIXME: debugging implementation
-				//
+				//TODO
+				//FIXME: debug
+				if (curzbuf[l] && (curzbuf[l] < 10))
+					frame[l].sym = '0' + curzbuf[l];
+				else
+					frame[l].sym = ' ';
 			}
 		}
+	}
+
+	/* Textures */
+	if (pproc.txd_plane > 0) {
+		//create temporary working buffer
+		npbuf = new vector3di[rendsize];
+		viz = vector3di(-1);
+
+		//lock the DP for reading
+		pipe->ReadLock();
+
+		//painter's algorithm
+		for (z = pproc.txd_plane; z > 0; z--) {
+			//copy al relevant points into working buf
+			for (l = 0; l < rendsize; l++) {
+				if (curzbuf[l] == z)
+					npbuf[l] = curpbuf[l];
+				else
+					npbuf[l] = viz;
+			}
+
+			//search for sub-rects
+			while (FindSubRectDI(npbuf,&via,&vib,&vic,&viz,g_w,g_h)) {
+				vox = pipe->GetVoxelI(&vic);
+//				if (!vox->texture) continue;
+
+				//TODO: draw a texture onto 'frame'
+				//FIXME: debug
+				dbg_print("[LVR] rect [%d %d] [%d %d] -> pnt [%d %d %d]",
+						via.X,via.Y,vib.X,vib.Y,vic.X,vic.Y,vic.Z);
+				for (y = via.Y; y <= vib.Y; y++) {
+					l = y * g_w + via.X;
+					char xx = '0';
+					for (x = via.X; x <= vib.X; x++, l++) {
+						if ((mask) && (mask[l])) continue;
+						frame[l].sym = xx++;
+					}
+				}
+			}
+		}
+
+		//unlock DP
+		pipe->ReadUnlock();
+
+		//destroy working buffer
+		delete[] npbuf;
 	}
 }
 

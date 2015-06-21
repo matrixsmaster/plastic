@@ -64,6 +64,7 @@ struct SVoxelInf {
 	SGUIPixel pix;			//Color format used to display a voxel.
 	char sides[6];			//Symbols for each of six sides of a voxel cube.
 	char* mark;				//Mark. A voxel's 'name'.
+	void* texture;			//A 'texture'. May be anything.
 };
 
 ///Unified voxel table structure.
