@@ -44,6 +44,7 @@
 #define DPDEBUG 1
 
 ///Soft lock DataPipe on each voxel access operation.
+///Don't use this feature with LVR.
 //#define DPLOCKEACHVOX 1
 
 ///Amount of time to wait between locking write operations.
@@ -249,7 +250,7 @@ public:
 	virtual VModel* LoadModel(const char* fname, const vector3di pos, const vector3di gpos);
 
 	///Delete model from scene by pointer.
-	virtual bool UnloadModel(const VModel* ptr);
+	virtual bool UnloadModel(VModel* ptr);
 
 	///Purge all loaded models.
 	virtual void PurgeModels();
@@ -273,9 +274,16 @@ public:
 	///Returns true if the given point is out of current scene borders (Global coords).
 	virtual bool IsOutOfSceneGC(const vector3di pnt);
 
-	//FIXME: comment
+	///Returns a pointer to sprites vector.
 	virtual VSprVec* GetSprites()					{ return &sprs; }
+
+	///Loads a sprite into memory.
 	virtual VSprite* LoadSprite(const char* fname);
+
+	///Removes a sprite from memory.
+	virtual bool UnloadSprite(VSprite* ptr);
+
+	///Removes all the sprites from memory.
 	virtual void PurgeSprites();
 
 	//FIXME: comment

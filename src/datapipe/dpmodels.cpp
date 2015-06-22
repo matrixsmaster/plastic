@@ -53,13 +53,15 @@ VModel* DataPipe::LoadModel(const char* fname, const vector3di pos, const vector
 	return m;
 }
 
-bool DataPipe::UnloadModel(const VModel* ptr)
+bool DataPipe::UnloadModel(VModel* ptr)
 {
 	VModVec::iterator it;
 	if (!ptr) return false;
 
+	ReadLock();
 	for (it = objs.begin(); it != objs.end(); ++it)
 		if ((*it) == ptr) {
+			ReadUnlock();
 			WriteLock();
 			allocated -= (*it)->GetAllocatedRAM();
 			delete ((*it));
@@ -67,6 +69,7 @@ bool DataPipe::UnloadModel(const VModel* ptr)
 			WriteUnlock();
 			return true;
 		}
+	ReadUnlock();
 
 	return false;
 }
@@ -123,13 +126,16 @@ bool DataPipe::RemoveModel(VModel* obj)
 
 	if (objs.empty()) return false;
 
+	ReadLock();
 	for (mi = objs.begin(); mi != objs.end(); ++mi)
 		if ((*mi) == obj) {
+			ReadUnlock();
 			WriteLock();
 			objs.erase(mi);
 			WriteUnlock();
 			return true;
 		}
+	ReadUnlock();
 
 	return false;
 }

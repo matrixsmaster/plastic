@@ -60,7 +60,7 @@ PlasticActor::PlasticActor(EPAClass c, bool fem, NameGen* names, DataPipe* pptr)
 PlasticActor::~PlasticActor()
 {
 	Delete();
-	if (portrait) free(portrait);
+	if (portrait) pipe->UnloadSprite(portrait);
 }
 
 void PlasticActor::InitVars()
@@ -82,12 +82,9 @@ void PlasticActor::AutoInitStats()
 		curr = ns;
 	}
 
-	//FIXME: debug only!
 	if (!portrait) {
-		portrait = (SGUIPixel*)malloc(ACTPORTRAITH*ACTPORTRAITW*sizeof(SGUIPixel));
-		VSprite* s = pipe->LoadSprite("spr/testspr.dat");
-		memcpy(portrait,s->GetImage(),ACTPORTRAITH*ACTPORTRAITW*sizeof(SGUIPixel));
-		pipe->PurgeSprites();
+		//FIXME: debug only!
+		portrait = pipe->LoadSprite("spr/testspr.dat");
 	}
 }
 
@@ -184,13 +181,20 @@ bool PlasticActor::WearObject(InventoryObject* obj)
 	return false;
 }
 
+SGUIPixel* PlasticActor::GetPortrait()
+{
+	if (!portrait) return NULL;
+	return (portrait->GetImage());
+}
+
 bool PlasticActor::Spawn(PlasticWorld* wrld)
 {
 	model = pipe->LoadModel(attrib.model,pos,gpos);
 	if (model == NULL) return false;
 	world = wrld;
 	anim = new DAnimator(pipe,world->GetGameTimePtr(),model,attrib.model);
-	anim->LoadAnim("walking"); //FIXME: debug
+//	anim->LoadAnim("walking"); //FIXME: debug
+	//TODO: register face voxel
 	return true;
 }
 
@@ -198,6 +202,7 @@ void PlasticActor::Delete()
 {
 	if (model) pipe->UnloadModel(model);
 	if (anim) delete anim;
+	//TODO: unreg face voxel
 	anim = NULL;
 	model = NULL;
 	world = NULL;

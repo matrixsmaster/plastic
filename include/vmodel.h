@@ -58,29 +58,65 @@ private:
 
 	bool AllocBuf();
 	void HideEm();
+	voxel FindVoxel(EVoxelType tp);
+	voxel FindVoxel(const char* mrk);
 
 public:
 	VModel(SVoxelTab* tabptr);
 	virtual ~VModel();
 
+	///Returns an original (not rotated) model dimensions.
 	vector3di GetOrgSize()			{ return vector3di(s_x,s_y,s_z); }
+
+	///Returns a modified (rotated) model dimensions.
 	vector3di GetModSize()			{ return vector3di(bufside); }
 
+	///Returns a side of bounding box of rotated model (working buffer).
 	int GetBoundSide()				{ return bufside; }
+
+	///Returns a length (volume of the cube) of original model's data buffer.
 	ulli GetOrgLen()				{ return datlen; }
+
+	///Returns a length (volume of the cube) of model's working buffer.
 	ulli GetModLen()				{ return buflen; }
 
+	///Returns number of model 3D states.
 	int GetNumStates()				{ return nstates; }
+
+	///Returns current model 3D state.
 	int GetState()					{ return state; }
+
+	///Sets up a model 3D state and updates working buffer.
 	void SetState(int s);
 
+	///Loads a model from local file.
 	bool LoadFromFile(const char* fn);
+
+	///Returns amount of RAM allocated by a VModel.
 	ulli GetAllocatedRAM();
 
+	///Sets up a new model rotation and updates working buffer.
 	void SetRot(const vector3di r);
 
+	///Applies rotation to working buffer. No need to call this if you're using SetRot().
 	void ApplyRot();
 
+	///Hides all voxels equal to 'id'.
+	void HideVoxels(voxel id, bool hide);
+
+	///Hides all voxels of type 'tp'.
+	void HideVoxels(EVoxelType tp, bool hide);
+
+	///Hides all voxels with mark string equal to 'mrk'.
+	void HideVoxels(const char* mrk, bool hide);
+
+	///Replaces all voxels equal to 'old_id' with a voxels of 'new_id'.
+	void ReplaceVoxel(voxel old_id, voxel new_id);
+
+	///Replaces all voxels with mark string equal to 'mrk' with a voxels of 'new_id'.
+	void ReplaceVoxel(const char* mrk, voxel new_id);
+
+	///Returns a voxel in working buffer at specified scene coordinates.
 	voxel GetVoxelAt(const vector3di* p);
 };
 

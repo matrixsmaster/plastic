@@ -31,13 +31,33 @@ VSprite* DataPipe::LoadSprite(const char* fname)
 		return NULL;
 	}
 
-	allocated += spr->GetAllocatedRAM();
-
 	WriteLock();
+	allocated += spr->GetAllocatedRAM();
 	sprs.push_back(spr);
 	WriteUnlock();
 
 	return spr;
+}
+
+bool DataPipe::UnloadSprite(VSprite* ptr)
+{
+	VSprVec::iterator si;
+	if (!ptr) return false;
+
+	ReadLock();
+	for (si = sprs.begin(); si != sprs.end(); ++si)
+		if ((*si) == ptr) {
+			ReadUnlock();
+			WriteLock();
+			allocated -= (*si)->GetAllocatedRAM();
+			delete ((*si));
+			sprs.erase(si);
+			WriteUnlock();
+			return true;
+		}
+	ReadUnlock();
+
+	return false;
 }
 
 void DataPipe::PurgeSprites()

@@ -334,6 +334,54 @@ void VModel::HideEm()
 	}
 }
 
+voxel VModel::FindVoxel(EVoxelType tp)
+{
+	if (tp == VOXT_EMPTY) return 0;
+	//TODO
+	return 0;
+}
+
+voxel VModel::FindVoxel(const char* mrk)
+{
+	if (!mrk) return 0;
+	//TODO
+	return 0;
+}
+
+void VModel::HideVoxels(voxel id, bool hide)
+{
+	int i;
+	ulli l;
+
+	for (i = 0; (hdtab[i].v); i++) {
+		if (!hdtab[i].hidden) continue;
+
+		for (l = 0; l < buflen; l++)
+			if (buf[l] == hdtab[i].v)
+				buf[l] = 0;
+	}
+}
+
+void VModel::HideVoxels(EVoxelType tp, bool hide)
+{
+	//TODO
+}
+
+void VModel::HideVoxels(const char* mrk, bool hide)
+{
+	//TODO
+}
+
+void VModel::ReplaceVoxel(voxel old_id, voxel new_id)
+{
+	//TODO
+}
+
+void VModel::ReplaceVoxel(const char* mrk, voxel new_id)
+{
+	//TODO
+}
+
 voxel VModel::GetVoxelAt(const vector3di* p)
 {
 	ulli l;

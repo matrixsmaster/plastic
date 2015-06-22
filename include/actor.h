@@ -33,6 +33,7 @@
 #include "datapipe.h"
 #include "keybinder.h"
 #include "vmodel.h"
+#include "vsprite.h"
 #include "inventory.h"
 #include "namegen.h"
 #include "animator.h"
@@ -50,7 +51,7 @@ protected:
 	PlasticWorld* world;	//World instance
 	VModel* model;			//Actor's model
 	Inventory invent;		//Actor's inventory
-	SGUIPixel* portrait;	//Actor's portrait
+	VSprite* portrait;		//Actor's portrait
 	DAnimator* anim;		//Actor's animations
 
 	void InitVars();
@@ -60,6 +61,7 @@ public:
 	PlasticActor(EPAClass c, bool fem, NameGen* names, DataPipe* pptr);
 	virtual ~PlasticActor();
 
+	//FIXME: comment!
 	virtual void AutoInitStats();
 
 	bool IsNPC()						{ return isnpc; }
@@ -74,7 +76,7 @@ public:
 	bool UseObject(InventoryObject* obj);
 	bool WearObject(InventoryObject* obj);
 
-	SGUIPixel* GetPortrait()			{ return portrait; }
+	SGUIPixel* GetPortrait();
 	VModel* GetModel()					{ return model; }
 
 	SPAAttrib GetAttributes()			{ return attrib; }

@@ -118,23 +118,35 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 PlasticWorld::~PlasticWorld()
 {
+	//Just in case: stop the updates
+	lock_update = true;
+
+	//Stop rendering first to speed up freeing other resources
+	if (render) delete render;
+	render = NULL;
+
 	//Stop physics engine
 	if (physics) delete physics;
 
-	//Game data
+	//UI parts
+	if (binder) delete binder;
+	binder = NULL;
+	if (hud) delete hud;
+	hud = NULL;
+	if (radar) delete radar;
+	radar = NULL;
+
+	//Save and Free Game data
 	SaveGame();
 	if (society) delete society;
 	if (PC) delete PC;
+	PC = NULL;
 	if (clkres) delete clkres;
-	data->ConnectWorldGen(NULL); //disconnect WG
-	if (wgen) delete wgen;
 	if (msgsys) delete msgsys;
 
-	//UI parts
-	if (binder) delete binder;
-	if (hud) delete hud;
-	if (radar) delete radar;
-	if (render) delete render;
+	//Destroy WorldGen
+	data->ConnectWorldGen(NULL); //disconnect WG
+	if (wgen) delete wgen;
 
 	//The last one: DataPipe
 	if (data) delete data;
@@ -364,8 +376,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	vector3di tr = test->GetRot();
 	vector3di x;
 	SPABase stst;
-	VModel* ntst;
-	VSprite* nspr;
 
 	result = 1;
 
@@ -425,12 +435,6 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			case '6': tr.Z += 2; break;
 
 			case '8': SPAWNWNDMACRO(WNDNAM_VMODEDIT,new CurseGUIVModEditWnd(gui,test,sets,data->GetVoxTable(),true)); break;
-			case '9':
-				gui->RmWindow(WNDNAM_VMODEDIT);
-				ntst = data->LoadModel("testmodel.dat",vector3di(),vector3di());
-				nspr = data->LoadSprite("spr/testspr.dat");
-				//
-				break;
 
 			case KEY_F(4):
 					gui->GetColorManager()->Flush();

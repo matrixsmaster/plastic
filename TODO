@@ -41,3 +41,5 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Add simple "chip"-based AI and add actors ability to move (without pathfinding)
 
 -> Implement world pause mode (physics, animations, game clock and rendering are suspended)
+
+-> Add 'Field' algorithm from a 'minor_2d' test into vecmisc module
