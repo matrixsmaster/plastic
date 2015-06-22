@@ -406,8 +406,10 @@ void LVR::Postprocess()
 				dx = w / (vib.X - via.X);
 				dy = h / (vib.Y - via.Y);
 
+#ifdef LVRDEBUG
 				dbg_print("[LVR] rect [%d %d] [%d %d] -> pnt [%d %d %d]",
 						via.X,via.Y,vib.X,vib.Y,vic.X,vic.Y,vic.Z);
+#endif
 //				for (y = via.Y; y <= vib.Y; y++) {
 //					l = y * g_w + via.X;
 //					for (x = via.X; x <= vib.X; x++, l++) {

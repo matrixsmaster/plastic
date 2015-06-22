@@ -229,12 +229,19 @@ public:
 	virtual voxel GetVoxel(const vector3di* p, bool dynskip = false);				//return voxel code
 	virtual const SVoxelInf* GetVoxelI(const vector3di* p, bool dynskip = false);	//return voxel info
 
-	///Return an information about voxel by type code.
+	///Returns an information about the voxel by id.
 	virtual const SVoxelInf* GetVInfo(const voxel v);
+
+	///Returns an information about the voxel by mark.
+	virtual const SVoxelInf* GetVInfo(const char* mrk);
 
 	///Appends a new voxel into voxel table and returns its index.
 	///That index then can be used as a new voxel, until restart of DataPipe.
 	virtual voxel AppendVoxel(const SVoxelInf* nvox);
+
+	///Tries to remove a voxel from the universe.
+	///This voxel will only be marked as removed.
+	virtual void RemoveVoxel(voxel v);
 
 	///Return an elevation (max Z occupied by voxel) under point on XY-plane.
 	virtual int GetElevationUnder(const vector3di* p);
@@ -294,6 +301,7 @@ public:
 
 	///Returns a dictionary (vector of strings) by its name.
 	DPDict* GetDictionary(const char* dct_name);		//old style
+	///Returns a dictionary (vector of strings) by its name.
 	DPDict* GetDictionary(const std::string dct_name);	//new style
 };
 

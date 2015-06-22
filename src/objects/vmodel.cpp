@@ -87,7 +87,8 @@ bool VModel::LoadFromFile(const char* fn)
 	//read voxel types table (skips empty lines and comments)
 	for (i = 0; ((i < vtc) && (!feof(mf)));) {
 
-		switch (fgetc(mf)) {
+		char tmp = fgetc(mf);
+		switch (tmp) {
 		case '!':
 			//read the direct voxel number
 			if (fscanf(mf,"%c = %hu\n",&(tab[i].c),&(tab[i].v)) == 2) i++;
@@ -122,14 +123,18 @@ bool VModel::LoadFromFile(const char* fn)
 			}
 			break;
 
+		case '\n':
+			//just skip
+			break;
+
 		default:
 			//skip everything till next line or eof
 			while ((fgetc(mf) != '\n') && (!feof(mf))) ;
 		}
 	}
-	free(s); //free temporary string memory
 
 	if (feof(mf)) goto bad_exit; //shouldn't be at the end of table
+	free(s); //free temporary string memory
 
 	//create and initialize voxel hide table
 	j = (vtc + 1) * sizeof(SVoxHide); //reserve space for a stopper

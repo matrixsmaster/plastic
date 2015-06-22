@@ -70,6 +70,7 @@ void PlasticActor::InitVars()
 	portrait = NULL;
 	anim = NULL;
 	world = NULL;
+	headtxd = 0;
 }
 
 void PlasticActor::AutoInitStats()
@@ -189,22 +190,48 @@ SGUIPixel* PlasticActor::GetPortrait()
 
 bool PlasticActor::Spawn(PlasticWorld* wrld)
 {
+	SVoxelInf nvi;
+
+	//Load up actor's model
 	model = pipe->LoadModel(attrib.model,pos,gpos);
 	if (model == NULL) return false;
+
+	//Set up world instance pointer for call-backs
 	world = wrld;
+
+	//Initialize discrete animator
 	anim = new DAnimator(pipe,world->GetGameTimePtr(),model,attrib.model);
 //	anim->LoadAnim("walking"); //FIXME: debug
-	//TODO: register face voxel
+
+	//Register face voxel
+	nvi = *(pipe->GetVInfo("face")); //copy 'face' voxel
+	nvi.mark = NULL; //don't use the same mark
+	nvi.not_used = false; //just in case
+	nvi.texture = portrait; //apply face texture
+	headtxd = pipe->AppendVoxel(&nvi);
+
+	//Replace old face voxel
+	model->ReplaceVoxel("face",headtxd);
+
+	//Good to go
 	return true;
 }
 
 void PlasticActor::Delete()
 {
-	if (model) pipe->UnloadModel(model);
+	//Destroy animation system
 	if (anim) delete anim;
-	//TODO: unreg face voxel
 	anim = NULL;
+
+	//Destroy actor's model
+	if (model) pipe->UnloadModel(model);
 	model = NULL;
+
+	//To free face voxel
+	pipe->RemoveVoxel(headtxd);
+	headtxd = 0;
+
+	//We don't need world instance anymore
 	world = NULL;
 }
 

@@ -395,14 +395,43 @@ const SVoxelInf* DataPipe::GetVInfo(const voxel v)
 	else return NULL;
 }
 
+const SVoxelInf* DataPipe::GetVInfo(const char* mrk)
+{
+	unsigned i;
+
+	ReadLock(); //soft-lock pipe while we searching
+	for (i = 0; i < voxeltab.rlen; i++)
+		if (	(voxeltab.tab[i].mark) &&
+				(!strcmp(voxeltab.tab[i].mark,mrk)) ) {
+			ReadUnlock();
+			return &(voxeltab.tab[i]);
+		}
+	ReadUnlock();
+	return NULL;
+}
+
 voxel DataPipe::AppendVoxel(const SVoxelInf* nvox)
 {
 	unsigned l;
-	voxel v;
+	voxel v = 0;
 
 	if (!nvox) return 0;
 
-	l = voxeltab.rlen + 1;
+	//Hard lock the Pipe till this important operation is done.
+	WriteLock();
+
+	//find some empty space in already allocated table
+	for (l = 0; l < voxeltab.rlen; l++)
+		if (voxeltab.tab[l].not_used) {
+			v = l;
+#ifdef DPDEBUG
+			dbg_logstr("Empty voxel place was found.");
+#endif
+			break;
+		}
+
+	//if all places is occupied, try to enlarge the table
+	l = (v)? v:(voxeltab.rlen + 1);
 
 	//check for some room
 	if (l >= voxeltab.len) {
@@ -412,33 +441,63 @@ voxel DataPipe::AppendVoxel(const SVoxelInf* nvox)
 			dbg_logstr("No logical space left for a new voxel.");
 #endif
 			status = DPIPE_ERROR;
+			WriteUnlock();
 			return 0;
 		}
+
 		//allocate more space for a voxel table
 		l *= sizeof(SVoxelInf); //new table size
 		voxeltab.len = l;
 		voxeltab.tab = (SVoxelInf*)realloc(voxeltab.tab,l);
+
 		if (!voxeltab.tab) {
 			//out of memory
 #ifdef DPDEBUG
 			dbg_logstr("No memory space left for a new voxel.");
 #endif
 			status = DPIPE_ERROR;
+			WriteUnlock();
 			return 0;
 		}
 		allocated += sizeof(SVoxelInf); //update allocated memory counter
 	}
 
+	if (!v) {
+		//append
+		v = voxeltab.rlen;
+		voxeltab.rlen++;
+	} //else : overwrite
+
 	//add new voxel info
-	v = voxeltab.rlen;
 	voxeltab.tab[v] = *nvox;
-	voxeltab.rlen++;
 
 #ifdef DPDEBUG
 	dbg_print("Registered new voxel id=%hu.",v);
 #endif
 
+	WriteUnlock();
 	return v;
+}
+
+void DataPipe::RemoveVoxel(voxel v)
+{
+	if ((!v) || (v >= voxeltab.rlen)) return;
+
+	WriteLock();
+
+	voxeltab.tab[v].not_used = true;
+	if (voxeltab.tab[v].mark) {
+		free(voxeltab.tab[v].mark);
+		voxeltab.tab[v].mark = NULL;
+	}
+	voxeltab.tab[v].texture = NULL;
+	voxeltab.tab[v].type = VOXT_EMPTY;
+
+	WriteUnlock();
+
+#ifdef DPDEBUG
+	dbg_print("Voxel unregistered. id=%hu.",v);
+#endif
 }
 
 void DataPipe::ConnectWorldGen(WorldGen* ptr)

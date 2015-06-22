@@ -53,6 +53,7 @@ protected:
 	Inventory invent;		//Actor's inventory
 	VSprite* portrait;		//Actor's portrait
 	DAnimator* anim;		//Actor's animations
+	voxel headtxd;			//Textured head voxel id
 
 	void InitVars();
 

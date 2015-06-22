@@ -36,7 +36,7 @@ Add voxel destroying test for combat mode				| assigned	|
 ---------------------------------------------------------------------------------------
 Create messages loading & translation system			| done		|
 ---------------------------------------------------------------------------------------
-Test 'tup' as a temporary build system					| stall		|
+Test 'tup' as a temporary build system					| stall, meeting unavoidable
 ---------------------------------------------------------------------------------------
 Move html2vsprite tool in								| done		|
 ---------------------------------------------------------------------------------------
@@ -48,5 +48,7 @@ Implement world gamedata saving and loading				| assigned	|
 ---------------------------------------------------------------------------------------
 Speed up LVR fog by implementing look-up table			| assigned	|
 ---------------------------------------------------------------------------------------
-Implement reuse of dynamically appended voxels			| assigned	|
+Implement reuse of dynamically appended voxels			| in progr	|
+---------------------------------------------------------------------------------------
+Add wearable inventory items sub-class					| assigned	|
 ---------------------------------------------------------------------------------------

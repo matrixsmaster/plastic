@@ -68,6 +68,7 @@ struct SVoxelInf {
 	char sides[6];			//Symbols for each of six sides of a voxel cube.
 	char* mark;				//Mark. A voxel's 'name'.
 	void* texture;			//A 'texture'. May be anything.
+	bool not_used;			//A flag used to implement dynamic memory management.
 };
 
 ///Unified voxel table structure.
