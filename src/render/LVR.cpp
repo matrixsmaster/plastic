@@ -316,7 +316,7 @@ void LVR::Frame()
 
 void LVR::Postprocess()
 {
-	int x,y,z;
+	int x,y,z,w,h,dx,dy;
 	unsigned l;
 	SGUIPixel* frame;
 	int* curzbuf;
@@ -325,6 +325,8 @@ void LVR::Postprocess()
 	float fa,fb,fc;
 	vector3d vfa,vfb;
 	vector3di via,vib,vic,viz;
+	VSprite* spr;
+	SGUIPixel* txd;
 
 	/* Set buffers to active frame */
 	SETCURRENTBUFS;
@@ -369,16 +371,16 @@ void LVR::Postprocess()
 	}
 
 	/* Textures */
-	if (pproc.txd_plane > 0) {
+	if (pproc.txd_fplane > 0) {
 		//create temporary working buffer
 		npbuf = new vector3di[rendsize];
 		viz = vector3di(-1);
 
-		//lock the DP for reading
+		//lock the DP for reading sprites
 		pipe->ReadLock();
 
 		//painter's algorithm
-		for (z = pproc.txd_plane; z > 0; z--) {
+		for (z = pproc.txd_fplane; z > pproc.txd_nplane; z--) {
 			//copy al relevant points into working buf
 			for (l = 0; l < rendsize; l++) {
 				if (curzbuf[l] == z)
@@ -390,20 +392,29 @@ void LVR::Postprocess()
 			//search for sub-rects
 			while (FindSubRectDI(npbuf,&via,&vib,&vic,&viz,g_w,g_h)) {
 				vox = pipe->GetVoxelI(&vic);
-//				if (!vox->texture) continue;
+				if (!vox->texture) continue;
 
-				//TODO: draw a texture onto 'frame'
-				//FIXME: debug
+				//check area
+				if ((vib.X - via.X) < pproc.txd_minw) continue;
+				if ((vib.Y - via.Y) < pproc.txd_minh) continue;
+
+				//get texture and calculate values needed
+				spr = (VSprite*)vox->texture;
+				txd = spr->GetImage();
+				w = spr->GetWidth();
+				h = spr->GetHeight();
+				dx = w / (vib.X - via.X);
+				dy = h / (vib.Y - via.Y);
+
 				dbg_print("[LVR] rect [%d %d] [%d %d] -> pnt [%d %d %d]",
 						via.X,via.Y,vib.X,vib.Y,vic.X,vic.Y,vic.Z);
-				for (y = via.Y; y <= vib.Y; y++) {
-					l = y * g_w + via.X;
-					char xx = '0';
-					for (x = via.X; x <= vib.X; x++, l++) {
-						if ((mask) && (mask[l])) continue;
-						frame[l].sym = xx++;
-					}
-				}
+//				for (y = via.Y; y <= vib.Y; y++) {
+//					l = y * g_w + via.X;
+//					for (x = via.X; x <= vib.X; x++, l++) {
+//						if ((mask) && (mask[l])) continue;
+//
+//					}
+//				}
 			}
 		}
 

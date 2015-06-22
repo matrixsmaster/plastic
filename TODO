@@ -39,3 +39,5 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Add generation algorithm to create large buildings out of small blocks
 
 -> Add simple "chip"-based AI and add actors ability to move (without pathfinding)
+
+-> Implement world pause mode (physics, animations, game clock and rendering are suspended)

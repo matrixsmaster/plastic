@@ -426,7 +426,7 @@ void RenderPool::SetFarDist(const int d)
 void RenderPool::SetPostprocess(const SLVRPostProcess p)
 {
 	bool ppc = (	(p.fog_dist) ||
-					(p.noise) || (p.txd_plane)); //FIXME: move texturization to RP's PP
+					(p.noise) || (p.txd_fplane)); //FIXME: move texturization to RP's PP
 
 	pproc = p;
 

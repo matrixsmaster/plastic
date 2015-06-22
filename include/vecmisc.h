@@ -79,8 +79,10 @@ vector3d BilinearInterpolation(const vector3d* v, const vector3d* p);
 ///Helper function to fill rectangle information to pass to other functions (e.g. BilinearInt.).
 vector2di RectangleCornerK(const int num);
 
-//FIXME: comment
+///Fills in upper-left and bottom-right corners of a rectangle selected by equal 3D vectors in input array.
+///'zero' is a vector, which will be treated as no-point.
+///Returns either 1 (rect found) or 0 (nothing found).
+///Dumb algorithm for integer vectors.
 int FindSubRectDI(vector3di* arr, vector3di* ul, vector3di* br, vector3di* cont, const vector3di* zero, const int w, const int h);
-//int FindSubRectFI(vector3di* arr, vector3di* ul, vector3di* br, vector3di* cont);
 
 #endif /* VECMISC_H_ */

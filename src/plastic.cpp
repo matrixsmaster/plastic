@@ -87,6 +87,12 @@ static void* plastic_eventhread(void* ptr)
 
 		pthread_mutex_unlock(&m_render);
 
+		/* Check DataPipe status */
+		if (g_wrld->GetDataPipe()->GetStatus() == DPIPE_ERROR) {
+			errout("DataPipe error detected. Program will be terminated.");
+			g_quit = true;
+		}
+
 		/* To keep CPU load low(er) */
 		usleep(EVENTUSLEEP);
 	}

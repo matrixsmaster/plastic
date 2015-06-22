@@ -44,7 +44,9 @@ struct SLVRPostProcess {
 	int fog_dist;
 	SCTriple fog_col;
 	int noise;
-	int txd_plane;
+	int txd_fplane;
+	int txd_nplane;
+	int txd_minw,txd_minh;
 };
 
 ///Default post-processing.
@@ -52,7 +54,7 @@ struct SLVRPostProcess {
 	40, \
 	{40, 40, 40}, \
 	0, \
-	15, \
+	20, 5, 3, 3, \
 }
 
 #endif /* LVRCONSTS_H_ */

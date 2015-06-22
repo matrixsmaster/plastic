@@ -364,6 +364,8 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	vector3di tr = test->GetRot();
 	vector3di x;
 	SPABase stst;
+	VModel* ntst;
+	VSprite* nspr;
 
 	result = 1;
 
@@ -423,6 +425,12 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			case '6': tr.Z += 2; break;
 
 			case '8': SPAWNWNDMACRO(WNDNAM_VMODEDIT,new CurseGUIVModEditWnd(gui,test,sets,data->GetVoxTable(),true)); break;
+			case '9':
+				gui->RmWindow(WNDNAM_VMODEDIT);
+				ntst = data->LoadModel("testmodel.dat",vector3di(),vector3di());
+				nspr = data->LoadSprite("spr/testspr.dat");
+				//
+				break;
 
 			case KEY_F(4):
 					gui->GetColorManager()->Flush();

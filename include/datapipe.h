@@ -41,7 +41,7 @@
 #define DEFRAMMAX (2ULL * 1024*1024*1024)
 
 ///Define this to enable DataPipe debugging.
-//#define DPDEBUG 1
+#define DPDEBUG 1
 
 ///Soft lock DataPipe on each voxel access operation.
 //#define DPLOCKEACHVOX 1
@@ -220,7 +220,7 @@ public:
 	///Returns false if move is invalid.
 	virtual bool Move(const vector3di shf);
 
-	///Do NOT call this method in the outside code, unless you're know what you're doing!
+	///Do NOT call this method in the outside code, unless you know what you're doing!
 	virtual void ChunkQueue();
 
 	///Returns a specific voxel (or its data) in a loaded space.
@@ -230,6 +230,10 @@ public:
 
 	///Return an information about voxel by type code.
 	virtual const SVoxelInf* GetVInfo(const voxel v);
+
+	///Appends a new voxel into voxel table and returns its index.
+	///That index then can be used as a new voxel, until restart of DataPipe.
+	virtual voxel AppendVoxel(const SVoxelInf* nvox);
 
 	///Return an elevation (max Z occupied by voxel) under point on XY-plane.
 	virtual int GetElevationUnder(const vector3di* p);
@@ -280,9 +284,9 @@ public:
 	bool LoadStaticWorld();
 	bool SaveStaticWorld();
 
-	//FIXME: comment
-	DPDict* GetDictionary(const char* dct_name);
-	DPDict* GetDictionary(const std::string dct_name);
+	///Returns a dictionary (vector of strings) by its name.
+	DPDict* GetDictionary(const char* dct_name);		//old style
+	DPDict* GetDictionary(const std::string dct_name);	//new style
 };
 
 
@@ -296,12 +300,13 @@ public:
 	DataPipeDummy(SGameSettings* sets);
 	virtual ~DataPipeDummy();
 
-	void SetVoxTab(SVoxelTab* p)		{ voxeltab = *p; }
+	void SetVoxTab(SVoxelTab* p)				{ voxeltab = *p; }
 
-	void SetGP(vector3di pos)			{}
-	bool Move(const vector3di shf)		{ return false; }
+	void SetGP(vector3di pos)					{}
+	bool Move(const vector3di shf)				{ return false; }
 
 	voxel GetVoxel(const vector3di* p);
+	voxel GetVoxel(const vector3di* p, bool)	{ return GetVoxel(p); }
 };
 
 #endif /* DATAPIPE_H_ */

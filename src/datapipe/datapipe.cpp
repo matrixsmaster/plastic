@@ -395,6 +395,52 @@ const SVoxelInf* DataPipe::GetVInfo(const voxel v)
 	else return NULL;
 }
 
+voxel DataPipe::AppendVoxel(const SVoxelInf* nvox)
+{
+	unsigned l;
+	voxel v;
+
+	if (!nvox) return 0;
+
+	l = voxeltab.rlen + 1;
+
+	//check for some room
+	if (l >= voxeltab.len) {
+		if (l >= MAXVOXTYPES) {
+			//no space left, abnormal termination
+#ifdef DPDEBUG
+			dbg_logstr("No logical space left for a new voxel.");
+#endif
+			status = DPIPE_ERROR;
+			return 0;
+		}
+		//allocate more space for a voxel table
+		l *= sizeof(SVoxelInf); //new table size
+		voxeltab.len = l;
+		voxeltab.tab = (SVoxelInf*)realloc(voxeltab.tab,l);
+		if (!voxeltab.tab) {
+			//out of memory
+#ifdef DPDEBUG
+			dbg_logstr("No memory space left for a new voxel.");
+#endif
+			status = DPIPE_ERROR;
+			return 0;
+		}
+		allocated += sizeof(SVoxelInf); //update allocated memory counter
+	}
+
+	//add new voxel info
+	v = voxeltab.rlen;
+	voxeltab.tab[v] = *nvox;
+	voxeltab.rlen++;
+
+#ifdef DPDEBUG
+	dbg_print("Registered new voxel id=%hu.",v);
+#endif
+
+	return v;
+}
+
 void DataPipe::ConnectWorldGen(WorldGen* ptr)
 {
 	if (ptr) {
