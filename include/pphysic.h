@@ -49,6 +49,8 @@ private:
 	DataPipe* pipe;
 	PPModVec mods;
 
+	bool GetSurroundingVox(const SPPModelRec* mod, vector3di p);
+
 public:
 	PlasticPhysics(DataPipe* pipeptr);
 	virtual ~PlasticPhysics();
