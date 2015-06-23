@@ -34,9 +34,10 @@ struct SVoxCharPair {
 	voxel v;
 };
 
-struct SVoxHide {
+struct SVoxExtData {
 	voxel v;
 	bool hidden;
+	voxel nid;
 };
 
 class VModel : public VSceneObject {
@@ -54,10 +55,11 @@ private:
 	vector3di center;		//working buf center point
 	int state;				//current state
 	SVoxelTab* vtab;		//voxel table
-	SVoxHide* hdtab;		//voxel hide table
+	SVoxExtData* extab;		//voxel extra data table
 
 	bool AllocBuf();
 	void HideEm();
+	void ReplaceEm();
 	voxel FindVoxel(EVoxelType tp);
 	voxel FindVoxel(const char* mrk);
 

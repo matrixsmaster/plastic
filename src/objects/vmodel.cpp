@@ -37,14 +37,14 @@ VModel::VModel(SVoxelTab* tabptr) :
 	changed = false;
 	state = 0;
 	vtab = tabptr;
-	hdtab = NULL;
+	extab = NULL;
 }
 
 VModel::~VModel()
 {
 	int i;
 	if (buf) free(buf);
-	if (hdtab) free(hdtab);
+	if (extab) free(extab);
 	if (dat) {
 		for (i = 0; i < nstates; i++) free(dat[i]);
 		free(dat);
@@ -136,14 +136,14 @@ bool VModel::LoadFromFile(const char* fn)
 	if (feof(mf)) goto bad_exit; //shouldn't be at the end of table
 	free(s); //free temporary string memory
 
-	//create and initialize voxel hide table
-	j = (vtc + 1) * sizeof(SVoxHide); //reserve space for a stopper
-	hdtab = (SVoxHide*)malloc(j);
-	if (!hdtab) goto bad_exit;
-	memset(hdtab,0,j);
+	//create and initialize voxel extra data table
+	j = (vtc + 1) * sizeof(SVoxExtData); //reserve space for a stopper
+	extab = (SVoxExtData*)malloc(j);
+	if (!extab) goto bad_exit;
+	memset(extab,0,j);
 	for (i = 0, j = 0; i < vtc; i++) {
 		//copy non-zero voxels
-		if (tab[i].v) hdtab[j++].v = tab[i].v;
+		if (tab[i].v) extab[j++].v = tab[i].v;
 	}
 
 	//allocate memory: original data states map
@@ -322,6 +322,7 @@ void VModel::ApplyRot()
 	}
 
 	HideEm();
+	ReplaceEm();
 	changed = false;
 }
 
@@ -330,61 +331,112 @@ void VModel::HideEm()
 	int i;
 	ulli l;
 
-	for (i = 0; (hdtab[i].v); i++) {
-		if (!hdtab[i].hidden) continue;
+	//seek though ext tab
+	for (i = 0; (extab[i].v); i++) {
+		//don't touch not-hidden voxels
+		if (!extab[i].hidden) continue;
 
+		//remove hidden voxel from working buf
 		for (l = 0; l < buflen; l++)
-			if (buf[l] == hdtab[i].v)
+			if (buf[l] == extab[i].v)
 				buf[l] = 0;
+	}
+}
+
+void VModel::ReplaceEm()
+{
+	int i;
+	ulli l;
+
+	//seek though ext tab
+	for (i = 0; (extab[i].v); i++) {
+		//don't touch not-changed voxels
+		if (!extab[i].nid) continue;
+
+		//replace voxel in working buffer
+		for (l = 0; l < buflen; l++)
+			if (buf[l] == extab[i].v)
+				buf[l] = extab[i].nid;
 	}
 }
 
 voxel VModel::FindVoxel(EVoxelType tp)
 {
-	if (tp == VOXT_EMPTY) return 0;
-	//TODO
+	int i;
+	voxel v;
+	if ((!vtab) || (tp == VOXT_EMPTY)) return 0;
+
+	//seek though ext tab
+	for (i = 0; (extab[i].v); i++) {
+		v = extab[i].v;
+		if (v < vtab->rlen) {
+			//voxel is in the vox table, check it
+			if (vtab->tab[v].type == tp)
+				return v;
+		}
+	}
+
 	return 0;
 }
 
 voxel VModel::FindVoxel(const char* mrk)
 {
-	if (!mrk) return 0;
-	//TODO
+	int i;
+	voxel v;
+	if ((!vtab) || (!mrk)) return 0;
+
+	//seek though ext tab
+	for (i = 0; (extab[i].v); i++) {
+		v = extab[i].v;
+		if (v < vtab->rlen) {
+			//voxel is in the vox table, check it
+			if (	(vtab->tab[v].mark) &&
+					(!strcmp(vtab->tab[v].mark,mrk)) )
+				return v;
+		}
+	}
+
 	return 0;
 }
 
 void VModel::HideVoxels(voxel id, bool hide)
 {
 	int i;
-	ulli l;
 
-	for (i = 0; (hdtab[i].v); i++) {
-		if (!hdtab[i].hidden) continue;
-
-		for (l = 0; l < buflen; l++)
-			if (buf[l] == hdtab[i].v)
-				buf[l] = 0;
+	for (i = 0; (extab[i].v); i++) {
+		if (extab[i].v == id)
+			extab[i].hidden = hide;
 	}
+
+	if (hide) HideEm(); //just remove voxels from working buf
+	else ApplyRot();	//regenerate working buf
 }
 
 void VModel::HideVoxels(EVoxelType tp, bool hide)
 {
-	//TODO
+	HideVoxels(FindVoxel(tp),hide);
 }
 
 void VModel::HideVoxels(const char* mrk, bool hide)
 {
-	//TODO
+	HideVoxels(FindVoxel(mrk),hide);
 }
 
 void VModel::ReplaceVoxel(voxel old_id, voxel new_id)
 {
-	//TODO
+	int i;
+
+	for (i = 0; (extab[i].v); i++) {
+		if (extab[i].v == old_id)
+			extab[i].nid = new_id;
+	}
+
+	ReplaceEm();
 }
 
 void VModel::ReplaceVoxel(const char* mrk, voxel new_id)
 {
-	//TODO
+	ReplaceVoxel(FindVoxel(mrk),new_id);
 }
 
 voxel VModel::GetVoxelAt(const vector3di* p)
