@@ -33,67 +33,92 @@ PlasticPhysics::~PlasticPhysics()
 	//TODO
 }
 
+
+bool PlasticPhysics::GetSurroundingVox(const SPPModelRec* mod, vector3di p)
+{
+	voxel sv,ov;
+	vector3di cp = p;
+
+	//FIXME
+	cp.Z -= 1;
+	if (pipe->GetVoxel(&cp, true)) return true;
+
+	cp.Z += 1;
+	cp.X -= 1;
+	if (pipe->GetVoxel(&cp, true)) return true;
+
+	cp.X += 1;
+	cp.Z += 1;
+	if (pipe->GetVoxel(&cp, true)) return true;
+
+	cp.X += 1;
+	cp.Z += 1;
+	if (pipe->GetVoxel(&cp, true)) return true;
+
+	cp.Z -= 1;
+	cp.X += 1;
+	if (pipe->GetVoxel(&cp, true)) return true;
+
+	cp.X -= 1;
+	cp.Y -= 1;
+	if (pipe->GetVoxel(&cp, true)) return true;
+
+	cp.Y += 2;
+	if (pipe->GetVoxel(&cp, true)) return true;
+
+	return false;
+}
+
 const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 {
 	SPPCollision res;
 	int b;				//bound side
 	voxel sv,ov;		//scene voxel, object voxel
-	vector3di sp,p,op;	//scene point, ... ,object point
+	vector3di sp,p, cp;	//scene center point, object point, contact point
+	bool contact;
 
 	res.no_collision = true; //FIXME
 	res.depth = 0;
+	contact = false;
 
 	b = mod->modptr->GetBoundSide();
 	sp = mod->modptr->GetSPos();
 
-#if 0
 	//Search one-dimensional collision
+	//FIXME search on the border of the cube
 	for (p.X = (sp.X - b/2); p.X < (sp.X + b/2); ++(p.X)) {
 		for (p.Y = (sp.Y - b/2); p.Y < (sp.Y + b/2); ++(p.Y)) {
 			for (p.Z = (sp.Z - b/2); p.Z < (sp.Z + b/2); ++(p.Z)) {
-				//TODO contact
+
 				sv = pipe->GetVoxel(&p, true);
 				ov = mod->modptr->GetVoxelAt(&p);
 
 				if (sv && ov && (res.no_collision)) {
-					res.no_collision = false;
+					res.no_collision = true; //false;
 					res.start = p;
 					res.depth = 1;
 					break;
 				}
 
+				//Get surrounding voxels
+//				if (!sv && ov && !contact)
+//					if (!contact) {
+//						contact = GetSurroundingVox(mod, p);
+//						cp = p;
+//					}
 			}
 			if (!res.no_collision) break;
 		}
-		if (!res.no_collision) break;
+		if (!res.no_collision) break; // && contact
 	}
-#endif
 
-//	p = res.start;
-//	p.Z -= 1;
-//	//do something
-//	sv = pipe->GetVoxel(&p, true);
-//
-//
-//	p.Z += 1;
-//	p.X -= 1;
-//	//do s
-//	p.X += 1;
-//	p.Z += 1;
-//	//do s
-//	p.Z -= 1;
-//	p.X += 1;
-//	//do s
-//	p.X -= 1;
-//	p.Y -= 1;
-//	//do s
-//	p.Y += 2;
-//	//do s
-
-//	if (!res.no_collision)
-//		dbg_print("coll: %d, start [ %d %d %d ], depth = %d, (%p)", res.no_collision, res.start.X, res.start.Y, res.start.Z, res.depth, mod->modptr);
+	if (!res.no_collision)
+		dbg_print("[PHY] Last collision: %d, start [ %d %d %d ], depth = %d, (%p)", res.no_collision, res.start.X, res.start.Y, res.start.Z, res.depth, mod->modptr);
+	if (contact)
+		dbg_print("[PHY] Contact on [ %d %d %d ] voxel", cp.X, cp.Y, cp.Z);
 	return res;
 }
+
 
 void PlasticPhysics::Quantum()
 {
@@ -142,15 +167,16 @@ void PlasticPhysics::Quantum()
 		//skip contacting objects, which isn't moved
 		if ((!im->changed) && (!im->moved) && (im->contact)) continue;
 
-//		ccol = Collision(&(*im));
-//		if (ccol.no_collision) {
-//			im->changed = false;
-//			continue;
-//		}
+		ccol = Collision(&(*im));
+		if (ccol.no_collision) {
+			im->changed = false;
+			continue;
+		}
 
 		//TODO: gravity
 
 		//TODO: move object
+
 
 		im->changed = true;
 		sys_changed = true;
