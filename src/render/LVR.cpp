@@ -316,13 +316,13 @@ void LVR::Frame()
 
 void LVR::Postprocess()
 {
-	int x,y,z,w,h,dx,dy;
-	unsigned l;
+	int x,y,z,w,h;
+	unsigned l,ll;
 	SGUIPixel* frame;
 	int* curzbuf;
 	vector3di* curpbuf,* npbuf;
 	const SVoxelInf* vox;
-	float fa,fb,fc;
+	float fa,fb,fc,fd;
 	vector3d vfa,vfb;
 	vector3di via,vib,vic,viz;
 	VSprite* spr;
@@ -403,20 +403,30 @@ void LVR::Postprocess()
 				txd = spr->GetImage();
 				w = spr->GetWidth();
 				h = spr->GetHeight();
-				dx = w / (vib.X - via.X);
-				dy = h / (vib.Y - via.Y);
+				fa = (float)w / (float)(vib.X - via.X);
+				fb = (float)h / (float)(vib.Y - via.Y);
+				fc = fd = 0;
 
 #ifdef LVRDEBUG
 				dbg_print("[LVR] rect [%d %d] [%d %d] -> pnt [%d %d %d]",
 						via.X,via.Y,vib.X,vib.Y,vic.X,vic.Y,vic.Z);
 #endif
-//				for (y = via.Y; y <= vib.Y; y++) {
-//					l = y * g_w + via.X;
-//					for (x = via.X; x <= vib.X; x++, l++) {
-//						if ((mask) && (mask[l])) continue;
-//
-//					}
-//				}
+				for (y = via.Y; y <= vib.Y; y++) {
+					l = y * g_w + via.X;
+					for (x = via.X; x <= vib.X; x++, l++) {
+						if ((mask) && (mask[l])) continue;
+						ll = (unsigned)round(fd) * w + (unsigned)round(fc);
+						if (ll >= (unsigned)(w*h)) {
+							//break both cycles
+							y = vib.Y + 1;
+							break;
+						}
+						frame[l] = txd[ll];
+						fc += fa;
+					}
+					fc = 0;
+					fd += fb;
+				}
 			}
 		}
 
