@@ -236,7 +236,7 @@ void CurseGUIInventoryWnd::DestroyObject()
 	//TODO send message to overlay
 	dbg_print("Destroy \"%s\" ", obj->GetName().c_str());
 
-	table->ClearTable();
+	table->EraseTableData();
 	table->DelRow();
 
 	//fill table and select first item
@@ -274,7 +274,7 @@ void CurseGUIInventoryWnd::Sort()
 	if (invent->GetNumberItems() < 1) return;
 
 	//clear table
-	table->ClearTable();
+	table->EraseTableData();
 
 	if (!sortname->GetChecked() && !sortwght->GetChecked())
 			sorttype = INV_SDEFAULT;

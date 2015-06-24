@@ -29,6 +29,7 @@
 struct SPPModelRec {
 	VModel* modptr;
 	vector3di oldspos;
+	vector3di newpos;
 	bool moved;
 	bool changed;
 	bool contact;

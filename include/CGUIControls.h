@@ -24,6 +24,10 @@
 #include "CurseGUI.h"
 
 
+#define BW 2	//Border width
+#define BH 2	//Border Height
+
+
 enum ECGUIControlType {
 	GUICL_EMPTY,
 	GUICL_PICTURE,
@@ -315,11 +319,10 @@ public:
 	void SetScrolly(int s)						{ scrolly = s; }
 
 	///Clear data from all table.
-	void ClearTable();
+	void EraseTableData();
 
 	///Clear data from a cell.
-	void ClearData(int r, int c);
-
+	void EraseData(int r, int c);
 
 	///Add a row to the end of the table.
 	void AddRow();
