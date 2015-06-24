@@ -1,8 +1,8 @@
 Job														| Master	| Begemot
 ---------------------------------------------------------------------------------------
-Update voxel table (add common types of voxels)			| assigned	| assigned
+Update voxel table (add most common types of voxels)	| assigned	| assigned
 ---------------------------------------------------------------------------------------
-Implement hideable parts in VModel						| in progr	|
+Implement hideable parts in VModel						| done		|
 ---------------------------------------------------------------------------------------
 LVR: Use FOV.Z instead of separate far plane distance	| assigned	|
 ---------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ Implement world gamedata saving and loading				| assigned	|
 ---------------------------------------------------------------------------------------
 Speed up LVR fog by implementing look-up table			| assigned	|
 ---------------------------------------------------------------------------------------
-Implement reuse of dynamically appended voxels			| in progr	|
+Implement reuse of dynamically appended voxels			| done		|
 ---------------------------------------------------------------------------------------
 Add wearable inventory items sub-class					| assigned	|
 ---------------------------------------------------------------------------------------
