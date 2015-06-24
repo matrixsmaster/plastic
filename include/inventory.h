@@ -23,10 +23,11 @@
 #include <string>
 #include <vector>
 #include <stdlib.h>
+#include "IGData.h"
 
 
 /* Basic inventory item */
-class InventoryObject {
+class InventoryObject : public IGData {
 private:
 	std::string name,desc;
 	int weight,cond,cost;
@@ -34,6 +35,10 @@ private:
 public:
 	InventoryObject();
 	virtual ~InventoryObject()		{}
+
+	virtual const bool operator == (const InventoryObject & obj);
+	virtual bool SerializeToFile(FILE* f);
+	virtual bool DeserializeFromFile(FILE* f);
 
 	virtual void SetName(const std::string s)	{ name = s; }
 	virtual void SetDesc(const std::string s)	{ desc = s; }
@@ -46,20 +51,22 @@ public:
 	virtual int GetWeight()						{ return weight; }
 	virtual int GetCondition()					{ return cond; }
 	virtual int GetCost()						{ return cost; }
-
-	bool operator == (const InventoryObject & obj) const { return (name == obj.name) && (desc == obj.desc) && (weight == obj.weight)
-			&& (cond == obj.cond) && (cost == obj.cost); }
-
 };
 
+/* ******************************************************************** */
+
 /* Storage container for all of the inventory items */
-class Inventory {
+class Inventory : public IGData {
 private:
 	std::vector<InventoryObject*> items;
 
 public:
 	Inventory();
 	virtual ~Inventory();
+
+	///Game data interface serialization implementation.
+	bool SerializeToFile(FILE* f);
+	bool DeserializeFromFile(FILE* f);
 
 	///Returns the number of objects contained in the inventory.
 	int GetNumberItems();

@@ -37,12 +37,13 @@
 #include "inventory.h"
 #include "namegen.h"
 #include "animator.h"
+#include "IGData.h"
 
 
 class PlasticWorld;
 
 //Basic Actor Class
-class PlasticActor : public VSceneObject {
+class PlasticActor : public VSceneObject, public IGData {
 protected:
 	bool isnpc;				//NPC flag
 	SPAAttrib attrib;		//Basic attribs
@@ -60,7 +61,12 @@ protected:
 public:
 	PlasticActor(SPAAttrib a, DataPipe* pptr);
 	PlasticActor(EPAClass c, bool fem, NameGen* names, DataPipe* pptr);
+	PlasticActor(DataPipe* pptr);
 	virtual ~PlasticActor();
+
+	///Game data interface serialization implementation.
+	virtual bool SerializeToFile(FILE* f);
+	virtual bool DeserializeFromFile(FILE* f);
 
 	//FIXME: comment!
 	virtual void AutoInitStats();

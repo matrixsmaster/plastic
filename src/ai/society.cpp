@@ -140,6 +140,18 @@ void PlasticSociety::CreatePopulation()
 	GatherStatistic();
 }
 
+bool PlasticSociety::Load()
+{
+	GDVec* vec;
+
+	vec = reinterpret_cast<GDVec*> (&actors);
+	//FIXME
+	pipe->DeserializeThem(vec,"actors");
+
+	GatherStatistic();
+	return true;
+}
+
 PlasticActor* PlasticSociety::GetActor(VModel* mod)
 {
 	vector<PlasticActor*>::iterator oi;

@@ -56,6 +56,9 @@ bool PlasticWorld::NewGame()
 bool PlasticWorld::LoadGame()
 {
 	//TODO
+
+	society->Load();
+
 	return false;
 }
 

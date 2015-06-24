@@ -35,6 +35,7 @@
 #include "pltime.h"
 #include "prngen.h"
 #include "plastic.h"
+#include "IGData.h"
 
 
 ///Default amount of available RAM.
@@ -71,6 +72,9 @@
 ///Voxel table file name.
 #define VOXTABFILENAME "voxtab.dat"
 
+///INI file name pattern.
+#define INIFILEPATTERN "%s/%s.ini"
+
 ///Atmospherics settings file name.
 #define ATMOININAME "atmosphere"
 
@@ -83,6 +87,16 @@
 ///Game text messages db file name.
 #define MSGSDBFNAME "messages"
 
+///Dictionary file name pattern.
+#define DICTFILEPATTERN "%s/dct/%s.dat"
+
+///World map file name pattern.
+#define WORLDMAPFNPAT "%s/usr/worldmap"
+
+///Package file name pattern.
+#define PACKAGEFNPAT "%s/usr/%s.pck"
+
+/* **************************** DATA PIPE SUPPORT TYPES **************************** */
 
 /* States of DataPipe */
 enum EDPipeStatus {
@@ -123,6 +137,7 @@ typedef std::vector<VSprite*> VSprVec;
 typedef std::map<vector3dulli,SDataPlacement> PlaceMap;
 typedef std::vector<std::string> DPDict;
 typedef std::map<std::string,DPDict> DPDictMap;
+typedef std::vector<IGData*> GDVec;
 
 
 /* ********************************** DATA PIPE MAIN ********************************** */
@@ -293,16 +308,18 @@ public:
 	///Removes all the sprites from memory.
 	virtual void PurgeSprites();
 
+	///Returns a dictionary (vector of strings) by its name.
+	DPDict* GetDictionary(const char* dct_name);		//old style
+	///Returns a dictionary (vector of strings) by its name.
+	DPDict* GetDictionary(const std::string dct_name);	//new style
+
 	//FIXME: comment
 	SSavedGameHeader* LoadGameHeader();
 	bool SaveGameHeader(SSavedGameHeader* hdr);
 	bool LoadStaticWorld();
 	bool SaveStaticWorld();
-
-	///Returns a dictionary (vector of strings) by its name.
-	DPDict* GetDictionary(const char* dct_name);		//old style
-	///Returns a dictionary (vector of strings) by its name.
-	DPDict* GetDictionary(const std::string dct_name);	//new style
+	bool DeserializeThem(GDVec* arr, const char* name);
+	bool SerializeThem(GDVec* arr, const char* name);
 };
 
 

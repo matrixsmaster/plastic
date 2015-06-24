@@ -57,7 +57,7 @@ bool DataPipe::LoadStaticWorld()
 	if (!wgen) return false;
 
 	/* Load wgen map */
-	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
+	snprintf(tmp,MAXPATHLEN,WORLDMAPFNPAT,root);
 	if (!wgen->LoadMap(tmp)) return false;
 
 	/* Map known chunks */
@@ -71,10 +71,56 @@ bool DataPipe::SaveStaticWorld()
 	char tmp[MAXPATHLEN];
 
 	/* Save wgen map */
-	snprintf(tmp,MAXPATHLEN,"%s/usr/worldmap",root);
+	snprintf(tmp,MAXPATHLEN,WORLDMAPFNPAT,root);
 	wgen->SaveMap(tmp);
 
 	//TODO
 
 	return true;
+}
+
+bool DataPipe::DeserializeThem(GDVec* arr, const char* name)
+{
+	FILE* f;
+	char tmp[MAXPATHLEN];
+
+	if (!name) return false;
+	snprintf(tmp,MAXPATHLEN,PACKAGEFNPAT,root,name);
+	f = fopen(tmp,"rb");
+	if (!f) {
+		errout("Unable to open file '%s' for reading\n",tmp);
+		return false;
+	}
+
+#ifdef DPDEBUG
+	dbg_print("File %s opened for deserialization",tmp);
+#endif
+
+	//TODO
+
+	fclose(f);
+	return false;
+}
+
+bool DataPipe::SerializeThem(GDVec* arr, const char* name)
+{
+	FILE* f;
+	char tmp[MAXPATHLEN];
+
+	if (!name) return false;
+	snprintf(tmp,MAXPATHLEN,PACKAGEFNPAT,root,name);
+	f = fopen(tmp,"wb");
+	if (!f) {
+		errout("Unable to open file '%s' for writing\n",tmp);
+		return false;
+	}
+
+#ifdef DPDEBUG
+	dbg_print("File %s opened for serialization",tmp);
+#endif
+
+	//TODO
+
+	fclose(f);
+	return false;
 }

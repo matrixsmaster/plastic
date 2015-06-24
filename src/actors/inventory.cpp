@@ -21,15 +21,34 @@
 
 using namespace std;
 
-InventoryObject::InventoryObject()
+InventoryObject::InventoryObject() : IGData()
 {
 	name = "";
 	desc = "";
 	weight = cond = cost = 0;
 }
 
+const bool InventoryObject::operator == (const InventoryObject & obj)
+{
+	return (name == obj.name) && (desc == obj.desc) && (weight == obj.weight)
+			&& (cond == obj.cond) && (cost == obj.cost);
+}
 
-Inventory::Inventory()
+bool InventoryObject::SerializeToFile(FILE* f)
+{
+	//TODO
+	return false;
+}
+
+bool InventoryObject::DeserializeFromFile(FILE* f)
+{
+	//TODO
+	return false;
+}
+
+/* ******************************************************************** */
+
+Inventory::Inventory() : IGData()
 {
 	//DEBUG:
 	InventoryObject* oj = new InventoryObject();
@@ -127,6 +146,18 @@ Inventory::~Inventory()
 			delete (*it);
 		items.clear();
 	}
+}
+
+bool Inventory::SerializeToFile(FILE* f)
+{
+	//TODO
+	return false;
+}
+
+bool Inventory::DeserializeFromFile(FILE* f)
+{
+	//TODO
+	return false;
 }
 
 int Inventory::GetNumberItems()

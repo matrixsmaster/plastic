@@ -26,7 +26,7 @@
 
 
 PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr) :
-		VSceneObject()
+		VSceneObject(), IGData()
 {
 	pipe = pptr;
 	InitVars();
@@ -36,7 +36,7 @@ PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr) :
 }
 
 PlasticActor::PlasticActor(EPAClass c, bool fem, NameGen* names, DataPipe* pptr) :
-		VSceneObject()
+		VSceneObject(), IGData()
 {
 	pipe = pptr;
 	InitVars();
@@ -57,6 +57,12 @@ PlasticActor::PlasticActor(EPAClass c, bool fem, NameGen* names, DataPipe* pptr)
 	}
 }
 
+PlasticActor::PlasticActor(DataPipe* pptr)
+{
+	pipe = pptr;
+	InitVars();
+}
+
 PlasticActor::~PlasticActor()
 {
 	Delete();
@@ -66,11 +72,26 @@ PlasticActor::~PlasticActor()
 void PlasticActor::InitVars()
 {
 	isnpc = true;
+	memset(&attrib,0,sizeof(attrib));
+	memset(&base,0,sizeof(base));
+	curr = base;
 	model = NULL;
 	portrait = NULL;
 	anim = NULL;
 	world = NULL;
 	headtxd = 0;
+}
+
+bool PlasticActor::SerializeToFile(FILE* f)
+{
+	//TODO
+	return false;
+}
+
+bool PlasticActor::DeserializeFromFile(FILE* f)
+{
+	//TODO
+	return false;
 }
 
 void PlasticActor::AutoInitStats()
@@ -201,7 +222,7 @@ bool PlasticActor::Spawn(PlasticWorld* wrld)
 
 	//Initialize discrete animator
 	anim = new DAnimator(pipe,world->GetGameTimePtr(),model,attrib.model);
-//	anim->LoadAnim("walking"); //FIXME: debug
+	anim->LoadAnim("walking"); //FIXME: debug
 
 	//Register face voxel
 	nvi = *(pipe->GetVInfo("face")); //copy 'face' voxel

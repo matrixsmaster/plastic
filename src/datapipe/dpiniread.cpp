@@ -39,7 +39,7 @@ bool DataPipe::LoadIni(const std::string name)
 	IniData cur;
 
 	//make filepath and try to open file
-	snprintf(nm,MAXPATHLEN,"%s/%s.ini",root,name.c_str());
+	snprintf(nm,MAXPATHLEN,INIFILEPATTERN,root,name.c_str());
 	f = fopen(nm,"r");
 	if (!f) {
 		errout("Unable to open INI file '%s'\n",nm);

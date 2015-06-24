@@ -33,7 +33,7 @@ bool DataPipe::LoadDict(const std::string name)
 	vector<string> cur;
 
 	//make filepath and try to open file
-	snprintf(nm,MAXPATHLEN,"%s/dct/%s.dat",root,name.c_str());
+	snprintf(nm,MAXPATHLEN,DICTFILEPATTERN,root,name.c_str());
 	f = fopen(nm,"r");
 	if (!f) {
 		errout("Unable to open dictionary file '%s'\n",nm);
