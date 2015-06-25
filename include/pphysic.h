@@ -51,6 +51,8 @@ private:
 	PPModVec mods;
 
 	bool GetSurroundingVox(const SPPModelRec* mod, vector3di p);
+	void ResolveColision();
+	bool Contact(const SPPModelRec* mod);
 
 public:
 	PlasticPhysics(DataPipe* pipeptr);
