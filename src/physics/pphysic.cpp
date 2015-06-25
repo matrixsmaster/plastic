@@ -206,8 +206,11 @@ void PlasticPhysics::Quantum()
 			--iv;
 		}
 	}
+	//delete remainder of the models vector (if it exists)
+	if (im < mods.end()) mods.erase(im,mods.end());
+
 //	dbg_print("fmod.s = %u, mods.s = %u", fmod->size(), mods.size());
-	if (fmod->size() != mods.size()) abort();
+	if (fmod->size() != mods.size()) abort(); //FIXME: debug only
 
 	/* Calculate collisions */
 	iv = fmod->begin();
