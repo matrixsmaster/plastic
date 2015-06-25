@@ -146,9 +146,22 @@ bool PlasticSociety::Load()
 
 	vec = reinterpret_cast<GDVec*> (&actors);
 	//FIXME
-	pipe->DeserializeThem(vec,"actors");
+	if (!pipe->DeserializeThem(vec,"actors"))
+		return false;
 
 	GatherStatistic();
+	return true;
+}
+
+bool PlasticSociety::Save()
+{
+	GDVec* vec;
+
+	vec = reinterpret_cast<GDVec*> (&actors);
+	//FIXME
+	if (!pipe->SerializeThem(vec,"actors"))
+		return false;
+
 	return true;
 }
 

@@ -20,7 +20,7 @@ PHY Collision detection									|			| in progr
 ---------------------------------------------------------------------------------------
 PHY Gravity												|			| assigned
 ---------------------------------------------------------------------------------------
-Test 'textured' rendering of voxel sides				| in progr	|
+Test 'textured' rendering of voxel sides				| done		|
 ---------------------------------------------------------------------------------------
 Gather portrait generation sprites						|			| assigned
 ---------------------------------------------------------------------------------------
@@ -51,4 +51,6 @@ Speed up LVR fog by implementing look-up table			| assigned	|
 Implement reuse of dynamically appended voxels			| done		|
 ---------------------------------------------------------------------------------------
 Add wearable inventory items sub-class					| assigned	|
+---------------------------------------------------------------------------------------
+Add texturization settings to LVRconf					| assigned	|
 ---------------------------------------------------------------------------------------

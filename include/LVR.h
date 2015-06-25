@@ -78,8 +78,8 @@ public:
 	virtual void SetPostprocess(const SLVRPostProcess p);
 	virtual SLVRPostProcess GetPostprocess() { return pproc; }
 
-	virtual const int* GetZBuf()			{ return zbuf; }
-	virtual const vector3di* GetPBuf()		{ return pbuf; }
+	virtual const int* GetZBuf();
+	virtual const vector3di* GetPBuf();
 	virtual vector3di GetProjection(const vector2di pnt);
 
 	virtual void Frame();

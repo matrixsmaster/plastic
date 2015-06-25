@@ -137,7 +137,8 @@ PlasticWorld::~PlasticWorld()
 	radar = NULL;
 
 	//Save and Free Game data
-	SaveGame();
+	if (!SaveGame())
+		errout("Unable to save game data!\n");
 	if (society) delete society;
 	if (PC) delete PC;
 	PC = NULL;

@@ -84,6 +84,10 @@ RenderPool::RenderPool(DataPipe* data, bool started) :
 	frames = 0;
 	stopped = !started;
 
+	/* Copy initialized PP to global setting and reset local */
+	g_pproc = pproc;
+	memset(&pproc,0,sizeof(pproc));
+
 	/* Create frame mutex */
 	pthread_mutex_init(&m_rend,NULL);
 
@@ -203,8 +207,12 @@ bool RenderPool::Quantum()
 		pthread_mutex_unlock(&(cur->mtx));
 	}
 
-	for (i = 0, cur = pool; i < RENDERPOOLN; i++, cur++)
-		cur->done = false;
+	/* Signal workers to start drawing next frame */
+//	for (i = 0, cur = pool; i < RENDERPOOLN; i++, cur++)
+//		cur->done = false;
+
+	/* Do local postprocessing */
+	Postprocess();
 
 	/* Release frame buffer */
 	pthread_mutex_unlock(&m_rend);
@@ -380,7 +388,7 @@ bool RenderPool::Resize(int w, int h)
 	}
 
 	/* Reset post-processing completely */
-	SetPostprocess(pproc);
+	SetPostprocess(g_pproc);
 
 	/* Release frame mutex */
 	pthread_mutex_unlock(&m_rend);
@@ -425,14 +433,28 @@ void RenderPool::SetFarDist(const int d)
 
 void RenderPool::SetPostprocess(const SLVRPostProcess p)
 {
+	//global PP enable flag
 	bool ppc = (	(p.fog_dist) ||
-					(p.noise) || (p.txd_fplane)); //FIXME: move texturization to RP's PP
+					(p.noise) );
 
-	pproc = p;
+	g_pproc = p;
+	memset(&pproc,0,sizeof(pproc));
 
+	//disable textured rendering in global PP
+	if (p.txd_fplane) g_pproc.txd_fplane = 0;
+
+	//set PP for all workers
 	for (int i = 0; i < RENDERPOOLN; i++) {
 		if (pool[i].lvr)
-			pool[i].lvr->SetPostprocess(p);
+			pool[i].lvr->SetPostprocess(g_pproc);
 		pool[i].dopproc = ppc;
+	}
+
+	//set renderpool's own PP (local)
+	if (p.txd_fplane) {
+		pproc.txd_fplane = p.txd_fplane;
+		pproc.txd_nplane = p.txd_nplane;
+		pproc.txd_minw = p.txd_minw;
+		pproc.txd_minh = p.txd_minh;
 	}
 }

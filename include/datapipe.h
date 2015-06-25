@@ -125,7 +125,7 @@ struct SDataPlacement {
 /* Save file header structure */
 struct SSavedGameHeader {
 	PlasticTime gtime;
-	int plx,pgx,ply,pgy,plz,pgz;
+//	int plx,pgx,ply,pgy,plz,pgz;
 	long gseed;
 };
 

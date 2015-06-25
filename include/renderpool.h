@@ -65,6 +65,7 @@ private:
 	pthread_mutex_t m_rend;			//Main thread frame mutex
 	unsigned frames;				//Frame counter
 	bool stopped;					//Render pool stopped flag
+	SLVRPostProcess g_pproc;		//Render pool global PP
 
 	void SpawnThreads();			//Rendering threads spawner
 	void KillThreads();				//Rendering threads killer
@@ -121,9 +122,10 @@ public:
 	void SetFarDist(const int d);
 	///Set new postprocessing settings.
 	void SetPostprocess(const SLVRPostProcess p);
+	///Returns global postprocessing settings.
+	SLVRPostProcess GetPostprocess() { return g_pproc; }
 
 	void Frame()					{}
-	void Postprocess()				{}
 };
 
 #endif /* RENDERPOOL_H_ */

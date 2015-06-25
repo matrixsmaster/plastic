@@ -192,6 +192,26 @@ void LVR::SetPostprocess(const SLVRPostProcess p)
 #endif
 }
 
+const int* LVR::GetZBuf()
+{
+#ifdef LVRDOUBLEBUFFERED
+	//return NOT active buffer data
+	return (zbuf + ((activebuf)? 0:rendsize));
+#else
+	return zbuf;
+#endif
+}
+
+const vector3di* LVR::GetPBuf()
+{
+#ifdef LVRDOUBLEBUFFERED
+	//return NOT active buffer data
+	return (pbuf + ((activebuf)? 0:rendsize));
+#else
+	return pbuf;
+#endif
+}
+
 vector3di LVR::GetProjection(const vector2di pnt)
 {
 	vector3di r(-1);
@@ -331,45 +351,6 @@ void LVR::Postprocess()
 	/* Set buffers to active frame */
 	SETCURRENTBUFS;
 
-	for (y = 0, l = 0; y < g_h; y++) {
-		for (x = 0; x < g_w; x++, l++) {
-			if ((mask) && (mask[l])) continue;
-
-			/* Fog */
-			if (pproc.fog_dist > 0) {
-				//FIXME: simplify this!
-				fa = curzbuf[l] - pproc.fog_dist;
-				if (fa > 0) {
-					fc = 1.f / (float)(far - pproc.fog_dist);
-					fb = fc * fa;
-					vfa = tripletovecf(frame[l].bg);
-					vfa *= (1.f - fb);
-					vfb.X = pproc.fog_col.r;
-					vfb.Y = pproc.fog_col.g;
-					vfb.Z = pproc.fog_col.b;
-					vfb *= fb;
-					vfa += vfb;
-					frame[l].bg = vecftotriple(vfa);
-
-					vfa = tripletovecf(frame[l].fg);
-					vfa *= (1.f - fb);
-					vfa += vfb;
-					frame[l].fg = vecftotriple(vfa);
-				}
-			}
-
-			/* Noise */
-			if (pproc.noise > 0) {
-				//TODO
-				//FIXME: debug
-				if (curzbuf[l] && (curzbuf[l] < 10))
-					frame[l].sym = '0' + curzbuf[l];
-				else
-					frame[l].sym = ' ';
-			}
-		}
-	}
-
 	/* Textures */
 	if (pproc.txd_fplane > 0) {
 		//create temporary working buffer
@@ -435,6 +416,46 @@ void LVR::Postprocess()
 
 		//destroy working buffer
 		delete[] npbuf;
+	} //end textures
+
+	/* Other */
+	for (y = 0, l = 0; y < g_h; y++) {
+		for (x = 0; x < g_w; x++, l++) {
+			if ((mask) && (mask[l])) continue;
+
+			/* Fog */
+			if (pproc.fog_dist > 0) {
+				//FIXME: simplify this!
+				fa = curzbuf[l] - pproc.fog_dist;
+				if (fa > 0) {
+					fc = 1.f / (float)(far - pproc.fog_dist);
+					fb = fc * fa;
+					vfa = tripletovecf(frame[l].bg);
+					vfa *= (1.f - fb);
+					vfb.X = pproc.fog_col.r;
+					vfb.Y = pproc.fog_col.g;
+					vfb.Z = pproc.fog_col.b;
+					vfb *= fb;
+					vfa += vfb;
+					frame[l].bg = vecftotriple(vfa);
+
+					vfa = tripletovecf(frame[l].fg);
+					vfa *= (1.f - fb);
+					vfa += vfb;
+					frame[l].fg = vecftotriple(vfa);
+				}
+			}
+
+			/* Noise */
+			if (pproc.noise > 0) {
+				//TODO
+				//FIXME: debug
+				if (curzbuf[l] && (curzbuf[l] < 10))
+					frame[l].sym = '0' + curzbuf[l];
+				else
+					frame[l].sym = ' ';
+			}
+		}
 	}
 }
 

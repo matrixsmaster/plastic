@@ -64,8 +64,10 @@ bool PlasticWorld::LoadGame()
 
 bool PlasticWorld::SaveGame()
 {
+	gamesave.gtime = gtime;
 	if (!data->SaveGameHeader(&gamesave)) return false;
 	if (!data->SaveStaticWorld()) return false;
+	if (!society->Save()) return false;
 
 	return true;
 }

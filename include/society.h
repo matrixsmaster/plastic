@@ -93,6 +93,8 @@ public:
 	//FIXME: comments
 	void CreatePopulation();
 	bool Load();
+	bool Save();
+
 	uli GetNumActors()								{ return actors.size(); }
 	PlasticActor* GetActor(VModel* mod);
 	PlasticActor* GetActor(uli n);
