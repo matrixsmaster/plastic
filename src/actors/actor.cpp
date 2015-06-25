@@ -222,7 +222,7 @@ bool PlasticActor::Spawn(PlasticWorld* wrld)
 
 	//Initialize discrete animator
 	anim = new DAnimator(pipe,world->GetGameTimePtr(),model,attrib.model);
-//	anim->LoadAnim("walking"); //FIXME: debug
+	anim->LoadAnim("walking"); //FIXME: debug
 
 	//Register face voxel
 	nvi = *(pipe->GetVInfo("face")); //copy 'face' voxel

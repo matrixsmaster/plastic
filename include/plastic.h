@@ -30,7 +30,7 @@
 ///Version information
 #define VERMAJOR 0
 #define VERMINOR 1
-#define VERSUBVR 4
+#define VERSUBVR 5
 
 ///Product name
 #define PRODNAME "Plastic Inquisitor"
@@ -116,6 +116,10 @@ static const SGameArg argp_table[GAMEARGTYPES] = {
 #define CHUNKUSLEEP 100000
 #define UPDATUSLEEP 100
 #define PHYSSUSLEEP 200
+
+///NCurses drawing optimization failsafe.
+///Defines number of frames, after which full redraw will explicitly be queried.
+#define OPTIMFRAMES 200
 
 
 #endif /* PLASTIC_H_ */

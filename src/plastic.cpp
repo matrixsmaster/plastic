@@ -45,6 +45,7 @@ static pthread_t		t_render = 0;
 static pthread_t		t_loader = 0;
 static pthread_t		t_physic = 0;
 static pthread_mutex_t	m_render;
+static int				g_frame = 0;
 volatile bool			g_quit = false;
 
 
@@ -107,6 +108,12 @@ static void* plastic_renderthread(void* ptr)
 
 		g_wrld->Frame();		//fast call, update HUD and select next frame
 		g_gui->Update(true);	//slow call, draw everything to terminal
+
+		//hack for ncurses optimization bug
+		if (++g_frame > OPTIMFRAMES) {
+			redrawwin(g_gui->GetWindow());
+			g_frame = 0;
+		}
 
 		pthread_mutex_unlock(&m_render);
 
