@@ -72,7 +72,52 @@ bool PlasticPhysics::GetSurroundingVox(const SPPModelRec* mod, vector3di p)
 bool PlasticPhysics::Contact(const SPPModelRec* mod)
 {
 	//TODO
-	return false;
+	int b;				//bound side
+	voxel ov;		//scene voxel, object voxel
+	vector3di sp,p, cp;	//scene center point, object point, contact point
+	bool contact;
+	int sx,sy,sz,ex,ey,ez;
+
+	contact = false;
+
+	//FIXME
+
+	//Getting bound side and central position of model
+	b = mod->modptr->GetBoundSide();
+	sp = mod->modptr->GetSPos();
+
+
+	//FIXME search into the cube of the model (border - 1)
+
+	//Initial and final positions model in scene
+	sx = sp.X - b/2;
+	sy = sp.Y - b/2;
+	sz = sp.Z - b/2;
+	ex = sp.X + b/2;
+	ey = sp.Y + b/2;
+	ez = sp.Z + b/2;
+
+//	p.Z = sp.Z - b/2;
+	for (p.Z = sz; p.Z < ez; ++(p.Z)) {
+		for (p.X = sx; p.X < ex; ++(p.X)) {
+			for (p.Y = sy; p.Y < ey; ++(p.Y)) {
+				//Get voxel from model
+				ov = mod->modptr->GetVoxelAt(&p);
+				if (ov)
+					if (GetSurroundingVox(mod, p)) {
+						contact = true;
+						break;
+					}
+			}
+			if (contact) break;
+		}
+		if (contact) break;
+	}
+
+	if (contact)
+		dbg_print("[PHY] Contact on [ %d %d %d ] voxel (%p)", p.X, p.Y, p.Z, mod->modptr);
+
+	return contact;
 }
 
 const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
@@ -174,7 +219,7 @@ void PlasticPhysics::Quantum()
 	/* Check and update models presence */
 	pipe->ReadLock();
 
-	dbg_print("Models quantity: %d", fmod->size());
+//	dbg_print("Models quantity: %d", fmod->size());
 
 	im = mods.begin();
 	for (iv = fmod->begin(); iv < fmod->end(); ++iv) {
@@ -214,28 +259,37 @@ void PlasticPhysics::Quantum()
 
 	/* Calculate collisions */
 	iv = fmod->begin();
-	for (im = mods.begin(); im < mods.end(); ++im) { //, ++iv) {
+	for (im = mods.begin(); im < mods.end(); ++im) {
 		//skip contacting objects, which isn't moved
 		if ((!im->changed) && (!im->moved) && (im->contact)) continue;
 
+		//Search collision
 		ccol = Collision(&(*im));
-		if (ccol.no_collision) {
+		contact = Contact(&(*im));
+
+		if (ccol.no_collision && contact) {
 			im->changed = false;
 			continue;
 		}
 
-		//TODO search contact
-//		contact = Contact();
+#if 0
+		if (ccol.no_collision) {
+			im->changed = false;
+			continue;
+		}
+#endif
 
-		newpos = im->oldspos;
-		newpos.X -= 1; //tmp
+		im->newpos = im->oldspos;
+		//Resolve collision with a depth at one voxel.
+		vector3di sp = im->modptr->GetSPos();
+
+		if ((!ccol.no_collision) && sp.Z > ccol.start.Z) im->newpos.Z += ccol.depth;
 
 		//TODO: gravity
 
+		if (!contact) im->newpos.Z--;
+
 		//TODO: move object
-
-		im->newpos = newpos;
-
 
 		im->changed = true;
 		sys_changed = true;
@@ -260,7 +314,7 @@ void PlasticPhysics::Quantum()
 		if (!im->changed) continue;
 
 		//actually update the model position
-		if (im->moved) im->modptr->SetPos(im->newpos); //(*iv)->GetPos());
+		if (im->moved) im->modptr->SetPos(im->newpos);
 		else im->modptr->SetPos(im->oldspos);
 	}
 
