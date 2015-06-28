@@ -30,6 +30,7 @@ void dbg_init(CurseGUI* gui)
 
 void dbg_finalize()
 {
+	debug_ui = NULL;
 }
 
 void dbg_toggle()

@@ -96,6 +96,8 @@ private:
 	bool NewGame();
 	bool LoadGame();
 	bool SaveGame();
+	void PushRenderConf();
+	void PullRenderConf();
 
 public:
 	PlasticWorld(SGameSettings* settings);

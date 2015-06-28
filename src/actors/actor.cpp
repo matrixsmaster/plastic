@@ -23,7 +23,7 @@
 #include "actor.h"
 #include "actorhelpers.h"
 #include "world.h"
-
+#include "debug.h"
 
 PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr) :
 		VSceneObject(), IGData()
@@ -84,8 +84,8 @@ void PlasticActor::InitVars()
 
 bool PlasticActor::SerializeToFile(FILE* f)
 {
-	//TODO
-	return false;
+	dbg_print("Serializing actor %p",this);
+	return true;
 }
 
 bool PlasticActor::DeserializeFromFile(FILE* f)

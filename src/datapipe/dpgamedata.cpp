@@ -33,19 +33,51 @@
 
 SSavedGameHeader* DataPipe::LoadGameHeader()
 {
+	FILE* f;
+	char tmp[MAXPATHLEN];
 	memset(&svhead,0,sizeof(svhead));
 
-	//TODO
+	/* Open the file */
+	snprintf(tmp,MAXPATHLEN,GAMEHDRFNPAT,root);
+	f = fopen(tmp,"rb");
+	if (!f) return NULL;
+
+	/* Load up data */
+	if (fread(&svhead,sizeof(svhead),1,f) != 1) {
+		memset(&svhead,0,sizeof(svhead)); //reset broken data
+		fclose(f);
+		return NULL;
+	}
+
+	/* Close the file */
+	fclose(f);
+
+	/* Restore RNG seed */
+	rngen->SetSeed(svhead.gseed);
 
 	return &svhead;
 }
 
 bool DataPipe::SaveGameHeader(SSavedGameHeader* hdr)
 {
-	if (!wgen) return false;
+	FILE* f;
+	char tmp[MAXPATHLEN];
 
-	//TODO
+	if (!hdr) return false;
+
+	/* Open the file */
+	snprintf(tmp,MAXPATHLEN,GAMEHDRFNPAT,root);
+	f = fopen(tmp,"wb");
+	if (!f) return false;
+
+	/* Save current seed */
 	hdr->gseed = rngen->GetSeed();
+
+	/* Write down data */
+	fwrite(hdr,sizeof(SSavedGameHeader),1,f);
+
+	/* And close the file */
+	fclose(f);
 
 	return true;
 }
@@ -84,7 +116,8 @@ bool DataPipe::DeserializeThem(GDVec* arr, const char* name)
 	FILE* f;
 	char tmp[MAXPATHLEN];
 
-	if (!name) return false;
+	if ((!arr) || (!name) || (arr->empty())) return false;
+
 	snprintf(tmp,MAXPATHLEN,PACKAGEFNPAT,root,name);
 	f = fopen(tmp,"rb");
 	if (!f) {
@@ -106,8 +139,10 @@ bool DataPipe::SerializeThem(GDVec* arr, const char* name)
 {
 	FILE* f;
 	char tmp[MAXPATHLEN];
+	GDVec::iterator ia;
 
-	if (!name) return false;
+	if ((!arr) || (!name) || (arr->empty())) return false;
+
 	snprintf(tmp,MAXPATHLEN,PACKAGEFNPAT,root,name);
 	f = fopen(tmp,"wb");
 	if (!f) {
@@ -120,7 +155,13 @@ bool DataPipe::SerializeThem(GDVec* arr, const char* name)
 #endif
 
 	//TODO
+	for (ia = arr->begin(); ia != arr->end(); ++ia)
+		if (!(((*ia))->SerializeToFile(f))) {
+			dbg_print("Unable to ser. obj %p",(*ia));
+			fclose(f);
+			return false;
+		}
 
 	fclose(f);
-	return false;
+	return true;
 }

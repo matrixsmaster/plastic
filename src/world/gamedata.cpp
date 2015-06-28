@@ -26,10 +26,16 @@ bool PlasticWorld::NewGame()
 {
 	vector3di v;
 
+	/* Reset savegame data */
+	memset(&gamesave,0,sizeof(gamesave));
+
 	/* Init world generator */
 	wgen->NewMap(data->GetMapSeed());
+	data->SetGP(wgen->GetPCInitPos()); //init central chunk
+
+	/* Init Player */
+//	PC = new Player(sets->PCData,data);
 	PC->SetGPos(wgen->GetPCInitPos());
-	data->SetGP(PC->GetGPos()); //init central chunk
 	PC->SetScenePos(data->GetGP());
 	v.X = CHUNKBOX / 2;
 	v.Y = v.X;
@@ -55,19 +61,57 @@ bool PlasticWorld::NewGame()
 
 bool PlasticWorld::LoadGame()
 {
-	//TODO
+	GDVec plr;
+	SSavedGameHeader* hptr;
 
-	society->Load();
+	plr.push_back(PC);
 
-	return false;
+	/* Begin loading process */
+	if (!((hptr = data->LoadGameHeader()))) return false;
+	if (!data->LoadStaticWorld()) return false;
+	if (!data->DeserializeThem(&plr,"player")) return false;
+	if (!society->Load()) return false;
+
+	/* Restore global data */
+	gamesave = *hptr;
+	gtime = gamesave.gtime;
+
+	return true;
 }
 
 bool PlasticWorld::SaveGame()
 {
+	GDVec plr;
+
+	/* Store global data */
+	plr.push_back(PC);
 	gamesave.gtime = gtime;
+
+	/* Begin saving process */
 	if (!data->SaveGameHeader(&gamesave)) return false;
 	if (!data->SaveStaticWorld()) return false;
+	if (!data->SerializeThem(&plr,"player")) return false;
 	if (!society->Save()) return false;
 
 	return true;
+}
+
+void PlasticWorld::PushRenderConf()
+{
+	gamesave.rend_fovx = render->GetFOV().X;
+	gamesave.rend_fovy = render->GetFOV().Y;
+	gamesave.rend_fovz = render->GetFOV().Z;
+	gamesave.rend_scale = render->GetScale();
+	gamesave.rend_pp = render->GetPostprocess();
+	gamesave.rend_used = true;
+}
+
+void PlasticWorld::PullRenderConf()
+{
+	vector3d rfov;
+
+	if (!gamesave.rend_used) return;
+	rfov = vector3d(gamesave.rend_fovx,gamesave.rend_fovy,gamesave.rend_fovz);
+	render->SetFOV(rfov);
+	render->SetPostprocess(gamesave.rend_pp);
 }

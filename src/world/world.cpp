@@ -106,6 +106,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 	/* Create render pool */
 	render = new RenderPool(data);
+	PullRenderConf();
 	render->GetSkies()->SetTime(&gtime);
 
 	/* Create text messages system */
@@ -122,7 +123,10 @@ PlasticWorld::~PlasticWorld()
 	lock_update = true;
 
 	//Stop rendering first to speed up freeing other resources
-	if (render) delete render;
+	if (render) {
+		PushRenderConf();
+		delete render;
+	}
 	render = NULL;
 
 	//Stop physics engine

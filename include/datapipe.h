@@ -36,6 +36,7 @@
 #include "prngen.h"
 #include "plastic.h"
 #include "IGData.h"
+#include "LVRconsts.h"
 
 
 ///Default amount of available RAM.
@@ -90,6 +91,9 @@
 ///Dictionary file name pattern.
 #define DICTFILEPATTERN "%s/dct/%s.dat"
 
+///Game save data 'header' file.
+#define GAMEHDRFNPAT "%s/usr/savegame"
+
 ///World map file name pattern.
 #define WORLDMAPFNPAT "%s/usr/worldmap"
 
@@ -127,6 +131,10 @@ struct SSavedGameHeader {
 	PlasticTime gtime;
 //	int plx,pgx,ply,pgy,plz,pgz;
 	long gseed;
+	bool rend_used;
+	float rend_scale;
+	float rend_fovx,rend_fovy,rend_fovz;
+	SLVRPostProcess rend_pp;
 };
 
 //Some shortcuts for long-named types

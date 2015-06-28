@@ -246,8 +246,17 @@ static void plastic_cleanup()
 	dbg_finalize();
 
 	/* Destroy all main classes instances */
-	if (g_wrld) delete g_wrld;
+	/* Note: there's a debug sequence, to be able to review
+	 * game saving process. So we should destroy GUI before
+	 * destroying the world, to release ncurses windows and
+	 * return terminal to its original state.
+	 */
+	if (g_wrld) g_wrld->ConnectGUI(NULL); //disconnect GUI
 	if (g_gui) delete g_gui;
+	errout("\nGUI destroyed\nDestroying world... ");
+	fflush(stderr); //to make sure output order is right
+	if (g_wrld) delete g_wrld;
+	errout("OK\n");
 
 	/* Print out the length of game session */
 	printf("\nGame session time = %llu sec.\n",gamelength / PLTIMEMS);

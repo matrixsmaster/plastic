@@ -18,7 +18,7 @@ Create physics system stubs, threads etc				| done		|
 ---------------------------------------------------------------------------------------
 PHY Collision detection									|			| in progr
 ---------------------------------------------------------------------------------------
-PHY Gravity												|			| assigned
+PHY Gravity												|			| in progr
 ---------------------------------------------------------------------------------------
 Test 'textured' rendering of voxel sides				| done		|
 ---------------------------------------------------------------------------------------
@@ -40,9 +40,9 @@ Test 'tup' as a temporary build system					| stall, meeting unavoidable
 ---------------------------------------------------------------------------------------
 Move html2vsprite tool in								| done		|
 ---------------------------------------------------------------------------------------
-Fix PHY system models sync								| in progr	|
+Fix PHY system models sync								| done		|
 ---------------------------------------------------------------------------------------
-Implement society data (actors etc) saving and loading	| in progr	|
+Implement society data (actors etc) saving and loading	| done		|
 ---------------------------------------------------------------------------------------
 Implement world gamedata saving and loading				| assigned	|
 ---------------------------------------------------------------------------------------

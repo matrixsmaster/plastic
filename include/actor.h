@@ -65,7 +65,7 @@ public:
 	virtual ~PlasticActor();
 
 	///Game data interface serialization implementation.
-	virtual bool SerializeToFile(FILE* f);
+	virtual bool SerializeToFile(FILE* f);		//keep it right after destructor
 	virtual bool DeserializeFromFile(FILE* f);
 
 	//FIXME: comment!
