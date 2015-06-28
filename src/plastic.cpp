@@ -37,16 +37,17 @@
 #include "pphysic.h"
 
 
-static SGameSettings	g_set = DEFAULT_SETTINGS;
-static PlasticWorld*	g_wrld = NULL;
-static CurseGUI*		g_gui = NULL;
-static pthread_t		t_event = 0;
-static pthread_t		t_render = 0;
-static pthread_t		t_loader = 0;
-static pthread_t		t_physic = 0;
-static pthread_mutex_t	m_render;
-static int				g_frame = 0;
-volatile bool			g_quit = false;
+static SGameSettings	g_set = DEFAULT_SETTINGS;	/* The game settings holder */
+static PlasticWorld*	g_wrld = NULL;				/* The world instance */
+static CurseGUI*		g_gui = NULL;				/* The ncurses GUI instance */
+static pthread_t		t_event = 0;				/* Events thread identifier */
+static pthread_t		t_render = 0;				/* Screen rendering thread id */
+static pthread_t		t_loader = 0;				/* Background chunks loader thread id */
+static pthread_t		t_physic = 0;				/* Physics engine thread id */
+static pthread_mutex_t	m_render;					/* Screen rendering / events processing mutex */
+static int				g_frame = 0;				/* Screen frames counter for redrawing failsafe */
+static int				g_wres = 0;					/* The last operation result code of the World instance*/
+volatile bool			g_quit = false;				/* Global quit event flag */
 
 
 /* *********************************************************** */
@@ -129,9 +130,8 @@ static void* plastic_chunksthread(void* ptr)
 	DataPipe* pipe = reinterpret_cast<DataPipe*> (ptr);
 
 	while (!g_quit) {
-
+		/* Move chunks loading queue */
 		pipe->ChunkQueue();
-
 		usleep(CHUNKUSLEEP);
 	}
 
@@ -143,9 +143,8 @@ static void* plastic_physicsthread(void* ptr)
 	PlasticPhysics* phy = reinterpret_cast<PlasticPhysics*> (ptr);
 
 	while (!g_quit) {
-
+		/* Update world's physics */
 		phy->Quantum();
-
 		usleep(PHYSSUSLEEP);
 	}
 
@@ -179,6 +178,7 @@ static void plastic_start()
 		errout("Unable to create the world (error #%d)\n",r);
 		abort();
 	}
+	g_wrld->SetDestRet(&g_wres);
 
 	/* Check main clock */
 	g_wrld->UpdateTime();
@@ -268,8 +268,10 @@ static void plastic_cleanup()
 
 int main(int argc, char* argv[])
 {
+	/* Init default pseudo-random numbers generator */
 	srand(time(NULL));
 
+	/* Show the banner */
 	printf(HELLOSTR,PRODNAME,VERMAJOR,VERMINOR,VERSUBVR,BUILDNO,PRODNAME);
 
 	/* Parse and print current settings. */
@@ -297,6 +299,12 @@ int main(int argc, char* argv[])
 	/* Free resources. */
 	plastic_cleanup();
 
-	printf("\n\nGood exit.\n");
-	return 0;
+	/* Print exit statement and exit */
+	if (g_wres) {
+		printf("\n\nBad exit (code = 0x%x)\n",g_wres);
+		return 1;
+	} else {
+		printf("\n\nGood exit.\n");
+		return 0;
+	}
 }

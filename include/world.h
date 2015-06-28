@@ -54,7 +54,7 @@ struct SWRayObjIntersect {
 };
 
 /* This class is more or less the game itself. It connects all other instances, like
- * DataPipe, LVR, GUI etc to make the World.
+ * DataPipe, LVR, GUI etc to make the Plastic World.
  */
 class PlasticWorld {
 private:
@@ -83,6 +83,7 @@ private:
 	PlasticPhysics* physics;
 	GameMessages* msgsys;
 	float timescale;
+	int* destret;
 //	pthread_mutex_t wrldmtx;
 
 	//FIXME: DEBUG
@@ -105,6 +106,9 @@ public:
 
 	///Returns result of latest operation.
 	int GetLastResult()						{ return result; }
+
+	///Sets up the destruction-safe copy of the last_result variable.
+	void SetDestRet(int* ptr)				{ destret = ptr; }
 
 	///Realtime clock.
 	ulli GetTime()							{ return rtime; }

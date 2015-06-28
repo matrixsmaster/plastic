@@ -32,6 +32,9 @@ enum {
 	PWKEY_RENDCFG,
 };
 
+#define PW_RESULT(X) { result = X; \
+	if (destret) *destret = result; }
+
 PlasticWorld::PlasticWorld(SGameSettings* settings)
 {
 	float alloc_gb;
@@ -57,6 +60,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	physics = NULL;
 	msgsys = NULL;
 	timescale = 1.f;
+	destret = NULL;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
@@ -119,6 +123,8 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 PlasticWorld::~PlasticWorld()
 {
+	PW_RESULT(0);
+
 	//Just in case: stop the updates
 	lock_update = true;
 
@@ -141,8 +147,10 @@ PlasticWorld::~PlasticWorld()
 	radar = NULL;
 
 	//Save and Free Game data
-	if (!SaveGame())
+	if (!SaveGame()) {
 		errout("Unable to save game data!\n");
+		PW_RESULT(1);
+	}
 	if (society) delete society;
 	if (PC) delete PC;
 	PC = NULL;
@@ -236,7 +244,7 @@ void PlasticWorld::ConnectGUI()
 	lock_update = true;
 
 	if ((!gui) || (!render)) {
-		result = 1;
+		PW_RESULT(1);
 		return;
 	}
 
@@ -245,7 +253,7 @@ void PlasticWorld::ConnectGUI()
 	g_h = gui->GetHeight();
 	if (!render->Resize(g_w,g_h)) {
 		errout("Unable to resize LVR frame!\n");
-		result = 2;
+		PW_RESULT(2);
 		return;
 	}
 
@@ -265,7 +273,7 @@ void PlasticWorld::ConnectGUI()
 
 	//OK
 	lock_update = false;
-	result = 0;
+	PW_RESULT(0);
 }
 
 void PlasticWorld::BindKeys()
@@ -286,7 +294,7 @@ void PlasticWorld::UpdateTime()
 	timespec cur;
 
 	//get current time
-	result = 0;
+	PW_RESULT(0);
 	clock_gettime(CLOCK_MONOTONIC_RAW,&cur);
 	now = cur.tv_sec * PLTIMEMS + (cur.tv_nsec / PLTIMEUS);
 
@@ -294,7 +302,7 @@ void PlasticWorld::UpdateTime()
 		/* Check resolution on first call */
 		clkres = new timespec;
 		clock_getres(CLOCK_MONOTONIC_RAW,clkres);
-		if (clkres->tv_nsec > PLTIMEMINRES) result = 1;
+		if (clkres->tv_nsec > PLTIMEMINRES) PW_RESULT(1)
 		epoch = now;
 	}
 
@@ -382,12 +390,12 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	vector3di x;
 	SPABase stst;
 
-	result = 1;
+	PW_RESULT(1);
 
 	//Check all instances needed
 	if ((!PC) || (!hud) || (!radar)) return;
 
-	result = 0;
+	PW_RESULT(0);
 
 	//Restart rendering if stopped and a letter key was pressed
 	if ((render->IsStopped()) && (e->t == GUIEV_KEYPRESS) && (isprint(e->k)))
@@ -516,7 +524,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 	default:
 		errout("Warning: unknown event type pumped. Possibly memory corruption.\n");
-		result = 1;
+		PW_RESULT(2);
 	}
 
 	/* Update radar here, to not intersect with resizing */
