@@ -69,7 +69,7 @@ bool PlasticWorld::LoadGame()
 	/* Begin loading process */
 	if (!((hptr = data->LoadGameHeader()))) return false;
 	if (!data->LoadStaticWorld()) return false;
-	if (!data->DeserializeThem(&plr,"player")) return false;
+	if (!data->DeserializeThem<PlasticActor>(&plr,"player",false)) return false;
 	if (!society->Load()) return false;
 
 	/* Restore global data */

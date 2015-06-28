@@ -142,12 +142,13 @@ void PlasticSociety::CreatePopulation()
 
 bool PlasticSociety::Load()
 {
-	GDVec* vec;
+	GDVec vec;
 
-	vec = reinterpret_cast<GDVec*> (&actors);
+//	vec = reinterpret_cast<GDVec*> (&actors);
 	//FIXME
-	if (!pipe->DeserializeThem(vec,"actors"))
+	if (!pipe->DeserializeThem<PlasticActor>(&vec,"actors"))
 		return false;
+	//TODO: connect pipe!
 
 	GatherStatistic();
 	return true;

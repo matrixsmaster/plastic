@@ -129,7 +129,6 @@ struct SDataPlacement {
 /* Save file header structure */
 struct SSavedGameHeader {
 	PlasticTime gtime;
-//	int plx,pgx,ply,pgy,plz,pgz;
 	long gseed;
 	bool rend_used;
 	float rend_scale;
@@ -192,6 +191,7 @@ protected:
 	bool LoadDict(const std::string name);
 	void MakeChunk(unsigned l, vector3di pos);
 	bool LoadChunk(SDataPlacement* res, PChunk buf);
+	FILE* DeserialOpen(const char* fn);
 
 public:
 	DataPipe(SGameSettings* sets, bool allocate = true);
@@ -326,9 +326,47 @@ public:
 	bool SaveGameHeader(SSavedGameHeader* hdr);
 	bool LoadStaticWorld();
 	bool SaveStaticWorld();
-	bool DeserializeThem(GDVec* arr, const char* name);
+
+	//FIXME: comment
+	template <class T> bool DeserializeThem(GDVec* arr, const char* name, bool alloc = true);
 	bool SerializeThem(GDVec* arr, const char* name);
 };
+
+/* Specialization of the deserializing template should be here, in header file. */
+template <class T> bool DataPipe::DeserializeThem(GDVec* arr, const char* name, bool alloc)
+{
+	FILE* f;
+	ulli i,n = 1;
+	T* p;
+
+	/* Check input */
+	if ((!arr) || ((!alloc) && (arr->empty()))) return false;
+	if (!((f = DeserialOpen(name)))) return false;
+
+	/* Load number of elements */
+	if ((!fread(&n,sizeof(n),1,f)) || (!n)) {
+		fclose(f);
+		return (n == 0); //if a file contains zero objects, it's fine
+	}
+
+	/* Load objects */
+	for (i = 0; (i < n) && (!feof(f)); i++) {
+		/* Check allocation */
+		if ((!alloc) && (i >= arr->size())) break;
+		/* Create new or use an existing object */
+		if (alloc) {
+			p = new T();
+			arr->push_back(p);
+		} else
+			p = static_cast<T*> (arr->at(i));
+		/* Load it up */
+		if (!p->DeserializeFromFile(f)) break;
+	}
+
+	/* We're done */
+	fclose(f);
+	return (i == n); //we should load exactly N objects
+}
 
 
 /* ********************************** DATA PIPE DUMMY ********************************** */

@@ -61,7 +61,7 @@ protected:
 public:
 	PlasticActor(SPAAttrib a, DataPipe* pptr);
 	PlasticActor(EPAClass c, bool fem, NameGen* names, DataPipe* pptr);
-	PlasticActor(DataPipe* pptr);
+	PlasticActor();
 	virtual ~PlasticActor();
 
 	///Game data interface serialization implementation.
@@ -69,6 +69,7 @@ public:
 	virtual bool DeserializeFromFile(FILE* f);
 
 	//FIXME: comment!
+	void SetDataPipe(DataPipe* p)		{ pipe = p; }
 	virtual void AutoInitStats();
 
 	bool IsNPC()						{ return isnpc; }

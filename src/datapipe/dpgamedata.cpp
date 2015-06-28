@@ -111,28 +111,26 @@ bool DataPipe::SaveStaticWorld()
 	return true;
 }
 
-bool DataPipe::DeserializeThem(GDVec* arr, const char* name)
+FILE* DataPipe::DeserialOpen(const char* fn)
 {
 	FILE* f;
 	char tmp[MAXPATHLEN];
 
-	if ((!arr) || (!name) || (arr->empty())) return false;
+	if (!fn) return NULL; //check
 
-	snprintf(tmp,MAXPATHLEN,PACKAGEFNPAT,root,name);
+	/* Prepare full file path and open the file */
+	snprintf(tmp,MAXPATHLEN,PACKAGEFNPAT,root,fn);
 	f = fopen(tmp,"rb");
 	if (!f) {
 		errout("Unable to open file '%s' for reading\n",tmp);
-		return false;
+		return NULL;
 	}
 
 #ifdef DPDEBUG
 	dbg_print("File %s opened for deserialization",tmp);
 #endif
 
-	//TODO
-
-	fclose(f);
-	return false;
+	return f;
 }
 
 bool DataPipe::SerializeThem(GDVec* arr, const char* name)
@@ -140,9 +138,12 @@ bool DataPipe::SerializeThem(GDVec* arr, const char* name)
 	FILE* f;
 	char tmp[MAXPATHLEN];
 	GDVec::iterator ia;
+	ulli n;
 
+	/* Check */
 	if ((!arr) || (!name) || (arr->empty())) return false;
 
+	/* Prepare full file path and open the file */
 	snprintf(tmp,MAXPATHLEN,PACKAGEFNPAT,root,name);
 	f = fopen(tmp,"wb");
 	if (!f) {
@@ -154,14 +155,20 @@ bool DataPipe::SerializeThem(GDVec* arr, const char* name)
 	dbg_print("File %s opened for serialization",tmp);
 #endif
 
-	//TODO
+	/* Store the number of the elements */
+	n = arr->size();
+	fwrite(&n,sizeof(n),1,f);
+
+	/* Go through the vector elements and serialize them */
 	for (ia = arr->begin(); ia != arr->end(); ++ia)
 		if (!(((*ia))->SerializeToFile(f))) {
-			dbg_print("Unable to ser. obj %p",(*ia));
+			/* Something went wrong */
+			dbg_print("Unable to serialize object %p",(*ia));
 			fclose(f);
 			return false;
 		}
 
+	/* We're done */
 	fclose(f);
 	return true;
 }

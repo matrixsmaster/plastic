@@ -57,9 +57,9 @@ PlasticActor::PlasticActor(EPAClass c, bool fem, NameGen* names, DataPipe* pptr)
 	}
 }
 
-PlasticActor::PlasticActor(DataPipe* pptr)
+PlasticActor::PlasticActor()
 {
-	pipe = pptr;
+	pipe = NULL;
 	InitVars();
 }
 
@@ -71,6 +71,8 @@ PlasticActor::~PlasticActor()
 
 void PlasticActor::InitVars()
 {
+	/* Do NOT use anything related to DataPipe here,
+	 * static initializations only! */
 	isnpc = true;
 	memset(&attrib,0,sizeof(attrib));
 	memset(&base,0,sizeof(base));
