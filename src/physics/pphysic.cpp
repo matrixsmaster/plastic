@@ -26,6 +26,7 @@ using namespace std;
 PlasticPhysics::PlasticPhysics(DataPipe* pipeptr)
 {
 	pipe = pipeptr;
+	locked = false;
 }
 
 PlasticPhysics::~PlasticPhysics()
@@ -215,6 +216,9 @@ void PlasticPhysics::Quantum()
 	bool sys_changed = false;
 
 	bool contact = false;
+
+	/* Check update lock */
+	if (locked) return;
 
 	/* Check and update models presence */
 	pipe->ReadLock();

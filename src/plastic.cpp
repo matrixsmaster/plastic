@@ -71,19 +71,29 @@ static void* plastic_eventhread(void* ptr)
 
 		/* Deal with Quit event (Soft Reset) */
 		if (g_gui->WillClose()) {
+			/* Pause the world */
+			g_wrld->StopUpdating();
+			/* Show confirmation message box */
 			mbox = new CurseGUIMessageBox(g_gui,"Quit","Are you sure you want to quit?","YES|NO");
 			g_gui->AddWindow(mbox);
 			while (mbox && (((btn = mbox->GetButtonPressed())) < 0)) {
-				//GUI idle:
+				/* GUI idle cycle */
 				usleep(EVENTUSLEEP);
 				g_gui->PumpEvents(&my_e);
 				g_gui->Update(true);
 			}
 			if (btn) {
-				g_gui->SoftReset();
-				dbg_init(g_gui);
-				g_wrld->ConnectGUI(g_gui);
+				/* Soft reset */
+				g_wrld->StopRendering();	//stop rendering
+				dbg_finalize();				//disconnect debug UI from GUI
+				g_wrld->ConnectGUI(NULL);	//disconnect world from GUI
+				g_gui->SoftReset();			//soft-reset the GUI (all windows will be removed)
+				g_gui->Update(false);		//dummy screen frame rendering
+				dbg_init(g_gui);			//re-connect debug UI
+				g_wrld->ConnectGUI(g_gui);	//re-connect world to GUI
+				g_wrld->StartUpdating();	//restart world updates
 			} else
+				/* Just set the quit event flag */
 				g_quit = true;
 		}
 
@@ -110,7 +120,7 @@ static void* plastic_renderthread(void* ptr)
 		g_wrld->Frame();		//fast call, update HUD and select next frame
 		g_gui->Update(true);	//slow call, draw everything to terminal
 
-		//hack for ncurses optimization bug
+		/* Hack around ncurses optimization bug */
 		if (++g_frame > OPTIMFRAMES) {
 			redrawwin(g_gui->GetWindow());
 			g_frame = 0;

@@ -48,6 +48,7 @@ struct SPPCollision {
 class PlasticPhysics {
 private:
 	DataPipe* pipe;
+	volatile bool locked;
 	PPModVec mods;
 
 	bool GetSurroundingVox(const SPPModelRec* mod, vector3di p);
@@ -57,6 +58,9 @@ private:
 public:
 	PlasticPhysics(DataPipe* pipeptr);
 	virtual ~PlasticPhysics();
+
+	void SetPause(bool on)			{ locked = on; }
+	bool GetPause()					{ return locked; }
 
 	const SPPCollision Collision(const SPPModelRec* mod);
 

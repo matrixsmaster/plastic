@@ -84,6 +84,7 @@ private:
 	GameMessages* msgsys;
 	float timescale;
 	int* destret;
+	volatile bool fixtimegap;
 //	pthread_mutex_t wrldmtx;
 
 	//FIXME: DEBUG
@@ -133,6 +134,12 @@ public:
 
 	///Starts rendering the world.
 	void StartRendering();
+
+	///Set the world on pause.
+	void StopUpdating();
+
+	///Resume the world updates.
+	void StartUpdating();
 
 	///Connects the game world to CurseGUI.
 	void ConnectGUI(CurseGUI* guiptr);

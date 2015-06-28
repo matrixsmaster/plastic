@@ -55,12 +55,13 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	rtime = epoch = passed = 0;
 	clkres = NULL;
 	fps = 0;
-	lock_update = true;
+	lock_update = false;
 	society = NULL;
 	physics = NULL;
 	msgsys = NULL;
 	timescale = 1.f;
 	destret = NULL;
+	fixtimegap = false;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
@@ -170,7 +171,7 @@ void PlasticWorld::Quantum()
 //	VModVec* objs = data->GetModels();
 
 	//Check all instances needed
-	if ((!PC) || (!hud) || (!radar)) return;
+	if ((!PC) || (!gui) || (!hud) || (!radar)) return;
 
 	//Check if the world is on pause
 	if (lock_update) return;
@@ -223,12 +224,14 @@ void PlasticWorld::Frame()
 
 void PlasticWorld::StopRendering()
 {
+	if (render->IsStopped()) return;
 	render->Stop();
 	gui->SetBackmasking(false);
 }
 
 void PlasticWorld::StartRendering()
 {
+	if (!render->IsStopped()) return;
 	render->Start();
 	gui->SetBackmasking(true);
 }
@@ -241,6 +244,7 @@ void PlasticWorld::ConnectGUI(CurseGUI* guiptr)
 
 void PlasticWorld::ConnectGUI()
 {
+	bool oldlock = lock_update;
 	lock_update = true;
 
 	if ((!gui) || (!render)) {
@@ -272,8 +276,25 @@ void PlasticWorld::ConnectGUI()
 	hud->SetMap(radar->GetImage(),radar->GetImageLen());
 
 	//OK
-	lock_update = false;
+	lock_update = oldlock;
 	PW_RESULT(0);
+}
+
+void PlasticWorld::StopUpdating()
+{
+	if (lock_update) return;
+//	data->WriteLock();
+	physics->SetPause(true);
+	lock_update = true;
+}
+
+void PlasticWorld::StartUpdating()
+{
+	if (!lock_update) return;
+	fixtimegap = true;
+	lock_update = false;
+	physics->SetPause(false);
+//	data->WriteUnlock();
 }
 
 void PlasticWorld::BindKeys()
@@ -308,8 +329,9 @@ void PlasticWorld::UpdateTime()
 
 	//calculate relative time and time gap
 	now -= epoch;
-	passed = now - rtime;
+	passed = (fixtimegap)? 1:(now - rtime);
 	rtime = now;
+	fixtimegap = false;
 
 	//update real-time part of game time
 	gtime.rms += passed;
@@ -482,6 +504,9 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				stst.HP = -2;
 				PC->ModCurStats(stst);
 				break;
+
+			case ',': StopUpdating(); break;
+			case '.': StartUpdating(); break;
 			}
 		}
 		test->SetRot(tr); //FIXME: debug only
@@ -528,7 +553,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 	}
 
 	/* Update radar here, to not intersect with resizing */
-	radar->Update();
+	if (!lock_update) radar->Update();
 
 	//FIXME: debug
 	wptr = gui->GetWindowN("Message");
