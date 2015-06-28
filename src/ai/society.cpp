@@ -143,24 +143,36 @@ void PlasticSociety::CreatePopulation()
 bool PlasticSociety::Load()
 {
 	GDVec vec;
+	GDVec::iterator iv;
 
-//	vec = reinterpret_cast<GDVec*> (&actors);
-	//FIXME
+	//Load actors
+	RemoveAllActors();
 	if (!pipe->DeserializeThem<PlasticActor>(&vec,"actors"))
 		return false;
-	//TODO: connect pipe!
 
+	//Move them to society and connect to DataPipe
+	for (iv = vec.begin(); iv != vec.end(); ++iv) {
+		actors.push_back(static_cast<PlasticActor*> (*iv));
+		actors[actors.size()-1]->SetDataPipe(pipe);
+	}
+
+	//Update statistic
 	GatherStatistic();
+
 	return true;
 }
 
 bool PlasticSociety::Save()
 {
-	GDVec* vec;
+	GDVec vec;
+	vector<PlasticActor*>::iterator oi;
 
-	vec = reinterpret_cast<GDVec*> (&actors);
-	//FIXME
-	if (!pipe->SerializeThem(vec,"actors"))
+	//Copy actors to a transition vector
+	for (oi = actors.begin(); oi != actors.end(); ++oi)
+		vec.push_back(static_cast<IGData*> (*oi));
+
+	//Save them
+	if (!pipe->SerializeThem(&vec,"actors"))
 		return false;
 
 	return true;

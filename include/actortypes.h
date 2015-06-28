@@ -136,4 +136,12 @@ enum EPCState {
 	PCS_VEHICLE
 };
 
+//Save file header structure
+struct SPAFileHeader {
+	int gpx,gpy,gpz;
+	int lpx,lpy,lpz;
+	bool have_portrait;
+	int port_w,port_h;
+};
+
 #endif /* ACTORTYPES_H_ */

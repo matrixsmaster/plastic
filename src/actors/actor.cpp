@@ -86,7 +86,35 @@ void PlasticActor::InitVars()
 
 bool PlasticActor::SerializeToFile(FILE* f)
 {
-	dbg_print("Serializing actor %p",this);
+	SPAFileHeader hdr;
+
+//	dbg_print("Serializing actor %p",this);
+
+	//Fill in header information
+	hdr.gpx = gpos.X;
+	hdr.gpy = gpos.Y;
+	hdr.gpz = gpos.Z;
+	hdr.lpx = pos.X;
+	hdr.lpy = pos.Y;
+	hdr.lpz = pos.Z;
+	hdr.have_portrait = (portrait != NULL);
+	if (portrait) {
+		hdr.port_w = portrait->GetWidth();
+		hdr.port_h = portrait->GetHeight();
+	}
+
+	//Write header
+	fwrite(&hdr,sizeof(hdr),1,f);
+
+	//Write attributes and stats
+	fwrite(&attrib,sizeof(attrib),1,f);
+	fwrite(&base,sizeof(base),1,f);
+	fwrite(&curr,sizeof(curr),1,f);
+
+	//Write portrait image
+	if (portrait)
+		fwrite(portrait->GetImage(),sizeof(SGUIPixel),hdr.port_w*hdr.port_h,f);
+
 	return true;
 }
 

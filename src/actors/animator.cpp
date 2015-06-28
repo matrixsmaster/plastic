@@ -108,6 +108,7 @@ void DAnimator::Update()
 	if (cframe == loop_e) cframe = loop_b;
 	else cframe++;
 	if (cframe >= frames) return; //no loop in animation, and animation has played
+	//TODO: switch to another animation (if specified)
 	anim[cframe].last = gtime->sms;
 	model->SetState(anim[cframe].state);
 }

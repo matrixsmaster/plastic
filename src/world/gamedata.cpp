@@ -75,6 +75,7 @@ bool PlasticWorld::LoadGame()
 	/* Restore global data */
 	gamesave = *hptr;
 	gtime = gamesave.gtime;
+	fixtimegap = true;
 
 	return true;
 }
