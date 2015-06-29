@@ -34,6 +34,7 @@ DAnimator::DAnimator(DataPipe* pipeptr, const PlasticTime* gtptr, VModel* modptr
 	loop_b = loop_e = 0;
 	anim = NULL;
 	cframe = 0;
+	memset(next_anim,0,sizeof(next_anim));
 
 	//extract the model's name
 	mdname = (char*)malloc(strlen(modnm));
@@ -79,6 +80,9 @@ bool DAnimator::LoadAnim(const char* name)
 	pipe->GetIniDataC(ini,"LoopEnd",res,sizeof(res));
 	loop_e = atoi(res);
 
+	//get next animation name
+	pipe->GetIniDataC(ini,"NextAnim",next_anim,sizeof(next_anim));
+
 	//load frames data
 	for (i = 0; i < frames; i++) {
 		//state number
@@ -91,7 +95,20 @@ bool DAnimator::LoadAnim(const char* name)
 		anim[i].wait_ms = atoi(res);
 	}
 
+	//update initial frame
+	Frame();
+
 	return true;
+}
+
+void DAnimator::Frame()
+{
+	//failsafe
+	if ((cframe >= frames) || (cframe < 0))
+		return;
+
+	anim[cframe].last = gtime->sms;
+	model->SetState(anim[cframe].state);
 }
 
 void DAnimator::Update()
@@ -107,8 +124,12 @@ void DAnimator::Update()
 	//switch to next frame
 	if (cframe == loop_e) cframe = loop_b;
 	else cframe++;
-	if (cframe >= frames) return; //no loop in animation, and animation has played
-	//TODO: switch to another animation (if specified)
-	anim[cframe].last = gtime->sms;
-	model->SetState(anim[cframe].state);
+	if (cframe >= frames) {
+		//switch to another animation (if specified)
+		if (strlen(next_anim)) LoadAnim(next_anim);
+		return; //no loop in animation, animation has played, and nothing to do
+	}
+
+	//set model state
+	Frame();
 }
