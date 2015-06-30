@@ -420,16 +420,17 @@ void RenderPool::SetScale(const double s)
 void RenderPool::SetFOV(const vector3d f)
 {
 	fov = f;
+	far = (int)round(f.Z);
 	for (int i = 0; i < RENDERPOOLN; i++)
 		if (pool[i].lvr) pool[i].lvr->SetFOV(f);
 }
 
-void RenderPool::SetFarDist(const int d)
-{
-	far = d;
-	for (int i = 0; i < RENDERPOOLN; i++)
-		if (pool[i].lvr) pool[i].lvr->SetFarDist(d);
-}
+//void RenderPool::SetFarDist(const int d)
+//{
+//	far = d;
+//	for (int i = 0; i < RENDERPOOLN; i++)
+//		if (pool[i].lvr) pool[i].lvr->SetFarDist(d);
+//}
 
 void RenderPool::SetPostprocess(const SLVRPostProcess p)
 {

@@ -36,7 +36,7 @@ CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
 	lvr = plvr;
 	scale = lvr->GetScale();
 	fov = lvr->GetFOV();
-	far = lvr->GetFarDist();
+//	far = lvr->GetFarDist();
 	ppset = lvr->GetPostprocess();
 
 	//Create labels
@@ -81,8 +81,7 @@ void CurseGUIRenderConfWnd::Fill()
 	e_fovx->SetText(string(buf));
 	snprintf(buf,sizeof(buf),"%d",(int)fov.Y);
 	e_fovy->SetText(string(buf));
-
-	snprintf(buf,sizeof(buf),"%d",far);
+	snprintf(buf,sizeof(buf),"%d",(int)fov.Z);
 	e_far->SetText(string(buf));
 
 	snprintf(buf,sizeof(buf),"%d",ppset.fog_dist);
@@ -109,8 +108,9 @@ void CurseGUIRenderConfWnd::Scan()
 	fov.X = tmp;
 	sscanf((e_fovy->GetText().c_str()),"%d",&tmp);
 	fov.Y = tmp;
+	sscanf((e_far->GetText().c_str()),"%d",&tmp);
+	fov.Z = tmp;
 
-	sscanf((e_far->GetText().c_str()),"%d",&far);
 	sscanf((e_fog->GetText().c_str()),"%d",&ppset.fog_dist);
 	sscanf((e_fogr->GetText().c_str()),"%hd",&(ppset.fog_col.r));
 	sscanf((e_fogg->GetText().c_str()),"%hd",&(ppset.fog_col.g));
@@ -122,7 +122,7 @@ void CurseGUIRenderConfWnd::Apply()
 {
 	lvr->SetScale(scale);
 	lvr->SetFOV(fov);
-	lvr->SetFarDist(far);
+//	lvr->SetFarDist(far);
 	lvr->SetPostprocess(ppset);
 }
 
@@ -133,8 +133,10 @@ void CurseGUIRenderConfWnd::Reset()
 	scale = DEFSCALE;
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
-	far = DEFFARPLANE;
+	fov.Z = DEFFOVZ;
 	ppset = temp;
+
+	Fill();
 }
 
 bool CurseGUIRenderConfWnd::PutEvent(SGUIEvent* e)

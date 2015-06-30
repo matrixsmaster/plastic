@@ -37,7 +37,7 @@
 #define DEFSCALE 1.f
 #define DEFFOVX 115
 #define DEFFOVY 62
-#define DEFFARPLANE 80
+#define DEFFOVZ 80
 
 ///LVR Post-processing settings.
 struct SLVRPostProcess {

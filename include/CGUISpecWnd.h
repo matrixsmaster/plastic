@@ -218,7 +218,7 @@ private:
 	LVR* lvr;
 	float scale;
 	vector3d fov;
-	int far;
+
 	SLVRPostProcess ppset;
 	CurseGUIEditBox* e_scale;
 	CurseGUIEditBox* e_fovx,*e_fovy;
