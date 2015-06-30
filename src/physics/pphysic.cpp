@@ -37,35 +37,35 @@ PlasticPhysics::~PlasticPhysics()
 
 bool PlasticPhysics::GetSurroundingVox(const SPPModelRec* mod, vector3di p)
 {
-	voxel sv,ov;
+//	voxel sv,ov;
 	vector3di cp = p;
 
 	//FIXME
 	cp.Z -= 1;
-	if (pipe->GetVoxel(&cp, true)) return true;
+	if (pipe->GetVoxel(&cp , true)) return true;
 
 	cp.Z += 1;
 	cp.X -= 1;
-	if (pipe->GetVoxel(&cp, true)) return true;
+	if (pipe->GetVoxel(&cp , true)) return true;
 
 	cp.X += 1;
 	cp.Z += 1;
-	if (pipe->GetVoxel(&cp, true)) return true;
+	if (pipe->GetVoxel(&cp , true)) return true;
 
 	cp.X += 1;
 	cp.Z += 1;
-	if (pipe->GetVoxel(&cp, true)) return true;
+	if (pipe->GetVoxel(&cp , true)) return true;
 
 	cp.Z -= 1;
 	cp.X += 1;
-	if (pipe->GetVoxel(&cp, true)) return true;
+	if (pipe->GetVoxel(&cp , true)) return true;
 
 	cp.X -= 1;
 	cp.Y -= 1;
-	if (pipe->GetVoxel(&cp, true)) return true;
+	if (pipe->GetVoxel(&cp , true)) return true;
 
 	cp.Y += 2;
-	if (pipe->GetVoxel(&cp, true)) return true;
+	if (pipe->GetVoxel(&cp , true)) return true;
 
 	return false;
 }
@@ -115,8 +115,8 @@ bool PlasticPhysics::Contact(const SPPModelRec* mod)
 		if (contact) break;
 	}
 
-	if (contact)
-		dbg_print("[PHY] Contact on [ %d %d %d ] voxel (%p)", p.X, p.Y, p.Z, mod->modptr);
+//	if (contact)
+//		dbg_print("[PHY] Contact on [ %d %d %d ] voxel (%p)", p.X, p.Y, p.Z, mod->modptr);
 
 	return contact;
 }
@@ -155,17 +155,11 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 	for (p.X = sx; p.X < ex; ++(p.X)) {
 		for (p.Y = sy; p.Y < ey; ++(p.Y)) {
 			for (p.Z = sz; p.Z < ez; ++(p.Z)) {
-
-				//Select the boundares of the cube
-//				if ((p.X == sx) || (p.X == (ex - 1)) ||
-//						(p.Y == sy) || (p.Y == (ey - 1)) ||
-//						(p.Z == sz) || (p.Z == (ez - 1)) ) {
-
-
 					//Get voxel from scene
 					sv = pipe->GetVoxel(&p, true);
 					//Get voxel from model
 					ov = mod->modptr->GetVoxelAt(&p);
+
 
 					if (sv && ov && res.no_collision) {
 						//Collision detected.
@@ -174,21 +168,10 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 						res.depth = 1;
 						break;
 					}
-
-					//Get surrounding voxels
-//					if (ov && !contact) {
-//						contact = GetSurroundingVox(mod, p);
-//						cp = p;
-//					}
-
-					//Break cycle if collision and contact detected
-//					if (!res.no_collision && contact) break;
-
-//				}
 			}
-			if (!res.no_collision) break;// && contact) break;
+			if (!res.no_collision) break;
 		}
-		if (!res.no_collision) break; // && contact) break;
+		if (!res.no_collision) break;
 	}
 
 //	if (!res.no_collision)
@@ -265,9 +248,10 @@ void PlasticPhysics::Quantum()
 	iv = fmod->begin();
 	for (im = mods.begin(); im < mods.end(); ++im) {
 		//skip contacting objects, which isn't moved
+		im->newpos = im->oldspos;
 		if ((!im->changed) && (!im->moved) && (im->contact)) continue;
 
-		//Search collision
+		//Search collision and contact with surface
 		ccol = Collision(&(*im));
 		contact = Contact(&(*im));
 
@@ -283,15 +267,31 @@ void PlasticPhysics::Quantum()
 		}
 #endif
 
-		im->newpos = im->oldspos;
-		//Resolve collision with a depth at one voxel.
-		vector3di sp = im->modptr->GetSPos();
+		/* Resolve collision with a depth at one voxel. */
+		if (!ccol.no_collision) {
+			//vector indicating collision
+			vector3di b_s = ccol.start - im->oldspos;
 
-		if ((!ccol.no_collision) && sp.Z > ccol.start.Z) im->newpos.Z += ccol.depth;
+			//normalization of the vector
+			vector3di b_ss = b_s.normalize();
+
+			//take the offset
+			vector3di c_s = b_ss * ccol.depth;
+
+			//change the direction of the vector
+			c_s *= -1;
+
+			//displace vector
+			im->newpos = c_s + im->oldspos;
+		}
+
 
 		//TODO: gravity
 
-		if (!contact) im->newpos.Z--;
+		if (!contact) {
+			vector3di g(0,0,-1);
+			im->newpos += g;
+		}
 
 		//TODO: move object
 
@@ -318,8 +318,9 @@ void PlasticPhysics::Quantum()
 		if (!im->changed) continue;
 
 		//actually update the model position
-		if (im->moved) im->modptr->SetPos(im->newpos);
-		else im->modptr->SetPos(im->oldspos);
+		im->modptr->SetPos(im->newpos);
+//		if (im->moved) im->modptr->SetPos(im->newpos);
+//		else im->modptr->SetPos(im->oldspos);
 	}
 
 	pipe->ReadUnlock();

@@ -118,6 +118,7 @@ public:
 	bool operator == (const CPoint3Di & comp) const 	{ return ((X==comp.X) && (Y==comp.Y) && (Z==comp.Z)); }
 	bool operator != (const CPoint3Di & comp) const 	{ return ((X!=comp.X) || (Y!=comp.Y) || (Z!=comp.Z)); }
 	CPoint3D ToReal()									{ return CPoint3D((double)X,(double)Y,(double)Z); }
+	CPoint3Di normalize()								{ double a = sqrt(X*X + Y*Y + Z*Z); return CPoint3Di(round(X/a), round(Y/a), round(Z/a));}
 	T Max()												{ CPoint2D<T> a(X,Y); a = CPoint2D<T>(a.Max(),Z); return a.Max(); }
 	T X, Y, Z;
 };
