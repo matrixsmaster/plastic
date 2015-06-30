@@ -26,9 +26,9 @@ PHY Collision detection									|			| in progr
 ---------------------------------------------------------------------------------------
 PHY Gravity												|			| in progr
 ---------------------------------------------------------------------------------------
-Implement society data (actors etc) saving and loading	| in progr	|
+Implement society data (actors etc) saving and loading	| done		|
 ---------------------------------------------------------------------------------------
-Implement world gamedata saving and loading				| in progr	|
+Implement world gamedata saving and loading				| done		|
 ---------------------------------------------------------------------------------------
 Add object view window									| in progr	|
 ---------------------------------------------------------------------------------------

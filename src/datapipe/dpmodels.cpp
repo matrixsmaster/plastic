@@ -115,6 +115,8 @@ voxel DataPipe::IntersectModel(const vector3di* p, VModel** obj, const bool auto
 
 void DataPipe::AddModel(VModel* obj)
 {
+	if (!obj) return;
+
 	WriteLock();
 	objs.push_back(obj);
 	WriteUnlock();

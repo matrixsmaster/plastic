@@ -316,6 +316,9 @@ public:
 	///Removes all the sprites from memory.
 	virtual void PurgeSprites();
 
+	///Adds an existing sprite to working set.
+	virtual void AddSprite(VSprite* spr);
+
 	///Returns a dictionary (vector of strings) by its name.
 	DPDict* GetDictionary(const char* dct_name);		//old style
 	///Returns a dictionary (vector of strings) by its name.

@@ -73,3 +73,13 @@ void DataPipe::PurgeSprites()
 	sprs.clear();
 	WriteUnlock();
 }
+
+void DataPipe::AddSprite(VSprite* spr)
+{
+	if (!spr) return;
+
+	WriteLock();
+	sprs.push_back(spr);
+	allocated += spr->GetAllocatedRAM();
+	WriteUnlock();
+}
