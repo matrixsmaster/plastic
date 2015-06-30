@@ -226,6 +226,7 @@ private:
 	CurseGUIEditBox* e_fog;
 	CurseGUIEditBox* e_fogr,*e_fogg,*e_fogb;
 	CurseGUIEditBox* e_noise;
+	CurseGUIEditBox* e_txdn,*e_txdf,*e_txdw,*e_txdh;
 	CurseGUIButton* b_apply,*b_reset;
 
 	void Fill();

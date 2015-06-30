@@ -176,15 +176,6 @@ void LVR::SetFOV(const vector3d f)
 #endif
 }
 
-//void LVR::SetFarDist(const int d)
-//{
-//	far = d;
-//
-//#ifdef LVRDEBUG
-//	dbg_print("[LVR] Far plane = %d",d);
-//#endif
-//}
-
 void LVR::SetPostprocess(const SLVRPostProcess p)
 {
 	pproc = p;

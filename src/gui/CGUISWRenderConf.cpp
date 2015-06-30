@@ -27,7 +27,7 @@ using namespace std;
 
 
 CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
-		CurseGUIWnd(scrn,8,8,26,9)
+		CurseGUIWnd(scrn,8,8,39,9)
 {
 	type = GUIWT_OTHER;
 	name = WNDNAM_LVRCONF;
@@ -36,7 +36,6 @@ CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
 	lvr = plvr;
 	scale = lvr->GetScale();
 	fov = lvr->GetFOV();
-//	far = lvr->GetFarDist();
 	ppset = lvr->GetPostprocess();
 
 	//Create labels
@@ -50,6 +49,10 @@ CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
 	new CurseGUILabel(ctrls,24,3,1,1,"G");
 	new CurseGUILabel(ctrls,24,4,1,1,"B");
 	new CurseGUILabel(ctrls,14,5,5,1,"Noise");
+	new CurseGUILabel(ctrls,27,1,6,1,"TXD Nd");
+	new CurseGUILabel(ctrls,27,2,6,1,"TXD Fd");
+	new CurseGUILabel(ctrls,27,3,6,1,"TXD Wm");
+	new CurseGUILabel(ctrls,27,4,6,1,"TXD Hm");
 
 	//Create edits
 	e_scale = new CurseGUIEditBox(ctrls,6,1,6,"0");
@@ -61,6 +64,10 @@ CurseGUIRenderConfWnd::CurseGUIRenderConfWnd(CurseGUI* scrn, LVR* plvr) :
 	e_fogg = new CurseGUIEditBox(ctrls,19,3,5,"0");
 	e_fogb = new CurseGUIEditBox(ctrls,19,4,5,"0");
 	e_noise = new CurseGUIEditBox(ctrls,19,5,6,"0");
+	e_txdn = new CurseGUIEditBox(ctrls,33,1,5,"0");
+	e_txdf = new CurseGUIEditBox(ctrls,33,2,5,"0");
+	e_txdw = new CurseGUIEditBox(ctrls,33,3,5,"0");
+	e_txdh = new CurseGUIEditBox(ctrls,33,4,5,"0");
 
 	//Create buttons
 	b_apply = new CurseGUIButton(ctrls,1,7,9,"Apply");
@@ -96,6 +103,15 @@ void CurseGUIRenderConfWnd::Fill()
 
 	snprintf(buf,sizeof(buf),"%d",ppset.noise);
 	e_noise->SetText(string(buf));
+
+	snprintf(buf,sizeof(buf),"%d",ppset.txd_nplane);
+	e_txdn->SetText(string(buf));
+	snprintf(buf,sizeof(buf),"%d",ppset.txd_fplane);
+	e_txdf->SetText(string(buf));
+	snprintf(buf,sizeof(buf),"%d",ppset.txd_minw);
+	e_txdw->SetText(string(buf));
+	snprintf(buf,sizeof(buf),"%d",ppset.txd_minh);
+	e_txdh->SetText(string(buf));
 }
 
 void CurseGUIRenderConfWnd::Scan()
@@ -115,14 +131,19 @@ void CurseGUIRenderConfWnd::Scan()
 	sscanf((e_fogr->GetText().c_str()),"%hd",&(ppset.fog_col.r));
 	sscanf((e_fogg->GetText().c_str()),"%hd",&(ppset.fog_col.g));
 	sscanf((e_fogb->GetText().c_str()),"%hd",&(ppset.fog_col.b));
+
 	sscanf((e_noise->GetText().c_str()),"%d",&(ppset.noise));
+
+	sscanf((e_txdn->GetText().c_str()),"%d",&(ppset.txd_nplane));
+	sscanf((e_txdf->GetText().c_str()),"%d",&(ppset.txd_fplane));
+	sscanf((e_txdw->GetText().c_str()),"%d",&(ppset.txd_minw));
+	sscanf((e_txdh->GetText().c_str()),"%d",&(ppset.txd_minh));
 }
 
 void CurseGUIRenderConfWnd::Apply()
 {
 	lvr->SetScale(scale);
 	lvr->SetFOV(fov);
-//	lvr->SetFarDist(far);
 	lvr->SetPostprocess(ppset);
 }
 
