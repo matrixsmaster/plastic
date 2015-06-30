@@ -30,7 +30,7 @@
 ///Version information
 #define VERMAJOR 0
 #define VERMINOR 1
-#define VERSUBVR 5
+#define VERSUBVR 6
 
 ///Product name
 #define PRODNAME "Plastic Inquisitor"

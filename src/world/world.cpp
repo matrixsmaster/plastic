@@ -519,6 +519,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 	case GUIEV_MOUSE:
 		/* Mouse */
+#if 0
 		if (e->m.bstate & GUIMOUS_LEFT) {
 			curso.X = e->m.x;
 			curso.Y = e->m.y;
@@ -541,6 +542,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 				hud->PrintStrToLog("%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
 			gui->SetCursorPos(curso.X,curso.Y);
 		}
+#endif
 		break;
 
 	case GUIEV_CTLBACK:

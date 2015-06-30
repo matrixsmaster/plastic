@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include "actor.h"
 #include "support.h"
+#include "world.h"
 
 
 enum {
@@ -100,13 +101,15 @@ const char* Player::GetStateStr()
 
 bool Player::ProcessEvent(const SGUIEvent* e)
 {
+	SWRayObjIntersect isc; //screen ray intersection
 	bool rc = false; //rotation change flag
 	mmask_t modb = BUTTON_CTRL | BUTTON_SHIFT | BUTTON_ALT;
 
-	if (e->t == GUIEV_MOUSE) {
-		//Check mouse wheel event
-		if (e->m.bstate & (GUISCRL_UP | GUISCRL_DW)) {
+	switch (e->t) {
+	case GUIEV_MOUSE:
 
+		if (e->m.bstate & (GUISCRL_UP | GUISCRL_DW)) {
+			//Wheel (camera rotation)
 			if ((e->m.bstate & modb) == rot_ver)
 				rot.X += (e->m.bstate & GUISCRL_UP)? rspd:-rspd;
 
@@ -117,10 +120,38 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 
 			rc = true;
 
+		} else if (e->m.bstate == BUTTON1_PRESSED) {
+			//Action button
+			isc = *(world->ScreenRay(vector2di(e->m.x,e->m.y)));
+			switch (state) {
+			case PCS_EXPLORING:
+				if (!isc.model) return true;
+				if (isc.model == model) {
+					world->GetHUD()->PutStrToLog(world->GetMsgSys()->GetMessage("SELFPOINT_LOG"));
+				} else if (isc.actor) {
+					world->GetMsgSys()->SetActorName(isc.actor->GetAttributes().name);
+					if (isc.actor->GetAttributes().female)
+						world->GetHUD()->PutStrToLog(world->GetMsgSys()->GetMessage("ACTRESS_LOG"));
+					else
+						world->GetHUD()->PutStrToLog(world->GetMsgSys()->GetMessage("ACTOR_LOG"));
+				}
+				break;
+
+			case PCS_INTERACTING:
+				//TODO
+				break;
+
+			case PCS_COMBAT:
+				//TODO
+				break;
+
+			default: break;
+			}
 		} else
 			return false;
+		break;
 
-	} else if (e->t == GUIEV_KEYPRESS) {
+	case GUIEV_KEYPRESS:
 
 		switch (binder->DecodeKey(e->k)) {
 		default: return false;
@@ -156,9 +187,11 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 			}
 
 		}
+		break;
 
-	} else
+	default:
 		return false;
+	}
 
 	if (rc) SetRot(rot); //Update rotation
 

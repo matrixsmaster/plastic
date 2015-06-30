@@ -12,8 +12,6 @@ Implement actors limbs mechanics						| assigned	|
 ---------------------------------------------------------------------------------------
 Finish WorldGen											| assigned	|
 ---------------------------------------------------------------------------------------
-Add voxel destroying test for combat mode				| assigned	|
----------------------------------------------------------------------------------------
 Add wearable inventory items sub-class					| assigned	|
 ---------------------------------------------------------------------------------------
 Speed up LVR fog by implementing look-up table			| assigned	|
@@ -23,6 +21,8 @@ PHY Collision detection									|			| in progr
 PHY Gravity												|			| in progr
 ---------------------------------------------------------------------------------------
 Add object view window									| in progr	|
+---------------------------------------------------------------------------------------
+Add voxel destroying test for combat mode				| in progr	|
 ---------------------------------------------------------------------------------------
 Test 'tup' as a temporary build system					| stall, meeting unavoidable
 ---------------------------------------------------------------------------------------
