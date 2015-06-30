@@ -16,10 +16,6 @@ Add voxel destroying test for combat mode				| assigned	|
 ---------------------------------------------------------------------------------------
 Add wearable inventory items sub-class					| assigned	|
 ---------------------------------------------------------------------------------------
-Add texturization settings to LVRconf					| in progr	|
----------------------------------------------------------------------------------------
-LVR: Use FOV.Z instead of separate far plane distance	| done		|
----------------------------------------------------------------------------------------
 Speed up LVR fog by implementing look-up table			| assigned	|
 ---------------------------------------------------------------------------------------
 PHY Collision detection									|			| in progr
@@ -53,4 +49,8 @@ Implement reuse of dynamically appended voxels			| done		|
 Implement society data (actors etc) saving and loading	| done		|
 ---------------------------------------------------------------------------------------
 Implement world gamedata saving and loading				| done		|
+---------------------------------------------------------------------------------------
+LVR: Use FOV.Z instead of separate far plane distance	| done		|
+---------------------------------------------------------------------------------------
+Add texturization settings to LVRconf					| done		|
 ---------------------------------------------------------------------------------------

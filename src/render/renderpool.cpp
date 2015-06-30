@@ -451,4 +451,8 @@ void RenderPool::SetPostprocess(const SLVRPostProcess p)
 		pproc.txd_minw = p.txd_minw;
 		pproc.txd_minh = p.txd_minh;
 	}
+
+	//restore all the values to make sure we'll return
+	//the right structure in GetPostprocess()
+	g_pproc = p;
 }
