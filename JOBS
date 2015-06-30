@@ -2,55 +2,55 @@ Job														| Master	| Begemot
 ---------------------------------------------------------------------------------------
 Update voxel table (add most common types of voxels)	| assigned	| assigned
 ---------------------------------------------------------------------------------------
-Implement hideable parts in VModel						| done		|
----------------------------------------------------------------------------------------
-LVR: Use FOV.Z instead of separate far plane distance	| assigned	|
----------------------------------------------------------------------------------------
-Add object view window									| in progr	|
----------------------------------------------------------------------------------------
-Implement some marks to use in voxel table				| done		|
----------------------------------------------------------------------------------------
 Implement DataPipe chunks saving and loading			| assigned	|
 ---------------------------------------------------------------------------------------
 Implement DataPipe chnuks mapping on load				| assigned	|
----------------------------------------------------------------------------------------
-Create physics system stubs, threads etc				| done		|
----------------------------------------------------------------------------------------
-PHY Collision detection									|			| in progr
----------------------------------------------------------------------------------------
-PHY Gravity												|			| in progr
----------------------------------------------------------------------------------------
-Test 'textured' rendering of voxel sides				| done		|
 ---------------------------------------------------------------------------------------
 Gather portrait generation sprites						|			| assigned
 ---------------------------------------------------------------------------------------
 Implement actors limbs mechanics						| assigned	|
 ---------------------------------------------------------------------------------------
-Add dictionaries to DP and finish the NameGen			| done		|
----------------------------------------------------------------------------------------
-Add actors animation lists								| in progr	|
----------------------------------------------------------------------------------------
 Finish WorldGen											| assigned	|
 ---------------------------------------------------------------------------------------
 Add voxel destroying test for combat mode				| assigned	|
 ---------------------------------------------------------------------------------------
-Create messages loading & translation system			| done		|
+Add wearable inventory items sub-class					| assigned	|
+---------------------------------------------------------------------------------------
+Speed up LVR fog by implementing look-up table			| assigned	|
+---------------------------------------------------------------------------------------
+PHY Collision detection									|			| in progr
+---------------------------------------------------------------------------------------
+PHY Gravity												|			| in progr
+---------------------------------------------------------------------------------------
+Add object view window									| in progr	|
 ---------------------------------------------------------------------------------------
 Test 'tup' as a temporary build system					| stall, meeting unavoidable
+---------------------------------------------------------------------------------------
+Implement some marks to use in voxel table				| done		|
+---------------------------------------------------------------------------------------
+Implement hideable parts in VModel						| done		|
+---------------------------------------------------------------------------------------
+Create physics system stubs, threads etc				| done		|
+---------------------------------------------------------------------------------------
+Test 'textured' rendering of voxel sides				| done		|
+---------------------------------------------------------------------------------------
+Add dictionaries to DP and finish the NameGen			| done		|
+---------------------------------------------------------------------------------------
+Add actors animation lists								| done		|
+---------------------------------------------------------------------------------------
+Create messages loading & translation system			| done		|
 ---------------------------------------------------------------------------------------
 Move html2vsprite tool in								| done		|
 ---------------------------------------------------------------------------------------
 Fix PHY system models sync								| done		|
 ---------------------------------------------------------------------------------------
-Implement society data (actors etc) saving and loading	| done		|
----------------------------------------------------------------------------------------
-Implement world gamedata saving and loading				| assigned	|
----------------------------------------------------------------------------------------
-Speed up LVR fog by implementing look-up table			| assigned	|
----------------------------------------------------------------------------------------
 Implement reuse of dynamically appended voxels			| done		|
 ---------------------------------------------------------------------------------------
-Add wearable inventory items sub-class					| assigned	|
+Implement society data (actors etc) saving and loading	| done		|
 ---------------------------------------------------------------------------------------
-Add texturization settings to LVRconf					| assigned	|
+Implement world gamedata saving and loading				| done		|
+---------------------------------------------------------------------------------------
+LVR: Use FOV.Z instead of separate far plane distance	| done		|
+---------------------------------------------------------------------------------------
+Add texturization settings to LVRconf					| done		|
 ---------------------------------------------------------------------------------------

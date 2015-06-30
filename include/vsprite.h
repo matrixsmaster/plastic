@@ -31,6 +31,7 @@ public:
 	VSprite();
 	virtual ~VSprite();
 
+	bool Assign(SGUIPixel* pict, int w, int h);
 	bool LoadFromFile(const char* fn);
 
 	SGUIPixel* GetImage()				{ return img; }

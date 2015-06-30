@@ -43,6 +43,9 @@ private:
 	int loop_b, loop_e;
 	SDAFrame* anim;
 	int cframe;
+	char next_anim[MAXPATHLEN];
+
+	void Frame();
 
 public:
 	DAnimator(DataPipe* pipeptr, const PlasticTime* gtptr, VModel* modptr, const char* modnm);

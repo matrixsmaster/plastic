@@ -35,6 +35,21 @@ VSprite::~VSprite()
 	if (img) free(img);
 }
 
+bool VSprite::Assign(SGUIPixel* pict, int w, int h)
+{
+	if ((w < 1) || (h < 1)) return false;
+
+	allocram = w * h * sizeof(SGUIPixel);
+	img = (SGUIPixel*)realloc(img,allocram);
+	if (!img) return false;
+
+	g_w = w;
+	g_h = h;
+	memcpy(img,pict,allocram);
+
+	return true;
+}
+
 bool VSprite::LoadFromFile(const char* fn)
 {
 	FILE* fi;

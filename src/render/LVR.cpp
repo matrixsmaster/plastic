@@ -48,7 +48,8 @@ LVR::LVR(DataPipe* data)
 
 	fov.X = DEFFOVX;
 	fov.Y = DEFFOVY;
-	far = DEFFARPLANE;
+	fov.Z = DEFFOVZ;
+	far = (int)DEFFOVZ;
 
 	pproc = temp;
 }
@@ -168,18 +169,10 @@ void LVR::SetScale(const double s)
 void LVR::SetFOV(const vector3d f)
 {
 	fov = f;
+	far = (int)round(f.Z);
 
 #ifdef LVRDEBUG
-	dbg_print("[LVR] FOV = [%.2f, %.2f]",f.X,f.Y);
-#endif
-}
-
-void LVR::SetFarDist(const int d)
-{
-	far = d;
-
-#ifdef LVRDEBUG
-	dbg_print("[LVR] Far plane = %d",d);
+	dbg_print("[LVR] FOV = [%.2f, %.2f, %d]",f.X,f.Y,far);
 #endif
 }
 

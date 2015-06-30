@@ -66,7 +66,7 @@ PlasticActor::PlasticActor()
 PlasticActor::~PlasticActor()
 {
 	Delete();
-	if (portrait) pipe->UnloadSprite(portrait);
+	RmPortrait();
 }
 
 void PlasticActor::InitVars()
@@ -79,16 +79,26 @@ void PlasticActor::InitVars()
 	curr = base;
 	model = NULL;
 	portrait = NULL;
+	portrait_reg = false;
 	anim = NULL;
 	world = NULL;
 	headtxd = 0;
 }
 
+void PlasticActor::RmPortrait()
+{
+	if (!portrait) return;
+	if (portrait_reg)
+		pipe->UnloadSprite(portrait);
+	else
+		delete portrait;
+	portrait = NULL;
+	portrait_reg = false;
+}
+
 bool PlasticActor::SerializeToFile(FILE* f)
 {
 	SPAFileHeader hdr;
-
-//	dbg_print("Serializing actor %p",this);
 
 	//Fill in header information
 	hdr.gpx = gpos.X;
@@ -120,8 +130,44 @@ bool PlasticActor::SerializeToFile(FILE* f)
 
 bool PlasticActor::DeserializeFromFile(FILE* f)
 {
-	//TODO
-	return false;
+	SPAFileHeader hdr;
+	SGUIPixel* portr;
+	size_t sz;
+
+	//reset actor information (just in case)
+	Delete();
+	RmPortrait();
+
+	//read and apply header data
+	if (fread(&hdr,sizeof(hdr),1,f) < 1) return false;
+	gpos = vector3di(hdr.gpx,hdr.gpy,hdr.gpz);
+	pos = vector3di(hdr.lpx,hdr.lpy,hdr.lpz);
+
+	//read and apply attribs and stats
+	if (fread(&attrib,sizeof(attrib),1,f) < 1) return false;
+	if (fread(&base,sizeof(base),1,f) < 1) return false;
+	if (fread(&curr,sizeof(curr),1,f) < 1) return false;
+
+	//get actor's portrait
+	if (hdr.have_portrait) {
+		//allocate temporary picture buffer
+		sz = hdr.port_w * hdr.port_h * sizeof(SGUIPixel);
+		portr = (SGUIPixel*)malloc(sz);
+		if (!portr) return false;
+
+		//load picture from file
+		if (fread(portr,1,sz,f) < 1) return false;
+
+		//create portrait sprite
+		portrait = new VSprite();
+		portrait->Assign(portr,hdr.port_w,hdr.port_h);
+		portrait_reg = false;
+
+		//free temp buf
+		free(portr);
+	}
+
+	return true;
 }
 
 void PlasticActor::AutoInitStats()
@@ -137,6 +183,7 @@ void PlasticActor::AutoInitStats()
 	if (!portrait) {
 		//FIXME: debug only!
 		portrait = pipe->LoadSprite("spr/testspr.dat");
+		portrait_reg = true;
 	}
 }
 
@@ -254,6 +301,12 @@ bool PlasticActor::Spawn(PlasticWorld* wrld)
 	anim = new DAnimator(pipe,world->GetGameTimePtr(),model,attrib.model);
 	anim->LoadAnim("walking"); //FIXME: debug
 
+	//Register portrait (if wasn't done before)
+	if ((portrait) && (!portrait_reg)) {
+		pipe->AddSprite(portrait);
+		portrait_reg = true;
+	}
+
 	//Register face voxel
 	nvi = *(pipe->GetVInfo("face")); //copy 'face' voxel
 	nvi.mark = NULL; //don't use the same mark
@@ -279,7 +332,7 @@ void PlasticActor::Delete()
 	model = NULL;
 
 	//To free face voxel
-	pipe->RemoveVoxel(headtxd);
+	if (headtxd) pipe->RemoveVoxel(headtxd);
 	headtxd = 0;
 
 	//We don't need world instance anymore

@@ -68,12 +68,13 @@ public:
 	virtual void SetEulerRotation(const vector3d r);
 	virtual void SetPosition(const vector3d pos);
 
+	///Set camera frustrum scaling.
 	virtual void SetScale(const double s);
 	double GetScale()						{ return scale.Z; }
+
+	///Set camera Field of View and clipping distance.
 	virtual void SetFOV(const vector3d f);
 	vector3d GetFOV()						{ return fov; }
-	virtual void SetFarDist(const int d);
-	int GetFarDist()						{ return far; }
 
 	virtual void SetPostprocess(const SLVRPostProcess p);
 	virtual SLVRPostProcess GetPostprocess() { return pproc; }

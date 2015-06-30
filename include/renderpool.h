@@ -116,10 +116,8 @@ public:
 
 	///Set camera frustrum scaling.
 	void SetScale(const double s);
-	///Set camera Field of View.
+	///Set camera Field of View and clipping distance.
 	void SetFOV(const vector3d f);
-	///Set far clipping plane distance.
-	void SetFarDist(const int d);
 	///Set new postprocessing settings.
 	void SetPostprocess(const SLVRPostProcess p);
 	///Returns global postprocessing settings.

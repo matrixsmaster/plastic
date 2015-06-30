@@ -53,10 +53,12 @@ protected:
 	VModel* model;			//Actor's model
 	Inventory invent;		//Actor's inventory
 	VSprite* portrait;		//Actor's portrait
+	bool portrait_reg;		//Actor's portrait registration flag
 	DAnimator* anim;		//Actor's animations
 	voxel headtxd;			//Textured head voxel id
 
 	void InitVars();
+	void RmPortrait();
 
 public:
 	PlasticActor(SPAAttrib a, DataPipe* pptr);
