@@ -83,6 +83,7 @@ public:
 	double Module() const								{ return sqrt(X*X + Y*Y + Z*Z); }
 	double DotProduct(const CPoint3D & s) const 		{ return X*s.X + Y*s.Y + Z*s.Z; }
 	CPoint3D MinusAbs(const CPoint3D & b) const			{ return CPoint3D(fabs(X-b.X),fabs(Y-b.Y),fabs(Z-b.Z)); }
+	CPoint3D Normalize() const							{ double a = Module(); return CPoint3D((X/a),(Y/a),(Z/a)); }
 	CPoint3D HalfWay(const CPoint3D s);
 	double DistanceTo(const CPoint3D s);
 	int fcompare(const double a, const double b);
@@ -99,6 +100,7 @@ public:
 	CPoint3Di(T X, T Y, T Z) :					X(X), Y(Y), Z(Z) {}
 	CPoint3Di(T all) :							X(all), Y(all), Z(all) {}
 	CPoint3Di(const CPoint3Di & nw) :			X(nw.X), Y(nw.Y), Z(nw.Z) {}
+	CPoint3Di(const CPoint3D & r) :				X(round(r.X)), Y(round(r.Y)), Z(round(r.Z)) {}
 	virtual ~CPoint3Di()						{}
 	CPoint3Di & operator = (const CPoint3Di & old) 		{ X=old.X; Y=old.Y; Z=old.Z; return *this; }
 	CPoint3Di operator + (const CPoint3Di & add) const	{ return CPoint3Di((X+add.X),(Y+add.Y),(Z+add.Z)); }
@@ -117,8 +119,10 @@ public:
 	CPoint3Di operator / (const CPoint3Di & div) const	{ return CPoint3Di((X/div.X),(Y/div.Y),(Z/div.Z)); }
 	bool operator == (const CPoint3Di & comp) const 	{ return ((X==comp.X) && (Y==comp.Y) && (Z==comp.Z)); }
 	bool operator != (const CPoint3Di & comp) const 	{ return ((X!=comp.X) || (Y!=comp.Y) || (Z!=comp.Z)); }
-	CPoint3D ToReal()									{ return CPoint3D((double)X,(double)Y,(double)Z); }
-	CPoint3Di normalize()								{ double a = sqrt(X*X + Y*Y + Z*Z); return CPoint3Di(round(X/a), round(Y/a), round(Z/a));}
+	CPoint3D ToReal() const								{ return CPoint3D((double)X,(double)Y,(double)Z); }
+	T Module() const									{ return (T)round(sqrt(X*X + Y*Y + Z*Z)); }
+	T DotProduct(const CPoint3Di & s) const				{ return X*s.X + Y*s.Y + Z*s.Z; }
+	CPoint3Di Normalize() const							{ return CPoint3Di(ToReal().Normalize()); }
 	T Max()												{ CPoint2D<T> a(X,Y); a = CPoint2D<T>(a.Max(),Z); return a.Max(); }
 	T X, Y, Z;
 };

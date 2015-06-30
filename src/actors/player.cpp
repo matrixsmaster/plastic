@@ -127,13 +127,13 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 			case PCS_EXPLORING:
 				if (!isc.model) return true;
 				if (isc.model == model) {
-					world->GetHUD()->PutStrToLog(world->GetMsgSys()->GetMessage("SELFPOINT_LOG"));
+					world->LogMsg("SELFPOINT_LOG");
 				} else if (isc.actor) {
 					world->GetMsgSys()->SetActorName(isc.actor->GetAttributes().name);
 					if (isc.actor->GetAttributes().female)
-						world->GetHUD()->PutStrToLog(world->GetMsgSys()->GetMessage("ACTRESS_LOG"));
+						world->LogMsg("ACTRESS_LOG");
 					else
-						world->GetHUD()->PutStrToLog(world->GetMsgSys()->GetMessage("ACTOR_LOG"));
+						world->LogMsg("ACTOR_LOG");
 				}
 				break;
 
@@ -142,7 +142,8 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 				break;
 
 			case PCS_COMBAT:
-				//TODO
+				if (isc.pnt != vector3di(-1))
+					world->FireTo(isc.pnt);
 				break;
 
 			default: break;

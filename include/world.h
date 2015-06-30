@@ -162,8 +162,14 @@ public:
 	///Returns a game text messages system instance.
 	GameMessages* GetMsgSys()				{ return msgsys; }
 
-	///Screen space - world intersection test.
+	///Screen space <-> world intersection test.
 	SWRayObjIntersect* ScreenRay(const vector2di p);
+
+	///Puts a tagged message into log part of the HUD.
+	void LogMsg(const char* tag);
+
+	///Fires at a given point.
+	bool FireTo(const vector3di pnt);
 
 	///Main events processing facility.
 	void ProcessEvents(SGUIEvent* e);

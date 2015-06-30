@@ -374,6 +374,19 @@ SWRayObjIntersect* PlasticWorld::ScreenRay(const vector2di p)
 	return &cinters;
 }
 
+void PlasticWorld::LogMsg(const char* tag)
+{
+	if (tag)
+		hud->PutStrToLog(msgsys->GetMessage(tag));
+}
+
+bool PlasticWorld::FireTo(const vector3di pnt)
+{
+	//TODO
+	dbg_print("Fire to [%d %d %d]",pnt.X,pnt.Y,pnt.Z);
+	return true;
+}
+
 void PlasticWorld::PlayerMoved()
 {
 	if (PC->GetGMov() != vector3di()) {

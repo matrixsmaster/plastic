@@ -27,7 +27,7 @@
 
 
 ///Define this to use debugging output.
-#define LVRDEBUG 1
+//#define LVRDEBUG 1
 
 ///Define this to use double-buffering in LVR.
 ///It's required to be enabled if using RenderPool.

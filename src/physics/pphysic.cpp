@@ -273,7 +273,7 @@ void PlasticPhysics::Quantum()
 			vector3di b_s = ccol.start - im->oldspos;
 
 			//normalization of the vector
-			vector3di b_ss = b_s.normalize();
+			vector3di b_ss = b_s.Normalize();
 
 			//take the offset
 			vector3di c_s = b_ss * ccol.depth;
