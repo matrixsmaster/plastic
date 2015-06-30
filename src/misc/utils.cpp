@@ -375,6 +375,11 @@ bool argparser(int argc, char* argv[], SGameSettings* sets)
 				fsm = 0;
 				break;
 
+			case GAT_NEWGAME:
+				sets->new_game = (atoi(argv[i]) == 1);
+				fsm = 0;
+				break;
+
 			case GAT_PLAYER:
 				strncpy(sets->PCData.name,argv[i],MAXACTNAMELEN);
 				fsm++;

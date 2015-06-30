@@ -63,13 +63,19 @@ bool PlasticWorld::LoadGame()
 {
 	GDVec plr;
 	SSavedGameHeader* hptr;
+//	vector3di v;
 
 	plr.push_back(PC);
 
-	/* Begin loading process */
+	/* Load header and landscape */
 	if (!((hptr = data->LoadGameHeader()))) return false;
 	if (!data->LoadStaticWorld()) return false;
+
+	/* Init Player */
 	if (!data->DeserializeThem<PlasticActor>(&plr,"player",false)) return false;
+	data->SetGP(PC->GetGPos());
+
+	/* Load all actors */
 	if (!society->Load()) return false;
 
 	/* Restore global data */

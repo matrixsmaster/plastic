@@ -120,8 +120,31 @@ bool PlasticActor::SerializeToFile(FILE* f)
 
 bool PlasticActor::DeserializeFromFile(FILE* f)
 {
-	//TODO
-	return false;
+	SPAFileHeader hdr;
+
+	//reset actor information (just in case)
+	Delete();
+	if (portrait) pipe->UnloadSprite(portrait);
+	portrait = NULL;
+
+	//read and apply header data
+	if (fread(&hdr,sizeof(hdr),1,f) < 1) return false;
+	gpos = vector3di(hdr.gpx,hdr.gpy,hdr.gpz);
+	pos = vector3di(hdr.lpx,hdr.lpy,hdr.lpz);
+
+	//read and apply attribs and stats
+	if (fread(&attrib,sizeof(attrib),1,f) < 1) return false;
+	if (fread(&base,sizeof(base),1,f) < 1) return false;
+	if (fread(&curr,sizeof(curr),1,f) < 1) return false;
+
+	//create and load new portrait
+	if (hdr.have_portrait) {
+//		portrait = new VSprite();
+		//TODO
+		fseek(f,hdr.port_w*hdr.port_h*sizeof(SGUIPixel),SEEK_CUR);
+	}
+
+	return true;
 }
 
 void PlasticActor::AutoInitStats()
@@ -279,7 +302,7 @@ void PlasticActor::Delete()
 	model = NULL;
 
 	//To free face voxel
-	pipe->RemoveVoxel(headtxd);
+	if (headtxd) pipe->RemoveVoxel(headtxd);
 	headtxd = 0;
 
 	//We don't need world instance anymore
