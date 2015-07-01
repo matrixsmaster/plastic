@@ -267,8 +267,11 @@ public:
 	///This voxel will only be marked as removed.
 	virtual void RemoveVoxel(voxel v);
 
-	///Return an elevation (max Z occupied by voxel) under point on XY-plane.
+	///Return an elevation (max Z occupied by voxel) under some point on XY-plane.
 	virtual int GetElevationUnder(const vector3di* p);
+
+	///Changes a voxel at a given scene co-ords.
+	virtual void ChangeVoxelAt(const vector3di* p, const voxel nv);
 
 	///Supply INI-file based data by INI name and field name.
 	void GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen);

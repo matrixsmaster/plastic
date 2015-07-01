@@ -414,7 +414,7 @@ bool PlasticWorld::FireTo(const vector3di pnt, SWRayObjIntersect* isc)
 
 	} else {
 		//to a static world
-		//TODO
+		data->ChangeVoxelAt(&pnt,0);
 	}
 
 	data->WriteUnlock();

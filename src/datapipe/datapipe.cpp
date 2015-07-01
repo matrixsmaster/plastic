@@ -30,6 +30,16 @@
 #endif
 
 
+/* Voxel access interlocking macros variations for multithreaded access */
+#ifdef DPLOCKEACHVOX
+#define DP_GETVOX_LOCK ReadLock()
+#define DP_GETVOX_UNLOCK ReadUnlock()
+#else
+#define DP_GETVOX_LOCK
+#define DP_GETVOX_UNLOCK
+#endif
+
+
 DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 {
 	int i;
@@ -343,15 +353,6 @@ inline bool DataPipe::ConvertSceneCoord(const vector3di* p, int* px, int* py, in
 	return true;
 }
 
-/* GetVoxel() Interlocking macros variations for multithreaded access */
-#ifdef DPLOCKEACHVOX
-#define DP_GETVOX_LOCK ReadLock()
-#define DP_GETVOX_UNLOCK ReadUnlock()
-#else
-#define DP_GETVOX_LOCK
-#define DP_GETVOX_UNLOCK
-#endif
-
 voxel DataPipe::GetVoxel(const vector3di* p, bool dynskip)
 {
 	PChunk ch;
@@ -385,6 +386,29 @@ voxel DataPipe::GetVoxel(const vector3di* p, bool dynskip)
 
 	DP_GETVOX_UNLOCK;
 	return tmp;
+}
+
+void DataPipe::ChangeVoxelAt(const vector3di* p, const voxel nv)
+{
+	PChunk ch;
+	int px,py,pz;
+	unsigned l;
+
+	DP_GETVOX_LOCK;
+
+	/* Converse co-ords */
+	if (!ConvertSceneCoord(p,&px,&py,&pz,&l)) {
+		DP_GETVOX_UNLOCK;
+		return;
+	}
+
+	/* Check the chunk status and return voxel id */
+	if (chstat[l] == DPCHK_READY) {
+		ch = chunks[l];
+		(*ch)[pz][py][px] = nv;
+	}
+
+	DP_GETVOX_UNLOCK;
 }
 
 const SVoxelInf* DataPipe::GetVoxelI(const vector3di* p, bool dynskip)
