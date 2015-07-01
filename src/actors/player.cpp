@@ -143,7 +143,7 @@ bool Player::ProcessEvent(const SGUIEvent* e)
 
 			case PCS_COMBAT:
 				if (isc.pnt != vector3di(-1))
-					world->FireTo(isc.pnt);
+					world->FireTo(isc.pnt,&isc);
 				break;
 
 			default: break;

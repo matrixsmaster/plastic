@@ -99,6 +99,8 @@ public:
 	bool Spawn(PlasticWorld* wrld);
 	void Delete();
 	void Animate();
+
+	void Damage(const vector3di* pnt);
 };
 
 //Special case for a player character

@@ -281,6 +281,68 @@ void DataPipe::FreeVoxTab()
 	memset(&voxeltab,0,sizeof(voxeltab));
 }
 
+inline bool DataPipe::ConvertSceneCoord(const vector3di* p, int* px, int* py, int* pz, unsigned* l)
+{
+#if HOLDCHUNKS == 1
+	/* Simplest case */
+
+	*px = p->X;
+	*py = p->Y;
+	*pz = p->Z;
+
+	if (	(*px < 0) || (*py < 0) || (*pz < 0) ||
+			(*px >= CHUNKBOX) || (*py >= CHUNKBOX) || (*pz >= CHUNKBOX) ) {
+		return false;
+	}
+	*l = 0;
+
+#else
+	int x,y,z;
+
+	/* Other cases */
+	x = p->X / CHUNKBOX - ((p->X < 0)? 1:0);
+	y = p->Y / CHUNKBOX - ((p->Y < 0)? 1:0);
+	z = p->Z / CHUNKBOX - ((p->Z < 0)? 1:0);
+	*px = p->X % CHUNKBOX;
+	*py = p->Y % CHUNKBOX;
+	*pz = p->Z % CHUNKBOX;
+	if (*px < 0) *px = CHUNKBOX + *px;
+	if (*py < 0) *py = CHUNKBOX + *py;
+	if (*pz < 0) *pz = CHUNKBOX + *pz;
+
+#if HOLDCHUNKS == 9
+	if (	(x < -1) || (y < -1) || (z < 0) ||
+			(x >  1) || (y >  1) || (z > 0) ) {
+		return false;
+	}
+	++y; ++x; //centerize
+	*l = y * 3 + x;
+
+#elif HOLDCHUNKS == 18
+	if (	(x < -1) || (y < -1) || (z < -1) ||
+			(x >  1) || (y >  1) || (z > 0) ) {
+		return false;
+	}
+	++z; ++y; ++x; //centerize
+	*l = z * 9 + y * 3 + x;
+
+#elif HOLDCHUNKS == 27
+	if (	(x < -1) || (y < -1) || (z < -1) ||
+			(x >  1) || (y >  1) || (z >  1) ) {
+		return false;
+	}
+	++z; ++y; ++x; //centerize
+	*l = z * 9 + y * 3 + x;
+
+#else /* Just a compile-time check */
+#error "Invalid value of HOLDCHUNKS!"
+
+#endif
+#endif
+
+	return true;
+}
+
 /* GetVoxel() Interlocking macros variations for multithreaded access */
 #ifdef DPLOCKEACHVOX
 #define DP_GETVOX_LOCK ReadLock()
@@ -297,10 +359,6 @@ voxel DataPipe::GetVoxel(const vector3di* p, bool dynskip)
 	unsigned l;
 	voxel tmp = 0;
 
-#if HOLDCHUNKS > 1
-	int x,y,z;
-#endif
-
 	if (status != DPIPE_IDLE) return 0;
 	DP_GETVOX_LOCK;
 
@@ -313,66 +371,13 @@ voxel DataPipe::GetVoxel(const vector3di* p, bool dynskip)
 		}
 	}
 
-#if HOLDCHUNKS == 1
-	/* Simplest case */
-
-	px = p->X;
-	py = p->Y;
-	pz = p->Z;
-
-	if (	(px < 0) || (py < 0) || (pz < 0) ||
-			(px >= CHUNKBOX) || (py >= CHUNKBOX) || (pz >= CHUNKBOX) ) {
+	/* Converse scene co-ords */
+	if (!ConvertSceneCoord(p,&px,&py,&pz,&l)) {
 		DP_GETVOX_UNLOCK;
 		return 0;
 	}
-	l = 0;
 
-#else
-
-	/* Other cases */
-	x = p->X / CHUNKBOX - ((p->X < 0)? 1:0);
-	y = p->Y / CHUNKBOX - ((p->Y < 0)? 1:0);
-	z = p->Z / CHUNKBOX - ((p->Z < 0)? 1:0);
-	px = p->X % CHUNKBOX;
-	py = p->Y % CHUNKBOX;
-	pz = p->Z % CHUNKBOX;
-	if (px < 0) px = CHUNKBOX + px;
-	if (py < 0) py = CHUNKBOX + py;
-	if (pz < 0) pz = CHUNKBOX + pz;
-
-#if HOLDCHUNKS == 9
-	if (	(x < -1) || (y < -1) || (z < 0) ||
-			(x >  1) || (y >  1) || (z > 0) ) {
-		DP_GETVOX_UNLOCK;
-		return 0;
-	}
-	++y; ++x; //centerize
-	l = y * 3 + x;
-
-#elif HOLDCHUNKS == 18
-	if (	(x < -1) || (y < -1) || (z < -1) ||
-			(x >  1) || (y >  1) || (z > 0) ) {
-		DP_GETVOX_UNLOCK;
-		return 0;
-	}
-	++z; ++y; ++x; //centerize
-	l = z * 9 + y * 3 + x;
-
-#elif HOLDCHUNKS == 27
-	if (	(x < -1) || (y < -1) || (z < -1) ||
-			(x >  1) || (y >  1) || (z >  1) ) {
-		DP_GETVOX_UNLOCK;
-		return 0;
-	}
-	++z; ++y; ++x; //centerize
-	l = z * 9 + y * 3 + x;
-
-#else /* Just a compile-time check */
-#error "Invalid value of HOLDCHUNKS!"
-
-#endif
-#endif
-
+	/* Check the chunk status and return voxel id */
 	if (chstat[l] == DPCHK_READY) {
 		ch = chunks[l];
 		tmp = (*ch)[pz][py][px];

@@ -187,6 +187,7 @@ protected:
 	bool FindChunk(vector3di pos, SDataPlacement* res);
 	bool LoadVoxTab();
 	void FreeVoxTab();
+	inline bool ConvertSceneCoord(const vector3di* p, int* px, int* py, int* pz, unsigned* l);
 	bool LoadIni(const std::string name);
 	bool LoadDict(const std::string name);
 	void MakeChunk(unsigned l, vector3di pos);

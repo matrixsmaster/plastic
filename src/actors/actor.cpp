@@ -344,6 +344,11 @@ void PlasticActor::Animate()
 	if (model && anim) anim->Update();
 }
 
+void PlasticActor::Damage(const vector3di* pnt)
+{
+	//TODO
+}
+
 SPABase PlasticActor::GetStats(bool current)
 {
 	if (current) return curr;

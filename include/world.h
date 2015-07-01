@@ -169,7 +169,7 @@ public:
 	void LogMsg(const char* tag);
 
 	///Fires at a given point.
-	bool FireTo(const vector3di pnt);
+	bool FireTo(const vector3di pnt, SWRayObjIntersect* isc);
 
 	///Main events processing facility.
 	void ProcessEvents(SGUIEvent* e);

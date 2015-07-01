@@ -380,10 +380,44 @@ void PlasticWorld::LogMsg(const char* tag)
 		hud->PutStrToLog(msgsys->GetMessage(tag));
 }
 
-bool PlasticWorld::FireTo(const vector3di pnt)
+bool PlasticWorld::FireTo(const vector3di pnt, SWRayObjIntersect* isc)
 {
-	//TODO
+	VModel* mod;
+	PlasticActor* npc;
+	voxel v;
+
 	dbg_print("Fire to [%d %d %d]",pnt.X,pnt.Y,pnt.Z);
+
+	data->WriteLock();
+
+	if (!isc) {
+		//detect point data
+		data->IntersectModel(&pnt,&mod,false);
+		npc = (mod)? society->GetActor(mod):NULL;
+	} else {
+		//get already detected data
+		mod = isc->model;
+		npc = isc->actor;
+	}
+
+	//Commit destructive action
+	if (npc) {
+		//to an actor
+		npc->Damage(&pnt);
+
+	} else if (mod) {
+		//to a dynamic model
+
+		//FIXME: temporary solution
+		v = mod->GetVoxelAt(&pnt);
+		if (v) mod->HideVoxels(v,true);
+
+	} else {
+		//to a static world
+		//TODO
+	}
+
+	data->WriteUnlock();
 	return true;
 }
 
