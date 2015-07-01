@@ -566,30 +566,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 
 	case GUIEV_MOUSE:
 		/* Mouse */
-#if 0
-		if (e->m.bstate & GUIMOUS_LEFT) {
-			curso.X = e->m.x;
-			curso.Y = e->m.y;
-
-			//FIXME: debug only
-			ScreenRay(curso);
-			x = cinters.pnt;
-			if (cinters.model) {
-				if (cinters.model == PC->GetModel()) {
-					hud->PutStrToLog(msgsys->GetMessage("SELFPOINT_LOG"));
-				} else if (cinters.actor) {
-					msgsys->SetActorName(cinters.actor->GetAttributes().name);
-					if (cinters.actor->GetAttributes().female)
-						hud->PutStrToLog(msgsys->GetMessage("ACTRESS_LOG"));
-					else
-						hud->PutStrToLog(msgsys->GetMessage("ACTOR_LOG"));
-				} else
-					hud->PrintStrToLog("%d:%d->%d:%d:%d (%p)",curso.X,curso.Y,x.X,x.Y,x.Z,cinters.model);
-			} else
-				hud->PrintStrToLog("%d:%d->%d:%d:%d",curso.X,curso.Y,x.X,x.Y,x.Z);
-			gui->SetCursorPos(curso.X,curso.Y);
-		}
-#endif
+		/* Nothing to do now */
 		break;
 
 	case GUIEV_CTLBACK:

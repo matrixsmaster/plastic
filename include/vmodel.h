@@ -27,7 +27,7 @@
 #include "vobject.h"
 
 #define VOXMARKERLEN 64
-#define VOXMARKERFMT "%c = %63[^\n]"
+#define VOXMARKERFMT "%c = %63[^\n]\n"
 
 struct SVoxCharPair {
 	char c;

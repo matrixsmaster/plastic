@@ -26,6 +26,7 @@
 
 
 #define NUMBODTYPE 3
+#define NUMBODPART 17
 #define NUMCLASSES 10
 
 //Basic types of robotic bodies
@@ -34,6 +35,27 @@ enum EPABodyType {
 	PBOD_ELMECH = 1,
 	PBOD_PNEUMO = 2,
 	PBOD_HYDROL = 4
+};
+
+//Basic types of body parts
+enum EPABodyPartType {
+	PBP_HEAD,
+	PBP_NECK,
+	PBP_CHEST,
+	PBP_WAIST,
+	PBP_PELVIS,
+	PBP_LUPARM,
+	PBP_LLWARM,
+	PBP_LHAND,
+	PBP_RUPARM,
+	PBP_RLWARM,
+	PBP_RHAND,
+	PBP_LUPLEG,
+	PBP_LLWLEG,
+	PBP_LFOOT,
+	PBP_RUPLEG,
+	PBP_RLWLEG,
+	PBP_RFOOT
 };
 
 //Basic classes of actors (used to determine initial basic values and actor's traits)
@@ -91,38 +113,7 @@ struct SPAAttrib {
 	char model[MAXPATHLEN];		//Actor's model
 };
 
-//Class to string conversion data
-struct SEPACRecord {
-	EPAClass c;
-	const char* s;
-};
-
-static const SEPACRecord paclass_to_str[NUMCLASSES+1] = {
-		{ PCLS_INQUISITOR,	"Inquisitor" },
-		{ PCLS_ROGUE,		"Rogue" },
-		{ PCLS_GUARD,		"Guard" },
-		{ PCLS_SEXBOT,		"Sexbot" },
-		{ PCLS_COMMONER,	"Commoner" },
-		{ PCLS_MAID,		"Maid" },
-		{ PCLS_NOBLE,		"Noble" },
-		{ PCLS_MECHANIC,	"Mechanic" },
-		{ PCLS_SMUGGLER,	"Smuggler" },
-		{ PCLS_TRADER,		"Merchant" },
-		{ PCLS_NONE,		"Nobody" },
-};
-
-//Body type to string conversion data
-struct SEPABRecord {
-	EPABodyType b;
-	const char* s;
-};
-
-static const SEPABRecord pabody_to_str[NUMBODTYPE] = {
-		{ PBOD_ELMECH,	"Electromech" },
-		{ PBOD_PNEUMO,	"Pneumatic" },
-		{ PBOD_HYDROL,	"Hydraulic" },
-};
-
+//Actor's portrait size
 #define ACTPORTRAITW 30
 #define ACTPORTRAITH 20
 
@@ -143,5 +134,40 @@ struct SPAFileHeader {
 	bool have_portrait;
 	int port_w,port_h;
 };
+
+/* ********************* CONVERSION DATA ********************* */
+
+//Body type to string conversion data
+struct SEPABRecord {
+	EPABodyType b;
+	const char* s;
+};
+
+static const SEPABRecord pabody_to_str[NUMBODTYPE] = {
+		{ PBOD_ELMECH,	"Electromech" },
+		{ PBOD_PNEUMO,	"Pneumatic" },
+		{ PBOD_HYDROL,	"Hydraulic" },
+};
+
+//Class to string conversion data
+struct SEPACRecord {
+	EPAClass c;
+	const char* s;
+};
+
+static const SEPACRecord paclass_to_str[NUMCLASSES+1] = {
+		{ PCLS_INQUISITOR,	"Inquisitor" },
+		{ PCLS_ROGUE,		"Rogue" },
+		{ PCLS_GUARD,		"Guard" },
+		{ PCLS_SEXBOT,		"Sexbot" },
+		{ PCLS_COMMONER,	"Commoner" },
+		{ PCLS_MAID,		"Maid" },
+		{ PCLS_NOBLE,		"Noble" },
+		{ PCLS_MECHANIC,	"Mechanic" },
+		{ PCLS_SMUGGLER,	"Smuggler" },
+		{ PCLS_TRADER,		"Merchant" },
+		{ PCLS_NONE,		"Nobody" },
+};
+
 
 #endif /* ACTORTYPES_H_ */

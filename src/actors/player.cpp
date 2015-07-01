@@ -84,7 +84,7 @@ Player::Player(SPAAttrib s, DataPipe* pptr) :
 	pptr->GetIniDataC(KEYBINDNAME,"WHEEL_VERT",tmp,sizeof(tmp));
 	rot_ver = mmask_by_str(tmp);
 
-	rspd = 4; //FIXME: debug
+	rspd = 6; //FIXME: debug
 }
 
 Player::~Player()

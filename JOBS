@@ -8,8 +8,6 @@ Implement DataPipe chnuks mapping on load				| assigned	|
 ---------------------------------------------------------------------------------------
 Gather portrait generation sprites						|			| assigned
 ---------------------------------------------------------------------------------------
-Implement actors limbs mechanics						| assigned	|
----------------------------------------------------------------------------------------
 Finish WorldGen											| assigned	|
 ---------------------------------------------------------------------------------------
 Add wearable inventory items sub-class					| assigned	|
@@ -23,6 +21,8 @@ PHY Gravity												|			| in progr
 Add object view window									| in progr	|
 ---------------------------------------------------------------------------------------
 Add voxel destroying test for combat mode				| in progr	|
+---------------------------------------------------------------------------------------
+Implement actors limbs mechanics						| in progr	|
 ---------------------------------------------------------------------------------------
 Test 'tup' as a temporary build system					| stall, meeting unavoidable
 ---------------------------------------------------------------------------------------
