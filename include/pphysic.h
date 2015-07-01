@@ -42,7 +42,6 @@ struct SPPCollision {
 	int depth;
 	bool no_collision;
 	SPPModelRec* next_obj;
-//	bool contact;
 };
 
 class PlasticPhysics {
@@ -51,8 +50,8 @@ private:
 	volatile bool locked;
 	PPModVec mods;
 
-	bool GetSurroundingVox(const SPPModelRec* mod, vector3di p);
-	void ResolveColision();
+	bool CheckSurroundingVox(const vector3di p);
+	vector3di ResolveCollision(const SPPCollision ccol, const vector3di v);
 	bool Contact(const SPPModelRec* mod);
 
 public:

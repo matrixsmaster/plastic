@@ -35,9 +35,8 @@ PlasticPhysics::~PlasticPhysics()
 }
 
 
-bool PlasticPhysics::GetSurroundingVox(const SPPModelRec* mod, vector3di p)
+bool PlasticPhysics::CheckSurroundingVox(const vector3di p)
 {
-//	voxel sv,ov;
 	vector3di cp = p;
 
 	//FIXME
@@ -72,21 +71,17 @@ bool PlasticPhysics::GetSurroundingVox(const SPPModelRec* mod, vector3di p)
 
 bool PlasticPhysics::Contact(const SPPModelRec* mod)
 {
-	//TODO
 	int b;				//bound side
-	voxel ov;		//scene voxel, object voxel
+	voxel ov;			//scene voxel, object voxel
 	vector3di sp,p, cp;	//scene center point, object point, contact point
 	bool contact;
 	int sx,sy,sz,ex,ey,ez;
 
 	contact = false;
 
-	//FIXME
-
 	//Getting bound side and central position of model
 	b = mod->modptr->GetBoundSide();
 	sp = mod->modptr->GetSPos();
-
 
 	//FIXME search into the cube of the model (border - 1)
 
@@ -98,14 +93,14 @@ bool PlasticPhysics::Contact(const SPPModelRec* mod)
 	ey = sp.Y + b/2;
 	ez = sp.Z + b/2;
 
-//	p.Z = sp.Z - b/2;
 	for (p.Z = sz; p.Z < ez; ++(p.Z)) {
 		for (p.X = sx; p.X < ex; ++(p.X)) {
 			for (p.Y = sy; p.Y < ey; ++(p.Y)) {
 				//Get voxel from model
 				ov = mod->modptr->GetVoxelAt(&p);
 				if (ov)
-					if (GetSurroundingVox(mod, p)) {
+					//Check surrounding voxels
+					if (CheckSurroundingVox(p)) {
 						contact = true;
 						break;
 					}
@@ -127,12 +122,10 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 	int b;				//bound side
 	voxel sv,ov;		//scene voxel, object voxel
 	vector3di sp,p, cp;	//scene center point, object point, contact point
-	bool contact;
 	int sx,sy,sz,ex,ey,ez;
 
-	res.no_collision = true; //FIXME
+	res.no_collision = true;
 	res.depth = 0;
-	contact = false;
 
 	//Getting bound side and central position of model
 	b = mod->modptr->GetBoundSide();
@@ -155,19 +148,19 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 	for (p.X = sx; p.X < ex; ++(p.X)) {
 		for (p.Y = sy; p.Y < ey; ++(p.Y)) {
 			for (p.Z = sz; p.Z < ez; ++(p.Z)) {
-					//Get voxel from scene
-					sv = pipe->GetVoxel(&p, true);
-					//Get voxel from model
-					ov = mod->modptr->GetVoxelAt(&p);
 
+				//Get voxel from scene
+				sv = pipe->GetVoxel(&p, true);
+				//Get voxel from model
+				ov = mod->modptr->GetVoxelAt(&p);
 
-					if (sv && ov && res.no_collision) {
-						//Collision detected.
-						res.no_collision = false;
-						res.start = p;
-						res.depth = 1;
-						break;
-					}
+				if (sv && ov && res.no_collision) {
+					//Collision detected.
+					res.no_collision = false;
+					res.start = p;
+					res.depth = 1;
+					break;
+				}
 			}
 			if (!res.no_collision) break;
 		}
@@ -177,14 +170,25 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 //	if (!res.no_collision)
 //		dbg_print("[PHY] Collision: %d, start [ %d %d %d ], depth = %d, (%p)", res.no_collision,
 //				res.start.X, res.start.Y, res.start.Z, res.depth, mod->modptr);
-//	if (contact)
-//		dbg_print("[PHY] Contact on [ %d %d %d ] voxel (%p)", cp.X, cp.Y, cp.Z, mod->modptr);
 	return res;
 }
 
-void PlasticPhysics::ResolveColision()
+vector3di PlasticPhysics::ResolveCollision(const SPPCollision ccol, const vector3di v)
 {
-	//TODO
+	//vector indicating collision
+	vector3di b_s = ccol.start - v;
+
+	//normalization of the vector
+	vector3di b_ss = b_s.Normalize();
+
+	//take the offset
+	vector3di c_s = b_ss * ccol.depth;
+
+	//change the direction of the vector
+	c_s *= -1;
+
+	//displace vector and returns it
+	return (c_s + v);
 }
 
 
@@ -195,10 +199,7 @@ void PlasticPhysics::Quantum()
 	SPPModelRec cur;
 	SPPCollision ccol;
 	VModVec* fmod = pipe->GetModels();
-	vector3di newpos;
 	bool sys_changed = false;
-
-	bool contact = false;
 
 	/* Check update lock */
 	if (locked) return;
@@ -206,14 +207,13 @@ void PlasticPhysics::Quantum()
 	/* Check and update models presence */
 	pipe->ReadLock();
 
-//	dbg_print("Models quantity: %d", fmod->size());
-
 	im = mods.begin();
 	for (iv = fmod->begin(); iv < fmod->end(); ++iv) {
 		//if a foreign model vector is larger than ours, add new model
 		if (im >= mods.end()) {
 			cur.modptr = *iv;
 			cur.oldspos = (*iv)->GetPos();
+			cur.newpos = cur.oldspos;
 			cur.moved = false;
 			cur.changed = false;
 			cur.contact = false;
@@ -228,6 +228,7 @@ void PlasticPhysics::Quantum()
 			im->changed = false; //reset flag
 			if ((*iv)->GetPos() != im->oldspos) {
 				im->oldspos = (*iv)->GetPos();
+				im->newpos = im->oldspos;
 				im->moved = true;
 			}
 			++im;
@@ -248,50 +249,30 @@ void PlasticPhysics::Quantum()
 	iv = fmod->begin();
 	for (im = mods.begin(); im < mods.end(); ++im) {
 		//skip contacting objects, which isn't moved
-		im->newpos = im->oldspos;
 		if ((!im->changed) && (!im->moved) && (im->contact)) continue;
 
-		//Search collision and contact with surface
+		//Search collision and search contact with surface
 		ccol = Collision(&(*im));
-		contact = Contact(&(*im));
+		im->contact = Contact(&(*im));
 
-		if (ccol.no_collision && contact) {
+		if (ccol.no_collision && im->contact) {
 			im->changed = false;
 			continue;
 		}
 
-#if 0
-		if (ccol.no_collision) {
-			im->changed = false;
-			continue;
-		}
-#endif
-
-		/* Resolve collision with a depth at one voxel. */
-		if (!ccol.no_collision) {
-			//vector indicating collision
-			vector3di b_s = ccol.start - im->oldspos;
-
-			//normalization of the vector
-			vector3di b_ss = b_s.Normalize();
-
-			//take the offset
-			vector3di c_s = b_ss * ccol.depth;
-
-			//change the direction of the vector
-			c_s *= -1;
-
-			//displace vector
-			im->newpos = c_s + im->oldspos;
-		}
-
-
-		//TODO: gravity
-
-		if (!contact) {
+		//gravity
+		if (!im->contact && ccol.no_collision) {
 			vector3di g(0,0,-1);
 			im->newpos += g;
 		}
+
+		/* Resolve collision with a depth of one voxel. */
+		if (!ccol.no_collision) {
+			im->newpos = ResolveCollision(ccol, im->oldspos);
+		}
+
+		//TODO: gravity
+
 
 		//TODO: move object
 
@@ -309,7 +290,7 @@ void PlasticPhysics::Quantum()
 	for (iv = fmod->begin(); iv != fmod->end(); ++iv, ++im) {
 		//don't forget to make sure we're still in sync
 		if ((*iv) != im->modptr) {
-			dbg_print("[PHY] Early return due to model vectors is out of sync");
+			dbg_print("[PHY] Early return due to models vector is out of sync");
 			pipe->ReadUnlock();
 			return;
 		}
@@ -319,8 +300,6 @@ void PlasticPhysics::Quantum()
 
 		//actually update the model position
 		im->modptr->SetPos(im->newpos);
-//		if (im->moved) im->modptr->SetPos(im->newpos);
-//		else im->modptr->SetPos(im->oldspos);
 	}
 
 	pipe->ReadUnlock();
