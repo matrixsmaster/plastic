@@ -88,18 +88,24 @@ void DataPipe::PurgeModels()
 	WriteUnlock();
 }
 
-voxel DataPipe::IntersectModel(const vector3di* p, VModel** obj, const bool autolock)
+voxel DataPipe::IntersectModel(const vector3di* p, VModel** obj, const VModel* excl, const bool autolock)
 {
 	voxel r;
 	VModVec::iterator mi;
 
 	if (autolock) ReadLock();
 
+	//Run search
 	if (!objs.empty()) {
 		for (mi = objs.begin(); mi != objs.end(); ++mi) {
+			//Skip excluded model
+			if ((excl) && ((*mi) == excl)) continue;
+			//Check bounding box intersection
 			if (IsPntInsideCubeI(p,(*mi)->GetSPosP(),(*mi)->GetBoundSide())) {
+				//Check point intersection
 				r = (*mi)->GetVoxelAt(p);
 				if (r) {
+					//We've found one!
 					if (autolock) ReadUnlock();
 					if (obj) *obj = *mi;
 					return r;
@@ -108,6 +114,7 @@ voxel DataPipe::IntersectModel(const vector3di* p, VModel** obj, const bool auto
 		}
 	}
 
+	//Nothing found
 	if (autolock) ReadUnlock();
 	if (obj) *obj = NULL;
 	return 0;

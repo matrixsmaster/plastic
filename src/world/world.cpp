@@ -367,7 +367,7 @@ SWRayObjIntersect* PlasticWorld::ScreenRay(const vector2di p)
 	cinters.model = NULL;
 	cinters.actor = NULL;
 	if (cinters.pnt != vector3di(-1)) {
-		data->IntersectModel(&(cinters.pnt),&(cinters.model),true);
+		data->IntersectModel(&(cinters.pnt),&(cinters.model),NULL,true);
 		if (cinters.model)
 			cinters.actor = society->GetActor(cinters.model);
 	}
@@ -392,7 +392,7 @@ bool PlasticWorld::FireTo(const vector3di pnt, SWRayObjIntersect* isc)
 
 	if (!isc) {
 		//detect point data
-		data->IntersectModel(&pnt,&mod,false);
+		data->IntersectModel(&pnt,&mod,NULL,false);
 		npc = (mod)? society->GetActor(mod):NULL;
 	} else {
 		//get already detected data

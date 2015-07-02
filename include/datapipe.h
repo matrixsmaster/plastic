@@ -291,7 +291,8 @@ public:
 
 	///Find which dynamic object have a non-empty voxel at given co-ords.
 	///Return voxel code and fills object pointer if supplied.
-	virtual voxel IntersectModel(const vector3di* p, VModel** obj, const bool autolock);
+	///Excludes model 'excl' from search if specified.
+	virtual voxel IntersectModel(const vector3di* p, VModel** obj, const VModel* excl, const bool autolock);
 
 	///Adds an existing model to working set.
 	virtual void AddModel(VModel* obj);

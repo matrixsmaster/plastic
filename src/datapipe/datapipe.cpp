@@ -365,7 +365,7 @@ voxel DataPipe::GetVoxel(const vector3di* p, bool dynskip)
 
 	/* Check for dynamic objects */
 	if (!dynskip) {
-		tmp = IntersectModel(p,NULL,false);
+		tmp = IntersectModel(p,NULL,NULL,false);
 		if (tmp) {
 			DP_GETVOX_UNLOCK;
 			return tmp;

@@ -39,5 +39,5 @@ DataPipeDummy::~DataPipeDummy()
 
 voxel DataPipeDummy::GetVoxel(const vector3di* p)
 {
-	return IntersectModel(p,NULL,true);
+	return IntersectModel(p,NULL,NULL,true);
 }
