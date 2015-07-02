@@ -20,6 +20,8 @@
 #include "pphysic.h"
 #include "debug.h"
 
+#define CONTACT 0
+
 using namespace std;
 
 
@@ -121,8 +123,9 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 	SPPCollision res;
 	int b;				//bound side
 	voxel sv,ov;		//scene voxel, object voxel
-	vector3di sp,p, cp;	//scene center point, object point, contact point
+	vector3di sp,p;	//scene center point, voxel point
 	int sx,sy,sz,ex,ey,ez;
+	VModel* misc;
 
 	res.no_collision = true;
 	res.depth = 0;
@@ -130,7 +133,6 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 	//Getting bound side and central position of model
 	b = mod->modptr->GetBoundSide();
 	sp = mod->modptr->GetSPos();
-
 
 	//FIXME search into the cube of the model (border - 1)
 
@@ -151,6 +153,8 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 
 				//Get voxel from scene
 				sv = pipe->GetVoxel(&p, true);
+				if (!sv)
+					sv = pipe->IntersectModel(&p,&misc,mod->modptr,false);
 				//Get voxel from model
 				ov = mod->modptr->GetVoxelAt(&p);
 
@@ -167,9 +171,9 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 		if (!res.no_collision) break;
 	}
 
-//	if (!res.no_collision)
-//		dbg_print("[PHY] Collision: %d, start [ %d %d %d ], depth = %d, (%p)", res.no_collision,
-//				res.start.X, res.start.Y, res.start.Z, res.depth, mod->modptr);
+	if (!res.no_collision)
+		dbg_print("[PHY] Collision: %d, start [ %d %d %d ], depth = %d, boundS = %d, (%p)", res.no_collision,
+				res.start.X, res.start.Y, res.start.Z, res.depth, b, mod->modptr);
 	return res;
 }
 
@@ -216,7 +220,11 @@ void PlasticPhysics::Quantum()
 			cur.newpos = cur.oldspos;
 			cur.moved = false;
 			cur.changed = false;
+#ifndef CONTACT
 			cur.contact = false;
+#else
+			cur.contact = true;
+#endif
 			mods.push_back(cur);
 			im = mods.end();
 			dbg_print("[PHY] Added model %p",(im-1)->modptr);
@@ -242,7 +250,6 @@ void PlasticPhysics::Quantum()
 	//delete remainder of the models vector (if it exists)
 	if (im < mods.end()) mods.erase(im,mods.end());
 
-//	dbg_print("fmod.s = %u, mods.s = %u", fmod->size(), mods.size());
 	if (fmod->size() != mods.size()) abort(); //FIXME: debug only
 
 	/* Calculate collisions */
@@ -253,18 +260,26 @@ void PlasticPhysics::Quantum()
 
 		//Search collision and search contact with surface
 		ccol = Collision(&(*im));
+#ifndef CONTACT
 		im->contact = Contact(&(*im));
+#endif
 
-		if (ccol.no_collision && im->contact) {
+		if (ccol.no_collision
+#ifndef CONTACT
+				&& im->contact) {
+#else
+			) {
+#endif
 			im->changed = false;
 			continue;
 		}
-
-		//gravity
+#ifndef CONTACT
+		/* gravity */
 		if (!im->contact && ccol.no_collision) {
 			vector3di g(0,0,-1);
 			im->newpos += g;
 		}
+#endif
 
 		/* Resolve collision with a depth of one voxel. */
 		if (!ccol.no_collision) {
