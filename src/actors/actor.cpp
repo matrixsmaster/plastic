@@ -373,6 +373,7 @@ void PlasticActor::Damage(const vector3di* pnt)
 		vci = pipe->GetVInfo(vc);
 		if (vci->mark) {
 			dbg_print("PA::Damage(): vci mark = '%s'",vci->mark);
+
 			//find the corresponding body part
 			for (i = 0; i < NUMBODPART; i++) {
 				for (j = 0; j < PABPNUMALIASES; j++) {
@@ -383,8 +384,10 @@ void PlasticActor::Damage(const vector3di* pnt)
 					}
 				}
 			}
+
 			if (bp != PBP_INVALID) {
 				dbg_print("PA::Damage(): BP = '%s'",pabtype_to_str[bp].aka[0]);
+
 				//FIXME: debug
 				limbs[bp] += dam;
 				UpdateLimbs();
@@ -396,16 +399,37 @@ void PlasticActor::Damage(const vector3di* pnt)
 	curr.HP -= dam;
 }
 
-void PlasticActor::UpdateLimbs()
+void PlasticActor::RemoveLimb(EPABodyPartType x)
 {
 	int i,j;
 
+	dbg_print("PA::RemoveLimb(): x = '%s'",pabtype_to_str[x].aka[0]);
+
+	//TODO: check the limb is already hidden
+
+	for (i = 0; i < PABPNUMALIASES; i++)
+		model->HideVoxels(pabtype_to_str[x].aka[i],true);
+
+	for (i = 0; pabp_tree[i].t != PBP_INVALID; i++) {
+		//search for a position of a current limb
+		if (pabp_tree[i].t != x) continue;
+
+		//remove children
+		for (j = 0; j < PABPHRNUMCHILDS; j++) {
+			if (pabp_tree[i].n[j] == PBP_INVALID) break;
+			RemoveLimb(pabp_tree[i].n[j]);
+		}
+	}
+}
+
+void PlasticActor::UpdateLimbs()
+{
+	int i;
+
 	if (!model) return;
 	for (i = 0; i < NUMBODPART; i++) {
-		if (limbs[i] >= PAMAXLIMBDAM) {
-			for (j = 0; j < PABPNUMALIASES; j++)
-				model->HideVoxels(pabtype_to_str[i].aka[j],true);
-		}
+		if (limbs[i] >= PAMAXLIMBDAM)
+			RemoveLimb((EPABodyPartType)i);
 	}
 }
 

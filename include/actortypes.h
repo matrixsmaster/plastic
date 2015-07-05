@@ -202,6 +202,29 @@ static const SPACRecord paclass_to_str[NUMCLASSES+1] = {
 
 /* ********************* OTHER DATA ********************* */
 
-//struct SPA
+//Body parts hierarchy node record
+#define PABPHRNUMCHILDS 3
+
+struct SPABPHierarchy {
+	EPABodyPartType t;
+	EPABodyPartType n[PABPHRNUMCHILDS];
+};
+
+static const SPABPHierarchy pabp_tree[14] = {
+		{ PBP_HEAD,		{ PBP_NECK, PBP_INVALID } },
+		{ PBP_NECK,		{ PBP_CHEST, PBP_INVALID } },
+		{ PBP_CHEST,	{ PBP_WAIST, PBP_LUPARM, PBP_RUPARM } },
+		{ PBP_WAIST,	{ PBP_PELVIS, PBP_INVALID } },
+		{ PBP_PELVIS,	{ PBP_LUPLEG, PBP_RUPLEG, PBP_INVALID } },
+		{ PBP_LUPLEG,	{ PBP_LLWLEG, PBP_INVALID } },
+		{ PBP_LLWLEG,	{ PBP_LFOOT, PBP_INVALID } },
+		{ PBP_RUPLEG,	{ PBP_RLWLEG, PBP_INVALID } },
+		{ PBP_RLWLEG,	{ PBP_RFOOT, PBP_INVALID } },
+		{ PBP_LUPARM,	{ PBP_LLWARM, PBP_INVALID } },
+		{ PBP_LLWARM,	{ PBP_LHAND, PBP_INVALID } },
+		{ PBP_RUPARM,	{ PBP_RLWARM, PBP_INVALID } },
+		{ PBP_RLWARM,	{ PBP_RHAND, PBP_INVALID } },
+		{ PBP_INVALID,	{ PBP_INVALID } }
+};
 
 #endif /* ACTORTYPES_H_ */

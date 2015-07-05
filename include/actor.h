@@ -60,6 +60,7 @@ protected:
 
 	void InitVars();
 	void RmPortrait();
+	void RemoveLimb(EPABodyPartType x);
 	void UpdateLimbs();
 
 public:
