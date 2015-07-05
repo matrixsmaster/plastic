@@ -124,6 +124,9 @@ bool PlasticActor::SerializeToFile(FILE* f)
 	fwrite(&base,sizeof(base),1,f);
 	fwrite(&curr,sizeof(curr),1,f);
 
+	//Write limbs state
+	fwrite(limbs,sizeof(limbs),1,f);
+
 	//Write portrait image
 	if (portrait)
 		fwrite(portrait->GetImage(),sizeof(SGUIPixel),hdr.port_w*hdr.port_h,f);
@@ -150,6 +153,9 @@ bool PlasticActor::DeserializeFromFile(FILE* f)
 	if (fread(&attrib,sizeof(attrib),1,f) < 1) return false;
 	if (fread(&base,sizeof(base),1,f) < 1) return false;
 	if (fread(&curr,sizeof(curr),1,f) < 1) return false;
+
+	//read limbs state
+	if (fread(limbs,sizeof(limbs),1,f) < 1) return false;
 
 	//get actor's portrait
 	if (hdr.have_portrait) {
@@ -320,6 +326,9 @@ bool PlasticActor::Spawn(PlasticWorld* wrld)
 	//Replace old face voxel
 	model->ReplaceVoxel("face",headtxd);
 
+	//Update limbs state
+	UpdateLimbs();
+
 	//Good to go
 	return true;
 }
@@ -356,7 +365,7 @@ void PlasticActor::Damage(const vector3di* pnt)
 	int dam;
 
 	//TODO: calc resistance
-	dam = 1;
+	dam = 10;
 
 	if (model && pnt) {
 		//commit 3d-visible damage
@@ -378,16 +387,26 @@ void PlasticActor::Damage(const vector3di* pnt)
 				dbg_print("PA::Damage(): BP = '%s'",pabtype_to_str[bp].aka[0]);
 				//FIXME: debug
 				limbs[bp] += dam;
-				if (limbs[bp] > 5) {
-					for (j = 0; j < PABPNUMALIASES; j++)
-						model->HideVoxels(pabtype_to_str[bp].aka[j],true);
-				}
+				UpdateLimbs();
 			}
 		}
 	}
 
 	//TODO: calc actual damage
 	curr.HP -= dam;
+}
+
+void PlasticActor::UpdateLimbs()
+{
+	int i,j;
+
+	if (!model) return;
+	for (i = 0; i < NUMBODPART; i++) {
+		if (limbs[i] >= PAMAXLIMBDAM) {
+			for (j = 0; j < PABPNUMALIASES; j++)
+				model->HideVoxels(pabtype_to_str[i].aka[j],true);
+		}
+	}
 }
 
 SPABase PlasticActor::GetStats(bool current)

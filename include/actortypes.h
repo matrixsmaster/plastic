@@ -59,6 +59,8 @@ enum EPABodyPartType {
 	PBP_RFOOT
 };
 
+#define PAMAXLIMBDAM 50
+
 //Basic classes of actors (used to determine initial basic values and actor's traits)
 enum EPAClass {
 	PCLS_INQUISITOR,
@@ -139,12 +141,12 @@ struct SPAFileHeader {
 /* ********************* CONVERSION DATA ********************* */
 
 //Body type to string conversion data
-struct SEPABRecord {
+struct SPABRecord {
 	EPABodyType b;
 	const char* s;
 };
 
-static const SEPABRecord pabody_to_str[NUMBODTYPE] = {
+static const SPABRecord pabody_to_str[NUMBODTYPE] = {
 		{ PBOD_ELMECH,	"Electromech" },
 		{ PBOD_PNEUMO,	"Pneumatic" },
 		{ PBOD_HYDROL,	"Hydraulic" },
@@ -153,12 +155,12 @@ static const SEPABRecord pabody_to_str[NUMBODTYPE] = {
 //Body part to string conversion data
 #define PABPNUMALIASES 3
 
-struct SEPABPRecord {
+struct SPABPRecord {
 	EPABodyPartType bt;
 	const char* aka[PABPNUMALIASES];
 };
 
-static const SEPABPRecord pabtype_to_str[NUMBODPART] = {
+static const SPABPRecord pabtype_to_str[NUMBODPART] = {
 		{ PBP_HEAD,		{ "head","hair","face" }, },
 		{ PBP_NECK,		{ "neck",NULL,NULL }, },
 		{ PBP_CHEST,	{ "chest","boobs",NULL }, },
@@ -179,12 +181,12 @@ static const SEPABPRecord pabtype_to_str[NUMBODPART] = {
 };
 
 //Class to string conversion data
-struct SEPACRecord {
+struct SPACRecord {
 	EPAClass c;
 	const char* s;
 };
 
-static const SEPACRecord paclass_to_str[NUMCLASSES+1] = {
+static const SPACRecord paclass_to_str[NUMCLASSES+1] = {
 		{ PCLS_INQUISITOR,	"Inquisitor" },
 		{ PCLS_ROGUE,		"Rogue" },
 		{ PCLS_GUARD,		"Guard" },
@@ -198,5 +200,8 @@ static const SEPACRecord paclass_to_str[NUMCLASSES+1] = {
 		{ PCLS_NONE,		"Nobody" },
 };
 
+/* ********************* OTHER DATA ********************* */
+
+//struct SPA
 
 #endif /* ACTORTYPES_H_ */

@@ -60,6 +60,7 @@ protected:
 
 	void InitVars();
 	void RmPortrait();
+	void UpdateLimbs();
 
 public:
 	PlasticActor(SPAAttrib a, DataPipe* pptr);

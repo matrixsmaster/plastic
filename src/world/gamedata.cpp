@@ -28,6 +28,9 @@ bool PlasticWorld::NewGame()
 
 	/* Reset savegame data */
 	memset(&gamesave,0,sizeof(gamesave));
+	gamesave.verA = VERMAJOR;
+	gamesave.verB = VERMINOR;
+	gamesave.verC = VERSUBVR;
 
 	/* Init world generator */
 	wgen->NewMap(data->GetMapSeed());
@@ -67,8 +70,14 @@ bool PlasticWorld::LoadGame()
 
 	plr.push_back(PC);
 
-	/* Load header and landscape */
+	/* Load game header and check its version */
 	if (!((hptr = data->LoadGameHeader()))) return false;
+	if (	(hptr->verA != VERMAJOR) ||
+			(hptr->verB != VERMINOR) ||
+			(hptr->verC != VERSUBVR) )
+		return false;
+
+	/* Load static world data */
 	if (!data->LoadStaticWorld()) return false;
 
 	/* Init Player */
