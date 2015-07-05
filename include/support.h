@@ -41,4 +41,7 @@ SCTriple vecftotriple(const vector3d s);
 ///Get mouse event mask by string representation.
 mmask_t mmask_by_str(const char* s);
 
+///Local implementation of safe strcpy() with auto-allocating feature.
+char* mstrnacpy(char* dest, const char* src, size_t n);
+
 #endif /* SUPPORT_H_ */

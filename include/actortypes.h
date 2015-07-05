@@ -39,7 +39,8 @@ enum EPABodyType {
 
 //Basic types of body parts
 enum EPABodyPartType {
-	PBP_HEAD,
+	PBP_INVALID = -1,
+	PBP_HEAD = 0,
 	PBP_NECK,
 	PBP_CHEST,
 	PBP_WAIST,
@@ -147,6 +148,34 @@ static const SEPABRecord pabody_to_str[NUMBODTYPE] = {
 		{ PBOD_ELMECH,	"Electromech" },
 		{ PBOD_PNEUMO,	"Pneumatic" },
 		{ PBOD_HYDROL,	"Hydraulic" },
+};
+
+//Body part to string conversion data
+#define PABPNUMALIASES 3
+
+struct SEPABPRecord {
+	EPABodyPartType bt;
+	const char* aka[PABPNUMALIASES];
+};
+
+static const SEPABPRecord pabtype_to_str[NUMBODPART] = {
+		{ PBP_HEAD,		{ "head","hair","face" }, },
+		{ PBP_NECK,		{ "neck",NULL,NULL }, },
+		{ PBP_CHEST,	{ "chest","boobs",NULL }, },
+		{ PBP_WAIST,	{ "waist",NULL,NULL }, },
+		{ PBP_PELVIS,	{ "pelvis",NULL,NULL }, },
+		{ PBP_LUPARM,	{ "LUA",NULL,NULL }, },
+		{ PBP_LLWARM,	{ "LLA",NULL,NULL }, },
+		{ PBP_LHAND,	{ "Lhand",NULL,NULL }, },
+		{ PBP_RUPARM,	{ "RUA",NULL,NULL }, },
+		{ PBP_RLWARM,	{ "RLA",NULL,NULL }, },
+		{ PBP_RHAND,	{ "Rhand",NULL,NULL }, },
+		{ PBP_LUPLEG,	{ "LUL",NULL,NULL }, },
+		{ PBP_LLWLEG,	{ "LLL",NULL,NULL }, },
+		{ PBP_LFOOT,	{ "Lfoot",NULL,NULL }, },
+		{ PBP_RUPLEG,	{ "RUL",NULL,NULL }, },
+		{ PBP_RLWLEG,	{ "RLL",NULL,NULL }, },
+		{ PBP_RFOOT,	{ "Rfoot",NULL,NULL }, },
 };
 
 //Class to string conversion data

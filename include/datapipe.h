@@ -275,6 +275,7 @@ public:
 
 	///Supply INI-file based data by INI name and field name.
 	void GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen);
+	char* GetIniDataC(const char* ininame, const char* inifield);
 	std::string GetIniDataS(const std::string ininame, const std::string inifield);
 
 	///Returns a pointer to models vector.

@@ -14,13 +14,13 @@ Add wearable inventory items sub-class					| assigned	|
 ---------------------------------------------------------------------------------------
 Speed up LVR fog by implementing look-up table			| assigned	|
 ---------------------------------------------------------------------------------------
+Add mouse position window filtering to CGUI PumpEvents	| assigned	|
+---------------------------------------------------------------------------------------
 PHY Collision detection									|			| in progr
 ---------------------------------------------------------------------------------------
 PHY Gravity												|			| in progr
 ---------------------------------------------------------------------------------------
 Add object view window									| in progr	|
----------------------------------------------------------------------------------------
-Add voxel destroying test for combat mode				| in progr	|
 ---------------------------------------------------------------------------------------
 Implement actors limbs mechanics						| in progr	|
 ---------------------------------------------------------------------------------------
@@ -53,4 +53,6 @@ Implement world gamedata saving and loading				| done		|
 LVR: Use FOV.Z instead of separate far plane distance	| done		|
 ---------------------------------------------------------------------------------------
 Add texturization settings to LVRconf					| done		|
+---------------------------------------------------------------------------------------
+Add voxel destroying test for combat mode				| done		|
 ---------------------------------------------------------------------------------------

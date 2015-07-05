@@ -1,4 +1,7 @@
-v.0.2 ----------------------------------------------------------
+v.0.4 (alpha) -----------------------------------------------------------------
+v.0.3 (pre-alpha) -------------------------------------------------------------
+
+v.0.2 (tech demo) -------------------------------------------------------------
 	Filled voxel table
 	Completed static world generation
 	Simple rigid physics (collisions and gravity)
@@ -8,7 +11,7 @@ v.0.2 ----------------------------------------------------------
 	Buildings and their generation
 	Working game load/save
 
-v.0.1 ----------------------------------------------------------
+v.0.1 (skeleton preview) ------------------------------------------------------
 OK	Fully working LVR (without lighting, though)
 OK	Working atmosphere (clouds and stars)
 OK	Some rigid actors

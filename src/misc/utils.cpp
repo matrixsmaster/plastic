@@ -351,8 +351,12 @@ bool argparser(int argc, char* argv[], SGameSettings* sets)
 		case 1: /* switch detected, reading first argument */
 			switch (curt) {
 			case GAT_ROOTDIR:
-				strncpy(sets->root,argv[i],MAXPATHLEN);
-				fsm = 0;
+				if (strlen(argv[i]) >= MAXPATHLEN) {
+					fsm = 100;
+				} else {
+					strncpy(sets->root,argv[i],MAXPATHLEN);
+					fsm = 0;
+				}
 				break;
 
 			case GAT_USESHELL:
@@ -381,8 +385,12 @@ bool argparser(int argc, char* argv[], SGameSettings* sets)
 				break;
 
 			case GAT_PLAYER:
-				strncpy(sets->PCData.name,argv[i],MAXACTNAMELEN);
-				fsm++;
+				if (strlen(argv[i]) >= MAXACTNAMELEN) {
+					fsm = 100;
+				} else {
+					strncpy(sets->PCData.name,argv[i],MAXACTNAMELEN);
+					fsm++;
+				}
 				break;
 
 			default:

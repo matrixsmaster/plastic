@@ -65,7 +65,14 @@ void DataPipe::GetIniDataC(const char* ininame, const char* inifield, char* dest
 	/* for use in old-styled code */
 	std::string nm(ininame), fl(inifield);
 	if ((!dest) || (maxlen < 2)) return;
-	strncpy(dest,GetIniDataS(nm,fl).c_str(),maxlen);
+	/* get information */
+	mstrnacpy(dest,GetIniDataS(nm,fl).c_str(),maxlen);
+}
+
+char* DataPipe::GetIniDataC(const char* ininame, const char* inifield)
+{
+	std::string nm(ininame), fl(inifield);
+	return (mstrnacpy(NULL,GetIniDataS(nm,fl).c_str(),0));
 }
 
 std::string DataPipe::GetIniDataS(const std::string ininame, const std::string inifield)

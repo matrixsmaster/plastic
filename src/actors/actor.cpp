@@ -23,7 +23,9 @@
 #include "actor.h"
 #include "actorhelpers.h"
 #include "world.h"
+#include "support.h"
 #include "debug.h"
+
 
 PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr) :
 		VSceneObject(), IGData()
@@ -83,6 +85,7 @@ void PlasticActor::InitVars()
 	anim = NULL;
 	world = NULL;
 	headtxd = 0;
+	memset(limbs,0,sizeof(limbs));
 }
 
 void PlasticActor::RmPortrait()
@@ -309,7 +312,7 @@ bool PlasticActor::Spawn(PlasticWorld* wrld)
 
 	//Register face voxel
 	nvi = *(pipe->GetVInfo("face")); //copy 'face' voxel
-	nvi.mark = NULL; //don't use the same mark
+	nvi.mark = mstrnacpy(NULL,nvi.mark,0); //copy the mark
 	nvi.not_used = false; //just in case
 	nvi.texture = portrait; //apply face texture
 	headtxd = pipe->AppendVoxel(&nvi);
@@ -346,7 +349,45 @@ void PlasticActor::Animate()
 
 void PlasticActor::Damage(const vector3di* pnt)
 {
-	//TODO
+	voxel vc;
+	const SVoxelInf* vci;
+	int i,j;
+	EPABodyPartType bp = PBP_INVALID;
+	int dam;
+
+	//TODO: calc resistance
+	dam = 1;
+
+	if (model && pnt) {
+		//commit 3d-visible damage
+		vc = model->GetVoxelAt(pnt);
+		vci = pipe->GetVInfo(vc);
+		if (vci->mark) {
+			dbg_print("PA::Damage(): vci mark = '%s'",vci->mark);
+			//find the corresponding body part
+			for (i = 0; i < NUMBODPART; i++) {
+				for (j = 0; j < PABPNUMALIASES; j++) {
+					if (!pabtype_to_str[i].aka[j]) break;
+					if (!strcmp(pabtype_to_str[i].aka[j],vci->mark)) {
+						bp = pabtype_to_str[i].bt;
+						break;
+					}
+				}
+			}
+			if (bp != PBP_INVALID) {
+				dbg_print("PA::Damage(): BP = '%s'",pabtype_to_str[bp].aka[0]);
+				//FIXME: debug
+				limbs[bp] += dam;
+				if (limbs[bp] > 5) {
+					for (j = 0; j < PABPNUMALIASES; j++)
+						model->HideVoxels(pabtype_to_str[bp].aka[j],true);
+				}
+			}
+		}
+	}
+
+	//TODO: calc actual damage
+	curr.HP -= dam;
 }
 
 SPABase PlasticActor::GetStats(bool current)

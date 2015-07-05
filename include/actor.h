@@ -56,6 +56,7 @@ protected:
 	bool portrait_reg;		//Actor's portrait registration flag
 	DAnimator* anim;		//Actor's animations
 	voxel headtxd;			//Textured head voxel id
+	int limbs[NUMBODPART];	//Limbs damage array
 
 	void InitVars();
 	void RmPortrait();
