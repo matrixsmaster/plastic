@@ -116,7 +116,8 @@ enum EDChunkStatus {
 	DPCHK_READY,
 	DPCHK_QUEUE,
 	DPCHK_LOADING,
-	DPCHK_ERROR
+	DPCHK_ERROR,
+	DPCHK_CHANGED
 };
 
 /* File data placement map record */

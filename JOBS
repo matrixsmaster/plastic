@@ -24,7 +24,7 @@ PHY Gravity												|			| in progr
 ---------------------------------------------------------------------------------------
 Add object view window									| in progr	|
 ---------------------------------------------------------------------------------------
-Test 'tup' as a temporary build system					| stall, meeting unavoidable
+Test 'tup' as a temporary build system					| done		|
 ---------------------------------------------------------------------------------------
 Implement some marks to use in voxel table				| done		|
 ---------------------------------------------------------------------------------------
