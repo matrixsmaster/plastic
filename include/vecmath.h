@@ -119,6 +119,8 @@ public:
 	CPoint3Di operator / (const CPoint3Di & div) const	{ return CPoint3Di((X/div.X),(Y/div.Y),(Z/div.Z)); }
 	bool operator == (const CPoint3Di & comp) const 	{ return ((X==comp.X) && (Y==comp.Y) && (Z==comp.Z)); }
 	bool operator != (const CPoint3Di & comp) const 	{ return ((X!=comp.X) || (Y!=comp.Y) || (Z!=comp.Z)); }
+//	bool operator  < (const CPoint3Di & comp) const		{ return (Module() < comp.Module()); }
+//	bool operator  > (const CPoint3Di & comp) const		{ return (Module() > comp.Module()); }
 	CPoint3D ToReal() const								{ return CPoint3D((double)X,(double)Y,(double)Z); }
 	T Module() const									{ return (T)round(sqrt(X*X + Y*Y + Z*Z)); }
 	T DotProduct(const CPoint3Di & s) const				{ return X*s.X + Y*s.Y + Z*s.Z; }

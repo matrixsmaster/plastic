@@ -100,11 +100,16 @@ bool DataPipe::LoadStaticWorld()
 
 bool DataPipe::SaveStaticWorld()
 {
+	unsigned i;
 	char tmp[MAXPATHLEN];
 
 	/* Save wgen map */
 	snprintf(tmp,MAXPATHLEN,WORLDMAPFNPAT,root);
 	wgen->SaveMap(tmp);
+
+	/* Save remaining chunks */
+	for (i = 0; i < HOLDCHUNKS; i++)
+		SaveChunk(i);
 
 	//TODO
 

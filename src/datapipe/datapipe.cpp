@@ -53,6 +53,7 @@ DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 	memset(chstat,0,sizeof(chstat));
 	memset(&voxeltab,0,sizeof(voxeltab));
 	allocated = 0;
+	chsavelast = 0;
 
 	wgen = NULL;
 	rammax = sets->rammax;
