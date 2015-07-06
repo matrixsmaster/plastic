@@ -23,7 +23,9 @@
 #include "actor.h"
 #include "actorhelpers.h"
 #include "world.h"
+#include "support.h"
 #include "debug.h"
+
 
 PlasticActor::PlasticActor(SPAAttrib a, DataPipe* pptr) :
 		VSceneObject(), IGData()
@@ -83,6 +85,7 @@ void PlasticActor::InitVars()
 	anim = NULL;
 	world = NULL;
 	headtxd = 0;
+	memset(limbs,0,sizeof(limbs));
 }
 
 void PlasticActor::RmPortrait()
@@ -121,6 +124,9 @@ bool PlasticActor::SerializeToFile(FILE* f)
 	fwrite(&base,sizeof(base),1,f);
 	fwrite(&curr,sizeof(curr),1,f);
 
+	//Write limbs state
+	fwrite(limbs,sizeof(limbs),1,f);
+
 	//Write portrait image
 	if (portrait)
 		fwrite(portrait->GetImage(),sizeof(SGUIPixel),hdr.port_w*hdr.port_h,f);
@@ -147,6 +153,9 @@ bool PlasticActor::DeserializeFromFile(FILE* f)
 	if (fread(&attrib,sizeof(attrib),1,f) < 1) return false;
 	if (fread(&base,sizeof(base),1,f) < 1) return false;
 	if (fread(&curr,sizeof(curr),1,f) < 1) return false;
+
+	//read limbs state
+	if (fread(limbs,sizeof(limbs),1,f) < 1) return false;
 
 	//get actor's portrait
 	if (hdr.have_portrait) {
@@ -309,13 +318,16 @@ bool PlasticActor::Spawn(PlasticWorld* wrld)
 
 	//Register face voxel
 	nvi = *(pipe->GetVInfo("face")); //copy 'face' voxel
-	nvi.mark = NULL; //don't use the same mark
+	nvi.mark = mstrnacpy(NULL,nvi.mark,0); //copy the mark
 	nvi.not_used = false; //just in case
 	nvi.texture = portrait; //apply face texture
 	headtxd = pipe->AppendVoxel(&nvi);
 
 	//Replace old face voxel
 	model->ReplaceVoxel("face",headtxd);
+
+	//Update limbs state
+	UpdateLimbs();
 
 	//Good to go
 	return true;
@@ -346,7 +358,79 @@ void PlasticActor::Animate()
 
 void PlasticActor::Damage(const vector3di* pnt)
 {
-	//TODO
+	voxel vc;
+	const SVoxelInf* vci;
+	int i,j;
+	EPABodyPartType bp = PBP_INVALID;
+	int dam;
+
+	//TODO: calc resistance
+	dam = 10;
+
+	if (model && pnt) {
+		//commit 3d-visible damage
+		vc = model->GetVoxelAt(pnt);
+		vci = pipe->GetVInfo(vc);
+		if (vci->mark) {
+			dbg_print("PA::Damage(): vci mark = '%s'",vci->mark);
+
+			//find the corresponding body part
+			for (i = 0; i < NUMBODPART; i++) {
+				for (j = 0; j < PABPNUMALIASES; j++) {
+					if (!pabtype_to_str[i].aka[j]) break;
+					if (!strcmp(pabtype_to_str[i].aka[j],vci->mark)) {
+						bp = pabtype_to_str[i].bt;
+						break;
+					}
+				}
+			}
+
+			if (bp != PBP_INVALID) {
+				dbg_print("PA::Damage(): BP = '%s'",pabtype_to_str[bp].aka[0]);
+
+				//FIXME: debug
+				limbs[bp] += dam;
+				UpdateLimbs();
+			}
+		}
+	}
+
+	//TODO: calc actual damage
+	curr.HP -= dam;
+}
+
+void PlasticActor::RemoveLimb(EPABodyPartType x)
+{
+	int i,j;
+
+	dbg_print("PA::RemoveLimb(): x = '%s'",pabtype_to_str[x].aka[0]);
+
+	//TODO: check the limb is already hidden
+
+	for (i = 0; i < PABPNUMALIASES; i++)
+		model->HideVoxels(pabtype_to_str[x].aka[i],true);
+
+	for (i = 0; pabp_tree[i].t != PBP_INVALID; i++) {
+		//search for a position of a current limb
+		if (pabp_tree[i].t != x) continue;
+
+		//remove children
+		for (j = 0; j < PABPHRNUMCHILDS; j++) {
+			if (pabp_tree[i].n[j] == PBP_INVALID) break;
+			RemoveLimb(pabp_tree[i].n[j]);
+		}
+	}
+}
+
+void PlasticActor::UpdateLimbs()
+{
+	int i;
+
+	if (!model) return;
+	for (i = 0; i < NUMBODPART; i++) {
+		if (limbs[i] >= PAMAXLIMBDAM)
+			RemoveLimb((EPABodyPartType)i);
+	}
 }
 
 SPABase PlasticActor::GetStats(bool current)

@@ -14,17 +14,17 @@ Add wearable inventory items sub-class					| assigned	|
 ---------------------------------------------------------------------------------------
 Speed up LVR fog by implementing look-up table			| assigned	|
 ---------------------------------------------------------------------------------------
+Add mouse position window filtering to CGUI PumpEvents	| assigned	|
+---------------------------------------------------------------------------------------
+Fix Y-axis mirror in VModel::Load()						| assigned	|
+---------------------------------------------------------------------------------------
 PHY Collision detection									|			| in progr
 ---------------------------------------------------------------------------------------
 PHY Gravity												|			| in progr
 ---------------------------------------------------------------------------------------
 Add object view window									| in progr	|
 ---------------------------------------------------------------------------------------
-Add voxel destroying test for combat mode				| in progr	|
----------------------------------------------------------------------------------------
-Implement actors limbs mechanics						| in progr	|
----------------------------------------------------------------------------------------
-Test 'tup' as a temporary build system					| stall, meeting unavoidable
+Test 'tup' as a temporary build system					| done		|
 ---------------------------------------------------------------------------------------
 Implement some marks to use in voxel table				| done		|
 ---------------------------------------------------------------------------------------
@@ -53,4 +53,8 @@ Implement world gamedata saving and loading				| done		|
 LVR: Use FOV.Z instead of separate far plane distance	| done		|
 ---------------------------------------------------------------------------------------
 Add texturization settings to LVRconf					| done		|
+---------------------------------------------------------------------------------------
+Add voxel destroying test for combat mode				| done		|
+---------------------------------------------------------------------------------------
+Implement actors limbs mechanics						| done		|
 ---------------------------------------------------------------------------------------

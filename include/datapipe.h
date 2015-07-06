@@ -116,7 +116,8 @@ enum EDChunkStatus {
 	DPCHK_READY,
 	DPCHK_QUEUE,
 	DPCHK_LOADING,
-	DPCHK_ERROR
+	DPCHK_ERROR,
+	DPCHK_CHANGED
 };
 
 /* File data placement map record */
@@ -128,6 +129,7 @@ struct SDataPlacement {
 
 /* Save file header structure */
 struct SSavedGameHeader {
+	int verA,verB,verC;
 	PlasticTime gtime;
 	long gseed;
 	bool rend_used;
@@ -275,6 +277,7 @@ public:
 
 	///Supply INI-file based data by INI name and field name.
 	void GetIniDataC(const char* ininame, const char* inifield, char* dest, int maxlen);
+	char* GetIniDataC(const char* ininame, const char* inifield);
 	std::string GetIniDataS(const std::string ininame, const std::string inifield);
 
 	///Returns a pointer to models vector.

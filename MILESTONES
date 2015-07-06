@@ -1,14 +1,24 @@
-v.0.2 ----------------------------------------------------------
-	Filled voxel table
+v.0.4 (alpha) -----------------------------------------------------------------
+	<planning>
+	
+v.0.3 (pre-alpha) -------------------------------------------------------------
+	Use of build system other than Eclipse CDT builder
+	Install target; VFS located in userspace
+	Game launch scripts
+	Working AI (at least for NPCs)
+	<to be continued>
+
+v.0.2 (tech demo) -------------------------------------------------------------
+	Filled voxel table (all physical types should be present)
 	Completed static world generation
 	Simple rigid physics (collisions and gravity)
-	Actors limbs mechanics and somewhat working combat mode
+OK	Actors limbs mechanics and somewhat working combat mode
 	Actors animations and movement
 	Actors portraits generation
 	Buildings and their generation
 	Working game load/save
 
-v.0.1 ----------------------------------------------------------
+v.0.1 (skeleton preview) ------------------------------------------------------
 OK	Fully working LVR (without lighting, though)
 OK	Working atmosphere (clouds and stars)
 OK	Some rigid actors

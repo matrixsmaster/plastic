@@ -39,7 +39,8 @@ enum EPABodyType {
 
 //Basic types of body parts
 enum EPABodyPartType {
-	PBP_HEAD,
+	PBP_INVALID = -1,
+	PBP_HEAD = 0,
 	PBP_NECK,
 	PBP_CHEST,
 	PBP_WAIST,
@@ -57,6 +58,8 @@ enum EPABodyPartType {
 	PBP_RLWLEG,
 	PBP_RFOOT
 };
+
+#define PAMAXLIMBDAM 50
 
 //Basic classes of actors (used to determine initial basic values and actor's traits)
 enum EPAClass {
@@ -138,24 +141,52 @@ struct SPAFileHeader {
 /* ********************* CONVERSION DATA ********************* */
 
 //Body type to string conversion data
-struct SEPABRecord {
+struct SPABRecord {
 	EPABodyType b;
 	const char* s;
 };
 
-static const SEPABRecord pabody_to_str[NUMBODTYPE] = {
+static const SPABRecord pabody_to_str[NUMBODTYPE] = {
 		{ PBOD_ELMECH,	"Electromech" },
 		{ PBOD_PNEUMO,	"Pneumatic" },
 		{ PBOD_HYDROL,	"Hydraulic" },
 };
 
+//Body part to string conversion data
+#define PABPNUMALIASES 3
+
+struct SPABPRecord {
+	EPABodyPartType bt;
+	const char* aka[PABPNUMALIASES];
+};
+
+static const SPABPRecord pabtype_to_str[NUMBODPART] = {
+		{ PBP_HEAD,		{ "head","hair","face" }, },
+		{ PBP_NECK,		{ "neck",NULL,NULL }, },
+		{ PBP_CHEST,	{ "chest","boobs",NULL }, },
+		{ PBP_WAIST,	{ "waist",NULL,NULL }, },
+		{ PBP_PELVIS,	{ "pelvis",NULL,NULL }, },
+		{ PBP_LUPARM,	{ "LUA",NULL,NULL }, },
+		{ PBP_LLWARM,	{ "LLA",NULL,NULL }, },
+		{ PBP_LHAND,	{ "Lhand",NULL,NULL }, },
+		{ PBP_RUPARM,	{ "RUA",NULL,NULL }, },
+		{ PBP_RLWARM,	{ "RLA",NULL,NULL }, },
+		{ PBP_RHAND,	{ "Rhand",NULL,NULL }, },
+		{ PBP_LUPLEG,	{ "LUL",NULL,NULL }, },
+		{ PBP_LLWLEG,	{ "LLL",NULL,NULL }, },
+		{ PBP_LFOOT,	{ "Lfoot",NULL,NULL }, },
+		{ PBP_RUPLEG,	{ "RUL",NULL,NULL }, },
+		{ PBP_RLWLEG,	{ "RLL",NULL,NULL }, },
+		{ PBP_RFOOT,	{ "Rfoot",NULL,NULL }, },
+};
+
 //Class to string conversion data
-struct SEPACRecord {
+struct SPACRecord {
 	EPAClass c;
 	const char* s;
 };
 
-static const SEPACRecord paclass_to_str[NUMCLASSES+1] = {
+static const SPACRecord paclass_to_str[NUMCLASSES+1] = {
 		{ PCLS_INQUISITOR,	"Inquisitor" },
 		{ PCLS_ROGUE,		"Rogue" },
 		{ PCLS_GUARD,		"Guard" },
@@ -169,5 +200,31 @@ static const SEPACRecord paclass_to_str[NUMCLASSES+1] = {
 		{ PCLS_NONE,		"Nobody" },
 };
 
+/* ********************* OTHER DATA ********************* */
+
+//Body parts hierarchy node record
+#define PABPHRNUMCHILDS 3
+
+struct SPABPHierarchy {
+	EPABodyPartType t;
+	EPABodyPartType n[PABPHRNUMCHILDS];
+};
+
+static const SPABPHierarchy pabp_tree[14] = {
+		{ PBP_HEAD,		{ PBP_NECK, PBP_INVALID } },
+		{ PBP_NECK,		{ PBP_CHEST, PBP_INVALID } },
+		{ PBP_CHEST,	{ PBP_WAIST, PBP_LUPARM, PBP_RUPARM } },
+		{ PBP_WAIST,	{ PBP_PELVIS, PBP_INVALID } },
+		{ PBP_PELVIS,	{ PBP_LUPLEG, PBP_RUPLEG, PBP_INVALID } },
+		{ PBP_LUPLEG,	{ PBP_LLWLEG, PBP_INVALID } },
+		{ PBP_LLWLEG,	{ PBP_LFOOT, PBP_INVALID } },
+		{ PBP_RUPLEG,	{ PBP_RLWLEG, PBP_INVALID } },
+		{ PBP_RLWLEG,	{ PBP_RFOOT, PBP_INVALID } },
+		{ PBP_LUPARM,	{ PBP_LLWARM, PBP_INVALID } },
+		{ PBP_LLWARM,	{ PBP_LHAND, PBP_INVALID } },
+		{ PBP_RUPARM,	{ PBP_RLWARM, PBP_INVALID } },
+		{ PBP_RLWARM,	{ PBP_RHAND, PBP_INVALID } },
+		{ PBP_INVALID,	{ PBP_INVALID } }
+};
 
 #endif /* ACTORTYPES_H_ */

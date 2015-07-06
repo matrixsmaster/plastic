@@ -56,8 +56,8 @@ void CurseGUIProgrBar::Step()
 void CurseGUIProgrBar::SetValue(int v)
 {
 	pos = v;
-	if (pos > g_max) pos = g_min;
-	if (pos < g_min) pos = g_max;
+	if (pos > g_max) pos = g_max;
+	if (pos < g_min) pos = g_min;
 }
 
 void CurseGUIProgrBar::Update()

@@ -55,3 +55,31 @@ mmask_t mmask_by_str(const char* s)
 	}
 	return 0;
 }
+
+char* mstrnacpy(char* dest, const char* src, size_t n)
+{
+	char* buf;
+	size_t l;
+
+	//Check source and get its length
+	if (!src) return NULL;
+	l = strlen(src);
+
+	if (!dest) {
+		//Auto-allocation
+		if (!n) n = l + 1;
+		buf = (char*)malloc(n);
+		if (!buf) return NULL;
+	} else
+		buf = dest;
+
+	//Check length and copy the string
+	if (!n) return buf;
+	strncpy(buf,src,n);
+
+	//Terminate result
+	if ((l >= n) && (n > 0))
+		buf[n-1] = 0;
+
+	return buf;
+}
