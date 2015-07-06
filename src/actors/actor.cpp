@@ -353,7 +353,10 @@ void PlasticActor::Delete()
 
 void PlasticActor::Animate()
 {
+	/* Actor's animation is physical, so we should stay in sync
+	 * with possible movements made by PHY engine. */
 	ReadModelPos();
+	/* Now just update discrete animator state */
 	if (model && anim) anim->Update();
 }
 

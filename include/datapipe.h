@@ -116,8 +116,14 @@ enum EDChunkStatus {
 	DPCHK_READY,
 	DPCHK_QUEUE,
 	DPCHK_LOADING,
-	DPCHK_ERROR,
-	DPCHK_CHANGED
+	DPCHK_ERROR
+};
+
+/* Chunk's state data structure */
+struct SChunkState {
+	EDChunkStatus s;
+	bool changed;
+	int gx,gy,gz;
 };
 
 /* File data placement map record */
@@ -160,7 +166,7 @@ protected:
 	ulli rammax;						//max amount of memory allowed to be allocated
 
 	PChunk chunks[HOLDCHUNKS];			//world chunk buffers
-	EDChunkStatus chstat[HOLDCHUNKS];	//chunks status
+	SChunkState chstat[HOLDCHUNKS];		//chunks state buffer
 	PlaceMap placetab;					//chunk displacement map
 
 	SVoxelTab voxeltab;					//voxel types table
