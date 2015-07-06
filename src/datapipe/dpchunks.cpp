@@ -53,6 +53,16 @@ bool DataPipe::LoadChunk(SDataPlacement* res, PChunk buf)
 	return false;
 }
 
+void DataPipe::SaveChunk(const unsigned l)
+{
+	//check if this chunk should be saved
+	if (chstat[l] != DPCHK_CHANGED) return;
+
+	//TODO
+
+	chstat[l] = DPCHK_READY; //remove 'changed' flag
+}
+
 void DataPipe::PurgeChunks()
 {
 	int i;
@@ -295,9 +305,16 @@ chunk_found:
 #endif
 }
 
-void DataPipe::MakeChunk(unsigned l, vector3di pos)
+void DataPipe::MakeChunk(const unsigned l, const vector3di pos)
 {
 	SDataPlacement plc;
+
+	if (chstat[l] == DPCHK_CHANGED) {
+#ifdef DPDEBUG
+		dbg_print("Saving chunk at [%d %d %d]",pos.X,pos.Y,pos.Z);
+#endif
+		SaveChunk(l);
+	}
 
 	if (!FindChunk(pos,&plc)) {
 		if (wgen) {

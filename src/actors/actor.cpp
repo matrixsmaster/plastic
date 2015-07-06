@@ -353,6 +353,7 @@ void PlasticActor::Delete()
 
 void PlasticActor::Animate()
 {
+	ReadModelPos();
 	if (model && anim) anim->Update();
 }
 

@@ -192,8 +192,9 @@ protected:
 	inline bool ConvertSceneCoord(const vector3di* p, int* px, int* py, int* pz, unsigned* l);
 	bool LoadIni(const std::string name);
 	bool LoadDict(const std::string name);
-	void MakeChunk(unsigned l, vector3di pos);
+	void MakeChunk(const unsigned l, const vector3di pos);
 	bool LoadChunk(SDataPlacement* res, PChunk buf);
+	void SaveChunk(const unsigned l);
 	FILE* DeserialOpen(const char* fn);
 
 public:
