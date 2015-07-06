@@ -379,7 +379,7 @@ voxel DataPipe::GetVoxel(const vector3di* p, bool dynskip)
 	}
 
 	/* Check the chunk status and return voxel id */
-	if (chstat[l] == DPCHK_READY) {
+	if ((chstat[l] == DPCHK_READY) || (chstat[l] == DPCHK_CHANGED)) {
 		ch = chunks[l];
 		tmp = (*ch)[pz][py][px];
 	}
@@ -403,7 +403,7 @@ void DataPipe::ChangeVoxelAt(const vector3di* p, const voxel nv)
 	}
 
 	/* Check the chunk status and return voxel id */
-	if (chstat[l] == DPCHK_READY) {
+	if ((chstat[l] == DPCHK_READY) || (chstat[l] == DPCHK_CHANGED)) {
 		ch = chunks[l];
 		(*ch)[pz][py][px] = nv;
 	}
