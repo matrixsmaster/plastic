@@ -21,6 +21,7 @@
 #include "debug.h"
 
 #define CONTACT 1
+//#define PHYDEBUG
 
 using namespace std;
 
@@ -173,9 +174,12 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 		if (!res.no_collision) break;
 	}
 
+#ifdef PHYDEBUG
 	if (!res.no_collision)
 		dbg_print("[PHY] Collision: %d, start [ %d %d %d ], depth = %d, boundS = %d, (%p)", res.no_collision,
 				res.start.X, res.start.Y, res.start.Z, res.depth, b, mod->modptr);
+#endif
+
 	return res;
 }
 
@@ -230,7 +234,9 @@ void PlasticPhysics::Quantum()
 #endif
 			mods.push_back(cur);
 			im = mods.end();
+#ifdef PHYDEBUG
 			dbg_print("[PHY] Added model %p",(im-1)->modptr);
+#endif
 			continue;
 		}
 
@@ -245,7 +251,9 @@ void PlasticPhysics::Quantum()
 			++im;
 		} else {
 			//model vector is out of sync
+#ifdef PHYDEBUG
 			dbg_print("[PHY] Removing model %p",im->modptr);
+#endif
 			im = mods.erase(im);
 			--iv;
 		}
