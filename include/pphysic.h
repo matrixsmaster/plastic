@@ -44,6 +44,11 @@ struct SPPCollision {
 	SPPModelRec* next_obj;
 };
 
+struct SPPContact {
+	bool contact;
+	vector3di pos;
+};
+
 class PlasticPhysics {
 private:
 	DataPipe* pipe;
@@ -52,7 +57,7 @@ private:
 
 	bool CheckSurroundingVox(const vector3di p);
 	vector3di ResolveCollision(const SPPCollision ccol, const vector3di v);
-	bool Contact(const SPPModelRec* mod);
+	const SPPContact Contact(const SPPModelRec* mod);
 
 public:
 	PlasticPhysics(DataPipe* pipeptr);
