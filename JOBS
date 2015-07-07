@@ -14,6 +14,8 @@ Add mouse position window filtering to CGUI PumpEvents	| assigned	|
 ---------------------------------------------------------------------------------------
 Fix Y-axis mirror in VModel::Load()						| assigned	|
 ---------------------------------------------------------------------------------------
+Add dry-run flag to game settings						| assigned	|
+---------------------------------------------------------------------------------------
 PHY Collision detection									|			| in progr
 ---------------------------------------------------------------------------------------
 PHY Gravity												|			| in progr

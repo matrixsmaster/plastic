@@ -93,6 +93,11 @@ public:
 typedef CPoint3D vector3d;
 
 
+/* Simple vector structure to use in I/O operations */
+struct SVector3di {
+	int X,Y,Z;
+};
+
 /* CPoint3D strict version for integer values, made as a template */
 template <class T> class CPoint3Di {
 public:
@@ -101,6 +106,7 @@ public:
 	CPoint3Di(T all) :							X(all), Y(all), Z(all) {}
 	CPoint3Di(const CPoint3Di & nw) :			X(nw.X), Y(nw.Y), Z(nw.Z) {}
 	CPoint3Di(const CPoint3D & r) :				X(round(r.X)), Y(round(r.Y)), Z(round(r.Z)) {}
+	CPoint3Di(const SVector3di & s) :			X(s.X), Y(s.Y), Z(s.Z) {}
 	virtual ~CPoint3Di()						{}
 	CPoint3Di & operator = (const CPoint3Di & old) 		{ X=old.X; Y=old.Y; Z=old.Z; return *this; }
 	CPoint3Di operator + (const CPoint3Di & add) const	{ return CPoint3Di((X+add.X),(Y+add.Y),(Z+add.Z)); }
@@ -122,6 +128,7 @@ public:
 //	bool operator  < (const CPoint3Di & comp) const		{ return (Module() < comp.Module()); }
 //	bool operator  > (const CPoint3Di & comp) const		{ return (Module() > comp.Module()); }
 	CPoint3D ToReal() const								{ return CPoint3D((double)X,(double)Y,(double)Z); }
+	SVector3di ToSimVecInt() const						{ SVector3di r; r.X=X; r.Y=Y; r.Z=Z;  return r; }
 	T Module() const									{ return (T)round(sqrt(X*X + Y*Y + Z*Z)); }
 	T DotProduct(const CPoint3Di & s) const				{ return X*s.X + Y*s.Y + Z*s.Z; }
 	CPoint3Di Normalize() const							{ return CPoint3Di(ToReal().Normalize()); }
