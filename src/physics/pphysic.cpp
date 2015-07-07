@@ -20,9 +20,6 @@
 #include "pphysic.h"
 #include "debug.h"
 
-#define CONTACT 1
-//#define PHYDEBUG
-
 using namespace std;
 
 
@@ -115,8 +112,10 @@ const SPPContact PlasticPhysics::Contact(const SPPModelRec* mod)
 		if (c.contact) break;
 	}
 
-//	if (contact)
-//		dbg_print("[PHY] Contact on [ %d %d %d ] voxel (%p)", p.X, p.Y, p.Z, mod->modptr);
+#ifdef PHYDEBUG
+	if (c.contact)
+		dbg_print("[PHY] Contact on [ %d %d %d ] voxel (%p)", p.X, p.Y, p.Z, mod->modptr);
+#endif
 
 	return c;
 }
@@ -271,6 +270,12 @@ void PlasticPhysics::Quantum()
 
 		//Search collision and search contact with surface
 		ccol = Collision(&(*im));
+
+		/* Resolve collision with a depth of one voxel. */
+		if (!ccol.no_collision) {
+			im->newpos = ResolveCollision(ccol, im->oldspos);
+		}
+
 #if CONTACT
 		ccont = Contact(&(*im));
 		im->contact = ccont.contact;
@@ -287,19 +292,11 @@ void PlasticPhysics::Quantum()
 
 #if CONTACT
 		/* gravity */
-		if (!im->contact && ccol.no_collision) {
-			vector3di g(0,0,-1);
-			im->newpos += g;
-		}
+		vector3di g(0,0,-1);
+		if (!ccol.no_collision)
+			g = vector3di(0,0,1);
+		im->newpos += g;
 #endif
-
-		/* Resolve collision with a depth of one voxel. */
-		if (!ccol.no_collision) {
-			im->newpos = ResolveCollision(ccol, im->oldspos);
-		}
-
-		//TODO: gravity
-
 
 		//TODO: move object
 
@@ -325,6 +322,8 @@ void PlasticPhysics::Quantum()
 		//check model needs updating
 		if (!im->changed) continue;
 
+		dbg_print("oldpos|newpos [ %d %d %d ] [ %d %d %d ]", im->oldspos.X, im->oldspos.Y, im->oldspos.Z,
+				im->newpos.X, im->newpos.Y, im->newpos.Z);
 		//actually update the model position
 		im->modptr->SetPos(im->newpos);
 	}
