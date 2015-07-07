@@ -34,7 +34,50 @@
 
 void DataPipe::ScanFiles()
 {
+	FILE* f;
+	char fn[MAXPATHLEN];
+	SDataPlacement cp;
+	SVector3di cv;
+
 	//TODO: scan world files to map known chunks
+	for (chsavelast = 0; ; chsavelast++) {
+		//get the save file name and open it
+		snprintf(fn,sizeof(fn),CHUNKSAVEFILE,root,chsavelast);
+		f = fopen(fn,"rb");
+		if (!f) break;
+
+		//scan chunks contained in file
+		while (!feof(f)) {
+			cp.offset = (ulli)ftell(f);
+			cp.filenum = chsavelast;
+
+			//read chunk position
+			if (fread(&cv,sizeof(cv),1,f) < 1) {
+				if (feof(f)) break; //EOF will be set only after the next read beyond the EOF :)
+				errout("Unable to read chunk position vector at %llu in file '%s'\n",cp.offset,fn);
+				break;
+			}
+			cp.pos = vector3di(cv);
+
+			//read chunk data length
+			if (fread(&(cp.length),sizeof(cp.length),1,f) < 1) {
+				errout("Unable to read chunk data length at %llu in file '%s'\n",cp.offset,fn);
+				break;
+			}
+
+			//append position information and advance through file
+			placetab.insert(std::make_pair(GetChunkLinearOffset(cp.pos),cp));
+			fseek(f,cp.length,SEEK_CUR);
+
+#ifdef DPDEBUG
+			dbg_print("[DP] Detected data for chunk at [%d %d %d]; file #%llu",cv.X,cv.Y,cv.Z,chsavelast);
+#endif
+		}
+
+		//close the file
+		fclose(f);
+	}
+
 	//TODO: if new game, delete these files
 	return;
 }
@@ -45,7 +88,7 @@ bool DataPipe::FindChunk(const vector3di pos, SDataPlacement* res)
 	if (!res) return false;
 
 #ifdef DPDEBUG
-	dbg_print("Searching for chunk [%d %d %d]...",pos.X,pos.Y,pos.Z);
+	dbg_print("[DP] Searching for chunk [%d %d %d]...",pos.X,pos.Y,pos.Z);
 #endif
 
 	lin = GetChunkLinearOffset(pos);
@@ -53,7 +96,7 @@ bool DataPipe::FindChunk(const vector3di pos, SDataPlacement* res)
 	if (placetab.count(lin)) {
 		*res = placetab[lin];
 #ifdef DPDEBUG
-		dbg_print("Found! [%d %d %d]",res->pos.X,res->pos.Y,res->pos.Z);
+		dbg_print("[DP] Found! [%d %d %d]",res->pos.X,res->pos.Y,res->pos.Z);
 #endif
 		return true;
 	}
@@ -73,6 +116,8 @@ void DataPipe::SaveChunk(const unsigned l)
 	SDataPlacement plc;
 	char fn[MAXPATHLEN];
 	vector3di pos;
+	SVector3di sp;
+	bool fnd = false;
 
 	//check if this chunk should be saved
 	if (!chstat[l].changed) return;
@@ -80,29 +125,49 @@ void DataPipe::SaveChunk(const unsigned l)
 	pos = vector3di(chstat[l].gx,chstat[l].gy,chstat[l].gz);
 
 #ifdef DPDEBUG
-	dbg_print("Saving chunk %u at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
+	dbg_print("[DP] Saving chunk %u at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
 #endif
-
-	plc.offset = 0; //impossible value
 
 	//if there's a file containing our chunk, use its number
 	if (!FindChunk(pos,&plc))
 		plc.filenum = chsavelast;
+	else
+		fnd = true;
 
 	//get the save file name and open it
 	snprintf(fn,sizeof(fn),CHUNKSAVEFILE,root,plc.filenum);
-	sav = fopen(fn,"a+");
+	sav = fopen(fn,"a+b");
 	if (!sav) {
-		errout("DataPipe::SaveChunk(): unable to open the file '%s'\n",fn);
+		errout("[DP] SaveChunk(): unable to open the file '%s'\n",fn);
 		return;
 	}
 
-	//if our file isn't new, seek to position needed
-	//TODO
+	//if our file isn't new, seek to the position needed
+	if (fnd) {
+		fseek(sav,plc.offset,SEEK_SET);
+	} else {
+		plc.offset = (ulli)ftell(sav);
+		//check the size of the resulting file
+		if ((plc.offset + (sizeof(VChunk) + sizeof(SVector3di)) * 2) >= settings.maxchfile) {
+			//open the new file (next time)
+			chsavelast++;
+		}
+	}
+
+	//fill in placement info
+	plc.length = sizeof(SVector3di) + sizeof(VChunk);
+
+	//write to file
+	sp = pos.ToSimVecInt();
+	fwrite(&sp,sizeof(sp),1,sav);
+	fwrite(&(plc.length),sizeof(plc.length),1,sav);
+	fwrite(chunks[l],sizeof(VChunk),1,sav);
 
 	//append data placement information
-	plc.pos = pos;
-	placetab.insert(std::make_pair(GetChunkLinearOffset(pos),plc));
+	if (!fnd) {
+		plc.pos = pos;
+		placetab.insert(std::make_pair(GetChunkLinearOffset(pos),plc));
+	}
 
 	//and we're done
 	fclose(sav);
@@ -167,7 +232,7 @@ void DataPipe::SetGP(vector3di pos)
 #endif
 
 #ifdef DPDEBUG
-	dbg_print("SetGP(): [%d %d %d]",GP.X,GP.Y,GP.Z);
+	dbg_print("[DP] SetGP(): [%d %d %d]",GP.X,GP.Y,GP.Z);
 #endif
 
 	MakeChunk(l,GP);
@@ -186,7 +251,7 @@ bool DataPipe::Move(const vector3di shf)
 		return false;
 
 #ifdef DPDEBUG
-	dbg_print("Move(): shift = [%d %d %d]",shf.X,shf.Y,shf.Z);
+	dbg_print("[DP] Move(): shift = [%d %d %d]",shf.X,shf.Y,shf.Z);
 #endif
 
 	rgp = GP + shf;
@@ -262,13 +327,13 @@ bool DataPipe::Move(const vector3di shf)
 					//new chunk
 					chstat[l].s = DPCHK_QUEUE;
 #ifdef DPDEBUG
-					dbg_print("Marking chunk %d",l);
+					dbg_print("[DP] Marking chunk %d",l);
 #endif
 					continue;
 				}
 
 #ifdef DPDEBUG
-				dbg_print("Swapping chunks %d <-> %d",l,nl);
+				dbg_print("[DP] Swapping chunks %d <-> %d",l,nl);
 #endif
 				//swap chunks
 				swa = chunks[l];
@@ -383,13 +448,13 @@ void DataPipe::MakeChunk(const unsigned l, const vector3di pos)
 			chstat[l].gy = pos.Y;
 			chstat[l].gz = pos.Z;
 #ifdef DPDEBUG
-			dbg_print("Chunk %u generated at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
+			dbg_print("[DP] Chunk %u generated at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
 #endif
 		} else {
 			chstat[l].s = DPCHK_ERROR;
 			chstat[l].changed = false;
 #ifdef DPDEBUG
-			dbg_print("No WorldGen instance to generate chunk at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
+			dbg_print("[DP] No WorldGen instance to generate chunk at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
 #endif
 		}
 
@@ -397,7 +462,7 @@ void DataPipe::MakeChunk(const unsigned l, const vector3di pos)
 		chstat[l].s = DPCHK_ERROR;
 		chstat[l].changed = false;
 #ifdef DPDEBUG
-		dbg_print("Error loading chunk %u at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
+		dbg_print("[DP] Error loading chunk %u at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
 #endif
 
 	} else {
@@ -406,7 +471,7 @@ void DataPipe::MakeChunk(const unsigned l, const vector3di pos)
 		chstat[l].gy = pos.Y;
 		chstat[l].gz = pos.Z;
 #ifdef DPDEBUG
-		dbg_print("Chunk %u loaded at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
+		dbg_print("[DP] Chunk %u loaded at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
 #endif
 
 	}
