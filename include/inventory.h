@@ -68,9 +68,6 @@ public:
 	bool SerializeToFile(FILE* f);
 	bool DeserializeFromFile(FILE* f);
 
-	///Loads up the inventory definition from the INI file.
-	bool LoadBasicInventory(const char* fname);
-
 	///Returns the number of objects contained in the inventory.
 	int GetNumItems();
 

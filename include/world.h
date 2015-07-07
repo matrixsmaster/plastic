@@ -101,6 +101,7 @@ private:
 	bool SaveGame();
 	void PushRenderConf();
 	void PullRenderConf();
+	bool LoadBasicInventory();
 
 public:
 	PlasticWorld(SGameSettings* settings);

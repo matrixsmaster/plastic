@@ -94,7 +94,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 	/* Load up basic inventory objects */
 	baseinvent = new Inventory();
-	if (!baseinvent->LoadBasicInventory(BASEINVININAME)) {
+	if (!LoadBasicInventory()) {
 		result = 4;
 		return;
 	}
@@ -165,6 +165,7 @@ PlasticWorld::~PlasticWorld()
 	PC = NULL;
 	if (clkres) delete clkres;
 	if (msgsys) delete msgsys;
+	if (baseinvent) delete baseinvent;
 
 	//Destroy WorldGen
 	data->ConnectWorldGen(NULL); //disconnect WG

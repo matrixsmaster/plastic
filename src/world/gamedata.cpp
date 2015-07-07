@@ -132,3 +132,9 @@ void PlasticWorld::PullRenderConf()
 	render->SetFOV(rfov);
 	render->SetPostprocess(gamesave.rend_pp);
 }
+
+bool PlasticWorld::LoadBasicInventory()
+{
+	//TODO: use BASEINVININAME as INI name
+	return true;
+}
