@@ -33,9 +33,11 @@ void printsettings(SGameSettings* s)
 	printf("Root dir:\t\t%s\n",			s->root);
 	printf("Use startup shell:\t%s\n",	BOOLSTR(s->use_shell));
 	printf("Start new game:\t\t%s\n",	BOOLSTR(s->new_game));
+	printf("Dry-Run:\t\t%s\n",			BOOLSTR(s->dryrun));
 	printf("World radius:\t\t%lu\n",	s->world_r);
 	printf("World seed value:\t%ld\n",	s->seed);
 	printf("Max RAM amount:\t\t%llu\n",	s->rammax);
+	printf("Max data file size:\t%llu\n",s->maxchfile);
 
 	//don't print player information
 	printf("\n");
@@ -170,6 +172,22 @@ opts_begin:
 		//discard testing world
 		delete wgen;
 		delete dpdum;
+		break;
+
+	case GAT_CHSAVMAX:
+		printf("Current max chunks data file size = %llu\n",s->maxchfile);
+		printf("New max size> ");
+		scanf("%llu",&(s->maxchfile));
+		if (s->maxchfile < 100) {
+			s->maxchfile *= 1024 * 1024 * 1024;
+			printf("Did you mean this value is in GiB? Converted to %llu bytes.\n",s->maxchfile);
+		}
+		break;
+
+	case GAT_DRYRUN:
+		puts("Dry-Run> Enter either (T)rue or (F)alse");
+		MGETCHAR(in);
+		s->dryrun = ((in == 't') || (in == 'T'));
 		break;
 	}
 
@@ -381,6 +399,16 @@ bool argparser(int argc, char* argv[], SGameSettings* sets)
 
 			case GAT_NEWGAME:
 				sets->new_game = (atoi(argv[i]) == 1);
+				fsm = 0;
+				break;
+
+			case GAT_CHSAVMAX:
+				sets->maxchfile = atoll(argv[i]);
+				fsm = 0;
+				break;
+
+			case GAT_DRYRUN:
+				sets->dryrun = (atoi(argv[i]) == 1);
 				fsm = 0;
 				break;
 

@@ -127,7 +127,7 @@ void DataPipe::SaveChunk(const unsigned l)
 	bool fnd = false;
 
 	//check if this chunk should be saved
-	if (!chstat[l].changed) return;
+	if ((!chstat[l].changed) || (settings.dryrun)) return;
 
 	pos = vector3di(chstat[l].gx,chstat[l].gy,chstat[l].gz);
 
@@ -203,7 +203,7 @@ void DataPipe::PurgeChunks()
 	WriteLock();
 	for (i = 0; i < HOLDCHUNKS; i++)
 		if (chunks[i]) {
-			SaveChunk(i);
+//			SaveChunk(i);
 			free(chunks[i]);
 			chunks[i] = NULL;
 			allocated -= sizeof(VChunk);

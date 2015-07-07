@@ -65,6 +65,14 @@ bool DataPipe::SaveGameHeader(SSavedGameHeader* hdr)
 
 	if (!hdr) return false;
 
+	/* Check Dry-Run mode */
+	if (settings.dryrun) {
+#ifdef DPDEBUG
+		dbg_logstr("[DP] Dry-run: not saving game header.");
+#endif
+		return true;
+	}
+
 	/* Open the file */
 	snprintf(tmp,MAXPATHLEN,GAMEHDRFNPAT,root);
 	f = fopen(tmp,"wb");
@@ -100,6 +108,14 @@ bool DataPipe::SaveStaticWorld()
 	unsigned i;
 	char tmp[MAXPATHLEN];
 
+	/* Check Dry-Run mode */
+	if (settings.dryrun) {
+#ifdef DPDEBUG
+		dbg_logstr("[DP] Dry-run: not saving static world.");
+#endif
+		return true;
+	}
+
 	/* Save wgen map */
 	snprintf(tmp,MAXPATHLEN,WORLDMAPFNPAT,root);
 	wgen->SaveMap(tmp);
@@ -127,7 +143,7 @@ FILE* DataPipe::DeserialOpen(const char* fn)
 	}
 
 #ifdef DPDEBUG
-	dbg_print("File %s opened for deserialization",tmp);
+	dbg_print("[DP] File %s opened for deserialization",tmp);
 #endif
 
 	return f;
@@ -143,6 +159,14 @@ bool DataPipe::SerializeThem(GDVec* arr, const char* name)
 	/* Check */
 	if ((!arr) || (!name) || (arr->empty())) return false;
 
+	/* Check Dry-Run mode */
+	if (settings.dryrun) {
+#ifdef DPDEBUG
+		dbg_print("[DP] Dry-run: serializing '%s' aborted.",name);
+#endif
+		return true;
+	}
+
 	/* Prepare full file path and open the file */
 	snprintf(tmp,MAXPATHLEN,PACKAGEFNPAT,root,name);
 	f = fopen(tmp,"wb");
@@ -152,7 +176,7 @@ bool DataPipe::SerializeThem(GDVec* arr, const char* name)
 	}
 
 #ifdef DPDEBUG
-	dbg_print("File %s opened for serialization",tmp);
+	dbg_print("[DP] File %s opened for serialization",tmp);
 #endif
 
 	/* Store the number of the elements */
@@ -163,7 +187,7 @@ bool DataPipe::SerializeThem(GDVec* arr, const char* name)
 	for (ia = arr->begin(); ia != arr->end(); ++ia)
 		if (!(((*ia))->SerializeToFile(f))) {
 			/* Something went wrong */
-			dbg_print("Unable to serialize object %p",(*ia));
+			dbg_print("[DP] Unable to serialize object %p",(*ia));
 			fclose(f);
 			return false;
 		}
