@@ -35,56 +35,54 @@ PlasticPhysics::~PlasticPhysics()
 }
 
 
-bool PlasticPhysics::CheckSurroundingVox(const vector3di p)
+bool PlasticPhysics::CheckSurroundingVox(const VModel* ptr, const vector3di p)
 {
 	vector3di cp = p;
+	VModel* misc;
 
-	//FIXME
 	cp.Z -= 1;
-	if (pipe->GetVoxel(&cp , true)) return true;
+
+	//Search contact with world
+	if (pipe->GetVoxel(&cp, true)) return true;
+
+	//Search contact with actors
+	if (pipe->IntersectModel(&cp,&misc,ptr,false)) return true;
 
 	return false;
 
+#if 0
 	cp.Z += 1;
 	cp.X -= 1;
 	if (pipe->GetVoxel(&cp , true)) return true;
-
 	cp.X += 1;
 	cp.Z += 1;
 	if (pipe->GetVoxel(&cp , true)) return true;
-
 	cp.X += 1;
 	cp.Z += 1;
 	if (pipe->GetVoxel(&cp , true)) return true;
-
 	cp.Z -= 1;
 	cp.X += 1;
 	if (pipe->GetVoxel(&cp , true)) return true;
-
 	cp.X -= 1;
 	cp.Y -= 1;
 	if (pipe->GetVoxel(&cp , true)) return true;
-
 	cp.Y += 2;
 	if (pipe->GetVoxel(&cp , true)) return true;
-
 	return false;
+#endif
 }
 
-const SPPContact PlasticPhysics::Contact(const SPPModelRec* mod)
+bool PlasticPhysics::Contact(const SPPModelRec* mod)
 {
 	int b;				//bound side
 	voxel ov;			//scene voxel, object voxel
 	vector3di sp,p, cp;	//scene center point, object point, contact point
 	int sx,sy,sz,ex,ey,ez;
-	SPPContact c;
-	c.contact = false;
+	bool contact = false;
 
 	//Getting bound side and central position of model
 	b = mod->modptr->GetBoundSide();
 	sp = mod->modptr->GetSPos();
-
-	//FIXME search into the cube of the model (border - 1)
 
 	//Initial and final positions model in scene
 	sx = sp.X - b/2;
@@ -101,15 +99,14 @@ const SPPContact PlasticPhysics::Contact(const SPPModelRec* mod)
 				ov = mod->modptr->GetVoxelAt(&p);
 				if (ov)
 					//Check surrounding voxels
-					if (CheckSurroundingVox(p)) {
-						c.contact = true;
-						c.pos = p;
+					if (CheckSurroundingVox(mod->modptr,p)) {
+						contact = true;
 						break;
 					}
 			}
-			if (c.contact) break;
+			if (contact) break;
 		}
-		if (c.contact) break;
+		if (contact) break;
 	}
 
 #ifdef PHYDEBUG
@@ -117,7 +114,7 @@ const SPPContact PlasticPhysics::Contact(const SPPModelRec* mod)
 		dbg_print("[PHY] Contact on [ %d %d %d ] voxel (%p)", p.X, p.Y, p.Z, mod->modptr);
 #endif
 
-	return c;
+	return contact;
 }
 
 const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
@@ -136,8 +133,6 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 	b = mod->modptr->GetBoundSide();
 	sp = mod->modptr->GetSPos();
 
-	//FIXME search into the cube of the model (border - 1)
-
 	//Initial and final positions model in scene
 	sx = sp.X - b/2;
 	sy = sp.Y - b/2;
@@ -145,8 +140,6 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 	ex = sp.X + b/2;
 	ey = sp.Y + b/2;
 	ez = sp.Z + b/2;
-
-	//TODO Find the outermost boundary of the model. ?
 
 	//Search one-dimensional collision and contact
 	for (p.X = sx; p.X < ex; ++(p.X)) {
@@ -157,6 +150,7 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 				sv = pipe->GetVoxel(&p, true);
 				if (!sv)
 					sv = pipe->IntersectModel(&p,&misc,mod->modptr,false);
+
 				//Get voxel from model
 				ov = mod->modptr->GetVoxelAt(&p);
 
@@ -207,7 +201,6 @@ void PlasticPhysics::Quantum()
 	VModVec::iterator iv;
 	SPPModelRec cur;
 	SPPCollision ccol;
-	SPPContact ccont;
 	VModVec* fmod = pipe->GetModels();
 	bool sys_changed = false;
 
@@ -226,11 +219,7 @@ void PlasticPhysics::Quantum()
 			cur.newpos = cur.oldspos;
 			cur.moved = false;
 			cur.changed = false;
-#if CONTACT
 			cur.contact = false;
-#else
-			cur.contact = true;
-#endif
 			mods.push_back(cur);
 			im = mods.end();
 #ifdef PHYDEBUG
@@ -268,7 +257,7 @@ void PlasticPhysics::Quantum()
 		//skip contacting objects, which isn't moved
 		if ((!im->changed) && (!im->moved) && (im->contact)) continue;
 
-		//Search collision and search contact with surface
+		//Search collision with surface and actors
 		ccol = Collision(&(*im));
 
 		/* Resolve collision with a depth of one voxel. */
@@ -276,27 +265,19 @@ void PlasticPhysics::Quantum()
 			im->newpos = ResolveCollision(ccol, im->oldspos);
 		}
 
-#if CONTACT
-		ccont = Contact(&(*im));
-		im->contact = ccont.contact;
-#endif
+		//Search contact with surface and actors
+		im->contact = Contact(&(*im));
 
-		if (ccol.no_collision
-#if CONTACT
-				&& im->contact
-#endif
-		) {
+		if (ccol.no_collision && im->contact) {
 			im->changed = false;
 			continue;
 		}
 
-#if CONTACT
-		/* gravity */
+		/* Gravity */
 		vector3di g(0,0,-1);
 		if (!ccol.no_collision)
 			g = vector3di(0,0,1);
 		im->newpos += g;
-#endif
 
 		//TODO: move object
 
