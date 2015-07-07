@@ -30,7 +30,7 @@
 ///Version information
 #define VERMAJOR 0
 #define VERMINOR 1
-#define VERSUBVR 8
+#define VERSUBVR 9
 
 ///Product name
 #define PRODNAME "Plastic Inquisitor"
@@ -44,7 +44,7 @@ under conditions of GNU GPL v2\n\n"
 
 
 ///Number of game argument types (run-time switches)
-#define GAMEARGTYPES 7
+#define GAMEARGTYPES 9
 
 ///Maximum length of helper string
 #define GAMEARGHELPLEN 360
@@ -58,6 +58,7 @@ struct SGameSettings {
 	ulli rammax;			//amount of memory that positively allowed to be used
 	long seed;				//seed of the universe (zero for random seed)
 	ulli maxchfile;			//maximum size of chunks data file
+	bool dryrun;			//dry-run flag
 	SPAAttrib PCData;		//player character settings
 };
 
@@ -70,6 +71,7 @@ struct SGameSettings {
 	(4ULL*1024*1024*1024),							\
 	800300,											\
 	(2ULL*1024*1024*1024),							\
+	false,											\
 	{ "Mary", true, PCLS_INQUISITOR, PBOD_PNEUMO, },\
 }
 
@@ -82,6 +84,8 @@ enum EGameArgType {
 	GAT_WORLDRAD,
 	GAT_RAMMAX,
 	GAT_SEED,
+	GAT_CHSAVMAX,
+	GAT_DRYRUN,
 	GAT_PLAYER
 };
 
@@ -108,6 +112,10 @@ static const SGameArg argp_table[GAMEARGTYPES] = {
 								"but not too much." },
 	{ GAT_SEED,		'S', true,	"Set the seed value used to generate the world. "\
 								"Should be zero to generate random seed." },
+	{ GAT_CHSAVMAX,	'c', true,	"Set the maximum length of a single chunks data "\
+								"file." },
+	{ GAT_DRYRUN,	'd', true,	"Enables Dry-Run mode (no game data will be saved"\
+								", although existing data would be loaded." },
 	{ GAT_PLAYER,	'P', false,	"String of data used to create player "\
 								"character. See details in documentation." },
 };

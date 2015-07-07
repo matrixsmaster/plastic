@@ -24,8 +24,6 @@ Add object view window									| in progr	|
 ---------------------------------------------------------------------------------------
 Implement DataPipe chunks saving and loading			| in progr	|
 ---------------------------------------------------------------------------------------
-Implement DataPipe chnuks mapping on load				| in progr	|
----------------------------------------------------------------------------------------
 Test 'tup' as a temporary build system					| done		|
 ---------------------------------------------------------------------------------------
 Implement some marks to use in voxel table				| done		|
@@ -59,4 +57,6 @@ Add texturization settings to LVRconf					| done		|
 Add voxel destroying test for combat mode				| done		|
 ---------------------------------------------------------------------------------------
 Implement actors limbs mechanics						| done		|
+---------------------------------------------------------------------------------------
+Implement DataPipe chnuks mapping on load				| done		|
 ---------------------------------------------------------------------------------------

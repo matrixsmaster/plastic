@@ -92,9 +92,6 @@ bool DataPipe::LoadStaticWorld()
 	snprintf(tmp,MAXPATHLEN,WORLDMAPFNPAT,root);
 	if (!wgen->LoadMap(tmp)) return false;
 
-	/* Map known chunks */
-	ScanFiles();
-
 	return true;
 }
 
@@ -110,8 +107,6 @@ bool DataPipe::SaveStaticWorld()
 	/* Save remaining chunks */
 	for (i = 0; i < HOLDCHUNKS; i++)
 		SaveChunk(i);
-
-	//TODO
 
 	return true;
 }

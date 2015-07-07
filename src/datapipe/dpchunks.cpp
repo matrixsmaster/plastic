@@ -39,12 +39,22 @@ void DataPipe::ScanFiles()
 	SDataPlacement cp;
 	SVector3di cv;
 
-	//TODO: scan world files to map known chunks
+	//scan world files to map known chunks
 	for (chsavelast = 0; ; chsavelast++) {
 		//get the save file name and open it
 		snprintf(fn,sizeof(fn),CHUNKSAVEFILE,root,chsavelast);
 		f = fopen(fn,"rb");
 		if (!f) break;
+
+		//if new game, delete this file
+		if (settings.new_game) {
+			fclose(f);
+			unlink(fn);
+#ifdef DPDEBUG
+			dbg_print("[DP] Deleted file '%s'",fn);
+#endif
+			continue;
+		}
 
 		//scan chunks contained in file
 		while (!feof(f)) {
@@ -77,9 +87,6 @@ void DataPipe::ScanFiles()
 		//close the file
 		fclose(f);
 	}
-
-	//TODO: if new game, delete these files
-	return;
 }
 
 bool DataPipe::FindChunk(const vector3di pos, SDataPlacement* res)
