@@ -197,7 +197,6 @@ protected:
 
 	bool Allocator(SGameSettings* sets);
 
-	void ScanFiles();
 	bool FindChunk(const vector3di pos, SDataPlacement* res);
 	void MakeChunk(const unsigned l, const vector3di pos);
 	bool LoadChunk(SDataPlacement* res, PChunk buf);
@@ -241,6 +240,10 @@ public:
 
 	///Discards all chunks buffers and release memory.
 	virtual void PurgeChunks();
+
+	///Scans user data files and maps known chunks or purges them if needed.
+	///Note: this method should be called only after legitimate WorldGen was set.
+	virtual void ScanFiles();
 
 	///Connects (or disconnects) world generator instance.
 	virtual void ConnectWorldGen(WorldGen* ptr);

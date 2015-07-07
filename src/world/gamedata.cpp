@@ -36,6 +36,9 @@ bool PlasticWorld::NewGame()
 	wgen->NewMap(data->GetMapSeed());
 	data->SetGP(wgen->GetPCInitPos()); //init central chunk
 
+	/* Delete old files */
+	data->ScanFiles();
+
 	/* Init Player */
 //	PC = new Player(sets->PCData,data);
 	PC->SetGPos(wgen->GetPCInitPos());

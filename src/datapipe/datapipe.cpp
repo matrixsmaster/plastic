@@ -76,8 +76,6 @@ DataPipe::DataPipe(SGameSettings* sets, bool allocate)
 	/* Allocate memory */
 	if (allocate) {
 		if (!Allocator(sets)) return;
-		/* Map known chunks or delete old files */
-		ScanFiles();
 	}
 
 	/* OK */

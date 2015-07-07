@@ -14,8 +14,6 @@ Add mouse position window filtering to CGUI PumpEvents	| assigned	|
 ---------------------------------------------------------------------------------------
 Fix Y-axis mirror in VModel::Load()						| assigned	|
 ---------------------------------------------------------------------------------------
-Add dry-run flag to game settings						| assigned	|
----------------------------------------------------------------------------------------
 PHY Collision detection									|			| in progr
 ---------------------------------------------------------------------------------------
 PHY Gravity												|			| in progr
@@ -59,4 +57,6 @@ Add voxel destroying test for combat mode				| done		|
 Implement actors limbs mechanics						| done		|
 ---------------------------------------------------------------------------------------
 Implement DataPipe chnuks mapping on load				| done		|
+---------------------------------------------------------------------------------------
+Add dry-run flag to game settings						| done		|
 ---------------------------------------------------------------------------------------

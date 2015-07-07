@@ -87,6 +87,10 @@ void DataPipe::ScanFiles()
 		//close the file
 		fclose(f);
 	}
+
+	//reset file numbering for new game
+	if (settings.new_game)
+		chsavelast = 0;
 }
 
 bool DataPipe::FindChunk(const vector3di pos, SDataPlacement* res)
@@ -113,8 +117,31 @@ bool DataPipe::FindChunk(const vector3di pos, SDataPlacement* res)
 
 bool DataPipe::LoadChunk(SDataPlacement* res, PChunk buf)
 {
-	//TODO
-	return false;
+	FILE* sav;
+	char fn[MAXPATHLEN];
+
+	if ((!res) || (!buf)) return false;
+
+	//get the save file name and open it
+	snprintf(fn,sizeof(fn),CHUNKSAVEFILE,root,res->filenum);
+	sav = fopen(fn,"rb");
+	if (!sav) {
+		errout("[DP] LoadChunk(): unable to open the file '%s'\n",fn);
+		return false;
+	}
+
+	//go to position and skip chunk position vector and data size
+	fseek(sav,res->offset + sizeof(SVector3di) + sizeof(ulli),SEEK_SET);
+
+	//read data
+	if (fread(buf,res->length,1,sav) < 1) {
+		errout("Unable to read chunk data at %llu in file '%s'\n",res->offset,fn);
+		return false;
+	}
+
+	//ok, close file
+	fclose(sav);
+	return true;
 }
 
 void DataPipe::SaveChunk(const unsigned l)
@@ -161,8 +188,8 @@ void DataPipe::SaveChunk(const unsigned l)
 		}
 	}
 
-	//fill in placement info
-	plc.length = sizeof(SVector3di) + sizeof(VChunk);
+	//fill in placement info remaining
+	plc.length = sizeof(VChunk);
 
 	//write to file
 	sp = pos.ToSimVecInt();

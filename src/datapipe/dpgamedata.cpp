@@ -100,6 +100,9 @@ bool DataPipe::LoadStaticWorld()
 	snprintf(tmp,MAXPATHLEN,WORLDMAPFNPAT,root);
 	if (!wgen->LoadMap(tmp)) return false;
 
+	/* Map known chunks */
+	ScanFiles();
+
 	return true;
 }
 
