@@ -2,8 +2,6 @@ Job														| Master	| Begemot
 ---------------------------------------------------------------------------------------
 Update voxel table (add most common types of voxels)	| assigned	| assigned
 ---------------------------------------------------------------------------------------
-Implement DataPipe chnuks mapping on load				| assigned	|
----------------------------------------------------------------------------------------
 Gather portrait generation sprites						|			| assigned
 ---------------------------------------------------------------------------------------
 Finish WorldGen											| assigned	|
@@ -23,6 +21,8 @@ PHY Gravity												|			| in progr
 Add object view window									| in progr	|
 ---------------------------------------------------------------------------------------
 Implement DataPipe chunks saving and loading			| in progr	|
+---------------------------------------------------------------------------------------
+Implement DataPipe chnuks mapping on load				| in progr	|
 ---------------------------------------------------------------------------------------
 Test 'tup' as a temporary build system					| done		|
 ---------------------------------------------------------------------------------------

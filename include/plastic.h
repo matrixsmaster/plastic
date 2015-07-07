@@ -57,6 +57,7 @@ struct SGameSettings {
 	uli world_r;			//world radius
 	ulli rammax;			//amount of memory that positively allowed to be used
 	long seed;				//seed of the universe (zero for random seed)
+	ulli maxchfile;			//maximum size of chunks data file
 	SPAAttrib PCData;		//player character settings
 };
 
@@ -68,6 +69,7 @@ struct SGameSettings {
 	32,												\
 	(4ULL*1024*1024*1024),							\
 	800300,											\
+	(2ULL*1024*1024*1024),							\
 	{ "Mary", true, PCLS_INQUISITOR, PBOD_PNEUMO, },\
 }
 

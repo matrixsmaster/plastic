@@ -73,6 +73,9 @@
 ///Voxel table file name.
 #define VOXTABFILENAME "voxtab.dat"
 
+///Chunks save file name pattern.
+#define CHUNKSAVEFILE "%s/usr/C%032llX"
+
 ///INI file name pattern.
 #define INIFILEPATTERN "%s/%s.ini"
 
@@ -116,15 +119,22 @@ enum EDChunkStatus {
 	DPCHK_READY,
 	DPCHK_QUEUE,
 	DPCHK_LOADING,
-	DPCHK_ERROR,
-	DPCHK_CHANGED
+	DPCHK_ERROR
+};
+
+/* Chunk's state data structure */
+struct SChunkState {
+	EDChunkStatus s;
+	bool changed;
+	int gx,gy,gz;
 };
 
 /* File data placement map record */
 struct SDataPlacement {
-	unsigned filenum;
+	ulli filenum;
 	vector3di pos;
-	long offset;
+	ulli offset;
+	ulli length;
 };
 
 /* Save file header structure */
@@ -143,7 +153,7 @@ typedef std::map<std::string,std::string> IniData;
 typedef std::map<std::string,IniData> IniMap;
 typedef std::vector<VModel*> VModVec;
 typedef std::vector<VSprite*> VSprVec;
-typedef std::map<vector3dulli,SDataPlacement> PlaceMap;
+typedef std::map<ulli,SDataPlacement> PlaceMap;
 typedef std::vector<std::string> DPDict;
 typedef std::map<std::string,DPDict> DPDictMap;
 typedef std::vector<IGData*> GDVec;
@@ -160,8 +170,9 @@ protected:
 	ulli rammax;						//max amount of memory allowed to be allocated
 
 	PChunk chunks[HOLDCHUNKS];			//world chunk buffers
-	EDChunkStatus chstat[HOLDCHUNKS];	//chunks status
+	SChunkState chstat[HOLDCHUNKS];		//chunks state buffer
 	PlaceMap placetab;					//chunk displacement map
+	ulli chsavelast;					//number of last chunks save file
 
 	SVoxelTab voxeltab;					//voxel types table
 
@@ -185,16 +196,22 @@ protected:
 	VSprVec sprs;						//sprites in scene
 
 	bool Allocator(SGameSettings* sets);
-	bool ScanFiles();
-	bool FindChunk(vector3di pos, SDataPlacement* res);
-	bool LoadVoxTab();
-	void FreeVoxTab();
-	inline bool ConvertSceneCoord(const vector3di* p, int* px, int* py, int* pz, unsigned* l);
-	bool LoadIni(const std::string name);
-	bool LoadDict(const std::string name);
+
+	void ScanFiles();
+	bool FindChunk(const vector3di pos, SDataPlacement* res);
 	void MakeChunk(const unsigned l, const vector3di pos);
 	bool LoadChunk(SDataPlacement* res, PChunk buf);
 	void SaveChunk(const unsigned l);
+
+	bool LoadVoxTab();
+	void FreeVoxTab();
+
+	inline bool ConvertSceneCoord(const vector3di* p, int* px, int* py, int* pz, unsigned* l);
+	ulli GetChunkLinearOffset(const vector3di p);
+
+	bool LoadIni(const std::string name);
+	bool LoadDict(const std::string name);
+
 	FILE* DeserialOpen(const char* fn);
 
 public:
