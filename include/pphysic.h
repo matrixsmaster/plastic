@@ -25,6 +25,9 @@
 #include "vecmath.h"
 #include "vmodel.h"
 
+#define CONTACT 1
+//#define PHYDEBUG
+
 
 struct SPPModelRec {
 	VModel* modptr;
