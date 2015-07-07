@@ -40,7 +40,6 @@ bool PlasticWorld::NewGame()
 	data->ScanFiles();
 
 	/* Init Player */
-//	PC = new Player(sets->PCData,data);
 	PC->SetGPos(wgen->GetPCInitPos());
 	PC->SetScenePos(data->GetGP());
 	v.X = CHUNKBOX / 2;
@@ -69,7 +68,6 @@ bool PlasticWorld::LoadGame()
 {
 	GDVec plr;
 	SSavedGameHeader* hptr;
-//	vector3di v;
 
 	plr.push_back(PC);
 

@@ -20,8 +20,6 @@ PHY Gravity												|			| in progr
 ---------------------------------------------------------------------------------------
 Add object view window									| in progr	|
 ---------------------------------------------------------------------------------------
-Implement DataPipe chunks saving and loading			| in progr	|
----------------------------------------------------------------------------------------
 Test 'tup' as a temporary build system					| done		|
 ---------------------------------------------------------------------------------------
 Implement some marks to use in voxel table				| done		|
@@ -59,4 +57,6 @@ Implement actors limbs mechanics						| done		|
 Implement DataPipe chnuks mapping on load				| done		|
 ---------------------------------------------------------------------------------------
 Add dry-run flag to game settings						| done		|
+---------------------------------------------------------------------------------------
+Implement DataPipe chunks saving and loading			| done		|
 ---------------------------------------------------------------------------------------

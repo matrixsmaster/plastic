@@ -229,7 +229,6 @@ void DataPipe::PurgeChunks()
 	WriteLock();
 	for (i = 0; i < HOLDCHUNKS; i++)
 		if (chunks[i]) {
-//			SaveChunk(i);
 			free(chunks[i]);
 			chunks[i] = NULL;
 			allocated -= sizeof(VChunk);
