@@ -37,7 +37,7 @@ void DataPipe::ScanFiles()
 	FILE* f;
 	char fn[MAXPATHLEN];
 	SDataPlacement cp;
-	SVector3di cv;
+	SChunkFileRec rec;
 
 	//scan world files to map known chunks
 	for (chsavelast = 0; ; chsavelast++) {
@@ -61,26 +61,23 @@ void DataPipe::ScanFiles()
 			cp.offset = (ulli)ftell(f);
 			cp.filenum = chsavelast;
 
-			//read chunk position
-			if (fread(&cv,sizeof(cv),1,f) < 1) {
+			//read chunk sub-header
+			if (fread(&rec,sizeof(rec),1,f) < 1) {
 				if (feof(f)) break; //EOF will be set only after the next read beyond the EOF :)
-				errout("Unable to read chunk position vector at %llu in file '%s'\n",cp.offset,fn);
+				errout("Unable to read chunk sub-header at %llu in file '%s'\n",cp.offset,fn);
 				break;
 			}
-			cp.pos = vector3di(cv);
 
-			//read chunk data length
-			if (fread(&(cp.length),sizeof(cp.length),1,f) < 1) {
-				errout("Unable to read chunk data length at %llu in file '%s'\n",cp.offset,fn);
-				break;
-			}
+			//fill placement data
+			cp.pos = rec.pos;
+			cp.length = rec.length;
 
 			//append position information and advance through file
 			placetab.insert(std::make_pair(GetChunkLinearOffset(cp.pos),cp));
 			fseek(f,cp.length,SEEK_CUR);
 
 #ifdef DPDEBUG
-			dbg_print("[DP] Detected data for chunk at [%d %d %d]; file #%llu",cv.X,cv.Y,cv.Z,chsavelast);
+			dbg_print("[DP] Detected data for chunk at [%d %d %d]; file #%llu",cp.pos.X,cp.pos.Y,cp.pos.Z,chsavelast);
 #endif
 		}
 
@@ -130,8 +127,8 @@ bool DataPipe::LoadChunk(SDataPlacement* res, PChunk buf)
 		return false;
 	}
 
-	//go to position and skip chunk position vector and data size
-	fseek(sav,res->offset + sizeof(SVector3di) + sizeof(ulli),SEEK_SET);
+	//go to position and skip chunk sub-header
+	fseek(sav,res->offset + sizeof(SChunkFileRec),SEEK_SET);
 
 	//read data
 	if (fread(buf,res->length,1,sav) < 1) {
@@ -150,13 +147,13 @@ void DataPipe::SaveChunk(const unsigned l)
 	SDataPlacement plc;
 	char fn[MAXPATHLEN];
 	vector3di pos;
-	SVector3di sp;
+	SChunkFileRec rec;
 	bool fnd = false;
 
 	//check if this chunk should be saved
 	if ((!chstat[l].changed) || (settings.dryrun)) return;
 
-	pos = vector3di(chstat[l].gx,chstat[l].gy,chstat[l].gz);
+	pos = vector3di(chstat[l].pos);
 
 #ifdef DPDEBUG
 	dbg_print("[DP] Saving chunk %u at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
@@ -164,13 +161,13 @@ void DataPipe::SaveChunk(const unsigned l)
 
 	//if there's a file containing our chunk, use its number
 	if (!FindChunk(pos,&plc))
-		plc.filenum = chsavelast;
+		plc.filenum = chsavelast; //or just use the next number
 	else
 		fnd = true;
 
 	//get the save file name and open it
 	snprintf(fn,sizeof(fn),CHUNKSAVEFILE,root,plc.filenum);
-	sav = fopen(fn,"a+b");
+	sav = fopen(fn,"wb");
 	if (!sav) {
 		errout("[DP] SaveChunk(): unable to open the file '%s'\n",fn);
 		return;
@@ -180,21 +177,23 @@ void DataPipe::SaveChunk(const unsigned l)
 	if (fnd) {
 		fseek(sav,plc.offset,SEEK_SET);
 	} else {
+		fseek(sav,0,SEEK_END);
 		plc.offset = (ulli)ftell(sav);
-		//check the size of the resulting file
-		if ((plc.offset + (sizeof(VChunk) + sizeof(SVector3di)) * 2) >= settings.maxchfile) {
-			//open the new file (next time)
+		//check the size of the resulting file (in advance)
+		if (	(plc.offset + ((sizeof(SChunkFileRec) + sizeof(VChunk)) * 2)) >=
+				settings.maxchfile) {
+			//next time, we'll open the new file
 			chsavelast++;
 		}
 	}
 
 	//fill in placement info remaining
 	plc.length = sizeof(VChunk);
+	rec.pos = chstat[l].pos;
+	rec.length = plc.length;
 
 	//write to file
-	sp = pos.ToSimVecInt();
-	fwrite(&sp,sizeof(sp),1,sav);
-	fwrite(&(plc.length),sizeof(plc.length),1,sav);
+	fwrite(&rec,sizeof(rec),1,sav);
 	fwrite(chunks[l],sizeof(VChunk),1,sav);
 
 	//append data placement information
@@ -478,9 +477,7 @@ void DataPipe::MakeChunk(const unsigned l, const vector3di pos)
 		if (wgen) {
 			wgen->GenerateChunk(chunks[l],pos);
 			chstat[l].s = DPCHK_READY;
-			chstat[l].gx = pos.X;
-			chstat[l].gy = pos.Y;
-			chstat[l].gz = pos.Z;
+			chstat[l].pos = pos.ToSimVecInt();
 #ifdef DPDEBUG
 			dbg_print("[DP] Chunk %u generated at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
 #endif
@@ -501,9 +498,7 @@ void DataPipe::MakeChunk(const unsigned l, const vector3di pos)
 
 	} else {
 		chstat[l].s = DPCHK_READY;
-		chstat[l].gx = pos.X;
-		chstat[l].gy = pos.Y;
-		chstat[l].gz = pos.Z;
+		chstat[l].pos = pos.ToSimVecInt();
 #ifdef DPDEBUG
 		dbg_print("[DP] Chunk %u loaded at [%d %d %d]",l,pos.X,pos.Y,pos.Z);
 #endif

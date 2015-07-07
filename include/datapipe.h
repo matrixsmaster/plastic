@@ -126,7 +126,13 @@ enum EDChunkStatus {
 struct SChunkState {
 	EDChunkStatus s;
 	bool changed;
-	int gx,gy,gz;
+	SVector3di pos;
+};
+
+/* Chunk data file sub-header structure */
+struct SChunkFileRec {
+	SVector3di pos;
+	ulli length;
 };
 
 /* File data placement map record */
