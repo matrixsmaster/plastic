@@ -85,6 +85,7 @@ private:
 	float timescale;
 	int* destret;
 	volatile bool fixtimegap;
+	Inventory* baseinvent;
 //	pthread_mutex_t wrldmtx;
 
 	//FIXME: DEBUG

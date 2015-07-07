@@ -283,18 +283,20 @@ class DataPipeDummy;
 class CurseGUIVModEditWnd : public CurseGUIWnd {
 private:
 	DataPipeDummy* pipe;
+	const char* fname;
 	VModel* model;
 	bool readonly;
 	KeyBinder* binder;
 	LVR* lvr;
 	CurseGUIPicture* surf;
 	vector3d campos;
+	CurseGUIEditBox* e_fname;
 
 	void ResizeWnd(int w, int h);
 	void Retrace();
 
 public:
-	CurseGUIVModEditWnd(CurseGUI* scrn, VModel* mod, SGameSettings* setts, SVoxelTab* vtab, bool rw = false);
+	CurseGUIVModEditWnd(CurseGUI* scrn, const char* modfn, SGameSettings* setts, SVoxelTab* vtab, bool rw = false);
 	virtual ~CurseGUIVModEditWnd();
 
 	bool PutEvent(SGUIEvent* e);

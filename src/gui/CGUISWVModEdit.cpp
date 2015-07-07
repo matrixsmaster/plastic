@@ -29,9 +29,17 @@
 enum {
 	OBJEDIT_ZOOMP,
 	OBJEDIT_ZOOMM,
+	OBJEDIT_MROTXP,
+	OBJEDIT_MROTXN,
+	OBJEDIT_MROTYP,
+	OBJEDIT_MROTYN,
+	OBJEDIT_MROTZP,
+	OBJEDIT_MROTZN,
 };
 
-CurseGUIVModEditWnd::CurseGUIVModEditWnd(CurseGUI* scrn, VModel* mod, SGameSettings* setts, SVoxelTab* vtab, bool rw) :
+using namespace std;
+
+CurseGUIVModEditWnd::CurseGUIVModEditWnd(CurseGUI* scrn, const char* modfn, SGameSettings* setts, SVoxelTab* vtab, bool rw) :
 		CurseGUIWnd(scrn,0,0,4,4)
 {
 	type = GUIWT_OTHER;
@@ -41,8 +49,8 @@ CurseGUIVModEditWnd::CurseGUIVModEditWnd(CurseGUI* scrn, VModel* mod, SGameSetti
 
 	pipe = new DataPipeDummy(setts);
 	pipe->SetVoxTab(vtab);
-	model = mod;
-	pipe->AddModel(model);
+	model = pipe->LoadModel(modfn,vector3di(),vector3di());
+	fname = modfn;
 
 	lvr = new LVR(pipe);
 	campos = model->GetPos().ToReal();
@@ -61,7 +69,7 @@ CurseGUIVModEditWnd::~CurseGUIVModEditWnd()
 	delete binder;
 	delete lvr;
 
-	pipe->RemoveModel(model);
+	pipe->UnloadModel(model);
 	delete pipe;
 }
 
@@ -92,10 +100,13 @@ void CurseGUIVModEditWnd::ResizeWnd(int w, int h)
 	h = (parent->GetHeight() - h) / 2;
 	Move(w,h);
 
+	//create filename editbox
+	e_fname = new CurseGUIEditBox(ctrls,1,1,g_w-2,string(fname));
+
 	//create working surface
 	w = g_w - 2 - ((readonly)? 0:VMODEDITRPAN);
 	h = g_h - 2 - ((readonly)? 0:VMODEDITBPAN);
-	surf = new CurseGUIPicture(ctrls,1,1,w,h);
+	surf = new CurseGUIPicture(ctrls,1,2,w,h);
 	lvr->Resize(w,h);
 
 	Retrace();
@@ -134,6 +145,15 @@ bool CurseGUIVModEditWnd::PutEvent(SGUIEvent* e)
 			case OBJEDIT_ZOOMM:
 				campos.Y -= 1;
 				lvr->SetPosition(campos);
+				break;
+
+			case OBJEDIT_MROTXP:
+			case OBJEDIT_MROTXN:
+			case OBJEDIT_MROTYP:
+			case OBJEDIT_MROTYN:
+			case OBJEDIT_MROTZP:
+			case OBJEDIT_MROTZN:
+				//TODO
 				break;
 			}
 		}

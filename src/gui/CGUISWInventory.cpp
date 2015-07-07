@@ -80,7 +80,7 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	ctrls = new CurseGUICtrlHolder(this);
 
 	//set the number of rows
-	nr = invent->GetNumberItems() + 1;
+	nr = invent->GetNumItems() + 1;
 
 	//create table
 	table = new CurseGUITable(ctrls,x1,y1,nr,nc,wwt,ht,wt, true);
@@ -133,7 +133,7 @@ void CurseGUIInventoryWnd::FillInventoryTable()
 {
 	char tmp[5];
 
-	for (int i = 1; i < invent->GetNumberItems()+1; ++i) {
+	for (int i = 1; i < invent->GetNumItems()+1; ++i) {
 		sprintf(tmp, "%d", i);
 		table->SetData(string(tmp), i, 0);
 		table->SetData(invent->GetInventoryObject(i-1)->GetName(), i, 1);
@@ -149,7 +149,7 @@ void CurseGUIInventoryWnd::SetSelectedItem()
 	int n;
 
 	if (sitem < 1) sitem = 1;
-	else if (sitem > invent->GetNumberItems()) sitem = invent->GetNumberItems();
+	else if (sitem > invent->GetNumItems()) sitem = invent->GetNumItems();
 
 	//previous item
 	sprintf(tmp, "%d", prev);
@@ -186,7 +186,7 @@ int CurseGUIInventoryWnd::Search(int n)
 
 	pt = search_edit->GetText();
 
-	for (i = n; i < invent->GetNumberItems(); i++) {
+	for (i = n; i < invent->GetNumItems(); i++) {
 		switch(srch) {
 		case 2: //search by description
 			nm = invent->GetInventoryObject(i)->GetDesc();
@@ -224,7 +224,7 @@ void CurseGUIInventoryWnd::SearchObject()
 void CurseGUIInventoryWnd::DestroyObject()
 {
 	InventoryObject *obj;
-	if (!invent->GetNumberItems()) return;
+	if (!invent->GetNumItems()) return;
 
 	obj = invent->GetInventoryObject(sitem-1);
 
@@ -242,7 +242,7 @@ void CurseGUIInventoryWnd::DestroyObject()
 	//fill table and select first item
 	FillTableHeader();
 
-	if(invent->GetNumberItems() > 0) {
+	if(invent->GetNumItems() > 0) {
 		FillInventoryTable();
 		SetSelectedItem();
 	} else description_lbl->SetCaption("You have no items.");
@@ -271,7 +271,7 @@ void CurseGUIInventoryWnd::RepairObject()
 
 void CurseGUIInventoryWnd::Sort()
 {
-	if (invent->GetNumberItems() < 1) return;
+	if (invent->GetNumItems() < 1) return;
 
 	//clear table
 	table->EraseTableData();
@@ -364,7 +364,7 @@ bool CurseGUIInventoryWnd::PutEvent(SGUIEvent* e)
 			return true;
 		case KEY_END:
 			prev = sitem;
-			sitem = invent->GetNumberItems();
+			sitem = invent->GetNumItems();
 			SetSelectedItem();
 			return true;
 		}

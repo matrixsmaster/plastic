@@ -62,6 +62,7 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 	timescale = 1.f;
 	destret = NULL;
 	fixtimegap = false;
+	baseinvent = NULL;
 
 	/* Create and set up DataPipe */
 	data = new DataPipe(sets);
@@ -90,6 +91,13 @@ PlasticWorld::PlasticWorld(SGameSettings* settings)
 
 	/* Connect wgen to datapipe */
 	data->ConnectWorldGen(wgen);
+
+	/* Load up basic inventory objects */
+	baseinvent = new Inventory();
+	if (!baseinvent->LoadBasicInventory(BASEINVININAME)) {
+		result = 4;
+		return;
+	}
 
 	/* Create or Load saved game data */
 	if (sets->new_game) {
@@ -516,7 +524,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			case '5': tr.Z -= 2; break;
 			case '6': tr.Z += 2; break;
 
-			case '8': SPAWNWNDMACRO(WNDNAM_VMODEDIT,new CurseGUIVModEditWnd(gui,test,sets,data->GetVoxTable(),true)); break;
+			case '8': SPAWNWNDMACRO(WNDNAM_VMODEDIT,new CurseGUIVModEditWnd(gui,"testmodel.dat",sets,data->GetVoxTable(),true)); break;
 
 			case KEY_F(4):
 					gui->GetColorManager()->Flush();

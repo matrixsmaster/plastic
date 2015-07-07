@@ -160,7 +160,13 @@ bool Inventory::DeserializeFromFile(FILE* f)
 	return false;
 }
 
-int Inventory::GetNumberItems()
+bool Inventory::LoadBasicInventory(const char* fname)
+{
+	//TODO
+	return true;
+}
+
+int Inventory::GetNumItems()
 {
 	return items.size();
 }

@@ -31,6 +31,8 @@ More 'global' or just not-started-yet tasks are here (not sorted):
 -> Move to GNU Autotools. This will cause a lot of work on implementing different use-cases. Most notably, misconsts.h should die.
 
 -> Consider movement of raycasting calculations from LVR to DataPipe to speed up model intersection testing.
+Upd: consider use of "raycast context", which should be used by every LVR worker instance. In this case, raycasting itself would
+stay at its place, in LVR; but DataPipe will work faster on point to model intersections.
 
 -> Draw some simple buildings (one or two stories)
 

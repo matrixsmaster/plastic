@@ -103,6 +103,10 @@
 ///Package file name pattern.
 #define PACKAGEFNPAT "%s/usr/%s.pck"
 
+///Global inventory base file name.
+#define BASEINVININAME "iobjects"
+
+
 /* **************************** DATA PIPE SUPPORT TYPES **************************** */
 
 /* States of DataPipe */
