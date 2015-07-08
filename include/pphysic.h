@@ -28,6 +28,7 @@
 #define CONTACT 1
 //#define PHYDEBUG
 
+#define PHY_COLLISION_EPSILON 0.4
 
 struct SPPModelRec {
 	VModel* modptr;
@@ -53,7 +54,7 @@ private:
 	volatile bool locked;
 	PPModVec mods;
 
-	bool CheckSurroundingVox(const VModel* ptr, const vector3di p);
+	bool CheckUnderlineVox(const VModel* ptr, const vector3di p);
 	vector3di ResolveCollision(const SPPCollision ccol, const vector3di v);
 	bool Contact(const SPPModelRec* mod);
 

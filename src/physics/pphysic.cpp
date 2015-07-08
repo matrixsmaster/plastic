@@ -35,11 +35,12 @@ PlasticPhysics::~PlasticPhysics()
 }
 
 
-bool PlasticPhysics::CheckSurroundingVox(const VModel* ptr, const vector3di p)
+bool PlasticPhysics::CheckUnderlineVox(const VModel* ptr, const vector3di p)
 {
 	vector3di cp = p;
 	VModel* misc;
 
+	//set underline coord
 	cp.Z -= 1;
 
 	//Search contact with world
@@ -49,27 +50,6 @@ bool PlasticPhysics::CheckSurroundingVox(const VModel* ptr, const vector3di p)
 	if (pipe->IntersectModel(&cp,&misc,ptr,false)) return true;
 
 	return false;
-
-#if 0
-	cp.Z += 1;
-	cp.X -= 1;
-	if (pipe->GetVoxel(&cp , true)) return true;
-	cp.X += 1;
-	cp.Z += 1;
-	if (pipe->GetVoxel(&cp , true)) return true;
-	cp.X += 1;
-	cp.Z += 1;
-	if (pipe->GetVoxel(&cp , true)) return true;
-	cp.Z -= 1;
-	cp.X += 1;
-	if (pipe->GetVoxel(&cp , true)) return true;
-	cp.X -= 1;
-	cp.Y -= 1;
-	if (pipe->GetVoxel(&cp , true)) return true;
-	cp.Y += 2;
-	if (pipe->GetVoxel(&cp , true)) return true;
-	return false;
-#endif
 }
 
 bool PlasticPhysics::Contact(const SPPModelRec* mod)
@@ -92,6 +72,7 @@ bool PlasticPhysics::Contact(const SPPModelRec* mod)
 	ey = sp.Y + b/2;
 	ez = sp.Z + b/2;
 
+	//Search contact
 	for (p.Z = sz; p.Z < ez; ++(p.Z)) {
 		for (p.X = sx; p.X < ex; ++(p.X)) {
 			for (p.Y = sy; p.Y < ey; ++(p.Y)) {
@@ -99,7 +80,7 @@ bool PlasticPhysics::Contact(const SPPModelRec* mod)
 				ov = mod->modptr->GetVoxelAt(&p);
 				if (ov)
 					//Check surrounding voxels
-					if (CheckSurroundingVox(mod->modptr,p)) {
+					if (CheckUnderlineVox(mod->modptr,p)) {
 						contact = true;
 						break;
 					}
@@ -108,7 +89,6 @@ bool PlasticPhysics::Contact(const SPPModelRec* mod)
 		}
 		if (contact) break;
 	}
-
 #ifdef PHYDEBUG
 	if (c.contact)
 		dbg_print("[PHY] Contact on [ %d %d %d ] voxel (%p)", p.X, p.Y, p.Z, mod->modptr);
@@ -146,10 +126,13 @@ const SPPCollision PlasticPhysics::Collision(const SPPModelRec* mod)
 		for (p.Y = sy; p.Y < ey; ++(p.Y)) {
 			for (p.Z = sz; p.Z < ez; ++(p.Z)) {
 
-				//Get voxel from scene
+				//Get voxel from scene (static)
 				sv = pipe->GetVoxel(&p, true);
+				//Get voxel from actors (dynamic)
 				if (!sv)
 					sv = pipe->IntersectModel(&p,&misc,mod->modptr,false);
+
+				if (!sv) continue;
 
 				//Get voxel from model
 				ov = mod->modptr->GetVoxelAt(&p);
@@ -182,7 +165,7 @@ vector3di PlasticPhysics::ResolveCollision(const SPPCollision ccol, const vector
 	vector3di b_s = ccol.start - v;
 
 	//normalization of the vector
-	vector3di b_ss = b_s.Normalize();
+	vector3di b_ss = b_s.Normalize(PHY_COLLISION_EPSILON);
 
 	//take the offset
 	vector3di c_s = b_ss * ccol.depth;
@@ -191,7 +174,7 @@ vector3di PlasticPhysics::ResolveCollision(const SPPCollision ccol, const vector
 	c_s *= -1;
 
 	//displace vector and returns it
-	return (c_s + v);
+	return (vector3di(c_s) + v);
 }
 
 
@@ -235,7 +218,7 @@ void PlasticPhysics::Quantum()
 				im->oldspos = (*iv)->GetPos();
 				im->newpos = im->oldspos;
 				im->moved = true;
-			}
+			} else im->newpos = im->oldspos;
 			++im;
 		} else {
 			//model vector is out of sync
@@ -274,12 +257,12 @@ void PlasticPhysics::Quantum()
 		}
 
 		/* Gravity */
-		vector3di g(0,0,-1);
-		if (!ccol.no_collision)
-			g = vector3di(0,0,1);
-		im->newpos += g;
-
-		//TODO: move object
+		if (!im->contact) {
+			vector3di g(0,0,-1);
+			if (!ccol.no_collision)
+				g = vector3di(0,0,1);
+			im->newpos += g;
+		}
 
 		im->changed = true;
 		sys_changed = true;
@@ -302,9 +285,10 @@ void PlasticPhysics::Quantum()
 
 		//check model needs updating
 		if (!im->changed) continue;
-
-		dbg_print("oldpos|newpos [ %d %d %d ] [ %d %d %d ]", im->oldspos.X, im->oldspos.Y, im->oldspos.Z,
-				im->newpos.X, im->newpos.Y, im->newpos.Z);
+//#if PHYDEBUG
+		dbg_print("oldpos|newpos [ %d %d %d ] [ %d %d %d ] (%p)", im->oldspos.X, im->oldspos.Y, im->oldspos.Z,
+				im->newpos.X, im->newpos.Y, im->newpos.Z, im->modptr);
+//#endif
 		//actually update the model position
 		im->modptr->SetPos(im->newpos);
 	}

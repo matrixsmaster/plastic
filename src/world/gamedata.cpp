@@ -84,6 +84,7 @@ bool PlasticWorld::LoadGame()
 	/* Init Player */
 	if (!data->DeserializeThem<PlasticActor>(&plr,"player",false)) return false;
 	data->SetGP(PC->GetGPos());
+	PC->SetScenePos(PC->GetGPos());
 
 	/* Load all actors */
 	if (!society->Load()) return false;

@@ -196,7 +196,7 @@ void PlasticWorld::Quantum()
 		hud->PutStrToLog(msgsys->GetMessage("WELCOME_LOG"));
 
 		//FIXME: debugging stuff
-		test = data->LoadModel("testmodel.dat",PC->GetPos()+vector3di(0,0,20),data->GetGP());
+		test = data->LoadModel("testmodel.dat",PC->GetPos()+vector3di(0,40,20),data->GetGP());
 		if (!test) abort();
 	}
 

@@ -11,7 +11,7 @@ v.0.3 (pre-alpha) -------------------------------------------------------------
 v.0.2 (tech demo) -------------------------------------------------------------
 	Filled voxel table (all physical types should be present)
 	Completed static world generation
-	Simple rigid physics (collisions and gravity)
+OK	Simple rigid physics (collisions and gravity)
 OK	Actors limbs mechanics and somewhat working combat mode
 	Actors animations and movement
 	Actors portraits generation

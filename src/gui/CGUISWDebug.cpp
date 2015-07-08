@@ -148,6 +148,7 @@ bool CurseGUIDebugWnd::PutEvent(SGUIEvent* e)
 			break;
 
 		default:
+#if 0
 			//FIXME: are we need this?
 			if((e->k >= 'A' && e->k <= 'Z') ||
 					(e->k >= 'a' && e->k <= 'z') ||
@@ -157,7 +158,9 @@ bool CurseGUIDebugWnd::PutEvent(SGUIEvent* e)
 				edit = true;
 				return true;
 			}
+#endif
 			break;
+
 		}
 		break;
 	default: break;

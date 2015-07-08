@@ -131,8 +131,12 @@ public:
 	SVector3di ToSimVecInt() const						{ SVector3di r; r.X=X; r.Y=Y; r.Z=Z;  return r; }
 	T Module() const									{ return (T)round(sqrt(X*X + Y*Y + Z*Z)); }
 	T DotProduct(const CPoint3Di & s) const				{ return X*s.X + Y*s.Y + Z*s.Z; }
-	CPoint3Di Normalize() const							{ return CPoint3Di(ToReal().Normalize()); }
 	T Max()												{ CPoint2D<T> a(X,Y); a = CPoint2D<T>(a.Max(),Z); return a.Max(); }
+	CPoint3Di Normalize() const							{ return CPoint3Di(ToReal().Normalize()); }
+	CPoint3Di Normalize(double epsilon) const
+			{ CPoint3D a(ToReal().Normalize()); return CPoint3Di(	((fabs(a.X)<epsilon)? 0:copysign(1,a.X)),
+																	((fabs(a.Y)<epsilon)? 0:copysign(1,a.Y)),
+																	((fabs(a.Z)<epsilon)? 0:copysign(1,a.Z))); }
 	T X, Y, Z;
 };
 
