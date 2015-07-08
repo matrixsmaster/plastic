@@ -22,13 +22,16 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <stdlib.h>
 #include "IGData.h"
+#include "vmodel.h"
+#include "vsprite.h"
 
 
 /* Basic inventory item */
 class InventoryObject : public IGData {
-private:
+protected:
 	std::string name,desc;
 	int weight,cond,cost;
 
@@ -88,5 +91,19 @@ public:
 };
 
 /* ******************************************************************** */
+
+class WearableObject : public InventoryObject {
+protected:
+	std::map<voxel,voxel> replacement; //Original voxel id -> Replacement voxel id
+
+public:
+	WearableObject();
+	virtual ~WearableObject();
+
+	void AddReplacement(const voxel old_id, const voxel new_id);
+	void RemoveReplacement(const voxel original_id);
+
+	void ApplyToModel(VModel* mod);
+};
 
 #endif /* INVENTORY_H_ */

@@ -43,7 +43,7 @@
 #define DEFRAMMAX (2ULL * 1024*1024*1024)
 
 ///Define this to enable DataPipe debugging.
-#define DPDEBUG 1
+//#define DPDEBUG 1
 
 ///Soft lock DataPipe on each voxel access operation.
 ///Don't use this feature with LVR.

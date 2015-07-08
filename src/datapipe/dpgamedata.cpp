@@ -190,7 +190,9 @@ bool DataPipe::SerializeThem(GDVec* arr, const char* name)
 	for (ia = arr->begin(); ia != arr->end(); ++ia)
 		if (!(((*ia))->SerializeToFile(f))) {
 			/* Something went wrong */
+#ifdef DPDEBUG
 			dbg_print("[DP] Unable to serialize object %p",(*ia));
+#endif
 			fclose(f);
 			return false;
 		}

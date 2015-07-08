@@ -285,10 +285,10 @@ void PlasticPhysics::Quantum()
 
 		//check model needs updating
 		if (!im->changed) continue;
-//#if PHYDEBUG
+#if PHYDEBUG
 		dbg_print("oldpos|newpos [ %d %d %d ] [ %d %d %d ] (%p)", im->oldspos.X, im->oldspos.Y, im->oldspos.Z,
 				im->newpos.X, im->newpos.Y, im->newpos.Z, im->modptr);
-//#endif
+#endif
 		//actually update the model position
 		im->modptr->SetPos(im->newpos);
 	}
