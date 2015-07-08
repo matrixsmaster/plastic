@@ -27,6 +27,11 @@
 
 
 enum {
+	OBJEDIT_WORK,
+	OBJEDIT_WNDXP,
+	OBJEDIT_WNDXN,
+	OBJEDIT_WNDYP,
+	OBJEDIT_WNDYN,
 	OBJEDIT_ZOOMP,
 	OBJEDIT_ZOOMM,
 	OBJEDIT_MROTXP,
@@ -35,6 +40,7 @@ enum {
 	OBJEDIT_MROTYN,
 	OBJEDIT_MROTZP,
 	OBJEDIT_MROTZN,
+	OBJEDIT_MROTRST,
 };
 
 using namespace std;
@@ -49,16 +55,29 @@ CurseGUIVModEditWnd::CurseGUIVModEditWnd(CurseGUI* scrn, const char* modfn, SGam
 
 	pipe = new DataPipeDummy(setts);
 	pipe->SetVoxTab(vtab);
-	model = pipe->LoadModel(modfn,vector3di(),vector3di());
+	model = (modfn)? (pipe->LoadModel(modfn,vector3di(),vector3di())):NULL;
 	fname = modfn;
 
 	lvr = new LVR(pipe);
-	campos = model->GetPos().ToReal();
+	if (model)
+		campos = model->GetPos().ToReal();
 	lvr->SetPosition(campos);
 
 	binder = new KeyBinder(pipe);
+	binder->RegKeyByName("OBJEDIT_WORK",OBJEDIT_WORK);
+	binder->RegKeyByName("OBJEDIT_WNDXP",OBJEDIT_WNDXP);
+	binder->RegKeyByName("OBJEDIT_WNDXN",OBJEDIT_WNDXN);
+	binder->RegKeyByName("OBJEDIT_WNDYP",OBJEDIT_WNDYP);
+	binder->RegKeyByName("OBJEDIT_WNDYN",OBJEDIT_WNDYN);
 	binder->RegKeyByName("OBJEDIT_ZOOMP",OBJEDIT_ZOOMP);
 	binder->RegKeyByName("OBJEDIT_ZOOMM",OBJEDIT_ZOOMM);
+	binder->RegKeyByName("OBJEDIT_MROTXP",OBJEDIT_MROTXP);
+	binder->RegKeyByName("OBJEDIT_MROTXN",OBJEDIT_MROTXN);
+	binder->RegKeyByName("OBJEDIT_MROTYP",OBJEDIT_MROTYP);
+	binder->RegKeyByName("OBJEDIT_MROTYN",OBJEDIT_MROTYN);
+	binder->RegKeyByName("OBJEDIT_MROTZP",OBJEDIT_MROTZP);
+	binder->RegKeyByName("OBJEDIT_MROTZN",OBJEDIT_MROTZN);
+	binder->RegKeyByName("OBJEDIT_MROTRST",OBJEDIT_MROTRST);
 
 	SetAutoAlloc(true);
 	ResizeWnd(scrn->GetWidth()/2,scrn->GetHeight()/2);
@@ -69,7 +88,7 @@ CurseGUIVModEditWnd::~CurseGUIVModEditWnd()
 	delete binder;
 	delete lvr;
 
-	pipe->UnloadModel(model);
+	if (model) pipe->UnloadModel(model);
 	delete pipe;
 }
 
@@ -124,19 +143,38 @@ void CurseGUIVModEditWnd::Retrace()
 
 bool CurseGUIVModEditWnd::PutEvent(SGUIEvent* e)
 {
+	vector3di mr;
+
 	if (will_close) return false;
+
+	/* Check for 'return to work' mode key */
+	if ((e->t == GUIEV_KEYPRESS) && (binder->DecodeKey(e->k) == OBJEDIT_WORK)) {
+		ctrls->Select(NULL);
+		return true;
+	}
 
 	/* Put the event to controls first */
 	if (ctrls->PutEvent(e)) return true;
 
+	/* Get the model rotation */
+	if (model) mr = model->GetRot();
+
 	/* Window-wide event */
 	switch (e->t) {
 	case GUIEV_KEYPRESS:
+		/* Standard key decoding */
 		switch (e->k) {
+		/* Standard GUI shortcuts */
 		case GUI_DEFCLOSE: will_close = true; return true;
 		case '\t': ctrls->Rotate(); break;
 		default:
+			/* Window-specific controls */
 			switch (binder->DecodeKey(e->k)) {
+			case OBJEDIT_WNDXP: ResizeWnd(g_w+1,g_h); break;
+			case OBJEDIT_WNDXN: ResizeWnd(g_w-1,g_h); break;
+			case OBJEDIT_WNDYP: ResizeWnd(g_w,g_h+1); break;
+			case OBJEDIT_WNDYN: ResizeWnd(g_w,g_h-1); break;
+
 			case OBJEDIT_ZOOMP:
 				campos.Y += 1;
 				lvr->SetPosition(campos);
@@ -147,22 +185,44 @@ bool CurseGUIVModEditWnd::PutEvent(SGUIEvent* e)
 				lvr->SetPosition(campos);
 				break;
 
-			case OBJEDIT_MROTXP:
-			case OBJEDIT_MROTXN:
-			case OBJEDIT_MROTYP:
-			case OBJEDIT_MROTYN:
-			case OBJEDIT_MROTZP:
-			case OBJEDIT_MROTZN:
-				//TODO
-				break;
+			case OBJEDIT_MROTXP: mr.X += 2; break;
+			case OBJEDIT_MROTXN: mr.X -= 2; break;
+			case OBJEDIT_MROTYP: mr.Y += 2; break;
+			case OBJEDIT_MROTYN: mr.Y -= 2; break;
+			case OBJEDIT_MROTZP: mr.Z += 2; break;
+			case OBJEDIT_MROTZN: mr.Z -= 2; break;
+			case OBJEDIT_MROTRST: mr = vector3di(); break;
 			}
 		}
+		if (model) model->SetRot(mr);
 		Retrace();
 		return true;
 
-//	case GUIEV_MOUSE:
-//		//TODO
-//		return true;
+	case GUIEV_CTLBACK:
+		switch (e->b.t) {
+		case GUIFB_EDITOK:
+			if (e->b.ctl == e_fname) {
+				//file name changed
+				if (model)
+					pipe->UnloadModel(model);
+				if (e_fname->GetText().empty()) {
+					fname = NULL;
+					model = NULL;
+				} else {
+					fname = e_fname->GetText().c_str();
+					model = pipe->LoadModel(fname,vector3di(),vector3di());
+					if (model) {
+						campos = model->GetPos().ToReal();
+						Retrace();
+					}
+					dbg_print("[MODEDIT]: model '%s' loaded to %p",fname,model);
+				}
+			}
+			break;
+
+		default: break;
+		}
+		break;
 
 	case GUIEV_RESIZE:
 		UpdateSize();

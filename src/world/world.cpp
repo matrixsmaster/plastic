@@ -525,7 +525,7 @@ void PlasticWorld::ProcessEvents(SGUIEvent* e)
 			case '5': tr.Z -= 2; break;
 			case '6': tr.Z += 2; break;
 
-			case '8': SPAWNWNDMACRO(WNDNAM_VMODEDIT,new CurseGUIVModEditWnd(gui,"testmodel.dat",sets,data->GetVoxTable(),true)); break;
+			case '8': SPAWNWNDMACRO(WNDNAM_VMODEDIT,new CurseGUIVModEditWnd(gui,"testmodel.dat",sets,data->GetVoxTable())); break;
 
 			case KEY_F(4):
 					gui->GetColorManager()->Flush();
