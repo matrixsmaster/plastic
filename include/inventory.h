@@ -27,6 +27,7 @@
 #include "IGData.h"
 #include "vmodel.h"
 #include "vsprite.h"
+#include "actortypes.h"
 
 
 /* Basic inventory item */
@@ -34,6 +35,7 @@ class InventoryObject : public IGData {
 protected:
 	std::string name,desc;
 	int weight,cond,cost;
+	SPABase boost;
 
 public:
 	InventoryObject();
@@ -92,18 +94,35 @@ public:
 
 /* ******************************************************************** */
 
+/* Wearable object type */
 class WearableObject : public InventoryObject {
 protected:
-	std::map<voxel,voxel> replacement; //Original voxel id -> Replacement voxel id
+	std::map<voxel,voxel> replacement;		//Original voxel id -> Replacement voxel id
+	VModel* oldmod;
 
 public:
 	WearableObject();
 	virtual ~WearableObject();
 
 	void AddReplacement(const voxel old_id, const voxel new_id);
+	void AddReplacement(const SVoxelTab* vtab, const char* oldmkr, const char* newmrk);
 	void RemoveReplacement(const voxel original_id);
 
 	void ApplyToModel(VModel* mod);
+	void RemoveFromModel(VModel* mod);
+};
+
+/* Raw voxel storage type */
+class VoxelObject : public InventoryObject {
+protected:
+	voxel stored;
+
+public:
+	VoxelObject();
+	virtual ~VoxelObject();
+
+	void SetVoxelId(voxel id)				{ stored = id; }
+	voxel GetVoxelId()						{ return stored; }
 };
 
 #endif /* INVENTORY_H_ */

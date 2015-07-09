@@ -450,3 +450,10 @@ voxel VModel::GetVoxelAt(const vector3di* p)
 	if (l >= buflen) return 0;
 	return buf[l]; //got the voxel
 }
+
+vector3di VModel::GetPlaceOfVoxel(const vector3di* start, voxel id)
+{
+	vector3di r;
+	//TODO
+	return r;
+}
