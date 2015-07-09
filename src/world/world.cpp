@@ -423,6 +423,10 @@ bool PlasticWorld::FireTo(const vector3di pnt, SWRayObjIntersect* isc)
 
 	} else {
 		//to a static world
+
+		//FIXME: debug
+		PC->GetInventory()->AddObject(new VoxelObject(data->GetVoxel(&pnt,true)));
+
 		data->ChangeVoxelAt(&pnt,0);
 	}
 

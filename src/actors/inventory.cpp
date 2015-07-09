@@ -19,21 +19,41 @@
 
 #include <string.h>
 #include "inventory.h"
+#include "actorhelpers.h"
 
 using namespace std;
 
 InventoryObject::InventoryObject() : IGData()
 {
+	kind = INVK_BASE;
+	InitVars();
+}
+
+InventoryObject::InventoryObject(EInventoryKind k) : IGData()
+{
+	kind = k;
+	InitVars();
+}
+
+void InventoryObject::InitVars()
+{
 	name = "";
 	desc = "";
-	weight = cond = cost = count = 0;
+	weight = cond = cost = 0;
+	count = 1;
 	memset(&boost,0,sizeof(boost));
+}
+
+const bool InventoryObject::BaseEqualTo(const InventoryObject & obj)
+{
+	return ((kind == obj.kind) && (name == obj.name) && (desc == obj.desc) &&
+			(weight == obj.weight) && (cond == obj.cond) && (cost == obj.cost) &&
+			IsPABaseEqual(boost,obj.boost));
 }
 
 const bool InventoryObject::operator == (const InventoryObject & obj)
 {
-	return (name == obj.name) && (desc == obj.desc) && (weight == obj.weight)
-			&& (cond == obj.cond) && (cost == obj.cost);
+	return BaseEqualTo(obj);
 }
 
 bool InventoryObject::SerializeToFile(FILE* f)
@@ -182,7 +202,19 @@ bool Inventory::DeserializeFromFile(FILE* f)
 
 void Inventory::AddObject(InventoryObject* obj)
 {
-	if (obj) items.push_back(obj);
+	vector<InventoryObject*>::iterator it;
+
+	if (!obj) return;
+
+	//check if we're already have this object
+	for (it = items.begin(); it != items.end(); ++it)
+		if ((*(*it)) == (*obj)) {
+			(*it)->IncCount();
+			return;
+		}
+
+	//add it
+	items.push_back(obj);
 }
 
 InventoryObject* Inventory::GetInventoryObject(int n)

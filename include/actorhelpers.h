@@ -29,4 +29,6 @@ bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe);
 
 void GetActorClassDescr(EPAClass c, char* str, unsigned len, DataPipe* pipe);
 
+bool IsPABaseEqual(const SPABase a, const SPABase b);
+
 #endif /* ACTORHELPERS_H_ */

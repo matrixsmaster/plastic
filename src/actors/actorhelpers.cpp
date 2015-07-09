@@ -115,3 +115,9 @@ void GetActorClassDescr(EPAClass c, char* str, unsigned len, DataPipe* pipe)
 
 	pipe->GetIniDataC(CLASNFONAME,fld.c_str(),str,len);
 }
+
+bool IsPABaseEqual(const SPABase a, const SPABase b)
+{
+	//TODO
+	return true;
+}

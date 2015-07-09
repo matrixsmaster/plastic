@@ -30,21 +30,38 @@
 #include "actortypes.h"
 
 
+/* Kinds of inventory objects */
+enum EInventoryKind {
+	INVK_BASE,
+	INVK_WEARABLE,
+	INVK_VOXEL,
+};
+
+
 /* Basic inventory item */
 class InventoryObject : public IGData {
 protected:
+	EInventoryKind kind;
 	std::string name,desc;
 	int weight,cond,cost,count;
 	SPABase boost;
 
+	//Internal basic variables initialization.
+	void InitVars();
+
+	//Basic comparative function to be able to use comparison in child's operators.
+	const bool BaseEqualTo(const InventoryObject & obj);
+
 public:
 	InventoryObject();
+	InventoryObject(EInventoryKind k);
 	virtual ~InventoryObject()		{}
 
 	virtual const bool operator == (const InventoryObject & obj);
 	virtual bool SerializeToFile(FILE* f);
 	virtual bool DeserializeFromFile(FILE* f);
 
+	virtual void SetKind(EInventoryKind k)		{ kind = k; }
 	virtual void SetName(const std::string s)	{ name = s; }
 	virtual void SetDesc(const std::string s)	{ desc = s; }
 	virtual void SetWeight(const int s)			{ weight = s; }
@@ -55,6 +72,7 @@ public:
 	virtual bool DecCount();
 	virtual void SetBoost(SPABase nb)			{ boost = nb; }
 
+	virtual EInventoryKind GetKind()			{ return kind; }
 	virtual std::string GetName()				{ return name; }
 	virtual std::string GetDesc()				{ return desc; }
 	virtual int GetWeight()						{ return weight; }
@@ -133,11 +151,12 @@ protected:
 	voxel stored;
 
 public:
-	VoxelObject();
-	virtual ~VoxelObject();
+	VoxelObject() : InventoryObject(INVK_VOXEL)			{ stored = 0; name = "voxel"; } //FIXME: testing
+	VoxelObject(voxel s) : InventoryObject(INVK_VOXEL)	{ stored = s; name = "voxel"; }
+	virtual ~VoxelObject()								{}
 
-	void SetVoxelId(voxel id)				{ stored = id; }
-	voxel GetVoxelId()						{ return stored; }
+	void SetVoxelId(voxel id)							{ stored = id; }
+	voxel GetVoxelId()									{ return stored; }
 };
 
 #endif /* INVENTORY_H_ */

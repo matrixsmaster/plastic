@@ -21,7 +21,7 @@
 
 using namespace std;
 
-WearableObject::WearableObject() : InventoryObject()
+WearableObject::WearableObject() : InventoryObject(INVK_WEARABLE)
 {
 	oldmod = NULL;
 }
