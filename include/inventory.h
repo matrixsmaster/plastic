@@ -53,7 +53,7 @@ public:
 	virtual void SetCount(const int s)			{ count = s; }
 	virtual void IncCount()						{ ++count; }
 	virtual bool DecCount();
-
+	virtual void SetBoost(SPABase nb)			{ boost = nb; }
 
 	virtual std::string GetName()				{ return name; }
 	virtual std::string GetDesc()				{ return desc; }
@@ -61,6 +61,7 @@ public:
 	virtual int GetCondition()					{ return cond; }
 	virtual int GetCost()						{ return cost; }
 	virtual int GetCount() 						{ return count; }
+	virtual SPABase GetBoost()					{ return boost; }
 };
 
 /* ******************************************************************** */
@@ -78,8 +79,11 @@ public:
 	bool SerializeToFile(FILE* f);
 	bool DeserializeFromFile(FILE* f);
 
+	///Adds an object to the inventory list.
+	void AddObject(InventoryObject* obj);
+
 	///Returns the number of objects contained in the inventory.
-	int GetNumItems();
+	int GetNumItems()							{ return items.size(); }
 
 	///Returns an object from the inventory.
 	InventoryObject * GetInventoryObject(int n);

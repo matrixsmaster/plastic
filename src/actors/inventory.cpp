@@ -180,9 +180,9 @@ bool Inventory::DeserializeFromFile(FILE* f)
 	return false;
 }
 
-int Inventory::GetNumItems()
+void Inventory::AddObject(InventoryObject* obj)
 {
-	return items.size();
+	if (obj) items.push_back(obj);
 }
 
 InventoryObject* Inventory::GetInventoryObject(int n)
