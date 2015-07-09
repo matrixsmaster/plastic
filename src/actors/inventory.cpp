@@ -25,7 +25,7 @@ InventoryObject::InventoryObject() : IGData()
 {
 	name = "";
 	desc = "";
-	weight = cond = cost = 0;
+	weight = cond = cost = count = 0;
 }
 
 const bool InventoryObject::operator == (const InventoryObject & obj)
@@ -46,6 +46,12 @@ bool InventoryObject::DeserializeFromFile(FILE* f)
 	return false;
 }
 
+bool InventoryObject::DecCount()
+{
+	count = (count > 0)? (count-1):0;
+	return (count > 0);
+}
+
 /* ******************************************************************** */
 
 Inventory::Inventory() : IGData()
@@ -54,13 +60,15 @@ Inventory::Inventory() : IGData()
 	InventoryObject* oj = new InventoryObject();
 	oj->SetName("Scull of enemy");
 	oj->SetDesc("Just a bowl.");
+	oj->SetCount(15);
 	oj->SetWeight(1);
 	oj->SetCondition(5);
 	oj->SetCost(15);
 	items.push_back(oj);
 	oj = new InventoryObject();
-	oj->SetName("Second object");
+	oj->SetName("Piece of crap");
 	oj->SetDesc("Yet another useless piece of crap. But this piece have a long description.");
+	oj->SetCount(1);
 	oj->SetWeight(12);
 	oj->SetCondition(7);
 	oj->SetCost(150);
@@ -68,6 +76,7 @@ Inventory::Inventory() : IGData()
 	oj = new InventoryObject();
 	oj->SetName("Last");
 	oj->SetDesc("The last object. Ever.");
+	oj->SetCount(1);
 	oj->SetWeight(5);
 	oj->SetCondition(99);
 	oj->SetCost(7);
@@ -78,10 +87,12 @@ Inventory::Inventory() : IGData()
 	oj->SetWeight(7);
 	oj->SetCondition(70);
 	oj->SetCost(1);
+	oj->SetCount(1);
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Spoon");
 	oj->SetDesc("Slow and not very effective weapon..");
+	oj->SetCount(1);
 	oj->SetWeight(0);
 	oj->SetCondition(15);
 	oj->SetCost(7);
@@ -89,48 +100,55 @@ Inventory::Inventory() : IGData()
 	oj = new InventoryObject();
 	oj->SetName("Chromatic Tuner");
 	oj->SetDesc("It's useful for tune your instrument (e.g. the chainsaw)");
+	oj->SetCount(1);
 	oj->SetWeight(5);
-	oj->SetCondition(99);
+	oj->SetCondition(96);
 	oj->SetCost(7);
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Chainsaw \"Friendship\"");
 	oj->SetDesc("Musical device.");
+	oj->SetCount(1);
 	oj->SetWeight(5);
 	oj->SetCondition(99);
-	oj->SetCost(7);
+	oj->SetCost(78);
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Wheel");
 	oj->SetDesc("Circle.");
+	oj->SetCount(3);
 	oj->SetWeight(5);
 	oj->SetCondition(99);
-	oj->SetCost(7);
+	oj->SetCost(27);
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Pitchfork");
 	oj->SetDesc("Good use for lifting persons.");
+	oj->SetCount(4);
 	oj->SetWeight(5);
 	oj->SetCondition(99);
-	oj->SetCost(7);
+	oj->SetCost(45);
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Book \"How to kill everyone\"");
 	oj->SetDesc("Wish you a good reading.");
+	oj->SetCount(7);
 	oj->SetWeight(5);
 	oj->SetCondition(99);
-	oj->SetCost(7);
+	oj->SetCost(12);
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Telegraph-post");
 	oj->SetDesc("It's hard to move, probably..");
+	oj->SetCount(1);
 	oj->SetWeight(5);
 	oj->SetCondition(99);
-	oj->SetCost(7);
+	oj->SetCost(170);
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Wheel");
 	oj->SetDesc("It's just a fucking wheel");
+	oj->SetCount(5);
 	oj->SetWeight(5);
 	oj->SetCondition(99);
 	oj->SetCost(7);
@@ -167,7 +185,7 @@ int Inventory::GetNumItems()
 
 InventoryObject* Inventory::GetInventoryObject(int n)
 {
-	if (items.empty()) return NULL;
+	if (items.empty() || ((int)items.size() <= n)) return NULL;
 	return items.at(n);
 }
 
@@ -177,7 +195,8 @@ bool Inventory::DestroyObject(InventoryObject* obj)
 
 	for (it = items.begin(); it != items.end(); ++it)
 		if ((*it) == obj) {
-			items.erase(it);
+			if (!(*it)->DecCount())
+				items.erase(it);
 			return true;
 		}
 
@@ -214,6 +233,27 @@ static int compwght(const void* a, const void* b)
 	return 0;
 }
 
+static int compcnt(const void* a, const void* b)
+{
+	InventoryObject** one = (InventoryObject**)a;
+	InventoryObject** two = (InventoryObject**)b;
+
+	if ( ((*one)->GetCount()) < ((*two)->GetCount()) ) return -1;
+	if ( ((*one)->GetCount()) > ((*two)->GetCount()) ) return 1;
+	return 0;
+}
+
+static int compcst(const void* a, const void* b)
+{
+	InventoryObject** one = (InventoryObject**)a;
+	InventoryObject** two = (InventoryObject**)b;
+
+	if ( ((*one)->GetCost()) < ((*two)->GetCost()) ) return -1;
+	if ( ((*one)->GetCost()) > ((*two)->GetCost()) ) return 1;
+	return 0;
+}
+
+
 void Inventory::SortDefault()
 {
 	if (items.empty()) return;
@@ -230,4 +270,16 @@ void Inventory::SortByWeight()
 {
 	if (items.empty()) return;
 	qsort(&items[0], items.size(), sizeof(InventoryObject*), compwght);
+}
+
+void Inventory::SortByCount()
+{
+	if (items.empty()) return;
+	qsort(&items[0], items.size(), sizeof(InventoryObject*), compcnt);
+}
+
+void Inventory::SortByCost()
+{
+	if (items.empty()) return;
+	qsort(&items[0], items.size(), sizeof(InventoryObject*), compcst);
 }

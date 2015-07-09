@@ -33,7 +33,7 @@
 class InventoryObject : public IGData {
 protected:
 	std::string name,desc;
-	int weight,cond,cost;
+	int weight,cond,cost,count;
 
 public:
 	InventoryObject();
@@ -48,12 +48,17 @@ public:
 	virtual void SetWeight(const int s)			{ weight = s; }
 	virtual void SetCondition(const int s)		{ cond = s; }
 	virtual void SetCost(const int s)			{ cost = s; }
+	virtual void SetCount(const int s)			{ count = s; }
+	virtual void IncCount()						{ ++count; }
+	virtual bool DecCount();
+
 
 	virtual std::string GetName()				{ return name; }
 	virtual std::string GetDesc()				{ return desc; }
 	virtual int GetWeight()						{ return weight; }
 	virtual int GetCondition()					{ return cond; }
 	virtual int GetCost()						{ return cost; }
+	virtual int GetCount() 						{ return count; }
 };
 
 /* ******************************************************************** */
@@ -88,6 +93,12 @@ public:
 
 	///Sorting inventory by weight
 	void SortByWeight();
+
+	///Sorting inventory by count
+	void SortByCount();
+
+	///Sorting inventory by cost
+	void SortByCost();
 };
 
 /* ******************************************************************** */

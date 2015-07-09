@@ -97,7 +97,9 @@ class Inventory;
 enum InventorySortType {
 	INV_SDEFAULT,		//default sorting
 	INV_SNAME,			//sorting by name
-	INV_SWEIGHT			//sorting by weight
+	INV_SWEIGHT,		//sorting by weight
+	INV_SCOUNT,			//sorting by count
+	INV_SCOST			//sorting by cost
 };
 
 class CurseGUIInventoryWnd : public CurseGUIWnd {
@@ -118,15 +120,15 @@ private:
 	CurseGUIButton* sort_btn;
 	CurseGUICheckBox* sortname;		//Sort by name
 	CurseGUICheckBox* sortwght;		//Sort by weight
-	CurseGUICheckBox* searchname;		//search in names
-	CurseGUICheckBox* searchdesc;		//Search in description
+	CurseGUICheckBox* sortcnt;		//Sort by count
+	CurseGUICheckBox* sortcost;		//Sort by cost
+	CurseGUICheckBox* searchname;	//search in names
+	CurseGUICheckBox* searchdesc;	//Search in description
 
 	int sitem;	//selected item in inventory.
 	int prev;	//previous selected object
 	int cso;	//current selected object
-	short srch;
-
-	//TODO add HOME and END
+	short srch; //search variable
 
 	InventorySortType sorttype;
 

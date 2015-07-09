@@ -56,7 +56,7 @@ void CurseGUIInventoryWnd::ResizeWnd()
 
 	hd = 5; //description height
 	wb = 20; //right buttons an label width
-	wwt = 6; nr = 7; nc = 5;
+	wwt = 6; nr = 7; nc = 6;
 	x1 = 1; y1 = 1;
 	ht = 15;
 
@@ -108,12 +108,13 @@ void CurseGUIInventoryWnd::ResizeWnd()
 	search_edit = new CurseGUIEditBox(ctrls, wt+3, y1+8, 12, "");
 	searchname = new CurseGUICheckBox(ctrls, wt+3, y1+9, 13, "name");
 	searchname->SetChecked(true);
-	searchdesc = new CurseGUICheckBox(ctrls, wt+3, y1+10, 13, "descript");
-
+	searchdesc = new CurseGUICheckBox(ctrls, wt+3, y1+10, 13, "descr");
 
 	sort_btn  = new CurseGUIButton(ctrls, wt+3, y1+12, 8, "Sort");
 	sortname = new CurseGUICheckBox(ctrls, wt+3, y1+13, 13, "by name");
 	sortwght = new CurseGUICheckBox(ctrls, wt+3, y1+14, 13, "by weight");
+	sortcnt = new CurseGUICheckBox(ctrls, wt+3, y1+15, 13, "by count");
+	sortcost = new CurseGUICheckBox(ctrls, wt+3, y1+16, 13, "by cost");
 
 	FillTableHeader();
 	FillInventoryTable();
@@ -124,9 +125,11 @@ void CurseGUIInventoryWnd::FillTableHeader()
 {
 	table->SetData("N", 0, 0);
 	table->SetData("Name", 0, 1);
-	table->SetData("Weight", 0, 2);
-	table->SetData("Cond.", 0, 3);
-	table->SetData("Cost", 0, 4);
+	table->SetData("Count", 0, 2);
+	table->SetData("Weight", 0, 3);
+	table->SetData("Cond.", 0, 4);
+	table->SetData("Cost", 0, 5);
+
 }
 
 void CurseGUIInventoryWnd::FillInventoryTable()
@@ -137,9 +140,10 @@ void CurseGUIInventoryWnd::FillInventoryTable()
 		sprintf(tmp, "%d", i);
 		table->SetData(string(tmp), i, 0);
 		table->SetData(invent->GetInventoryObject(i-1)->GetName(), i, 1);
-		table->SetData(IntToString(invent->GetInventoryObject(i-1)->GetWeight()), i, 2);
-		table->SetData(IntToString(invent->GetInventoryObject(i-1)->GetCondition()), i, 3);
-		table->SetData(IntToString(invent->GetInventoryObject(i-1)->GetCost()), i, 4);
+		table->SetData(IntToString(invent->GetInventoryObject(i-1)->GetCount()), i, 2);
+		table->SetData(IntToString(invent->GetInventoryObject(i-1)->GetWeight()), i, 3);
+		table->SetData(IntToString(invent->GetInventoryObject(i-1)->GetCondition()), i, 4);
+		table->SetData(IntToString(invent->GetInventoryObject(i-1)->GetCost()), i, 5);
 	}
 }
 
@@ -209,6 +213,7 @@ void CurseGUIInventoryWnd::SearchObject()
 {
 	int n = -1;
 
+	//FIXME comment it!
 	if (Search(cso + 1) == -1)
 		cso = -1;
 	n = Search(cso+1);
@@ -251,22 +256,22 @@ void CurseGUIInventoryWnd::DestroyObject()
 
 void CurseGUIInventoryWnd::DropObject()
 {
-	//TODO
+	//TODO button "drop object"
 }
 
 void CurseGUIInventoryWnd::WearObject()
 {
-	//TODO
+	//TODO button "wear object"
 }
 
 void CurseGUIInventoryWnd::UseObject()
 {
-	//TODO
+	//TODO button "use object"
 }
 
 void CurseGUIInventoryWnd::RepairObject()
 {
-	//TODO
+	//TODO button "repair object"
 }
 
 void CurseGUIInventoryWnd::Sort()
@@ -276,16 +281,23 @@ void CurseGUIInventoryWnd::Sort()
 	//clear table
 	table->EraseTableData();
 
-	if (!sortname->GetChecked() && !sortwght->GetChecked())
+	//set default sorting type if checkboxes are not checked
+	if (!sortname->GetChecked() && !sortwght->GetChecked() && !sortcnt->GetChecked() && !sortcost->GetChecked())
 			sorttype = INV_SDEFAULT;
 
-	//choice sorting
+	//choose sorting type
 	switch(sorttype) {
 	case INV_SNAME:
 		invent->SortByName();
 		break;
 	case INV_SWEIGHT:
 		invent->SortByWeight();
+		break;
+	case INV_SCOUNT:
+		invent->SortByCount();
+		break;
+	case INV_SCOST:
+		invent->SortByCost();
 		break;
 	default:
 		invent->SortDefault();
@@ -301,21 +313,32 @@ void CurseGUIInventoryWnd::Sort()
 
 void CurseGUIInventoryWnd::CheckCbox(CurseGUIControl* ctl)
 {
-	if (ctl == sortname) {
-		if (sortwght->GetChecked())
-			sortwght->SetChecked(false);
-		sorttype = INV_SNAME;
-	} else if (ctl == sortwght) {
-		if (sortname->GetChecked())
-			sortname->SetChecked(false);
-		sorttype = INV_SWEIGHT;
-	} else if (ctl == searchname) {
+	int i;
+	CurseGUICheckBox* ptr;
+
+	//Set searching variable
+	if (ctl == searchname) {
 		if (searchname->GetChecked())
 			srch++;
 		else srch--;
+		return;
 	} else if (ctl == searchdesc) {
 		if (searchdesc->GetChecked()) srch += 2;
 		else srch -= 2;
+		return;
+	}
+
+	//set sorting type
+	if (ctl == sortname)		sorttype = INV_SNAME;
+	else if (ctl == sortwght)	sorttype = INV_SWEIGHT;
+	else if (ctl == sortcnt)	sorttype = INV_SCOUNT;
+	else if (ctl == sortcost)	sorttype = INV_SCOST;
+
+	//disable other checkboxes (ignores all checkboxes above the position of the 'sort' button)
+	for (i = 0; i < ctrls->GetNumControls(GUICL_CHECKBOX); i++) {
+		ptr = (CurseGUICheckBox*)ctrls->GetControl(i,GUICL_CHECKBOX);
+		if (ptr->GetPosY() <= sort_btn->GetPosY()) continue;
+		if (ptr != ctl) ptr->SetChecked(false);
 	}
 }
 
