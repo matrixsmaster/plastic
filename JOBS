@@ -6,8 +6,6 @@ Gather portrait generation sprites						|			| assigned
 ---------------------------------------------------------------------------------------
 Finish WorldGen											| assigned	|
 ---------------------------------------------------------------------------------------
-Add wearable inventory items sub-class					| assigned	|
----------------------------------------------------------------------------------------
 Speed up LVR fog by implementing look-up table			| assigned	|
 ---------------------------------------------------------------------------------------
 Add mouse position window filtering to CGUI PumpEvents	| assigned	|
@@ -15,6 +13,8 @@ Add mouse position window filtering to CGUI PumpEvents	| assigned	|
 Fix Y-axis mirror in VModel::Load()						| assigned	|
 ---------------------------------------------------------------------------------------
 Add world's basic inventory loading facility			|			| in progr
+---------------------------------------------------------------------------------------
+Add wearable inventory items sub-class					| in progr	|
 ---------------------------------------------------------------------------------------
 Test 'tup' as a temporary build system					| done		|
 ---------------------------------------------------------------------------------------

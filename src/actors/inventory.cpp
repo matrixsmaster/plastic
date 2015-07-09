@@ -17,6 +17,7 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <string.h>
 #include "inventory.h"
 
 using namespace std;
@@ -26,6 +27,7 @@ InventoryObject::InventoryObject() : IGData()
 	name = "";
 	desc = "";
 	weight = cond = cost = count = 0;
+	memset(&boost,0,sizeof(boost));
 }
 
 const bool InventoryObject::operator == (const InventoryObject & obj)

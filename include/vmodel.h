@@ -120,6 +120,9 @@ public:
 
 	///Returns a voxel in working buffer at specified scene coordinates.
 	voxel GetVoxelAt(const vector3di* p);
+
+	///Returns a specific voxel position beginning from start point.
+	vector3di GetPlaceOfVoxel(const vector3di* start, voxel id);
 };
 
 #endif /* VMODEL_H_ */
