@@ -188,7 +188,7 @@ void WorldGen::CalcChunkElevRect(vector3d* arr, const vector3di chpos, int qx, i
 void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 {
 	int x,y,z,t;
-	voxel v,vgr;
+	voxel v,vgr,cwat;
 	SWGCell cell;
 	vector3d crn[4],pnt,tmp;
 	voxel grains[CHUNKBOX/VOXGRAIN][CHUNKBOX/VOXGRAIN][CHUNKBOX/VOXGRAIN];
@@ -208,6 +208,9 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 			for (x = 0; x < (CHUNKBOX/VOXGRAIN); x++)
 				grains[z][y][x] = GetVoxelOfType(VOXT_SAND); //FIXME: use cell type
 
+	//prepare water type for this chunk
+	cwat = GetVoxelOfType(VOXT_WATER);
+
 	//generate chunk data
 	switch (cell.chunkt) {
 	case WGCT_SURFACE:
@@ -225,9 +228,17 @@ void WorldGen::GenerateChunk(PChunk buf, vector3di pos)
 
 				//go through voxel column
 				for (z = 0; z < CHUNKBOX; z++) {
-					vgr = grains[z/VOXGRAIN][y/VOXGRAIN][x/VOXGRAIN];
-					//apply some noise
-					if (rng->RangedNumber(100) < 5) vgr = GetVoxelOfType(VOXT_SAND); //FIXME: use cell type
+
+					if (	((cell.t == WGCC_WATERSIDE) || (cell.t == WGCC_WATERONLY))
+							&& (z <= CHUNKBOX / WGELEVHFACTOR) ) {
+						//create a "beach"
+						vgr = cwat;
+					} else {
+						//get regular terrain grain
+						vgr = grains[z/VOXGRAIN][y/VOXGRAIN][x/VOXGRAIN];
+						//apply some noise
+						if (rng->RangedNumber(100) < 5) vgr = GetVoxelOfType(VOXT_SAND); //FIXME: use cell type
+					}
 
 					//set the actual data
 					v = (z < t)? vgr:0;

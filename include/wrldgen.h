@@ -48,6 +48,8 @@
 
 //FIXME: comment
 #define WGELEVATIONS 3
+
+/* Static terrain elevation factor (chunk_size / X) */
 #define WGELEVHFACTOR 4
 
 /* Number of cells to apply bilinear filtering for smoother landscape.
