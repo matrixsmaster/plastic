@@ -16,6 +16,10 @@ Add world's basic inventory loading facility			|			| in progr
 ---------------------------------------------------------------------------------------
 Add wearable inventory items sub-class					| in progr	|
 ---------------------------------------------------------------------------------------
+Add raw voxel inventory items							| in progr	|
+---------------------------------------------------------------------------------------
+Add AI parts inventory items							| in progr	|
+---------------------------------------------------------------------------------------
 Test 'tup' as a temporary build system					| done		|
 ---------------------------------------------------------------------------------------
 Implement some marks to use in voxel table				| done		|

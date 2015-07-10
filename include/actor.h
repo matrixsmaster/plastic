@@ -38,6 +38,7 @@
 #include "namegen.h"
 #include "animator.h"
 #include "IGData.h"
+#include "aicontroller.h"
 
 
 class PlasticWorld;
@@ -57,6 +58,7 @@ protected:
 	DAnimator* anim;		//Actor's animations
 	voxel headtxd;			//Textured head voxel id
 	int limbs[NUMBODPART];	//Limbs damage array
+	AIController ai;		//A.I.
 
 	void InitVars();
 	void RmPortrait();

@@ -28,6 +28,7 @@
 #include "vmodel.h"
 #include "vsprite.h"
 #include "actortypes.h"
+#include "aichip.h"
 
 
 /* Kinds of inventory objects */
@@ -35,6 +36,7 @@ enum EInventoryKind {
 	INVK_BASE,
 	INVK_WEARABLE,
 	INVK_VOXEL,
+	INVK_AIPART,
 };
 
 
@@ -51,6 +53,10 @@ protected:
 
 	//Basic comparative function to be able to use comparison in child's operators.
 	const bool BaseEqualTo(const InventoryObject & obj);
+
+	//Game data I/O
+	virtual void PushPrivateData(FILE* f);
+	virtual bool PullPrivateData(FILE* f);
 
 public:
 	InventoryObject();
@@ -133,6 +139,10 @@ protected:
 	std::map<voxel,voxel> replacement;		//Original voxel id -> Replacement voxel id
 	VModel* oldmod;
 
+	//Game data I/O
+	virtual void PushPrivateData(FILE* f);
+	virtual bool PullPrivateData(FILE* f);
+
 public:
 	WearableObject();
 	virtual ~WearableObject();
@@ -150,13 +160,32 @@ class VoxelObject : public InventoryObject {
 protected:
 	voxel stored;
 
+	//Game data I/O
+	virtual void PushPrivateData(FILE* f);
+	virtual bool PullPrivateData(FILE* f);
+
 public:
-	VoxelObject() : InventoryObject(INVK_VOXEL)			{ stored = 0; name = "voxel"; } //FIXME: testing
-	VoxelObject(voxel s) : InventoryObject(INVK_VOXEL)	{ stored = s; name = "voxel"; }
+	VoxelObject();
+	VoxelObject(voxel s);
 	virtual ~VoxelObject()								{}
 
 	void SetVoxelId(voxel id)							{ stored = id; }
 	voxel GetVoxelId()									{ return stored; }
+};
+
+/* AI-relative object */
+class AIPartObject : public InventoryObject {
+protected:
+	AIChip* chip;
+	bool controller;
+
+	//Game data I/O
+	virtual void PushPrivateData(FILE* f);
+	virtual bool PullPrivateData(FILE* f);
+
+public:
+	AIPartObject();
+	virtual ~AIPartObject();
 };
 
 #endif /* INVENTORY_H_ */

@@ -56,15 +56,33 @@ const bool InventoryObject::operator == (const InventoryObject & obj)
 	return BaseEqualTo(obj);
 }
 
+void InventoryObject::PushPrivateData(FILE* f)
+{
+	int tmp = 0;
+
+	//there's no additional data to store in base inventory object
+	fwrite(&tmp,sizeof(int),1,f);
+}
+
+bool InventoryObject::PullPrivateData(FILE* f)
+{
+	int tmp;
+
+	if (!fread(&tmp,sizeof(int),1,f)) return false;
+	return (tmp == 0);
+}
+
 bool InventoryObject::SerializeToFile(FILE* f)
 {
 	//TODO
+	PushPrivateData(f);
 	return false;
 }
 
 bool InventoryObject::DeserializeFromFile(FILE* f)
 {
 	//TODO
+	PullPrivateData(f);
 	return false;
 }
 

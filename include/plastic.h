@@ -30,7 +30,7 @@
 ///Version information
 #define VERMAJOR 0
 #define VERMINOR 1
-#define VERSUBVR 10
+#define VERSUBVR 11
 
 ///Product name
 #define PRODNAME "Plastic Inquisitor"
@@ -71,7 +71,7 @@ struct SGameSettings {
 	(4ULL*1024*1024*1024),							\
 	800300,											\
 	(2ULL*1024*1024*1024),							\
-	false,											\
+	true,											\
 	{ "Mary", true, PCLS_INQUISITOR, PBOD_PNEUMO, },\
 }
 

@@ -1,11 +1,14 @@
 v.0.4 (alpha) -----------------------------------------------------------------
-	<planning>
-	
-v.0.3 (pre-alpha) -------------------------------------------------------------
 	Use of build system other than Eclipse CDT builder
 	Install target; VFS located in userspace
 	Game launch scripts
+	<planning>
+
+v.0.3 (pre-alpha) -------------------------------------------------------------
 	Working AI (at least for NPCs)
+	Fully working inventory system
+	Dialogue system semi-stub
+	Container objects
 	<to be continued>
 
 v.0.2 (tech demo) -------------------------------------------------------------

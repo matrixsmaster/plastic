@@ -31,6 +31,17 @@ WearableObject::~WearableObject()
 	if (oldmod) RemoveFromModel(oldmod);
 }
 
+void WearableObject::PushPrivateData(FILE* f)
+{
+	//TODO
+}
+
+bool WearableObject::PullPrivateData(FILE* f)
+{
+	//TODO
+	return true;
+}
+
 void WearableObject::AddReplacement(const voxel old_id, const voxel new_id)
 {
 	replacement.insert(make_pair(old_id,new_id));
