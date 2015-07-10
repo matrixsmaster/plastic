@@ -241,6 +241,11 @@ void CurseGUIInventoryWnd::DestroyObject()
 	//TODO send message to overlay
 	dbg_print("Destroy \"%s\" ", obj->GetName().c_str());
 
+	//Write count of object to table
+	table->SetData(IntToString(obj->GetCount()), sitem, 2);
+
+	if (obj->GetCount() > 0) return;
+
 	table->EraseTableData();
 	table->DelRow();
 
