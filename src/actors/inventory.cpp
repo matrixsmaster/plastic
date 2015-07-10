@@ -108,7 +108,6 @@ Inventory::Inventory() : IGData()
 	oj = new InventoryObject();
 	oj->SetName("Piece of crap");
 	oj->SetDesc("Yet another useless piece of crap. But this piece have a long description.");
-	oj->SetCount(1);
 	oj->SetWeight(12);
 	oj->SetCondition(7);
 	oj->SetCost(150);
@@ -116,7 +115,6 @@ Inventory::Inventory() : IGData()
 	oj = new InventoryObject();
 	oj->SetName("Last");
 	oj->SetDesc("The last object. Ever.");
-	oj->SetCount(1);
 	oj->SetWeight(5);
 	oj->SetCondition(99);
 	oj->SetCost(7);
@@ -127,12 +125,10 @@ Inventory::Inventory() : IGData()
 	oj->SetWeight(7);
 	oj->SetCondition(70);
 	oj->SetCost(1);
-	oj->SetCount(1);
 	items.push_back(oj);
 	oj = new InventoryObject();
 	oj->SetName("Spoon");
 	oj->SetDesc("Slow and not very effective weapon..");
-	oj->SetCount(1);
 	oj->SetWeight(0);
 	oj->SetCondition(15);
 	oj->SetCost(7);
@@ -140,7 +136,6 @@ Inventory::Inventory() : IGData()
 	oj = new InventoryObject();
 	oj->SetName("Chromatic Tuner");
 	oj->SetDesc("It's useful for tune your instrument (e.g. the chainsaw)");
-	oj->SetCount(1);
 	oj->SetWeight(5);
 	oj->SetCondition(96);
 	oj->SetCost(7);
@@ -148,7 +143,6 @@ Inventory::Inventory() : IGData()
 	oj = new InventoryObject();
 	oj->SetName("Chainsaw \"Friendship\"");
 	oj->SetDesc("Musical device.");
-	oj->SetCount(1);
 	oj->SetWeight(5);
 	oj->SetCondition(99);
 	oj->SetCost(78);
@@ -180,7 +174,6 @@ Inventory::Inventory() : IGData()
 	oj = new InventoryObject();
 	oj->SetName("Telegraph-post");
 	oj->SetDesc("It's hard to move, probably..");
-	oj->SetCount(1);
 	oj->SetWeight(5);
 	oj->SetCondition(99);
 	oj->SetCost(170);

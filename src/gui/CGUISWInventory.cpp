@@ -162,13 +162,15 @@ void CurseGUIInventoryWnd::SetSelectedItem()
 	memset(&tmp, 0, 5);
 
 	//highlight current item
-	sprintf(tmp, ">%d", sitem);
-	table->SetData(string(tmp), sitem, 0);
+	if (invent->GetNumItems()) {
+		sprintf(tmp, ">%d", sitem);
+		table->SetData(string(tmp), sitem, 0);
+	}
 
 	//show description for item from inventory
 	ShowDescription();
 
-	//scrolling items
+	//items scrolling
 	n = 0;
 	if (sitem == 1) table->SetScrolly(n);
 	else {
@@ -180,7 +182,10 @@ void CurseGUIInventoryWnd::SetSelectedItem()
 
 void CurseGUIInventoryWnd::ShowDescription()
 {
-	description_lbl->SetCaption(invent->GetInventoryObject(sitem-1)->GetDesc());
+	if (invent->GetNumItems() > 0)
+		description_lbl->SetCaption(invent->GetInventoryObject(sitem-1)->GetDesc());
+	else
+		description_lbl->SetCaption("You have no items.");
 }
 
 int CurseGUIInventoryWnd::Search(int n)
