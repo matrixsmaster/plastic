@@ -43,3 +43,9 @@ stay at its place, in LVR; but DataPipe will work faster on point to model inter
 -> Add simple "chip"-based AI and add actors ability to move (without pathfinding)
 
 -> Add 'Field' algorithm from a 'minor_2d' test into vecmisc module
+
+-> Fix physics in cases of not-ready-yet chunks
+
+-> Add lock() method for radar and fix its flicker
+
+-> Implement dynamic (threaded) FM synthesizer for voices and music (see tests/testfmsynth)
