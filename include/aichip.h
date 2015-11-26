@@ -23,16 +23,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
 enum EAIChipType {
 	AICHIP_EMPTY,
 	AICHIP_ROM,
-	AICHIP_VIDEO,
 	AICHIP_AUDIO,
+	AICHIP_VIDEO,
+	AICHIP_BCARD,
+	AICHIP_MEMORY,
 	AICHIP_PATHS,
-	AICHIP_SPEECH,
-	AICHIP_DB,
-	AICHIP_SSD,
+	AICHIP_STT,
+	AICHIP_TTS,
+	AICHIP_FACEREC,
+	AICHIP_FACEMOT,
+	AICHIP_BODYCON,
+	AICHIP_WICOMM,
+	AICHIP_INVALID /* terminator */
 };
 
 /* Base class of the A.I. chip */
@@ -47,15 +52,6 @@ public:
 	/* There's no need to use IGData, so we'll use this simple methods */
 	virtual void PushData(FILE* f) {}
 	virtual bool PullData(FILE* f) { return true; }
-};
-
-/* AI ROM */
-class AIROMChip : public AIChip {
-protected:
-
-public:
-	AIROMChip() : AIChip()	{ kind = AICHIP_ROM; }
-	virtual ~AIROMChip()	{}
 };
 
 #endif /* AICHIP_H_ */

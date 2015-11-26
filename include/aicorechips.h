@@ -17,28 +17,40 @@
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef AICONTROLLER_H_
-#define AICONTROLLER_H_
+#ifndef AICORECHIPS_H_
+#define AICORECHIPS_H_
 
-#include "IGData.h"
 #include "aichip.h"
-#include "aicorechips.h"
+#include "actortypes.h"
 
-#define AICHIPSLOTS 12
-
-
-class AIController : public IGData {
-private:
-	AIChip* chips[AICHIPSLOTS];		//chip/cards slots
-	int backup;						//backup battery energy level
+/* AI ROM */
+class AIROMChip : public AIChip {
+protected:
 
 public:
-	AIController();
-	virtual ~AIController();
-
-	///Game data interface serialization implementation.
-	bool SerializeToFile(FILE* f);
-	bool DeserializeFromFile(FILE* f);
+	AIROMChip() : AIChip()	{ kind = AICHIP_ROM; }
+	virtual ~AIROMChip()	{}
 };
 
-#endif /* AICONTROLLER_H_ */
+/* AI Braincard */
+class AIBraincard : public AIChip {
+protected:
+	unsigned hash;
+
+public:
+	AIBraincard() : AIChip()	{ kind = AICHIP_BCARD; }
+	virtual ~AIBraincard()		{}
+};
+
+/* AI Memory */
+class AIMEMChip : public AIChip {
+protected:
+	unsigned hash;
+	SPAPsyBase psy;
+
+public:
+	AIMEMChip() : AIChip()	{ kind = AICHIP_MEMORY; }
+	virtual ~AIMEMChip()	{}
+};
+
+#endif /* AICORECHIPS_H_ */

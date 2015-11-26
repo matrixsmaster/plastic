@@ -105,14 +105,14 @@ void CurseGUIActorViewWnd::ResizeWnd()
 	AV_ADDLABELMACRO("Acc",cr.Acc,bs.Acc,8,3);
 
 	//stats (brain)
-	AV_ADDLABELMACRO("Eng",cr.Eng,bs.Eng,10,3);
-	AV_ADDLABELMACRO("Spch",cr.Spch,bs.Spch,11,2);
-	AV_ADDLABELMACRO("Brv",cr.Brv,bs.Brv,12,3);
+	AV_ADDLABELMACRO("Eng",cr.MR.Eng,bs.MR.Eng,10,3);
+	AV_ADDLABELMACRO("Spch",cr.MR.Spch,bs.MR.Spch,11,2);
+	AV_ADDLABELMACRO("Brv",cr.MR.Brv,bs.MR.Brv,12,3);
 	if (atrs.female)
 		AV_ADDLABELMACRO("Bety",cr.Chr,bs.Chr,13,2)
 	else
 		AV_ADDLABELMACRO("Char",cr.Chr,bs.Chr,13,2)
-	AV_ADDLABELMACRO("Trd",cr.Trd,bs.Trd,14,3);
+	AV_ADDLABELMACRO("Trd",cr.MR.Trd,bs.MR.Trd,14,3);
 
 	//stats (battle)
 	AV_ADDLABELMACRO("AP",cr.AP,bs.AP,16,4);

@@ -73,11 +73,11 @@ bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe)
 	}
 
 	GETSTATFIELD(CC,"_CC");
-	GETSTATFIELD(Eng,"_Eng");
-	GETSTATFIELD(Spch,"_Spch");
-	GETSTATFIELD(Brv,"_Brv");
+	GETSTATFIELD(MR.Eng,"_Eng");
+	GETSTATFIELD(MR.Spch,"_Spch");
+	GETSTATFIELD(MR.Brv,"_Brv");
 	GETSTATFIELD(Chr,"_Chr");
-	GETSTATFIELD(Trd,"_Trd");
+	GETSTATFIELD(MR.Trd,"_Trd");
 	GETSTATFIELD(AP,"_AP");
 	GETSTATFIELD(DT,"_DT");
 	GETSTATFIELD(DM,"_DM");
@@ -87,10 +87,10 @@ bool FillActorBasicStats(SPAAttrib* attr, SPABase* stat, DataPipe* pipe)
 	//determine opposition class
 	fld = pipe->GetIniDataS(CLASNFONAME,cls + "_Oppos");
 	if (fld.empty()) return false;
-	stat->Oppos = PCLS_NONE;
+	stat->MR.Oppos = PCLS_NONE;
 	for (i = 0; i < NUMCLASSES; i++)
 		if (!strcmp(fld.c_str(),paclass_to_str[i].s)) {
-			stat->Oppos = paclass_to_str[i].c;
+			stat->MR.Oppos = paclass_to_str[i].c;
 			break;
 		}
 

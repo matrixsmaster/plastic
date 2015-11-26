@@ -73,7 +73,16 @@ enum EPAClass {
 	PCLS_MECHANIC,
 	PCLS_SMUGGLER,
 	PCLS_TRADER,
-	PCLS_NONE			//Not a class actually; endpoint
+	PCLS_NONE			//Not a class actually; terminator
+};
+
+//Actor's memory-related attributes
+struct SPAPsyBase {
+	EPAClass Oppos;		//Opposing class (those who should be hated)
+	int Eng;			//Engineering
+	int Spch;			//Speechcraft
+	int Brv;			//Braveness
+	int Trd;			//Trade
 };
 
 //Actor's basic value used in game mechanics
@@ -90,14 +99,10 @@ struct SPABase {
 	int Eff;			//Efficiency (%)
 	int RS;				//Reaction speed
 	int Acc;			//Accuracy (%)
+	int Chr;			//Charisma (or beauty)
 
 	/* Brain and psychology state */
-	EPAClass Oppos;		//Opposing class (those who should be hated)
-	int Eng;			//Engineering
-	int Spch;			//Speechcraft
-	int Brv;			//Braveness
-	int Chr;			//Charisma (or beauty)
-	int Trd;			//Trade
+	SPAPsyBase MR;		//Memory-related attribs
 
 	/* Battle-relevant values */
 	int AP;				//Armor points

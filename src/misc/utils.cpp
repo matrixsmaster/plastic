@@ -287,14 +287,14 @@ chargen_begin:
 
 		//print out class default stats
 		puts("Basic stats:");
-		printf("Charge capacity\t%d\tEngineering\t%d\n",cbas.CC,cbas.Eng);
-		printf("Speed\t\t%d\tSpeechcraft\t%d\n",cbas.Spd,cbas.Spch);
-		printf("Strength\t%d\tBraveness\t%d\n",cbas.Str,cbas.Brv);
+		printf("Charge capacity\t%d\tEngineering\t%d\n",cbas.CC,cbas.MR.Eng);
+		printf("Speed\t\t%d\tSpeechcraft\t%d\n",cbas.Spd,cbas.MR.Spch);
+		printf("Strength\t%d\tBraveness\t%d\n",cbas.Str,cbas.MR.Brv);
 		if (s->PCData.female)
 			printf("Efficiency\t%d\tBeauty\t\t%d\n",cbas.Eff,cbas.Chr);
 		else
 			printf("Efficiency\t%d\tCharisma\t%d\n",cbas.Eff,cbas.Chr);
-		printf("Reaction speed\t%d\tTrade\t\t%d\n",cbas.RS,cbas.Trd);
+		printf("Reaction speed\t%d\tTrade\t\t%d\n",cbas.RS,cbas.MR.Trd);
 		printf("Accuracy\t%d\n",cbas.Acc);
 		printf("AP\t%d\tDT\t%d\tDM\t%d\n\n",cbas.AP,cbas.DT,cbas.DM);
 
