@@ -32,6 +32,16 @@
 #define SIZEPRC 0.5f
 #define BVOLUME 0.3f
 #define BMAXSIZ 40
+#define BMINSIZ 2
+#define MAXWIDTH 2048
+
+#define MAXMISCVALUE 4000
+#define MAXBPVALUE 4000
+#define MINBODYVALUE 500
+#define MAXBODYVALUE 7000
+#define MAXINVOBJS 100
+
+#define NLINES 3
 
 SCell g_line[WLENGTH];
 SBuilding g_estate[WLENGTH];
@@ -40,15 +50,32 @@ int g_actnum;
 PRNGen* g_rng;
 PropertyMap g_pmap;
 static WINDOW *scrn;
-static int g_x;
+static int g_x,g_s,g_y;
 
 using namespace std;
 
 ostringstream g_log;
 
+/* ********************************************************************************** */
+
+static void create_misc(SDynObj* p)
+{
+	if (!p) return;
+	p->type = (g_rng->FloatNum() < 0.1)? DO_BODYPRT:DO_MISC;
+	p->cond = g_rng->RangedNumber(100);
+	p->bvalue = g_rng->RangedNumber((p->type == DO_MISC)? MAXMISCVALUE:MAXBPVALUE);
+}
+
 static void init_inv(vector<SDynObj>* p)
 {
-	//TODO
+	SDynObj o;
+	int i,tot = g_rng->RangedNumber(MAXINVOBJS) + 1;
+
+	if (!p) return;
+	for (i = 0; i < tot; i++) {
+		create_misc(&o);
+		p->push_back(o);
+	}
 }
 
 static void init_pop()
@@ -63,7 +90,7 @@ static void init_pop()
 
 		for (j = 0, f = 0; j < l; j++,n++) {
 			//make actor
-			g_actors[n].ID = n + 100;
+			g_actors[n].ID = n;
 			g_actors[n].cls = (EPAClass)i;
 			g_actors[n].base = paclass_tab[i].atr;
 			g_actors[n].curr = g_actors[n].base;
@@ -92,8 +119,9 @@ static void init_build()
 
 	//build
 	while (n < m) {
-		//pick a place
-		i = g_rng->RangedNumber(BMAXSIZ)+1;
+		//pick a size and a place
+		i = g_rng->RangedNumber(BMAXSIZ);
+		if (i < BMINSIZ) i = BMINSIZ;
 		while (g_line[x].bld) x = g_rng->RangedNumber(WLENGTH);
 		for (j = 0; j < i; j++)
 			if ((j+x >= WLENGTH) || (g_line[j+x].bld)) {
@@ -156,17 +184,152 @@ static void init_build()
 
 static void init_objs()
 {
-	int i,j;
+}
+/*
+static void drop_object(SDynObj o, int pnt)
+{
+	int i;
 
-	for (i = 0; i < WLENGTH; i++) {
-		//
+	if ((pnt < 0) || (pnt >= WLENGTH)) {
+		g_log << "Dropping object into void (given " << pnt << " coord)" << endl;
+		return;
 	}
+
+	for (i = 0; i < WLENGTH/2; i++) {
+		if ((pnt + i < WLENGTH) && (g_line[pnt+i].obj.type == DO_INVALID)) {
+			g_log << "Dropping object @ " << pnt << " to " << pnt+i << endl;
+			g_line[pnt+i].obj = o;
+			return;
+		}
+		if ((pnt - i >= 0) && (g_line[pnt-i].obj.type == DO_INVALID)) {
+			g_log << "Dropping object @ " << pnt << " to " << pnt-i << endl;
+			g_line[pnt-i].obj = o;
+			return;
+		}
+	}
+
+	g_log << "Unable to drop object from " << pnt << " (no space available)" << endl;
+}
+
+static void death(int a)
+{
+	int i;
+	SDynObj c;
+
+	for (i = 0; i < WLENGTH; i++)
+		if (g_line[i].npc == &(g_actors))
+
+	g_log << "Dead: " << g_actors[a].ID << endl;
+
+	c.type = DO_BODY;
+	c.cond = g_rng->RangedNumber(10);
+	c.bvalue = g_actors[a].curr.Qual * MAXBODYVALUE / 100;
+	if (c.bvalue < MINBODYVALUE) c.bvalue = MINBODYVALUE;
+
+	drop_object(c,)
+}
+
+static void fight(int a, int b)
+{
+	//TODO
+}
+*/
+
+static void dump_info()
+{
+	g_log << "TODO: some info about " << g_s << endl;
 }
 
 static void update()
 {
+	int i,j,k,w,h;
+	char buf[NLINES][MAXWIDTH+1];
+	string buf2; //'cause I'm lazy bastard
+
+	wclear(scrn);
 	box(scrn,0,0);
 	wrefresh(scrn);
+	getmaxyx(scrn,h,w);
+	w -= 2; //border
+	h -= 2;
+	if (w > MAXWIDTH) w = MAXWIDTH;
+
+	//current co-ordinate: top left corner
+	snprintf(buf[0],MAXWIDTH,"%d",g_x);
+	mvwaddstr(scrn,0,0,buf[0]);
+	memset(buf,0,sizeof(buf));
+
+	//cells: right at the bottom line
+	for (i = g_x, j = 0; j < w; i++,j++) {
+		for (k = 0; k < NLINES; k++)
+			buf[k][j] = ' ';
+
+		if ((i < 0) || (i >= WLENGTH)) continue;
+
+		if (g_line[i].bld) {
+			buf[0][j] = '#';
+			//TODO
+		} else
+			buf[0][j] = '_';
+
+		switch (g_line[i].obj.type) {
+		case DO_REACTOR:
+			buf[1][j] = 'R';
+			break;
+
+		case DO_CRADLE:
+			buf[1][j] = '@';
+			break;
+
+		case DO_MISC:
+			buf[1][j] = '$';
+			break;
+
+		case DO_BODY:
+			buf[1][j] = '%';
+			break;
+
+		case DO_BODYPRT:
+			buf[1][j] = '`';
+			break;
+
+		default:
+			break;
+		}
+
+		if (g_line[i].npc) {
+			buf[2][j] = (g_line[i].npc->female)? 'F':'M';
+			//TODO
+		}
+	}
+
+	//print out cells data
+	for (k = 0; k < NLINES; k++)
+		mvwaddnstr(scrn,h-k,1,buf[k],w);
+
+	//print log
+	k = h - NLINES;
+	for (j = 0, i = g_log.str().length()-1; (i >= 0) && (k > 0); i--) {
+		if (g_log.str().at(i) == '\n') {
+			if (j++ < g_y) {
+				buf2.clear();
+				continue;
+			}
+			mvwaddnstr(scrn,k--,1,buf2.c_str(),w);
+			buf2.clear();
+		} else
+			/* If you see this, please apply holy water to your eyes
+			 * IMMEDIATELY, to unsee this. Otherwise you'll get an eye
+			 * cancer! You've been warned! */
+			buf2.insert(buf2.begin(),1,g_log.str().at(i));
+	}
+
+	//place cursor
+	i = w / 2;
+	g_s = i + g_x - 1;
+	if (g_s < 0) g_s = 0;
+	if (g_s >= WLENGTH) g_s = WLENGTH-1;
+	move(h+1,i);
 }
 
 int main(int argc, char* argv[])
@@ -177,6 +340,7 @@ int main(int argc, char* argv[])
 	//try to get ncurses screen beforehand
 	scrn = initscr();
 	if (!scrn) abort();
+	g_log << endl; //starting line
 
 	i = (argc > 1)? atoi(argv[1]):0;
 	g_rng = new PRNGen(true);
@@ -207,6 +371,8 @@ int main(int argc, char* argv[])
 	keypad(scrn,TRUE);
 
 	//main loop
+	g_s = 0;
+	g_y = 1;
 	for (g_x = 0, key = 0; key != ERR;) {
 		i = halfdelay(1);
 		if (i != ERR) key = getch();
@@ -216,6 +382,9 @@ int main(int argc, char* argv[])
 		case 'q': key = ERR; break;
 		case KEY_LEFT: g_x--; break;
 		case KEY_RIGHT: g_x++; break;
+		case KEY_DOWN: g_y = (g_y > 1)? g_y-1:g_y; break;
+		case KEY_UP: g_y++; break;
+		case 'i': dump_info(); break;
 		}
 
 		update();
