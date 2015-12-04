@@ -27,21 +27,8 @@
 #include "prngen.h"
 #include "cell.h"
 #include "prop.h"
-
-#define WLENGTH 2000
-#define SIZEPRC 0.5f
-#define BVOLUME 0.3f
-#define BMAXSIZ 40
-#define BMINSIZ 2
-#define MAXWIDTH 2048
-
-#define MAXMISCVALUE 4000
-#define MAXBPVALUE 4000
-#define MINBODYVALUE 500
-#define MAXBODYVALUE 7000
-#define MAXINVOBJS 100
-
-#define NLINES 3
+#include "main.h"
+#include "social.h"
 
 SCell g_line[WLENGTH];
 SBuilding g_estate[WLENGTH];
@@ -49,12 +36,12 @@ SActor g_actors[WLENGTH];
 int g_actnum;
 PRNGen* g_rng;
 PropertyMap g_pmap;
+std::ostringstream g_log;
 static WINDOW *scrn;
 static int g_x,g_s,g_y;
+static unsigned g_qn;
 
 using namespace std;
-
-ostringstream g_log;
 
 /* ********************************************************************************** */
 
@@ -64,6 +51,41 @@ static void create_misc(SDynObj* p)
 	p->type = (g_rng->FloatNum() < 0.1)? DO_BODYPRT:DO_MISC;
 	p->cond = g_rng->RangedNumber(100);
 	p->bvalue = g_rng->RangedNumber((p->type == DO_MISC)? MAXMISCVALUE:MAXBPVALUE);
+}
+
+static void print_build(SBuilding* b)
+{
+	if (!b) return;
+	g_log << "Building " << b->ID << ": " << ((b->is_plant)? "Plant.":"Generic.");
+	g_log << " " << b->len << " \"floors\". Cond.: " << b->cond << endl;
+}
+
+static void print_obj(SDynObj* o)
+{
+	//TODO
+}
+
+static void print_actor(SActor* a)
+{
+	if (!a) return;
+	g_log << "Actor " << a->ID << ": " << paclass_tab[a->cls].s << " ";
+	g_log << ((a->female)? "female":"male") << endl;
+	g_log << "HP:\t" << a->base.HP << "\t/\t" << a->curr.HP << endl;
+	g_log << "Qual:\t" << a->base.Qual << "\t/\t" << a->curr.Qual << endl;
+	g_log << "CC:\t" << a->base.CC << "\t/\t" << a->curr.CC << endl;
+	g_log << "Spd:\t" << a->base.Spd << "\t/\t" << a->curr.Spd << endl;
+	g_log << "Chr:\t" << a->base.Chr << "\t/\t" << a->curr.Chr << endl;
+	g_log << "AP:\t" << a->base.AP << "\t/\t" << a->curr.AP << endl;
+	g_log << "DT:\t" << a->base.DT << "\t/\t" << a->curr.DT << endl;
+	g_log << "Eng:\t" << a->base.MR.Eng << "\t/\t" << a->curr.MR.Eng << endl;
+	g_log << "Spch:\t" << a->base.MR.Spch << "\t/\t" << a->curr.MR.Spch << endl;
+	g_log << "Brv:\t" << a->base.MR.Brv << "\t/\t" << a->curr.MR.Brv << endl;
+	g_log << "Trd:\t" << a->base.MR.Trd << "\t/\t" << a->curr.MR.Trd << endl;
+	g_log << "Sor:\t" << a->base.MR.Sor << "\t/\t" << a->curr.MR.Sor << endl;
+	g_log << "Mot:\t";
+	for (int i = 0; i < NUMMOTIVES; i++)
+		g_log << a->curr.MR.Mtv[i] << ", ";
+	g_log << endl;
 }
 
 static void init_inv(vector<SDynObj>* p)
@@ -95,9 +117,12 @@ static void init_pop()
 			g_actors[n].base = paclass_tab[i].atr;
 			g_actors[n].curr = g_actors[n].base;
 			g_actors[n].female = (g_rng->FloatNum() < 0.6);
-			if (g_actors[n].female) f++;
+			if (g_actors[n].female) f++; //count females
+			//init inventory
 			g_actors[n].inv = new vector<SDynObj>;
 			init_inv(g_actors[n].inv);
+			//reset motives
+			memset(g_actors[n].curr.MR.Mtv,0,sizeof(g_actors[n].curr.MR.Mtv));
 
 			//place actor
 			while (g_line[x].npc) x = g_rng->RangedNumber(WLENGTH);
@@ -237,7 +262,23 @@ static void fight(int a, int b)
 
 static void dump_info()
 {
-	g_log << "TODO: some info about " << g_s << endl;
+	if (g_line[g_s].bld) print_build(g_line[g_s].bld);
+	if (g_line[g_s].obj.type > DO_INVALID)
+		print_obj(&(g_line[g_s].obj));
+	if (g_line[g_s].npc) print_actor(g_line[g_s].npc);
+}
+
+static void quantum()
+{
+	int i;
+
+	g_qn++;
+
+	//buildings decay
+	if (g_qn % BUILDDECAYRATE == 0) {
+		for (i = 0; i < WLENGTH; i++)
+			if (g_estate[i].cond) g_estate[i].cond--;
+	}
 }
 
 static void update()
@@ -257,9 +298,13 @@ static void update()
 	//current co-ordinate: top left corner
 	snprintf(buf[0],MAXWIDTH,"%d",g_x);
 	mvwaddstr(scrn,0,0,buf[0]);
-	memset(buf,0,sizeof(buf));
+
+	//current quantum number: bottom right corner
+	snprintf(buf[0],MAXWIDTH,"%u",g_qn);
+	mvwaddstr(scrn,h+1,w-strlen(buf[0]+2),buf[0]);
 
 	//cells: right at the bottom line
+	memset(buf,0,sizeof(buf));
 	for (i = g_x, j = 0; j < w; i++,j++) {
 		for (k = 0; k < NLINES; k++)
 			buf[k][j] = ' ';
@@ -371,9 +416,11 @@ int main(int argc, char* argv[])
 	keypad(scrn,TRUE);
 
 	//main loop
+	g_x = 0;
 	g_s = 0;
 	g_y = 1;
-	for (g_x = 0, key = 0; key != ERR;) {
+	g_qn = 0;
+	for (key = 0; key != ERR;) {
 		i = halfdelay(1);
 		if (i != ERR) key = getch();
 		if (key == ERR) key = 0;
@@ -384,9 +431,12 @@ int main(int argc, char* argv[])
 		case KEY_RIGHT: g_x++; break;
 		case KEY_DOWN: g_y = (g_y > 1)? g_y-1:g_y; break;
 		case KEY_UP: g_y++; break;
+		case KEY_HOME: g_x = 0; break;
+		case KEY_END: g_x = WLENGTH-1; break;
 		case 'i': dump_info(); break;
 		}
 
+		quantum();
 		update();
 	}
 
